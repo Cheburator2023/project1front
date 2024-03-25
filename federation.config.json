@@ -1,0 +1,7 @@
+{
+  "name": "sumRM",
+  "exposes": {
+    "./Routes": "./src/Routes",
+    "./Layout": "./src/Layout"
+  }
+}

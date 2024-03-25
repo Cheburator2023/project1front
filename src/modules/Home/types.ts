@@ -1,0 +1,7 @@
+enum TABLE_ACTION {
+  ADD = 'ADD',
+  EDIT = 'EDIT',
+  HISTORY_CHANGES = 'HISTORY_CHANGES',
+}
+
+export { TABLE_ACTION };

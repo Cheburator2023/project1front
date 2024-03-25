@@ -1,0 +1,4 @@
+apiVersion: v1
+description: A Helm chart defining mrms-frontend service.
+name: mrms-frontend
+version: 0.0.1

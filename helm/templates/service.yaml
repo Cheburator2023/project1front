@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mrms-frontend.fullname" . }}
+  labels: {{- include "mrms-frontend.labels" . | nindent 4 }}
+spec:
+  ports:
+    - name: 8080-tcp
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: {{ include "mrms-frontend.fullname" . }}
