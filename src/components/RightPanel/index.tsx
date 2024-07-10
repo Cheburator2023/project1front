@@ -85,7 +85,7 @@ export const RightPanel = ({
           {header}
         </Header>
         <Body>{errorCmp || loadingCmp || body}</Body>
-        <Footer>{footer}</Footer>
+        {footer ? <Footer>{footer}</Footer> : null}
       </Panel>
     </Overlay>,
     document.body,

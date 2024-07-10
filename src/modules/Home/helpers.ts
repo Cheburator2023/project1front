@@ -1,4 +1,4 @@
-import { ColumnsFilter } from './TableModels/types';
+import { Column, ColumnsFilter } from './TableModels/types';
 import { initialColumns } from './constants';
 
 const checkColumnsFiltersForEqual = (
@@ -10,11 +10,29 @@ const checkColumnsFiltersForEqual = (
 
   return columnsFiltersStr === newColumnsFiltersStr;
 };
-
 const filterColumnsByColumnsFilters = (columnsFilters: Partial<ColumnsFilter>) => {
   const columnsFiltersNames = Object.keys(columnsFilters);
 
-  return initialColumns.filter(({ name }) => columnsFiltersNames.includes(name));
+  return columnsFiltersNames.reduce((acc, name) => {
+    const column = initialColumns.find((col) => col.name === name);
+    if (column) acc.push(column);
+    return acc;
+  }, [] as typeof initialColumns);
 };
 
-export { checkColumnsFiltersForEqual, filterColumnsByColumnsFilters };
+const filterColumnsFiltersByColumns = (
+  columns: Column[],
+  columnsFilters: Partial<ColumnsFilter>,
+): Partial<ColumnsFilter> =>
+  columns.reduce((acc, column) => {
+    if (column.name in columnsFilters) {
+      acc[column.name] = columnsFilters[column.name];
+    }
+    return acc;
+  }, {} as Partial<ColumnsFilter>);
+
+export {
+  checkColumnsFiltersForEqual,
+  filterColumnsByColumnsFilters,
+  filterColumnsFiltersByColumns,
+};

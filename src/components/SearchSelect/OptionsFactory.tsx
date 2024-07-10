@@ -8,7 +8,7 @@ import { ReactComponent as PeopleSolid } from '@admiral-ds/icons/build/system/Pe
 
 import { SELECT_TYPE, OptionsFactoryProps } from './types';
 import { CustomOption } from './CustomOption';
-import { NOT_NULL_OPTION } from './constants';
+import { NOT_NULL_OPTION, EMPTY_OPTION } from './constants';
 
 // const Chevron = styled(ChevronRightOutline)<{ $isOpened?: boolean; dimension?: Dimension }>`
 //   transition: all 0.3s;
@@ -41,12 +41,14 @@ const TextWrapper = styled.div`
 interface OptionsFactoryI {
   optionsProps: OptionsFactoryProps;
   selectNotNullEnabled: boolean;
+  selectEmptyEnabled: boolean;
   selectedValues?: string[];
 }
 
 export const OptionsFactory = ({
   optionsProps,
   selectedValues,
+  selectEmptyEnabled,
   selectNotNullEnabled,
 }: OptionsFactoryI): JSX.Element => {
   const { type: selectType } = optionsProps;
@@ -57,8 +59,8 @@ export const OptionsFactory = ({
 
       return (
         <>
-          {groups.map((group) => (
-            <OptionGroup key={group.text} label={group.text}>
+          {groups.map((group, index) => (
+            <OptionGroup key={`${group.text}-${index + 1}`} label={group.text}>
               {group.options.map(({ value, text, filtersCount }) => (
                 <Option key={value} value={value}>
                   <TextWrapper>
@@ -111,20 +113,34 @@ export const OptionsFactory = ({
               )}
             />
           )}
-          {options.map(({ value, text, disabled }) => (
+          {selectEmptyEnabled && (
             <Option
-              key={value}
-              disabled={disabled}
-              value={value}
+              value={EMPTY_OPTION.value}
               renderOption={(p) => (
                 <CustomOption
-                  text={text}
-                  checked={!!selectedValues?.includes(value)}
+                  text={EMPTY_OPTION.text}
+                  checked={!!selectedValues?.includes(EMPTY_OPTION.value)}
                   onChange={() => p.onClickItem?.()}
                 />
               )}
             />
-          ))}
+          )}
+          {options
+            .filter(({ visible = true }) => visible)
+            .map(({ value, text, disabled }) => (
+              <Option
+                key={value}
+                disabled={disabled}
+                value={value}
+                renderOption={(p) => (
+                  <CustomOption
+                    text={text}
+                    checked={!!selectedValues?.includes(value)}
+                    onChange={() => p.onClickItem?.()}
+                  />
+                )}
+              />
+            ))}
         </div>
       );
     }

@@ -3,4 +3,9 @@ const NOT_NULL_OPTION = {
   text: 'Не пустые',
 };
 
-export { NOT_NULL_OPTION };
+const EMPTY_OPTION = {
+  value: 'empty',
+  text: 'Пустые',
+};
+
+export { NOT_NULL_OPTION, EMPTY_OPTION };

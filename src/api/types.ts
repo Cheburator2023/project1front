@@ -1,22 +1,45 @@
 import { ColumnsFilter, Row } from 'src/modules/Home/TableModels/types';
 
+export type CustomError = {
+  statusCode: number;
+  message: string;
+};
+
+export type SuccessResponse<T> = {
+  error: false;
+  data: T;
+};
+
+export type ErrorResponse = {
+  error: true;
+  data: CustomError;
+};
+
 export type ModelsResponseType = {
   data: {
-    cards: Array<Partial<Row> & { system_model_id: string }>;
+    cards: Array<Partial<Row>>;
   };
 };
 
-export type TemplatesType = Array<{
+export type Template = {
   template_id: number;
   user_id: string | null;
-  group_id: number;
-  template_label: string;
-  group_label: string;
+  group_id?: number;
+  template_name: string;
+  group_label?: string;
   template_value: Partial<ColumnsFilter>;
-}>;
+  isOwner?: boolean;
+  public?: boolean;
+};
 
-export type TemplatesResponseType = {
-  data: TemplatesType;
+export type TemplateAddApi = {
+  template_name: string;
+  public: boolean;
+  template_value: Partial<ColumnsFilter>;
+};
+
+export type TemplateUpdateApi = TemplateAddApi & {
+  template_id: number;
 };
 
 export enum ArtifactType {
@@ -26,6 +49,7 @@ export enum ArtifactType {
   DATE_ISO8601 = 'date_iso8601',
   CASE_DATE = 'case_date',
   DATE = 'date',
+  QUARTERLY_DATE = 'quarterly_date',
   FILE_OBJECT_STORAGE = 'file_object_storage',
   FILE_GIT = 'file_git',
   FILE_NEXUS = 'file_nexus',
@@ -67,12 +91,13 @@ export type Artifact = {
   task_name?: string;
   bpmn_name?: string;
   is_edit_flg: ArtifactFlag;
-  is_active_flg: ArtifactFlag;
-  is_class_flg: ArtifactFlag;
+  is_active_flg?: ArtifactFlag;
+  is_class_flg?: ArtifactFlag;
   is_main_info_flg?: ArtifactFlag;
   is_multi_fill_flg?: ArtifactFlag;
   artefact_type_desc: ArtifactType;
   values: Array<ArtifactValue>;
+  start_date_depend_artefact?: keyof Row;
 };
 
 export type ArtifactResponse = {
@@ -116,3 +141,7 @@ export type ModelHistoryChangesResponse = {
     username: string;
   };
 }[];
+
+export type ReportApi = {
+  filters: Partial<ColumnsFilter>;
+};

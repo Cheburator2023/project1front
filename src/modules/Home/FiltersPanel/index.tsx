@@ -13,8 +13,20 @@ import {
 import { exploitationSelectOptions, modelsSelectOptions } from './constants';
 import { TemplatesFilter } from './TemplatesFilter';
 import { FiltersContext } from '../FiltersContext';
+import { ACTIVE_SCREEN, RIGHT_PANEL_TYPE } from '../types';
+import { Template } from 'src/api/types';
 
-export const FiltersPanel = () => {
+interface FiltersPanelProps {
+  templates: Template[];
+  updateActiveScreen: React.Dispatch<React.SetStateAction<ACTIVE_SCREEN>>;
+  updateRightPanelType: (value: React.SetStateAction<RIGHT_PANEL_TYPE | null>) => void;
+}
+
+export const FiltersPanel = ({
+  templates,
+  updateActiveScreen,
+  updateRightPanelType,
+}: FiltersPanelProps) => {
   const { topFilters, onChangeTopFilters } = useContext(FiltersContext);
 
   const handleChange = (name: string, value: string[]) =>
@@ -25,6 +37,7 @@ export const FiltersPanel = () => {
       <FilterButton
         dimension="s"
         icon={<FilterOutline />}
+        onClick={() => updateActiveScreen(ACTIVE_SCREEN.TEMPLATE_FILTERS)}
         appearance={topFilters.templates.length ? 'success' : 'primary'}
         displayAsSquare
       />
@@ -37,7 +50,7 @@ export const FiltersPanel = () => {
         selectedValues={topFilters.objectTypeRegistry}
         onChange={handleChange}
       />
-      <TemplatesFilter />
+      <TemplatesFilter templates={templates} updateRightPanelType={updateRightPanelType} />
       <CustomDateField
         type="date-range"
         dimension="s"

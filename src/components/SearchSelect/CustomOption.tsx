@@ -8,21 +8,30 @@ export const Container = styled.label`
   display: flex;
   flex-direction: row;
   padding: 6px 0;
+  height: 30px;
   box-sizing: border-box;
   align-items: center;
   cursor: pointer;
   user-select: none;
+  overflow: hidden;
+  text-wrap: nowrap;
+
+  div {
+    overflow: hidden;
+    text-wrap: nowrap;
+    text-overflow: ellipsis;
+  }
 
   & > div:first-child {
     margin: 0 10px;
     padding: 8px;
   }
+`;
 
-  & > div:last-child {
-    overflow: hidden;
-    text-wrap: nowrap;
-    text-overflow: ellipsis;
-  }
+const Label = styled(T)`
+  overflow: hidden;
+  text-wrap: nowrap;
+  text-overflow: ellipsis;
 `;
 
 interface OptionProps {
@@ -35,12 +44,12 @@ export const CustomOption = ({ text, checked, onChange }: OptionProps) => {
   const textRef = useRef(null);
 
   return (
-    <Container>
+    <Container key={text}>
       <Checkbox dimension="s" onChange={onChange} checked={checked} />
 
-      <T ref={textRef} font="Body/Body 2 Long" as="div">
+      <Label ref={textRef} font="Body/Body 2 Long" as="div">
         {text}
-      </T>
+      </Label>
       <Tooltip showOnOverflowOnly targetRef={textRef} title={text} />
     </Container>
   );

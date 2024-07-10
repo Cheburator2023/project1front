@@ -1,8 +1,18 @@
+import { EMPTY_OPTION, NOT_NULL_OPTION } from './constants';
 import { OptionsFactoryProps, SELECT_TYPE, SelectTemplatesOptions } from './types';
 
-export const getOptionsValues = (options: OptionsFactoryProps) => {
-  if (options.type !== SELECT_TYPE.TEMPLATES) {
-    return options.options.map(({ value }) => value);
+export const byMainOptions = (value: string) =>
+  value !== NOT_NULL_OPTION.value && value !== EMPTY_OPTION.value;
+
+export const getOptionsValues = (options: OptionsFactoryProps, mainOptionsOnly = false) => {
+  if (options.type === SELECT_TYPE.STRING) {
+    const optionsValues = options.options.map((option) => option.value);
+
+    if (mainOptionsOnly) {
+      return optionsValues.filter(byMainOptions);
+    }
+
+    return optionsValues;
   }
 
   return [];
@@ -57,9 +67,9 @@ export const getFilteredOptionsBySearch = (
 
   return {
     type: SELECT_TYPE.STRING,
-    options: options.options.filter((option) =>
-      filterOptionValueBySearchString(option.text, loweCaseSearchString),
-    ),
+    options: options.options
+      .filter((option) => filterOptionValueBySearchString(option.text, loweCaseSearchString))
+      .sort(),
   };
 };
 

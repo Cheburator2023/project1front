@@ -1,13 +1,15 @@
 import { createContext } from 'react';
+import { ErrorResponse, SuccessResponse } from './types';
 
 export const FetchContext = createContext<{
   // eslint-disable-next-line no-use-before-define
-  protectedFetch?: <T, N = void>(
+  protectedFetch?: <N, T = void>(
     routeUrl: string,
     params?: Record<string, string>,
     body?: N,
     method?: string,
-  ) => Promise<T>;
+    fileName?: string,
+  ) => Promise<SuccessResponse<T> | ErrorResponse>;
 }>({
   protectedFetch: undefined,
 });

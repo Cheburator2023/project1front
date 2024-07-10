@@ -1,5 +1,178 @@
 # Semantic Versioning Changelog
 
+## [1.17.10](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/compare/v1.17.9...v1.17.10) (2024-07-09)
+
+
+### Bug Fixes
+
+* remove dashboards ([cbe16ee](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/commit/cbe16eeb663daf47e4f9063e5eb85e75fd8954af))
+
+## [1.17.9](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/compare/v1.17.8...v1.17.9) (2024-07-09)
+
+
+### Bug Fixes
+
+* fix bug with search in filter column ([e7541e0](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/commit/e7541e02c37b1b1c4b81d178c4334ee4743a569f))
+
+## [1.17.8](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/compare/v1.17.7...v1.17.8) (2024-07-07)
+
+
+### Bug Fixes
+
+* upd packages ([a9851ff](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/commit/a9851ffd6359914e47f7ace26d64e2fe7ca86d11))
+
+## [1.17.7](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/compare/v1.17.6...v1.17.7) (2024-07-05)
+
+
+### Bug Fixes
+
+* fix bugs with column filters ([7a9fbf2](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/commit/7a9fbf2a5ce29d64638c4f51469917dba7cd30de))
+
+## [1.17.6](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/compare/v1.17.5...v1.17.6) (2024-07-01)
+
+
+### Bug Fixes
+
+* fix column name ([994e509](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/commit/994e509d9f44f64ef0867208a8b85858c7acaade))
+
+## [1.17.5](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/compare/v1.17.4...v1.17.5) (2024-07-01)
+
+
+### Bug Fixes
+
+* fix bug with wrap select text, unpin first cm ([1fbef7a](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/commit/1fbef7a3a54e927086c770b59206232a54e6bb4f))
+
+## [1.17.4](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/compare/v1.17.3...v1.17.4) (2024-07-01)
+
+
+### Bug Fixes
+
+* fix bug with styles, hide drag and drop func ([fa66ca8](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/commit/fa66ca801324a85a3ac890c91ac9961406ed0439))
+
+## [1.17.3](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/compare/v1.17.2...v1.17.3) (2024-07-01)
+
+
+### Bug Fixes
+
+* fix bugs with types ([306e022](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/commit/306e0227116a9cf995ef7846393355e8c062a8cc))
+
+## [1.17.2](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/compare/v1.17.1...v1.17.2) (2024-07-01)
+
+
+### Bug Fixes
+
+* fix bugs ([540b70d](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/commit/540b70d66d9f44ad9c83216e08fd3f4b5da2e948))
+
+## [1.17.1](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/compare/v1.17.0...v1.17.1) (2024-06-28)
+
+
+### Bug Fixes
+
+* update column titles ([9829875](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/commit/9829875731f5cd9405369a831a8c625fff8cf731))
+
+# [1.17.0](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/compare/v1.16.0...v1.17.0) (2024-06-07)
+
+
+### Features
+
+* add csv report ([c90bf4c](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/commit/c90bf4c7ad23805ed6199c94a75ad39ada313663))
+
+# [1.16.0](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/compare/v1.15.0...v1.16.0) (2024-06-05)
+
+
+### Features
+
+* update mocks, types. Add filtered options ([cf3fe3e](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/commit/cf3fe3e3228cb1aeb2037bee356ac39c78548378))
+
+# [1.15.0](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/compare/v1.14.1...v1.15.0) (2024-05-31)
+
+
+### Features
+
+* add new artefact ([076d8ab](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/commit/076d8ab1bd0716271b18a06248879476a3bc4c68))
+
+## [1.14.1](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/compare/v1.14.0...v1.14.1) (2024-05-31)
+
+
+### Bug Fixes
+
+* add virtual scroll for select ([461db3f](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/commit/461db3fc1dab15854aae135eea83a9ca6d6828bd))
+
+# [1.14.0](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/compare/v1.13.0...v1.14.0) (2024-05-27)
+
+
+### Features
+
+* add empty filter option, add user info ([55d4227](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/commit/55d4227400a89faca1cfdb4c9b11e105fe6bbcab))
+
+# [1.13.0](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/compare/v1.12.2...v1.13.0) (2024-05-21)
+
+
+### Features
+
+* add virtual scroll for table models ([0de2023](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/commit/0de20230b660369a0689c1e061b3a7d9dc715bb0))
+* optimization for table filters ([5f5b65b](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/commit/5f5b65bdcfac8789d08632dcdf8a3dc1f8058842))
+
+## [1.12.2](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/compare/v1.12.1...v1.12.2) (2024-05-14)
+
+
+### Bug Fixes
+
+* fix bugs with filters and model form ([be017f1](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/commit/be017f1d310abd6179cb2317ebe049592f7222c2))
+
+## [1.12.1](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/compare/v1.12.0...v1.12.1) (2024-05-08)
+
+
+### Bug Fixes
+
+* fix bug with model table and filters counter ([e2eebfe](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/commit/e2eebfe29fa4927e7dfaf890a63f4008262dd592))
+
+# [1.12.0](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/compare/v1.11.3...v1.12.0) (2024-05-08)
+
+
+### Features
+
+* panel management for templates filters ([cfe28f6](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/commit/cfe28f6c22c48054a006b972d985909096585c21))
+
+## [1.11.3](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/compare/v1.11.2...v1.11.3) (2024-04-26)
+
+
+### Bug Fixes
+
+* fix bug with date format ([3063d3a](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/commit/3063d3a5f071754ef9a07f6cad096aac31e9f612))
+
+## [1.11.2](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/compare/v1.11.1...v1.11.2) (2024-04-25)
+
+
+### Bug Fixes
+
+* update date format for date fields in form ([f5d9d63](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/commit/f5d9d63d03b43706a1fe490b557ae68f80a00976))
+
+## [1.11.1](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/compare/v1.11.0...v1.11.1) (2024-04-24)
+
+
+### Bug Fixes
+
+* fix row date mask ([bb2c99b](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/commit/bb2c99b412005ef9fadd4329c618952da6c44f39))
+
+# [1.11.0](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/compare/v1.10.2...v1.11.0) (2024-04-24)
+
+
+### Features
+
+* add column filter by date range for table ([a8d0128](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/commit/a8d0128146262374eb07485c127398ae35b0cf5b))
+
+## [1.10.2](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/compare/v1.10.1...v1.10.2) (2024-04-19)
+
+## [1.10.1](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/compare/v1.10.0...v1.10.1) (2024-04-18)
+
+# [1.10.0](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/compare/v1.9.4...v1.10.0) (2024-04-16)
+
+
+### Features
+
+* crud operations for template, refactoring ([5132725](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/commit/513272593a5be96dd0047de24826b98945ee7111))
+
 ## [1.9.4](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/compare/v1.9.3...v1.9.4) (2024-03-21)
 
 

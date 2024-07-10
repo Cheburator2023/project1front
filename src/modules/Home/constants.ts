@@ -1,4 +1,9 @@
-import { COLUMN_TYPE, Column, ColumnsFilter } from 'src/modules/Home/TableModels/types';
+import {
+  ArtificialRow,
+  COLUMN_TYPE,
+  Column,
+  ColumnsFilter,
+} from 'src/modules/Home/TableModels/types';
 
 export const initialColumns: Array<Column> = [
   {
@@ -14,7 +19,7 @@ export const initialColumns: Array<Column> = [
   {
     name: 'update_date',
     title: 'Отчетная дата / дата последних изменений информации о Модели',
-    type: COLUMN_TYPE.STRING,
+    type: COLUMN_TYPE.DATE,
   },
   {
     name: 'model_alias',
@@ -29,7 +34,7 @@ export const initialColumns: Array<Column> = [
   {
     name: 'model_version',
     title: 'Версия модели',
-    type: COLUMN_TYPE.NUMBER,
+    type: COLUMN_TYPE.STRING,
   },
   {
     name: 'model_name',
@@ -52,6 +57,11 @@ export const initialColumns: Array<Column> = [
     type: COLUMN_TYPE.STRING,
   },
   {
+    name: 'business_model_risk_subtype',
+    title: 'Подвид риска, для оценки которого применяется Модель / Подтип Бизнес-модели',
+    type: COLUMN_TYPE.STRING,
+  },
+  {
     name: 'business_customer',
     title: 'Владелец Модели / Алгоритма',
     type: COLUMN_TYPE.STRING,
@@ -69,7 +79,7 @@ export const initialColumns: Array<Column> = [
   {
     name: 'implementation_validity',
     title: 'Утверждение РС / Модели / Алгоритма в эксплуатацию',
-    type: COLUMN_TYPE.STRING,
+    type: COLUMN_TYPE.DATE,
   },
   {
     name: 'model_changes_info',
@@ -84,7 +94,7 @@ export const initialColumns: Array<Column> = [
   {
     name: 'developing_end_date',
     title: 'Дата окончания разработки Модели',
-    type: COLUMN_TYPE.STRING,
+    type: COLUMN_TYPE.DATE,
   },
   {
     name: 'record_id',
@@ -139,7 +149,7 @@ export const initialColumns: Array<Column> = [
   {
     name: 'calibration_date',
     title: 'Дата калибровки',
-    type: COLUMN_TYPE.STRING,
+    type: COLUMN_TYPE.DATE,
   },
   {
     name: 'regulatory_code_of_asset_class',
@@ -217,6 +227,26 @@ export const initialColumns: Array<Column> = [
     type: COLUMN_TYPE.STRING,
   },
   {
+    name: 'usage_confirm_date_q1',
+    title: 'Q1',
+    type: COLUMN_TYPE.QUARTERLY_DATE,
+  },
+  {
+    name: 'usage_confirm_date_q2',
+    title: 'Q2',
+    type: COLUMN_TYPE.QUARTERLY_DATE,
+  },
+  {
+    name: 'usage_confirm_date_q3',
+    title: 'Q3',
+    type: COLUMN_TYPE.QUARTERLY_DATE,
+  },
+  {
+    name: 'usage_confirm_date_q4',
+    title: 'Q4',
+    type: COLUMN_TYPE.QUARTERLY_DATE,
+  },
+  {
     name: 'validity_approve',
     title: 'Решение об утверждении РС / Модели',
     type: COLUMN_TYPE.STRING,
@@ -224,7 +254,7 @@ export const initialColumns: Array<Column> = [
   {
     name: 'validity_approve_date',
     title: 'Дата утверждения РС / Модели / Алгоритма',
-    type: COLUMN_TYPE.STRING,
+    type: COLUMN_TYPE.DATE,
   },
   {
     name: 'bank_document',
@@ -234,7 +264,7 @@ export const initialColumns: Array<Column> = [
   {
     name: 'remove_date',
     title: 'Дата выведения РС / Модели из эксплуатации',
-    type: COLUMN_TYPE.STRING,
+    type: COLUMN_TYPE.DATE,
   },
   {
     name: 'remove_decision',
@@ -249,7 +279,7 @@ export const initialColumns: Array<Column> = [
   {
     name: 'developing_start_date',
     title: 'Дата начала разработки Модели',
-    type: COLUMN_TYPE.STRING,
+    type: COLUMN_TYPE.DATE,
   },
   {
     name: 'data_source_description',
@@ -314,7 +344,7 @@ export const initialColumns: Array<Column> = [
   {
     name: 'validation_report_approve_date',
     title: 'Дата утверждения отчета валидации',
-    type: COLUMN_TYPE.STRING,
+    type: COLUMN_TYPE.DATE,
   },
   {
     name: 'validation_result',
@@ -325,7 +355,7 @@ export const initialColumns: Array<Column> = [
     name: 'validation_result_approve_date',
     title:
       'Информация о дате утверждения на УО МР текущих (действующих) агрегированных результатов валидации',
-    type: COLUMN_TYPE.STRING,
+    type: COLUMN_TYPE.DATE,
   },
   {
     name: 'auto_validation_result',
@@ -350,12 +380,12 @@ export const initialColumns: Array<Column> = [
   {
     name: 'date_submission_to_regulator',
     title: 'Дата подачи заявки Регулятору',
-    type: COLUMN_TYPE.STRING,
+    type: COLUMN_TYPE.DATE,
   },
   {
     name: 'decision_date_and_number_of_application_model_for_segment',
     title:
-      'Дата и номер решения Регулятора о выдаче разрешения на применение РС / Модели для сегмента',
+      'Дата и номер решения Регулятора о выдаче разрешения на применение РС/Модели для сегмента',
     type: COLUMN_TYPE.STRING,
   },
   {
@@ -366,7 +396,7 @@ export const initialColumns: Array<Column> = [
   {
     name: 'decision_date_of_application_model_for_segment',
     title: 'Дата решения БР о выдаче разрешения на применение РС / Модели для сегмента',
-    type: COLUMN_TYPE.STRING,
+    type: COLUMN_TYPE.DATE,
   },
   {
     name: 'decision_number_of_application_model_for_segment',
@@ -375,13 +405,13 @@ export const initialColumns: Array<Column> = [
   },
   {
     name: 'notification_date_and_number_of_application_model_for_segment',
-    title: 'Дата уведомления БР о применении РС / Модели для сегмента',
+    title: 'Дата и номер уведомления в адрес Регулятора о применении РС / Модели для сегмента',
     type: COLUMN_TYPE.STRING,
   },
   {
     name: 'notification_date_of_application_model_for_segment',
     title: 'Дата уведомления БР о применении РС / Модели для сегмента',
-    type: COLUMN_TYPE.STRING,
+    type: COLUMN_TYPE.DATE,
   },
   {
     name: 'notification_number_of_application_model_for_segment',
@@ -391,13 +421,13 @@ export const initialColumns: Array<Column> = [
   {
     name: 'decision_date_and_number_of_application_model',
     title:
-      'Дата и номер первичного решения Регулятора о выдаче разрешения на применение РС / Модели (для всех сегментов)',
+      'Дата и номер первичного решения Регулятора о выдаче разрешения на применение РС/Модели (для всех сегментов)',
     type: COLUMN_TYPE.STRING,
   },
   {
     name: 'decision_date_of_application_model',
     title: 'Дата решения БР о выдаче разрешения на применение РС / Модели',
-    type: COLUMN_TYPE.STRING,
+    type: COLUMN_TYPE.DATE,
   },
   {
     name: 'decision_number_of_application_model',
@@ -408,13 +438,13 @@ export const initialColumns: Array<Column> = [
   {
     name: 'notification_date_and_number_of_application_model',
     title:
-      'Дата и номер уведомления в адрес Регулятора о начале первичного применения РС / Модели (для всех сегментов)',
+      'Дата и номер уведомления в адрес Регулятора о начале первичного применения РС/Модели (для всех сегментов)',
     type: COLUMN_TYPE.STRING,
   },
   {
     name: 'notification_date_of_application_model',
     title: 'Дата уведомления БР о применении РС / Модели',
-    type: COLUMN_TYPE.STRING,
+    type: COLUMN_TYPE.DATE,
   },
   {
     name: 'notification_number_of_application_model',
@@ -425,7 +455,7 @@ export const initialColumns: Array<Column> = [
   {
     name: 'start_date_of_application_model_approved_regulator',
     title: 'Дата начала применения РС / Модели, утвержденная Регулятором',
-    type: COLUMN_TYPE.STRING,
+    type: COLUMN_TYPE.DATE,
   },
   {
     name: 'model_crs_code',
@@ -455,7 +485,7 @@ export const initialColumns: Array<Column> = [
   {
     name: 'model_epic_04_date',
     title: 'Дата решения 04',
-    type: COLUMN_TYPE.STRING,
+    type: COLUMN_TYPE.DATE,
   },
   {
     name: 'model_epic_05',
@@ -470,7 +500,7 @@ export const initialColumns: Array<Column> = [
   {
     name: 'data_completion_of_stage_05a',
     title: 'Дата завершения разработки пилота',
-    type: COLUMN_TYPE.STRING,
+    type: COLUMN_TYPE.DATE,
   },
   {
     name: 'solution_to_implement_model',
@@ -485,7 +515,7 @@ export const initialColumns: Array<Column> = [
   {
     name: 'model_epic_07_date',
     title: 'Дата решения для 07 этапа',
-    type: COLUMN_TYPE.STRING,
+    type: COLUMN_TYPE.DATE,
   },
   {
     name: 'custom_model_id',
@@ -504,28 +534,28 @@ export const initialColumns: Array<Column> = [
   },
   {
     name: 'model_epic_09',
-    title: 'Модельный эпик 09',
+    title: 'Эпик 09',
     type: COLUMN_TYPE.STRING,
   },
   {
     name: 'model_epic_11',
-    title: 'Модельный эпик 11',
+    title: 'Эпик 11',
     type: COLUMN_TYPE.STRING,
   },
   {
     name: 'model_epic_11_date',
     title: 'Дата решения для эпика 11',
-    type: COLUMN_TYPE.STRING,
+    type: COLUMN_TYPE.DATE,
   },
   {
     name: 'model_epic_12',
-    title: 'Индикатор модели',
+    title: 'Этап 12',
     type: COLUMN_TYPE.STRING,
   },
   {
     name: 'model_epic_12_date',
     title: 'Дата решения для эпика 12',
-    type: COLUMN_TYPE.STRING,
+    type: COLUMN_TYPE.DATE,
   },
   {
     name: 'model_status',
@@ -549,16 +579,8 @@ export const initialColumns: Array<Column> = [
   },
 ];
 
-export const initialColumnsFilters: ColumnsFilter = {
-  id: [],
-  root_model_id: [],
+export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
   system_model_id: [],
-  model_source: [],
-  auto_validation_result: [],
-  uuid: [],
-  model_status: [],
-  model_status_assignee: [],
-  pvr: [],
   group_company: [],
   update_date: [],
   model_alias: [],
@@ -568,6 +590,7 @@ export const initialColumnsFilters: ColumnsFilter = {
   model_desc: [],
   model_type: [],
   model_risk_type: [],
+  business_model_risk_subtype: [],
   business_customer: [],
   business_customer_departament: [],
   significance_validity: [],
@@ -601,6 +624,11 @@ export const initialColumnsFilters: ColumnsFilter = {
   regulatory_class: [],
   regulatory_subclass: [],
   goals_using_results_of_work_rs: [],
+  usage_confirm_date_q1: [],
+  usage_confirm_date_q2: [],
+  usage_confirm_date_q3: [],
+  usage_confirm_date_q4: [],
+  create_date: [],
   validity_approve: [],
   validity_approve_date: [],
   bank_document: [],
@@ -623,12 +651,13 @@ export const initialColumnsFilters: ColumnsFilter = {
   validation_report_approve_date: [],
   validation_result: [],
   validation_result_approve_date: [],
+  auto_validation_result: [],
   importance_changes: [],
   approve_importance: [],
   approve_importance_changes: [],
-  date_and_number_regulator_notification: [],
   date_submission_to_regulator: [],
   decision_date_and_number_of_application_model_for_segment: [],
+  date_and_number_regulator_notification: [],
   decision_date_of_application_model_for_segment: [],
   decision_number_of_application_model_for_segment: [],
   notification_date_and_number_of_application_model_for_segment: [],
@@ -661,6 +690,14 @@ export const initialColumnsFilters: ColumnsFilter = {
   model_epic_11_date: [],
   model_epic_12: [],
   model_epic_12_date: [],
+  model_status: [],
+  model_status_assignee: [],
+  pvr: [],
+  model_source: [],
+  id: [],
+  root_model_id: [],
+  model_version_id: [],
+  uuid: [],
   product_name: [],
   developing_model_reason: [],
   provides_piloting: [],

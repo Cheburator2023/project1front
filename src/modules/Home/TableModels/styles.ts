@@ -1,7 +1,6 @@
-import { Table } from '@admiral-ds/react-ui';
 import styled from 'styled-components';
 
-import { SearchSelect } from '../../../components/SearchSelect';
+import { Table } from 'src/shared/ui';
 
 const CustomTable = styled(Table)`
   .tbody {
@@ -39,36 +38,4 @@ const CustomTable = styled(Table)`
   }
 `;
 
-const CustomSearchSelect = styled(SearchSelect)`
-  .searchSelect {
-    min-width: 150px;
-    margin-top: 15px;
-    border-radius: 0;
-    width: 100%;
-    padding: 4px 8px;
-    align-items: center;
-
-    div {
-      border-radius: 4px;
-    }
-
-    .chip {
-      max-width: 93px;
-      border-radius: 4px;
-    }
-
-    .counter {
-      border-radius: 4px;
-    }
-
-    div {
-      border: none;
-    }
-
-    #selectValueWrapper {
-      padding-left: 0;
-    }
-  }
-`;
-
-export { CustomTable, CustomSearchSelect };
+export { CustomTable };

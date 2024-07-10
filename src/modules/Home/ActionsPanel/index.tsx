@@ -7,15 +7,19 @@ import { ReactComponent as SettingsOutline } from '@admiral-ds/icons/build/syste
 
 import { IconButton } from 'src/components/IconButton';
 
+import { useNavigate } from 'react-router-dom';
 import { CustomSearchInput, Container } from './styles';
+import { RIGHT_PANEL_TYPE } from '../types';
 
 interface ActionsPanelProps {
   handleSearch: (newSearchString: string) => void;
-  onAddNewModel: () => void;
+  updateRightPanelType: (value: React.SetStateAction<RIGHT_PANEL_TYPE | null>) => void;
 }
 
-export const ActionsPanel = ({ onAddNewModel, handleSearch }: ActionsPanelProps) => {
+export const ActionsPanel = ({ updateRightPanelType, handleSearch }: ActionsPanelProps) => {
   const [searchValue, setSearchValue] = useState('');
+
+  const navigate = useNavigate();
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,9 +47,13 @@ export const ActionsPanel = ({ onAddNewModel, handleSearch }: ActionsPanelProps)
           icon={<PlusCircleSolid />}
           tooltip="Добавить модель"
           color="#0062FF"
-          onClick={onAddNewModel}
+          onClick={() => updateRightPanelType(RIGHT_PANEL_TYPE.ADD_MODEL)}
         />
-        <IconButton icon={<BrokerOutlineIcon />} tooltip="Графики" onClick={() => null} />
+        <IconButton
+          icon={<BrokerOutlineIcon />}
+          tooltip="Графики"
+          onClick={() => navigate('charts')}
+        />
         <IconButton icon={<MenuOutline />} tooltip="Меню" onClick={() => null} />
         <IconButton icon={<SettingsOutline />} tooltip="Настройки" onClick={() => null} />
       </div>

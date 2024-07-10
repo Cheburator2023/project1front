@@ -7,6 +7,7 @@ enum SELECT_TYPE {
 type SelectOption = {
   value: string;
   text: string;
+  visible?: boolean;
   disabled?: boolean;
   nestedValues?: string[];
   parentsValues?: string[];

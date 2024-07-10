@@ -1,10 +1,11 @@
 import React, { useCallback, useState, useMemo, useEffect } from 'react';
 import { Button, Field } from '@admiral-ds/react-ui';
 
-import { OptionsFactoryProps } from './types';
+import { OptionsFactoryProps, SELECT_TYPE } from './types';
 import { OptionsFactory } from './OptionsFactory';
 import { SelectValue } from './SelectValue';
 import {
+  byMainOptions,
   checkForUniqueValue,
   getFilteredOptionsBySearch,
   getOptionsValues,
@@ -17,11 +18,12 @@ import {
   DropDownBottomPanelContainer,
 } from './styles';
 import { CustomOption } from './CustomOption';
-import { NOT_NULL_OPTION } from './constants';
+import { EMPTY_OPTION, NOT_NULL_OPTION } from './constants';
 
 interface SearchSelectProps {
   name: string;
   options: OptionsFactoryProps;
+  virtualScrollEnabled?: boolean;
   key?: string;
   selectedValues?: string[];
   autoFocus?: boolean;
@@ -40,6 +42,7 @@ interface SearchSelectProps {
   multiple?: boolean;
   addNewOptionEnabled?: boolean;
   selectNotNullEnabled?: boolean;
+  selectEmptyEnabled?: boolean;
   selectAllEnabled?: boolean;
   renderDropDownBottomPanel?: () => React.ReactNode;
   onAddNewOption?: (newOptionValue: string) => void;
@@ -64,8 +67,10 @@ const SearchSelect = ({
   required = false,
   disabled = false,
   multiple = true,
+  virtualScrollEnabled = false,
   addNewOptionEnabled = false,
   selectNotNullEnabled = false,
+  selectEmptyEnabled = false,
   selectAllEnabled = true,
   renderDropDownBottomPanel,
   onAddNewOption,
@@ -81,24 +86,31 @@ const SearchSelect = ({
   const [forcedOpen, setForcedOpen] = useState(false);
 
   useEffect(() => {
+    let newOptions = options;
+
+    if (searchValue) {
+      newOptions = getFilteredOptionsBySearch(options, searchValue);
+    }
+    setSelectOptions(newOptions);
+  }, [options]);
+
+  useEffect(() => {
     if (selectedValues && selectedValues.length) {
       // Except additional options, like "not-null"
-      const selectedMainOptions = selectedValues.filter(
-        (selectedValue) => selectedValue !== NOT_NULL_OPTION.value,
-      );
+      const selectedMainOptions = selectedValues.filter(byMainOptions);
 
       const isSelectAll = optionsValues.length === selectedMainOptions.length;
 
       setSelectedAllValues(isSelectAll);
     }
-  }, [optionsValues, optionsValues.length, selectedValues]);
+  }, [optionsValues, selectedValues]);
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     let newSelectedValues = Array.from(e.target.selectedOptions).map((option) => option.value);
 
-    if (selectedAllValues && newSelectedValues.length !== optionsValues.length) {
+    if (selectedAllValues && newSelectedValues.length !== optionsValues?.length) {
       setSelectedAllValues(false);
-    } else if (!selectedAllValues && newSelectedValues.length === optionsValues.length) {
+    } else if (!selectedAllValues && newSelectedValues.length === optionsValues?.length) {
       setSelectedAllValues(true);
     }
 
@@ -107,16 +119,26 @@ const SearchSelect = ({
       newSelectedValues = [];
     }
 
-    // setSelectValue(newSelectedValues);
+    // Add selected options that are out of the scope of the search
+    if (searchValue) {
+      const selectOptionsValues = getOptionsValues(selectOptions);
+
+      const prevSelectedValues =
+        selectedValues?.filter((value) => !selectOptionsValues.includes(value)) ?? [];
+
+      newSelectedValues = [...prevSelectedValues, ...newSelectedValues];
+    }
+
     onChange(name, newSelectedValues);
   };
 
   const handleChangeSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     let newSelectedValues: string[] = [];
 
-    if (e.target.checked) {
+    if (e.target.checked && options.type === SELECT_TYPE.STRING) {
+      newSelectedValues = [...optionsValues, NOT_NULL_OPTION.value, EMPTY_OPTION.value];
+
       setSelectedAllValues(true);
-      newSelectedValues = [...optionsValues, NOT_NULL_OPTION.value];
     } else {
       setSelectedAllValues(false);
     }
@@ -180,6 +202,7 @@ const SearchSelect = ({
           placeholder={getPlaceholder(loading, error)}
           dropContainerCssMixin={DropContainerCssMixin}
           showCheckbox={false}
+          virtualScroll={virtualScrollEnabled ? { itemHeight: 'auto' } : undefined}
           // showCheckbox={options.type !== SELECT_TYPE.TAGS}
           renderSelectValue={(value) =>
             !loading && (
@@ -191,25 +214,19 @@ const SearchSelect = ({
               />
             )
           }
-          renderDropDownTopPanel={() =>
-            !!optionsValues.length && (
-              // eslint-disable-next-line jsx-a11y/no-static-element-interactions
-              <div onKeyDown={handlePreventEvent}>
-                <CustomSearchInput
-                  onChange={handleSearch}
-                  value={searchValue}
-                  placeholder="Поиск"
+          renderDropDownTopPanel={() => (
+            // eslint-disable-next-line jsx-a11y/no-static-element-interactions
+            <div onKeyDown={handlePreventEvent}>
+              <CustomSearchInput onChange={handleSearch} value={searchValue} placeholder="Поиск" />
+              {multiple && selectAllEnabled && (
+                <CustomOption
+                  text="Выбрать все"
+                  checked={selectedAllValues}
+                  onChange={handleChangeSelectAll}
                 />
-                {multiple && selectAllEnabled && (
-                  <CustomOption
-                    text="Выбрать все"
-                    checked={selectedAllValues}
-                    onChange={handleChangeSelectAll}
-                  />
-                )}
-              </div>
-            )
-          }
+              )}
+            </div>
+          )}
           renderDropDownBottomPanel={() => (
             <DropDownBottomPanelContainer>
               {addNewOptionEnabled && (
@@ -229,6 +246,7 @@ const SearchSelect = ({
           <OptionsFactory
             optionsProps={selectOptions}
             selectNotNullEnabled={selectNotNullEnabled}
+            selectEmptyEnabled={selectEmptyEnabled}
             selectedValues={selectedValues}
           />
         </CustomSelect>

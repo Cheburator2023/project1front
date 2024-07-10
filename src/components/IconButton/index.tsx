@@ -3,7 +3,7 @@ import React, { useRef } from 'react';
 import { Tooltip } from '../Tooltip';
 
 interface IconButtonProps {
-  tooltip: string;
+  tooltip?: string;
   name?: string;
   color?: string;
   icon: React.ReactNode;
@@ -35,7 +35,7 @@ export const IconButton = ({
       >
         {icon}
       </IconPlacement>
-      <Tooltip targetRef={iconRef} title={tooltip} />
+      {tooltip ? <Tooltip targetRef={iconRef} title={tooltip} /> : null}
     </>
   );
 };

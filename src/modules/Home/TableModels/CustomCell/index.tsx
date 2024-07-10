@@ -7,8 +7,8 @@ import { Tooltip } from 'src/components/Tooltip';
 import { IconButton } from 'src/components';
 
 import { CellContentFactory } from './CellContentFactory';
-import { COLUMN_TYPE, Row } from '../types';
-import { TABLE_ACTION } from '../../types';
+import { COLUMN_TYPE, Column, Row } from '../types';
+import { RIGHT_PANEL_TYPE } from '../../types';
 
 const CellWrapper = styled.div<{ type: COLUMN_TYPE }>`
   display: block;
@@ -55,19 +55,18 @@ const ActionsContainer = styled.div`
 `;
 
 interface CustomCellProps {
+  column: Column;
   value: string;
-  type: COLUMN_TYPE;
   row: Row;
-  name: keyof Row;
   editable: boolean;
-  onAction: (action: TABLE_ACTION.EDIT | TABLE_ACTION.HISTORY_CHANGES) => void;
+  onAction: (action: RIGHT_PANEL_TYPE.EDIT_MODEL | RIGHT_PANEL_TYPE.HISTORY_CHANGES) => void;
 }
 
 export const CustomCell = ({
+  row,
+  column,
   value,
   editable,
-  type,
-  name,
   onAction,
 }: CustomCellProps): React.ReactElement => {
   const cellRef = useRef(null);
@@ -76,15 +75,15 @@ export const CustomCell = ({
     const { name } = e.target as HTMLButtonElement;
 
     if (name === 'edit') {
-      onAction(TABLE_ACTION.EDIT);
+      onAction(RIGHT_PANEL_TYPE.EDIT_MODEL);
     } else {
-      onAction(TABLE_ACTION.HISTORY_CHANGES);
+      onAction(RIGHT_PANEL_TYPE.HISTORY_CHANGES);
     }
   }, []);
 
   return (
     <>
-      <CellWrapper type={type}>
+      <CellWrapper type={column.type}>
         <ActionsContainer className="actionsContainer">
           <ActionBtn
             name="historyChanges"
@@ -105,7 +104,7 @@ export const CustomCell = ({
             />
           )}
         </ActionsContainer>
-        <div ref={cellRef}>{CellContentFactory({ value, type, name })}</div>
+        <div ref={cellRef}>{CellContentFactory({ value, column, row })}</div>
       </CellWrapper>
       <Tooltip targetRef={cellRef} showOnOverflowOnly title={value} />
     </>

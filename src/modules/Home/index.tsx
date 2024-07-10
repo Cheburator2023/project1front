@@ -1,14 +1,14 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
 import { Loading, ErrorStatus } from 'src/components';
 import { Column, ColumnsFilter, Row } from 'src/modules/Home/TableModels/types';
+import { DownloadReportContext } from 'src/Layout/DownloadReportContext';
 
 import { FiltersPanel } from 'src/modules/Home/FiltersPanel';
-
 import { API_ROUTES, useFetch } from 'src/api';
-import { ModelsResponseType } from 'src/api/types';
 
+import { ModelsResponseType, Template } from 'src/api/types';
 import { initialColumns, initialColumnsFilters } from './constants';
 import { FiltersContext } from './FiltersContext';
 import { TopFilters } from './FiltersPanel/types';
@@ -16,9 +16,11 @@ import { initialTopFilters } from './FiltersPanel/constants';
 import { TableModels } from './TableModels';
 import { Pagination } from './Pagination';
 import { ActionsPanel } from './ActionsPanel';
-import { Forms } from './Forms';
+import { RightModalPanel } from './RightModalPanel';
 import { checkColumnsFiltersForEqual, filterColumnsByColumnsFilters } from './helpers';
-import { TABLE_ACTION } from './types';
+import { ACTIVE_SCREEN, RIGHT_PANEL_TYPE } from './types';
+import { TemplateFilters } from './TemplateFilters';
+import { FORM_MODE } from './RightModalPanel/ModelForm/types';
 
 const StatusWrapper = styled.div`
   display: flex;
@@ -28,26 +30,32 @@ const StatusWrapper = styled.div`
 `;
 
 const Home = () => {
+  const { updateColumnsFilters, downloadReportStatus } = useContext(DownloadReportContext);
+
+  const [activeScreen, setActiveScreen] = useState(ACTIVE_SCREEN.TABLE);
+  const [rightPanelType, setRightPanelType] = useState<RIGHT_PANEL_TYPE | null>(null);
+
   // Cell activities
-  const [activeStatus, setActiveStatus] = useState<TABLE_ACTION | null>(null);
   const [activeCellName, setActiveCellName] = useState<keyof Row>();
   const [activeRowId, setActiveRowId] = useState<string>();
 
   // Table data
-  const [rowList, setRowList] = useState<Array<Partial<Row> & { id: string }>>([]);
+  const [rowList, setRowList] = useState<Array<Partial<Row>>>([]);
   const [columnList, setColumnList] = useState<Column[]>(initialColumns);
 
   // Filters
   const [topFilters, setTopFilters] = useState<TopFilters>(initialTopFilters);
-  const [columnsFilters, setColumnFilters] =
+  const [columnsFilters, setColumnsFilters] =
     useState<Partial<ColumnsFilter>>(initialColumnsFilters);
 
   const [searchString, setSearchString] = useState<string>('');
 
   // Pagination
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(20);
   const [page, setPage] = useState(1);
   const [totalRows, setTotalRows] = useState<number>(0);
+
+  const [templates, setTemplates] = useState<Template[]>([]);
 
   const {
     responseData: modelsData,
@@ -56,6 +64,11 @@ const Home = () => {
   } = useFetch<ModelsResponseType>({
     apiRoute: API_ROUTES.MODELS,
     // mockedResponse: mockedModelsResponse,
+  });
+
+  const { responseData: templateData } = useFetch<Template[]>({
+    apiRoute: API_ROUTES.TEMPLATES,
+    // mockedResponse: mockedTemplatesResponse,
   });
 
   useEffect(() => {
@@ -70,6 +83,18 @@ const Home = () => {
       setTotalRows(formattedRows.length);
     }
   }, [modelsData]);
+
+  useEffect(() => {
+    if (templateData) {
+      setTemplates(templateData);
+    }
+  }, [templateData]);
+
+  useEffect(() => {
+    if (downloadReportStatus) {
+      updateColumnsFilters(columnsFilters);
+    }
+  }, [columnsFilters, downloadReportStatus]);
 
   const handleChangePage = (result: { page: number; pageSize: number }) => {
     if (result.page !== page) {
@@ -105,7 +130,7 @@ const Home = () => {
   const handleChangeColumnFilters = useCallback(
     (newColumnFilters: Partial<ColumnsFilter>) => {
       updateColumnList(newColumnFilters);
-      setColumnFilters(newColumnFilters);
+      setColumnsFilters(newColumnFilters);
     },
     [updateColumnList],
   );
@@ -122,21 +147,21 @@ const Home = () => {
 
   const handleClickOnActionCell = useCallback(
     (
-      action: TABLE_ACTION.EDIT | TABLE_ACTION.HISTORY_CHANGES,
+      action: RIGHT_PANEL_TYPE.EDIT_MODEL | RIGHT_PANEL_TYPE.HISTORY_CHANGES,
       rowId: string,
       cellName: keyof Row,
     ) => {
-      setActiveStatus(action);
+      setRightPanelType(action);
       setActiveCellName(cellName);
       setActiveRowId(rowId);
     },
     [rowList],
   );
 
-  const handleSubmit = useCallback((newRow: Row, mode: TABLE_ACTION) => {
+  const handleSubmit = useCallback((newRow: Row, formMode: FORM_MODE) => {
     const newRowWithId = { ...newRow, id: newRow.system_model_id, hover: true };
 
-    if (mode === TABLE_ACTION.EDIT) {
+    if (formMode === FORM_MODE.EDIT) {
       setRowList((prevRows) =>
         prevRows.map((row) =>
           row?.system_model_id === newRowWithId.system_model_id ? newRowWithId : row,
@@ -148,7 +173,7 @@ const Home = () => {
   }, []);
 
   const handleOnClose = useCallback(() => {
-    setActiveStatus(null);
+    setRightPanelType(null);
     setActiveCellName(undefined);
     setActiveRowId(undefined);
   }, []);
@@ -171,35 +196,49 @@ const Home = () => {
 
   return (
     <FiltersContext.Provider value={contextValue}>
-      <Forms
+      <RightModalPanel
         rows={rowList}
+        templates={templates}
         activeRowId={activeRowId}
-        activeStatus={activeStatus}
+        activeStatus={rightPanelType}
         activeCellName={activeCellName}
+        updateTemplates={setTemplates}
         onSubmit={handleSubmit}
         onClose={handleOnClose}
       />
-      <FiltersPanel />
-      <ActionsPanel
-        handleSearch={handleSearch}
-        onAddNewModel={() => setActiveStatus(TABLE_ACTION.ADD)}
-      />
-      <TableModels
-        rowList={rowList}
-        columnList={columnList}
-        page={page}
-        pageSize={pageSize}
-        searchString={searchString}
-        onActionCell={handleClickOnActionCell}
-        updateRowsCount={setTotalRows}
-        setCurrentPage={setPage}
-      />
-      <Pagination
-        page={page}
-        pageSize={pageSize}
-        onChangePage={handleChangePage}
-        totalElements={totalRows}
-      />
+      {activeScreen === ACTIVE_SCREEN.TEMPLATE_FILTERS && (
+        <TemplateFilters
+          templates={templates}
+          updateActiveScreen={setActiveScreen}
+          updateRightPanelType={setRightPanelType}
+        />
+      )}
+      {activeScreen === ACTIVE_SCREEN.TABLE && (
+        <>
+          <FiltersPanel
+            templates={templates}
+            updateActiveScreen={setActiveScreen}
+            updateRightPanelType={setRightPanelType}
+          />
+          <ActionsPanel handleSearch={handleSearch} updateRightPanelType={setRightPanelType} />
+          <TableModels
+            rowList={rowList}
+            columnList={columnList}
+            page={page}
+            pageSize={pageSize}
+            searchString={searchString}
+            onActionCell={handleClickOnActionCell}
+            updateRowsCount={setTotalRows}
+            setCurrentPage={setPage}
+          />
+          <Pagination
+            page={page}
+            pageSize={pageSize}
+            onChangePage={handleChangePage}
+            totalElements={totalRows}
+          />
+        </>
+      )}
     </FiltersContext.Provider>
   );
 };

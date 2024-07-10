@@ -3,10 +3,17 @@ import { useContext, useEffect, useState } from 'react';
 import { FetchContext } from './FetchContext';
 import { API_ROUTES } from './constants';
 
+export interface MutationProtectedFetchProps<T> {
+  body: T;
+  fetchApiRoute: API_ROUTES;
+  fetchMethod: 'POST' | 'PUT' | 'DELETE';
+  routeParam?: string | number;
+  fileName?: string;
+}
 interface FetchProps<T> {
   apiRoute?: API_ROUTES;
   params?: Record<string, string>;
-  method?: 'POST' | 'GET' | 'PUT';
+  method?: 'POST' | 'GET' | 'PUT' | 'DELETE';
   mockedResponse?: T;
   delay?: number;
 }
@@ -50,10 +57,10 @@ export const useFetch = <T>({
           return mockedResponse;
         }
 
-        const response = await protectedFetch?.<T>(apiRoute, params);
+        const response = await protectedFetch?.<void, T>(apiRoute, params);
 
-        if (response) {
-          setResponseData(response);
+        if (response && !response.error) {
+          setResponseData(response.data);
           setError('');
         } else {
           setError('Ошибка загрузки');
@@ -72,15 +79,26 @@ export const useFetch = <T>({
   };
 
   return {
-    protectedFetch: <N, M>(
-      body: N,
-      newApiRoute?: API_ROUTES,
-      newMethod?: 'POST' | 'GET' | 'PUT',
-    ) => {
-      const route = newApiRoute || apiRoute;
+    // fetch for CREATE, UPDATE, DELETE operations
+    mutationProtectedFetch: <N, M>({
+      body,
+      fetchApiRoute,
+      fetchMethod,
+      routeParam,
+      fileName,
+    }: MutationProtectedFetchProps<N>) => {
+      const getRoute = () => {
+        if (routeParam && fetchApiRoute) {
+          return `${fetchApiRoute}/${routeParam}`;
+        }
+
+        return fetchApiRoute || apiRoute;
+      };
+
+      const route = getRoute();
 
       if (route) {
-        return protectedFetch?.<M, N>(route, params, body, newMethod ?? method);
+        return protectedFetch?.<N, M>(route, params, body, fetchMethod ?? method, fileName);
       }
     },
     refetch,

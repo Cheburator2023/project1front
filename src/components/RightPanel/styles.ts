@@ -45,7 +45,6 @@ const Body = styled.div`
   display: flex;
   height: 100%;
   overflow-y: auto;
-  padding: 16px 24px;
   box-sizing: border-box;
   flex-direction: column;
 `;

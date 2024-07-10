@@ -38,6 +38,6 @@ export const CustomSearchInput = styled(SearchInput)`
 
 export const DropContainerCssMixin = css`
   & > div {
-    max-height: 250px;
+    max-height: 300px;
   }
 `;

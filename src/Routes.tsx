@@ -1,15 +1,27 @@
 import React from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, useRoutes } from 'react-router-dom';
 
 import { Home } from './modules';
 
 function RoutesComponent() {
-  return (
-    <Routes>
-      <Route index element={<Home />} />
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
-  );
+  const routes: React.ReactElement<unknown, string | React.JSXElementConstructor<unknown>> | null =
+    useRoutes([
+      {
+        path: '/',
+        index: true,
+        element: <Home />,
+      },
+      {
+        path: 'charts',
+        element: <div>Графики и дашборды</div>,
+      },
+      {
+        path: '*',
+        element: <Navigate to="/" replace />,
+      },
+    ]);
+
+  return routes;
 }
 
 export default RoutesComponent;

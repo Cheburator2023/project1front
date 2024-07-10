@@ -1,0 +1,116 @@
+import React, { useState } from 'react';
+import { Button } from '@admiral-ds/react-ui';
+
+import { COLUMN_TYPE, Column, ColumnsFilter, Row } from '../types';
+import { SELECT_TYPE } from 'src/components/SearchSelect/types';
+import { getColumnFilterOptions, getFilteredRowsByColumnsFilter } from '../helpers';
+import { CustomDateField, CustomSearchSelect } from './styles';
+import { getDateRange, getFormattedDateValue } from './helpers';
+
+interface ColumnFilterProps {
+  column: Column;
+  rowList: Partial<Row>[];
+  columnsFilters: Partial<ColumnsFilter>;
+  onChangeColumnsFilter: (rowFieldName: string, selectValue: string[]) => void;
+}
+
+export const ColumnFilter = React.memo(
+  ({ column, rowList, columnsFilters, onChangeColumnsFilter }: ColumnFilterProps) => {
+    const initialValue =
+      column.type === COLUMN_TYPE.DATE
+        ? getFormattedDateValue(columnsFilters?.[column.name])
+        : columnsFilters?.[column.name];
+
+    const [value, setValue] = useState<string[] | string | undefined>(initialValue);
+
+    switch (column.type) {
+      case COLUMN_TYPE.QUARTERLY_DATE:
+      case COLUMN_TYPE.DATE: {
+        const formattedValue = getFormattedDateValue(value);
+
+        return (
+          <div
+            // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+            onClick={(
+              e: React.MouseEvent<HTMLDivElement, MouseEvent> | React.KeyboardEvent<HTMLDivElement>,
+            ) => {
+              e.stopPropagation();
+            }}
+          >
+            <CustomDateField
+              type="date-range"
+              dimension="s"
+              id="dates"
+              displayClearIcon
+              placeholder="Дата не выбрана"
+              dropContainerClassName="dropContainerClass"
+              value={value}
+              disableCopying
+              onChange={(e) => {
+                const newDateValue = e.currentTarget.value;
+
+                setValue(newDateValue);
+
+                const dateRange = getDateRange(newDateValue);
+
+                if (dateRange) {
+                  onChangeColumnsFilter(column.name, dateRange);
+                }
+              }}
+            />
+          </div>
+        );
+      }
+
+      default: {
+        if (typeof value === 'string') {
+          return null;
+        }
+
+        const filteredRowsIds = getFilteredRowsByColumnsFilter(rowList, columnsFilters).reduce(
+          (filteredRowsIds, filteredRow) => {
+            if (filteredRow && filteredRow?.id) {
+              return [...filteredRowsIds, filteredRow.id];
+            }
+
+            return filteredRowsIds;
+          },
+          [] as string[],
+        );
+
+        const options = getColumnFilterOptions(
+          rowList,
+          column.name,
+          columnsFilters,
+          filteredRowsIds,
+        );
+
+        return (
+          <CustomSearchSelect
+            key={`${filteredRowsIds.length}`}
+            name={column.name}
+            selectedValues={value}
+            onChange={(_, newValue) => setValue(newValue)}
+            selectNotNullEnabled
+            selectEmptyEnabled
+            virtualScrollEnabled
+            options={{
+              type: SELECT_TYPE.STRING,
+              options,
+            }}
+            renderDropDownBottomPanel={() => (
+              <Button
+                onClick={() => value && onChangeColumnsFilter(column.name, value)}
+                dimension="s"
+              >
+                Применить
+              </Button>
+            )}
+          />
+        );
+      }
+    }
+  },
+);
+
+ColumnFilter.displayName = 'ColumnFilter';

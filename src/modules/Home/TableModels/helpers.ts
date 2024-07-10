@@ -1,5 +1,7 @@
-import { NOT_NULL_OPTION } from 'src/components/SearchSelect/constants';
+import { EMPTY_OPTION, NOT_NULL_OPTION } from 'src/components/SearchSelect/constants';
 import { COLUMN_TYPE, Column, ColumnsFilter, Row } from './types';
+import { initialColumns } from '../constants';
+import { isWithinInterval } from 'date-fns';
 
 const getTime = (value: unknown) => {
   if (typeof value === 'string') {
@@ -58,18 +60,18 @@ const getPageRows = ({
   page,
   pageSize,
 }: {
-  rows: Array<Partial<Row> & { id: string }>;
+  rows: Array<Partial<Row>>;
   page: number;
   pageSize: number;
 }) => {
   const startRowIndex = page > 1 ? pageSize * page - pageSize : 0;
-  const lastRowIndex = (page > 1 ? pageSize * page : pageSize) - 1;
+  const lastRowIndex = page > 1 ? pageSize * page : pageSize;
 
   return rows.slice(startRowIndex, lastRowIndex);
 };
 
 const getFilteredRowsBySearch = (
-  rows: Array<Partial<Row> & { id: string }>,
+  rows: Array<Partial<Row>>,
   colNames: Array<keyof Row>,
   searchString: string,
 ) =>
@@ -82,25 +84,67 @@ const getFilteredRowsBySearch = (
         .split(searchString.toLowerCase()).length > 1,
   );
 
-const getColumnFilterOptions = (
-  rowList: Array<Partial<Row> & { id: string }>,
-  columnName: keyof Row,
+const getColumnFilterOptionVisibilityStatus = (
+  columnValue: string,
+  rowId?: string,
+  filteredRowsIds?: string[],
+  activeColumnFilters?: string[],
 ) => {
-  const uniqueColumnValues = rowList.reduce((columnValues, row) => {
-    const columnValue = row[columnName];
+  // Check for filtered row
+  const isCurrentRowPassedFilters = !!(rowId && filteredRowsIds?.includes(rowId));
 
-    if (columnValue && !columnValues.includes(columnValue)) {
-      return [...columnValues, columnValue];
-    }
+  // Check for active filters
+  const isCurrentFilterActive = !!(
+    activeColumnFilters &&
+    activeColumnFilters.length &&
+    activeColumnFilters.includes(columnValue)
+  );
 
-    return columnValues;
-  }, [] as string[]);
-
-  return uniqueColumnValues.map((columnValue) => ({
-    value: `${columnValue}`,
-    text: `${columnValue}`,
-  }));
+  return isCurrentFilterActive || isCurrentRowPassedFilters;
 };
+
+const getColumnFilterOptions = (
+  rowList: Array<Partial<Row>>,
+  columnName: keyof Row,
+  columnsFilters?: Partial<ColumnsFilter>,
+  filteredRowsIds?: Array<string>,
+) =>
+  rowList.reduce(
+    (columnValues, row) => {
+      const columnValue = row[columnName];
+      const activeColumnFilters = columnsFilters?.[columnName];
+
+      if (columnValue) {
+        // Check for unique value
+        const isUniqueValue = !columnValues.find((item) => item.value === columnValue);
+
+        const isVisibleValue = getColumnFilterOptionVisibilityStatus(
+          columnValue,
+          row.id,
+          filteredRowsIds,
+          activeColumnFilters,
+        );
+
+        if (!isUniqueValue || !isVisibleValue) {
+          return columnValues;
+        }
+
+        return [
+          ...columnValues,
+          {
+            value: columnValue,
+            text: columnValue,
+          },
+        ];
+      }
+
+      return columnValues;
+    },
+    [] as Array<{
+      value: string;
+      text: string;
+    }>,
+  );
 
 const getValueColumnFilterOptions = (
   columnName: keyof Row,
@@ -128,7 +172,7 @@ const getValuesColumnsFilterOptions = (
   );
 
 const getFilteredRowsByColumnsFilter = (
-  tableRows: Array<Partial<Row> & { id: string }>,
+  tableRows: Array<Partial<Row>>,
   columnsFilter: Partial<ColumnsFilter>,
 ) => {
   const rowFields = Object.keys(columnsFilter) as Array<keyof Row>;
@@ -145,6 +189,44 @@ const getFilteredRowsByColumnsFilter = (
 
       const fieldValue = row[fieldName];
 
+      // Check for column type
+      const columnType = initialColumns.find((column) => column.name === fieldName)?.type;
+
+      if (!columnType) {
+        return false;
+      }
+
+      if (columnType === COLUMN_TYPE.DATE) {
+        if (!fieldValue || fieldValue === 'invalid date') {
+          return false;
+        }
+
+        const fieldValueDateString = new Date(fieldValue.split(' ')[0]);
+
+        if (!fieldValueDateString) {
+          return false;
+        }
+
+        const [start, end] = [new Date(fieldFilters[0]), new Date(fieldFilters[1])];
+
+        if (!fieldValueDateString || !start || !end) {
+          return false;
+        }
+
+        return isWithinInterval(fieldValueDateString, {
+          start,
+          end,
+        });
+      }
+
+      // Check for not-null and empty filter
+      if (
+        fieldFilters?.includes(NOT_NULL_OPTION.value) &&
+        fieldFilters?.includes(EMPTY_OPTION.value)
+      ) {
+        return true;
+      }
+
       // Check for not-null filter
       if (fieldFilters?.includes(NOT_NULL_OPTION.value)) {
         if (!fieldValue) {
@@ -153,6 +235,17 @@ const getFilteredRowsByColumnsFilter = (
 
         if (fieldFilters?.length === 1) {
           return true;
+        }
+      }
+
+      // Check for empty filter
+      if (fieldFilters?.includes(EMPTY_OPTION.value)) {
+        if (!fieldValue) {
+          return true;
+        }
+
+        if (fieldFilters?.length === 1) {
+          return false;
         }
       }
 
@@ -165,7 +258,7 @@ const getFilteredRowsByColumnsFilter = (
 };
 
 export {
-  getTime as StrToTime,
+  getTime,
   compare,
   getPageRows,
   getFilteredRowsBySearch,

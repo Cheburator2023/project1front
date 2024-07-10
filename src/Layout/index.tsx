@@ -1,15 +1,24 @@
 import React, { useCallback, useState } from 'react';
-import styled, { ThemeProvider, createGlobalStyle } from 'styled-components';
-import { LIGHT_THEME, DropdownProvider } from '@admiral-ds/react-ui';
+import styled, { createGlobalStyle, ThemeProvider } from 'styled-components';
+import { DropdownProvider } from '@admiral-ds/react-ui';
+import Keycloak from 'keycloak-js';
 import { FetchContext } from 'src/api';
 
 import { Header } from './Header';
-import { DownloadReportContext } from './DownloadReport/DownloadReportContext';
-import { CSVReportBody, CSVReportHeader, UpdateCSVContentArguments } from './DownloadReport/types';
+import { DownloadReportContext } from './DownloadReportContext';
+import { themes } from './theme/theme';
+
+import { ColumnsFilter } from 'src/modules/Home/TableModels/types';
 
 interface LayoutProps {
   children: React.ReactNode;
-  protectedFetch?: <T>(routeUrl: string, body?: BodyInit, method?: string) => Promise<T>;
+  user?: Keycloak.KeycloakTokenParsed & { family_name: string; given_name: string };
+  protectedFetch?: <T, N>(
+    routeUrl: string,
+    params?: Record<string, string>,
+    body?: N,
+    method?: string,
+  ) => Promise<T>;
   goToSum?: () => void;
   onLogout?: () => void;
 }
@@ -24,28 +33,28 @@ const Container = styled.div`
   min-width: 1600px;
 `;
 
-const Layout = ({ children, protectedFetch, goToSum, onLogout }: LayoutProps) => {
-  const [reportHeader, setReportHeader] = useState<CSVReportHeader>([]);
-  const [reportBody, setReportBody] = useState<CSVReportBody>([]);
+const Layout = ({ children, user, protectedFetch, goToSum, onLogout }: LayoutProps) => {
+  const [downloadReportStatus, setDownloadReportStatus] = useState(false);
+  const [columnsFilters, setColumnsFilters] = useState<Partial<ColumnsFilter>>();
 
-  const updateCVSReportContent = useCallback((newReportContent: UpdateCSVContentArguments) => {
-    if (newReportContent.type === 'body') {
-      setReportBody(newReportContent.body);
-    } else {
-      setReportHeader(newReportContent.header);
-    }
+  const updateColumnsFilters = useCallback((newColumnsFilters?: Partial<ColumnsFilter>) => {
+    setColumnsFilters(newColumnsFilters);
   }, []);
 
   return (
     // eslint-disable-next-line react/jsx-no-constructed-context-values
     <FetchContext.Provider value={{ protectedFetch }}>
-      <ThemeProvider theme={LIGHT_THEME}>
+      <ThemeProvider theme={themes.light}>
         <DropdownProvider>
           <GlobalStyle />
-          <DownloadReportContext.Provider value={{ updateCVSReportContent }}>
+          <DownloadReportContext.Provider value={{ updateColumnsFilters, downloadReportStatus }}>
             <Container>
               <Header
-                csvReportContent={{ header: reportHeader, body: reportBody }}
+                user={user}
+                downloadReportStatus={downloadReportStatus}
+                columnsFilters={columnsFilters}
+                updateColumnsFilters={updateColumnsFilters}
+                updateDownloadReportStatus={setDownloadReportStatus}
                 goToSum={goToSum}
                 onLogout={onLogout}
               />
@@ -59,3 +68,4 @@ const Layout = ({ children, protectedFetch, goToSum, onLogout }: LayoutProps) =>
 };
 
 export default Layout;
+export * from './theme/theme';
