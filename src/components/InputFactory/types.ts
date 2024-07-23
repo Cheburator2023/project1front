@@ -45,12 +45,12 @@ type FlagInputValue = {
 
 type DateInputValue = {
   type: INPUT_TYPE.DATE;
-  value: Date;
+  value: Date | null;
 };
 
 type QuarterlyDateInputValue = {
   type: INPUT_TYPE.QUARTERLY_DATE;
-  value: Date;
+  value: Date | null;
 };
 
 type QuarterlyDateGroupInputValue = {

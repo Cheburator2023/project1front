@@ -1,5 +1,4 @@
 import { SelectStringOptions } from 'src/components/SearchSelect/types';
-import { differenceInYears, addYears } from 'date-fns';
 
 import {
   DateInputValue,
@@ -12,6 +11,7 @@ import {
   SelectInputValue,
   StringInputValue,
 } from './types';
+import { format } from 'date-fns';
 
 export const getSelectValues = (valueIds: string[], options: SelectStringOptions) =>
   options.reduce(
@@ -76,13 +76,20 @@ export const getDateValue = (
   value?: InputValue,
   initialValue?: DateInputValue | QuarterlyDateInputValue,
 ) => {
-  if (!value) {
-    return initialValue?.value;
+  let dateValue;
+
+  if (!value && initialValue?.value) {
+    dateValue = format(initialValue.value, 'dd.MM.yyyy');
   }
 
-  if (value.type === INPUT_TYPE.DATE || value.type === INPUT_TYPE.QUARTERLY_DATE) {
-    return value.value;
+  if (
+    value?.value &&
+    (value.type === INPUT_TYPE.DATE || value.type === INPUT_TYPE.QUARTERLY_DATE)
+  ) {
+    dateValue = format(value.value, 'dd.MM.yyyy');
   }
+
+  return dateValue;
 };
 
 export const getFlagValue = (value?: InputValue, initialValue?: FlagInputValue) => {
@@ -106,14 +113,4 @@ export const getSelectValue = (
   if (value.type === INPUT_TYPE.SELECT || value.type === INPUT_TYPE.MULTI_SELECT) {
     return formatValuesForSelect(value);
   }
-};
-
-export const getStartDateInCurrentYear = (startDate: Date) => {
-  const yearsFromStartDate = differenceInYears(Date.now(), startDate);
-
-  if (yearsFromStartDate) {
-    return addYears(startDate, yearsFromStartDate);
-  }
-
-  return startDate;
 };

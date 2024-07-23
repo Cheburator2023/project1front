@@ -15,7 +15,15 @@ import { FORM_MODE, FormFields, FormFieldsSchema, FormValues } from './types';
 import { ColumnsFilter, Row } from '../../TableModels/types';
 import { initialColumns } from '../../constants';
 import { ADDITIONAL_DAYS_OUT_QUARTER, ADD_NEW_MODEL_SCHEMA, MONTHS_IN_QUARTER } from './constants';
-import { addMonths, format, isWithinInterval, subBusinessDays } from 'date-fns';
+import {
+  addMonths,
+  addYears,
+  differenceInYears,
+  format,
+  isWithinInterval,
+  startOfYear,
+  subBusinessDays,
+} from 'date-fns';
 import { RIGHT_PANEL_TYPE } from '../../types';
 
 // A set of functions that help with the conversion of artifacts values for selected options
@@ -174,10 +182,34 @@ const getMultiSelectInitialValue = (
   };
 };
 
-const getDateLimits = (startDate: Date, quarter: number) => ({
-  minDate: quarter ? addMonths(startDate, quarter * MONTHS_IN_QUARTER) : startDate,
-  maxDate: addMonths(startDate, quarter * MONTHS_IN_QUARTER + MONTHS_IN_QUARTER),
-});
+const getDateLimits = (startDate: Date, quarter: number) => {
+  const firstDateOfCurrentYear = startOfYear(new Date());
+
+  const minDate = addMonths(firstDateOfCurrentYear, (quarter - 1) * MONTHS_IN_QUARTER);
+  const maxDate = addMonths(minDate, MONTHS_IN_QUARTER);
+
+  if (isWithinInterval(startDate, { start: minDate, end: maxDate })) {
+    return {
+      minDate: startDate,
+      maxDate: maxDate,
+    };
+  }
+
+  return {
+    minDate,
+    maxDate,
+  };
+};
+
+export const getStartDateInCurrentYear = (startDate: Date) => {
+  const yearsFromStartDate = differenceInYears(Date.now(), startDate);
+
+  if (yearsFromStartDate) {
+    return addYears(startDate, yearsFromStartDate);
+  }
+
+  return startDate;
+};
 
 const getDisabledStatus = (minDate: Date, maxDate: Date) =>
   !isWithinInterval(Date.now(), {
@@ -410,7 +442,7 @@ const getFormFields = ({
   }, [] as FormFields);
 
   // TODO: move it to prev reduce
-  return formFields.reduce((fields, field) => {
+  const newFormFields = formFields.reduce((fields, field) => {
     if (field.type === INPUT_TYPE.QUARTERLY_DATE) {
       // Skip prev quartes, wait for last one
       if (field.quarter === 4) {
@@ -428,6 +460,8 @@ const getFormFields = ({
 
     return [...fields, field];
   }, [] as FormFields);
+
+  return newFormFields;
 };
 
 const getValuesFromParentModel = (fields: FormFields): FormValues =>
@@ -486,8 +520,9 @@ const getProperFormatValueForSubmit = (inputValue: InputValue) => {
 
   switch (type) {
     case INPUT_TYPE.DATE:
+    case INPUT_TYPE.QUARTERLY_DATE:
       return {
-        artefact_string_value: format(value, 'dd.MM.YYYY'),
+        artefact_string_value: value ? format(value, 'dd.MM.yyyy') : '',
         artefact_value_id: null,
       };
     case INPUT_TYPE.FLAG:

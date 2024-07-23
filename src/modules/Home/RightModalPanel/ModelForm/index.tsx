@@ -217,9 +217,11 @@ export const ModelForm = ({
             {fields.map((field) => (
               <InputFactory<keyof Row>
                 key={field.id}
+                values={values}
                 autoFocus={editCellName === field.name}
                 onChange={handleChange}
                 inputFactory={field}
+                editFieldName={editCellName}
                 error={notValidFields.includes(field.name)}
               />
             ))}

@@ -1,5 +1,24 @@
 # Semantic Versioning Changelog
 
+## [1.18.1](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/compare/v1.18.0...v1.18.1) (2024-07-16)
+
+
+### Bug Fixes
+
+* fix bug with auto focus on edit field ([8213ae2](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/commit/8213ae290ca783114f991fc728687b5930c12732))
+
+# [1.18.0](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/compare/v1.17.10...v1.18.0) (2024-07-15)
+
+
+### Bug Fixes
+
+* fix bugs with form ([ed85098](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/commit/ed8509841fd78003e3e62d9444c9cf535bb0d72e))
+
+
+### Features
+
+* add allocation feature ([28a074f](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/commit/28a074fc588c7a8f7f5d6f5999d8d2ae4b39c2f7))
+
 ## [1.17.10](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/compare/v1.17.9...v1.17.10) (2024-07-09)
 
 

@@ -24,7 +24,7 @@ import {
 
 interface InputFactoryI<T extends string> {
   inputFactory: InputFactoryProps<T>;
-  autoFocus?: boolean;
+  editFieldName?: T;
   ref?: React.Ref<HTMLInputElement>;
   error?: boolean;
   values?: Partial<Record<T, InputValue>>;
@@ -36,7 +36,7 @@ function InputFactory<T extends string>({
   values,
   error,
   ref,
-  autoFocus,
+  editFieldName,
   onChange,
 }: InputFactoryI<T>) {
   const {
@@ -50,6 +50,7 @@ function InputFactory<T extends string>({
   } = inputFactory;
 
   const value = values?.[name];
+  const autoFocus = editFieldName === name;
 
   switch (type) {
     case INPUT_TYPE.NUMBER: {
@@ -89,7 +90,7 @@ function InputFactory<T extends string>({
     case INPUT_TYPE.DATE: {
       const { maxDate, minDate, initialValue } = inputFactory;
 
-      const formattedValue = getDateValue(value, initialValue);
+      const dateValue = getDateValue(value, initialValue);
 
       return (
         <DateField
@@ -103,11 +104,14 @@ function InputFactory<T extends string>({
           placeholder={placeholder}
           required={required}
           label={label}
-          value={formattedValue ? format(formattedValue, 'dd.MM.yyyy') : undefined}
+          value={dateValue}
           maxDate={maxDate}
           minDate={minDate}
           onChange={(e) =>
-            onChange?.(name, { type, value: parse(e.target.value, 'dd.MM.yyyy', new Date()) })
+            onChange?.(name, {
+              type,
+              value: e.target.value ? parse(e.target.value, 'dd.MM.yyyy', new Date()) : null,
+            })
           }
         />
       );
@@ -117,12 +121,12 @@ function InputFactory<T extends string>({
 
       return (
         <Field
+          id={id}
           key={id}
           required={required}
           status={error ? 'error' : undefined}
           extraText={error && 'Обязательное поле'}
           label={label}
-          id={id}
         >
           <div
             style={{
@@ -133,31 +137,30 @@ function InputFactory<T extends string>({
             }}
           >
             {quartes.map((quarter) => {
-              const quarterValue = values?.[quarter.name];
-              const quarterFormattedValue = getDateValue(quarterValue, quarter.initialValue);
+              const quarterDateValue = getDateValue(values?.[quarter.name], quarter?.initialValue);
 
               return (
                 <DateField
-                  style={{ maxWidth: '140px' }}
-                  ref={ref}
-                  autoFocus={autoFocus}
                   key={quarter.id}
+                  ref={ref}
+                  style={{ maxWidth: '140px' }}
+                  autoFocus={editFieldName === quarter.name}
                   status={error ? 'error' : undefined}
                   extraText={error && 'Обязательное поле'}
                   disabled={quarter.disabled}
                   dimension="s"
-                  placeholder={quarter.placeholder}
+                  placeholder="Укажите дату"
                   required={quarter.required}
                   label={quarter.label}
-                  value={
-                    quarterFormattedValue ? format(quarterFormattedValue, 'dd.MM.yyyy') : undefined
-                  }
+                  value={quarterDateValue}
                   maxDate={quarter.maxDate}
                   minDate={quarter.minDate}
                   onChange={(e) =>
                     onChange?.(quarter.name, {
                       type: quarter.type,
-                      value: parse(e.target.value, 'dd.MM.yyyy', new Date()),
+                      value: e.target.value
+                        ? parse(e.target.value, 'dd.MM.yyyy', new Date())
+                        : null,
                     })
                   }
                 />
@@ -197,7 +200,7 @@ function InputFactory<T extends string>({
 
       return (
         <SearchSelect
-          key={String(formattedValue?.length)}
+          key={name}
           autoFocus={autoFocus}
           error={error}
           extraText={error ? 'Обязательное поле' : undefined}
@@ -225,7 +228,7 @@ function InputFactory<T extends string>({
 
       return (
         <SearchSelect
-          key={String(formattedValue?.length)}
+          key={name}
           name={`${name}`}
           displayClearIcon
           error={error}
