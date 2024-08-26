@@ -80,6 +80,9 @@ export const RowWrapper = ({
       isGroup={isGroup}
       rowWidth={rowWidth}
       hover={!!row.hover}
+      data-row={row.id}
+      data-group={isGroup}
+      data-first-row-in-group={row?.groupRows?.[0] ?? null}
     >
       <SimpleRow
         className="tr-simple"

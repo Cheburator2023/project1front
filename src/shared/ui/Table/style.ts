@@ -1,6 +1,7 @@
 import styled, { css } from 'styled-components';
 import { ReactComponent as ArrowUpOutline } from '@admiral-ds/icons/build/system/ArrowUpOutline.svg';
 import { ReactComponent as ChevronDownOutline } from '@admiral-ds/icons/build/system/ChevronDownOutline.svg';
+import { ReactComponent as DragOutline } from './icons/dragIcon.svg';
 import { IconPlacement, typography } from '@admiral-ds/react-ui';
 
 import type { TableProps } from './';
@@ -479,4 +480,67 @@ export const MirrorText = styled.div`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+`;
+
+/** Утилита, введенная на время перехода с styled-components theme на custom css properties
+ * Утилита будет удалена одновременно со старым механизмом темизации
+ */
+export const parseShadow = (token: string) => {
+  let result = token;
+  result = result.replace('box-shadow: ', '');
+  result = result.replace(';', '');
+  return result;
+};
+
+export const MirrorRow = styled.div<{ dimension: TableProps['dimension'] }>`
+  position: fixed;
+  z-index: 6;
+  visibility: hidden;
+  display: flex;
+  align-items: center;
+  max-width: 288px;
+  box-shadow: var(
+    --admiral-box-shadow-Shadow08,
+    ${(p) => parseShadow(p.theme.shadow['Shadow 08'])}
+  );
+  background: var(--admiral-color-Neutral_Neutral00, ${(p) => p.theme.color['Neutral/Neutral 00']});
+  padding-left: ${({ dimension }) => (dimension === 's' || dimension === 'm' ? 36 : 48)}px;
+  ${rowStyle}
+
+  &[data-cursor='normal'] {
+    cursor: grabbing;
+  }
+  &[data-cursor='error'] {
+    cursor: not-allowed;
+  }
+`;
+
+export const DragCell = styled(Cell)<{ dimension: TableProps['dimension'] }>`
+  width: ${({ dimension }) => (dimension === 's' || dimension === 'm' ? 36 : 48)}px;
+  padding: ${({ dimension }) => {
+    switch (dimension) {
+      case 's':
+        return '6px 8px 5px 8px';
+      case 'l':
+        return '12px 12px 11px 12px';
+      case 'xl':
+        return '16px 12px 15px 12px';
+      case 'm':
+      default:
+        return '10px 8px 9px 8px';
+    }
+  }};
+  border: none;
+`;
+
+export const DragIcon = styled(DragOutline)<{ $disabled?: boolean }>`
+  display: flex;
+  flex-shrink: 0;
+  cursor: ${(p) => (p.$disabled ? 'not-allowed' : 'pointer')};
+  & *[fill^='#'] {
+    fill: ${({ theme, $disabled }) =>
+      $disabled
+        ? `var(--admiral-color-Neutral_Neutral30, ${theme.color['Neutral/Neutral 30']})`
+        : `var(--admiral-color-Neutral_Neutral50, ${theme.color['Neutral/Neutral 50']})`};
+  }
 `;

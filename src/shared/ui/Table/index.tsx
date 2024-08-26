@@ -1,6 +1,6 @@
 import * as React from 'react';
 import ReactDOM from 'react-dom';
-import type { CSSProperties } from 'react';
+import { CSSProperties, useEffect, useRef, useState } from 'react';
 import { Checkbox, LIGHT_THEME, DropdownContext } from '@admiral-ds/react-ui';
 import { useTheme } from 'styled-components';
 import type { FlattenInterpolation, ThemeProps, DefaultTheme } from 'styled-components';
@@ -31,10 +31,12 @@ import {
   HiddenHeader,
   Mirror,
   MirrorText,
+  DragCell,
 } from './style';
 import { VirtualBody } from './VirtualBody';
 import { ReactComponent as CursorGrabbing } from './icons/cursorGrabbing.svg';
 import { ReactComponent as CursorNotAllowed } from './icons/cursorNotAllowed.svg';
+import { RowDrag } from './drag/RowDrag';
 
 export * from './RowAction';
 
@@ -285,6 +287,17 @@ export interface TableProps extends React.HTMLAttributes<HTMLDivElement> {
    * Если nextColumnName равен null, значит столбец был перемещен в самый конец списка.
    */
   onColumnDragEnd?: (columnName: string, nextColumnName: string | null) => void;
+  /** Включение возможности drag & drop строк */
+  rowsDraggable?: boolean;
+  /** Колбек, который срабатывает при попытке перетащить строку таблицы на новое место.
+   * rowId - id строки, которая перетаскивается;
+   * nextRowId - id строки, перед которой пытается встать передвигаемая строка.
+   * Если nextRowId равен null, значит строку передвигают в самый конец таблицы.
+   * groupRowId - id групповой строки (строки с заголовком группы), по данному id можно
+   * определить к какой группе будет относиться перетаскиваемая строка
+   * Если groupRowId равен null, то строка не принадлежит ни к какой группе.
+   */
+  onRowDrag?: (rowId: string, nextRowId: string | null, groupRowId: string | null) => void;
 }
 
 type GroupInfo = {
@@ -297,9 +310,9 @@ type RowInfo = {
   checked: boolean;
 };
 
-type Group = Record<string, GroupInfo>;
-type GroupRows = Record<string, RowInfo>;
-type ZebraRows = Record<string, 'odd' | 'even' | 'ingroup odd' | 'ingroup even' | 'group'>;
+export type Group = Record<string, GroupInfo>;
+export type GroupRows = Record<string, RowInfo>;
+export type ZebraRows = Record<string, 'odd' | 'even' | 'ingroup odd' | 'ingroup even' | 'group'>;
 
 export const Table: React.FC<TableProps> = ({
   columnList,
@@ -331,6 +344,8 @@ export const Table: React.FC<TableProps> = ({
   locale,
   onColumnDrag,
   onColumnDragEnd,
+  rowsDraggable = false,
+  onRowDrag,
   ...props
 }) => {
   const theme = useTheme() || LIGHT_THEME;
@@ -361,6 +376,7 @@ export const Table: React.FC<TableProps> = ({
   // save callback via useRef to not update dragObserver on each callback change
   const columnDragCallback = React.useRef(onColumnDrag);
   const dragInfo = React.useRef<{ columnName: string; nextColumnName: string | null } | null>(null);
+  const [rowDragging, setRowDragging] = useState(false);
 
   const groupToRowsMap = rowList.reduce<Group>((acc: Group, row) => {
     if (typeof row.groupRows !== 'undefined') {
@@ -421,6 +437,37 @@ export const Table: React.FC<TableProps> = ({
         return acc;
       }, {})
     : {};
+
+  const rowMirrorRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (rowMirrorRef.current && rowDragging && rowsDraggable) {
+      const observer = observeRect(rowMirrorRef.current, (rect: any) => {
+        const topCoord = scrollBodyRef.current?.getBoundingClientRect().top || 0;
+        const bottomCoord = scrollBodyRef.current?.getBoundingClientRect().bottom || 0;
+
+        if (scrollBodyRef.current) {
+          const scrollTop = scrollBodyRef.current.scrollTop;
+          const scrollHeight = scrollBodyRef.current.scrollHeight;
+          const offsetHeight = scrollBodyRef.current.offsetHeight;
+
+          if (
+            rect.bottom > bottomCoord &&
+            scrollHeight > offsetHeight &&
+            scrollTop + offsetHeight < scrollHeight
+          ) {
+            scrollBodyRef.current.scrollBy({ top: Math.abs(bottomCoord - rect.bottom) });
+          }
+          if (rect.top < topCoord && scrollTop > 0) {
+            scrollBodyRef.current.scrollBy({ top: -Math.abs(topCoord - rect.top) });
+          }
+        }
+      });
+
+      observer.observe();
+      return () => observer.unobserve();
+    }
+  }, [rowsDraggable, rowDragging]);
 
   React.useLayoutEffect(() => {
     if (hiddenHeaderRef.current) {
@@ -584,6 +631,7 @@ export const Table: React.FC<TableProps> = ({
   React.useEffect(() => {
     const stickyCols = stickyColumnsWrapperRef.current;
     const normalCols = normalColumnsWrapperRef.current;
+    const rowMirror = rowMirrorRef.current;
 
     function handleDrop(item: HTMLElement | null, before: HTMLElement | null) {
       const columnName = item?.dataset?.thColumn;
@@ -611,12 +659,25 @@ export const Table: React.FC<TableProps> = ({
       }
       setColumnDragging(false);
     }
+    function renderMirror(dragRow: HTMLElement | null) {
+      const firstCell = dragRow?.getElementsByClassName('td')[0];
+      if (firstCell && rowMirror) {
+        rowMirror.appendChild(firstCell.cloneNode(true));
+      }
+    }
+    function removeMirror() {
+      if (rowMirror && rowMirror.lastChild) {
+        rowMirror.removeChild(rowMirror.lastChild);
+      }
+    }
 
     if (normalCols && isAnyColumnDraggable) {
       const observer = dragObserver(
         [normalCols],
         {
           mirrorRef,
+          renderMirror,
+          removeMirror,
           dimension,
           direction: 'horizontal',
           invalid: (el: HTMLElement) => {
@@ -806,6 +867,7 @@ export const Table: React.FC<TableProps> = ({
         renderCell={renderCell}
         indeterminate={indeterminate}
         checked={checked}
+        rowsDraggable={rowsDraggable}
       />
     );
   };
@@ -822,6 +884,7 @@ export const Table: React.FC<TableProps> = ({
       renderBodyCell={renderBodyCell(idx)}
       onRowExpansionChange={handleExpansionChange}
       onRowSelectionChange={handleCheckboxChange}
+      rowsDraggable={rowsDraggable}
     />
   );
 
@@ -908,8 +971,9 @@ export const Table: React.FC<TableProps> = ({
   const renderHiddenHeader = () => {
     return (
       <HiddenHeader ref={hiddenHeaderRef} data-verticalscroll={verticalScroll}>
-        {(displayRowSelectionColumn || displayRowExpansionColumn) && (
+        {(displayRowSelectionColumn || displayRowExpansionColumn || rowsDraggable) && (
           <StickyWrapper>
+            {rowsDraggable && <DragCell dimension={dimension} />}
             {displayRowExpansionColumn && <ExpandCell dimension={dimension} />}
             {displayRowSelectionColumn && (
               <CheckboxCell dimension={dimension}>
@@ -947,8 +1011,14 @@ export const Table: React.FC<TableProps> = ({
         data-verticalscroll={verticalScroll}
       >
         <Header dimension={dimension} ref={headerRef} className="tr">
-          {(displayRowSelectionColumn || displayRowExpansionColumn || stickyColumns.length > 0) && (
+          {(displayRowSelectionColumn ||
+            displayRowExpansionColumn ||
+            stickyColumns.length > 0 ||
+            rowsDraggable) && (
             <StickyWrapper ref={stickyColumnsWrapperRef} greyHeader={greyHeader}>
+              {rowsDraggable && (
+                <DragCell dimension={dimension} data-draggable={false} data-droppable={false} />
+              )}
               {displayRowExpansionColumn && (
                 <ExpandCell dimension={dimension} data-draggable={false} data-droppable={false} />
               )}
@@ -992,6 +1062,13 @@ export const Table: React.FC<TableProps> = ({
           </Mirror>,
           rootRef?.current || document.body,
         )}
+      <RowDrag
+        onRowDrag={onRowDrag}
+        dimension={dimension}
+        rowsDraggable={rowsDraggable}
+        scrollBodyRef={scrollBodyRef}
+        rowToGroupMap={rowToGroupMap}
+      />
     </TableContainer>
   );
 };

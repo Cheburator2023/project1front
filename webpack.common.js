@@ -5,6 +5,18 @@ const ModuleFederationPlugin = require('webpack').container.ModuleFederationPlug
 const federationConfig = require('./federation.config.json');
 const deps = require('./package.json').dependencies;
 
+const SRC_DIR = path.join(__dirname, './src');
+
+const ALIAS = {
+  '@src': `${SRC_DIR}`,
+  '@shared': `${SRC_DIR}/shared`,
+  '@app': `${SRC_DIR}/app`,
+  '@entities': `${SRC_DIR}/entities`,
+  '@pages': `${SRC_DIR}/pages`,
+  '@features': `${SRC_DIR}/features`,
+  '@widgets': `${SRC_DIR}/widgets`,
+};
+
 module.exports = {
   entry: {
     app: './src/index',
@@ -64,9 +76,11 @@ module.exports = {
     clean: true,
   },
   resolve: {
+    alias: ALIAS,
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
-    alias: {
-      src: path.resolve(__dirname, './src'),
+    fallback: {
+      url: false,
+      path: false,
     },
   },
   module: {

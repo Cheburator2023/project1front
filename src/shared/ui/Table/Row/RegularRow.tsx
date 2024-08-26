@@ -5,6 +5,8 @@ import type { TableRow, RowId, Column, Dimension } from '../';
 
 import {
   CheckboxCell,
+  DragCell,
+  DragIcon,
   ExpandCell,
   ExpandIcon,
   ExpandIconPlacement,
@@ -34,6 +36,8 @@ export interface RegularRowProps {
   onRowSelectionChange?: (rowId: RowId) => void;
   /** Функция рендера ячейки */
   renderBodyCell: (row: TableRow, column: Column) => React.ReactNode;
+  /** Активен ли drag&drop строк в таблице */
+  rowsDraggable?: boolean;
 }
 
 export const RegularRow = ({
@@ -47,6 +51,7 @@ export const RegularRow = ({
   onRowExpansionChange,
   onRowSelectionChange,
   renderBodyCell,
+  rowsDraggable,
 }: RegularRowProps) => {
   const handleCheckboxClick = (e: React.MouseEvent<HTMLElement>) => {
     // клик по чекбоксу не должен вызывать событие клика по строке
@@ -61,10 +66,18 @@ export const RegularRow = ({
 
   return (
     <>
-      {(displayRowSelectionColumn || displayRowExpansionColumn || stickyColumns.length > 0) && (
-        <StickyWrapper>
+      {(displayRowSelectionColumn ||
+        displayRowExpansionColumn ||
+        stickyColumns.length > 0 ||
+        rowsDraggable) && (
+        <StickyWrapper data-column="expand">
+          {rowsDraggable && (
+            <DragCell dimension={dimension}>
+              <DragIcon data-dragicon $disabled={row.disabled} />
+            </DragCell>
+          )}
           {displayRowExpansionColumn && (
-            <ExpandCell dimension={dimension}>
+            <ExpandCell dimension={dimension} data-column="expand" data-row={row.id}>
               {row.expandedRowRender && (
                 <ExpandIconPlacement
                   style={{ margin: 0, flexShrink: 0 }}
@@ -79,7 +92,12 @@ export const RegularRow = ({
             </ExpandCell>
           )}
           {displayRowSelectionColumn && (
-            <CheckboxCell dimension={dimension} className="td_checkbox">
+            <CheckboxCell
+              dimension={dimension}
+              className="td_checkbox"
+              data-column="checkbox"
+              data-row={row.id}
+            >
               <Checkbox
                 disabled={row.disabled || row.checkboxDisabled}
                 dimension={checkboxDimension}
