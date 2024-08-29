@@ -1,4 +1,4 @@
-import { ColumnsFilter, Row } from '@pages/Home/TableModels/types';
+import { ColumnsFilter, Row } from '@shared/types';
 
 export type CompareModelsResponseType = {
   data: {
@@ -24,6 +24,13 @@ export type ErrorResponse = {
 export type ModelsResponseType = {
   data: {
     cards: Array<Partial<Row>>;
+  };
+};
+
+export type MetricsResponseType = {
+  distributionByLifecycleStageModels: {
+    name: string;
+    data: (string | number)[][];
   };
 };
 

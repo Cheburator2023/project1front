@@ -155,4 +155,58 @@ type Column = {
   renderCell?: ColumnAdmiral['renderCell'];
 };
 
-export { COLUMN_TYPE, Row, ArtificialRow, Column, ColumnsFilter, TopFilters };
+enum ModelStatus {
+  NOT_IMPLEMENTED = 'Не внедряется',
+  DEVELOPED_NOT_IMPLEMENTED = 'Разработана, не внедрена',
+  IMPLEMENTED_IN_PIM = 'Внедрена в ПИМ',
+  IMPLEMENTED_OUTSIDE_PIM = 'Внедрена вне ПИМ',
+  NOT_EFFECTIVE = 'Модель не эффективна в БП заказчика',
+  DECOMMISSIONED = 'Вывод модели из эксплуатации',
+  IN_IMPLEMENTATION = 'Внедряется',
+}
+
+enum ModelSource {
+  SUM_RM = 'sum-rm',
+}
+
+type DsStreamOption = {
+  artefact_value: string;
+};
+
+type DsStreamArtifact = {
+  values: DsStreamOption[];
+};
+
+export const dsStreamArtifact: DsStreamArtifact = {
+  values: [
+    {
+      artefact_value: 'Управление моделирования РБ',
+    },
+    {
+      artefact_value: 'Управление моделирования КИБ и СМБ',
+    },
+    {
+      artefact_value: 'Управление перспективных алгоритмов машинного обучения',
+    },
+    {
+      artefact_value: 'Управление процессных и финансовых моделей',
+    },
+    {
+      artefact_value: 'Управление моделирования партнерств и ИТ-процессов',
+    },
+  ],
+};
+
+export {
+  COLUMN_TYPE,
+  Row,
+  ArtificialRow,
+  Column,
+  ColumnsFilter,
+  TopFilters,
+  ModelSource,
+  DsStreamArtifact,
+  DsStreamOption,
+  ModelStatus,
+};
+

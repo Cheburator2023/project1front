@@ -1,7 +1,7 @@
 import React from 'react';
 import { Navigate, useRoutes } from 'react-router-dom';
 
-import { Home } from '@pages';
+import { Home, ChartsDashboardPage } from '@pages';
 
 function RoutesComponent() {
   const routes: React.ReactElement<unknown, string | React.JSXElementConstructor<unknown>> | null =
@@ -13,7 +13,7 @@ function RoutesComponent() {
       },
       {
         path: 'charts',
-        element: <div>Графики и дашборды</div>,
+        element: <ChartsDashboardPage />,
       },
       {
         path: '*',

@@ -1,0 +1,20 @@
+.tooltip-key {
+  color: #000;
+  font-variant-numeric: lining-nums tabular-nums;
+  font-feature-settings: 'cv04' on, 'cv03' on;
+  font-family: "VTB Group UI", sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 16px;
+}
+
+.tooltip-value {
+  color: #000;
+  font-variant-numeric: lining-nums tabular-nums;
+  font-family: "VTB Group UI", sans-serif;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 16px;
+}

@@ -2,6 +2,6 @@
   "name": "sumRM",
   "exposes": {
     "./Routes": "./src/app/Routes",
-    "./app": "./src/app"
+    "./Layout": "./src/app/Layout"
   }
 }

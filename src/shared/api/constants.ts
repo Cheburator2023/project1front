@@ -1,6 +1,8 @@
 export enum API_ROUTES {
-  COMPARE_MODELS = '/compare',
   MODELS = '/models',
+  MODELS_EDIT = '/models/update',
+  COMPARE_MODELS = '/models/compare',
+  MODEL_ADD = '/model/create',
   MODEL_ARTIFACT_HISTORY = '/model/artefact/history',
   TEMPLATES = '/templates',
   TEMPLATE_ADD = '/template/create',
@@ -8,7 +10,6 @@ export enum API_ROUTES {
   TEMPLATE_DELETE = '/template/delete',
   ARTIFACTS = '/artefacts',
   ARTIFACTS_EDIT = '/artefacts/update',
-  MODEL_ADD = '/model/create',
-  MODELS_EDIT = '/models/update',
   REPORT = '/report',
+  METRICS = '/metrics',
 }

@@ -1,0 +1,69 @@
+export type FrameSizeType =
+  | 'stat-sm'
+  | 'stat-md'
+  | 'stat-lg'
+  | 'chart-sm'
+  | 'chart-md'
+  | 'chart-lg';
+
+export type StatisticDataProps = {
+  caption: string;
+  value: number;
+  delta: number;
+  relative?: boolean;
+};
+
+export type MetricsModels = {
+  developedModels: number;
+  implementedModels: number;
+  finalStatusModels: number;
+  sumRmModels: number;
+  totalModels: number;
+  registryCoverageModels: number;
+  riskCoverageFinalStatusModels: number;
+  onMonitoringModels: number;
+  takenOutOfOperationModels: number;
+  stage05A: number;
+  stage05B: number;
+  finalStatusByMonthModels: number[];
+  stalledModelsByMonth: number[];
+  lifecycleStageDistribution: {
+    initialization: number;
+    dataPilot: number;
+    dataSearch: number;
+    model: number;
+    dataBuild: number;
+    integration: number;
+  };
+};
+
+export enum MetricsCaption {
+  KPI_SUM = 'КПЭ СУМ',
+  TOTAL_MODELS = 'Всего моделей',
+  IMPLEMENTED_MODELS = 'Внедренные модели',
+  DEVELOPED_MODELS = 'Разработанные модели',
+  SUM_RM_MODELS = 'Модели в MPM СУМ',
+  FINAL_STATUS_MODELS = 'Модели с финальным статусом',
+  REGISTRY_COVERAGE_MODELS = 'Доля моделей, покрытых системой управления реестром моделей',
+  RISK_COVERAGE_FINAL_STATUS_MODELS = 'Доля моделей, покрытых системой управления модельным риском, с финальным статусом',
+  ON_MONITORING_MODELS = 'Модели на мониторинге',
+  TAKEN_OUT_OF_OPERATION_MODELS = 'Кол-во моделей, выведенных из эксп.',
+  FINAL_STATUS_BY_MONTH_MODELS = 'Динамика моделей с финальным статусом',
+  STALLED_MODLES_BY_MONTH = 'Количество моделей, которые не продвигаются больше 5 дней',
+  DISTRIBUTION_BY_LIFECYCLE_STAGE_MODELS = 'Распределение моделей по этапам жцм',
+  PILOTS = 'Пилоты',
+  DYNAMIC_BY_STREAMS_MODELS = 'Динамика моделей по стримам',
+}
+
+export interface MetricsDeltas {
+  totalModelsDelta: number;
+  implementedModelsDelta: number;
+  developedModelsDelta: number;
+  sumRmModelsDelta: number;
+  finalStatusModelsDelta: number;
+  riskCoverageFinalStatusModelsDelta: number;
+  registryCoverageModelsDelta: number;
+  onMonitoringModelsDelta: number;
+  takenOutOfOperationModelsDelta: number;
+}
+
