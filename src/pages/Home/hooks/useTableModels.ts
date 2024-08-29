@@ -11,8 +11,6 @@ import {
 } from '@shared/constants';
 import {
   API_ROUTES,
-  mockedModelsResponse,
-  mockedTemplatesResponse,
   DownloadReportContext,
   useFetch,
   ModelsResponseType,
@@ -58,18 +56,19 @@ export const useTableModels = () => {
     error,
   } = useFetch<ModelsResponseType>({
     apiRoute: API_ROUTES.MODELS,
-    mockedResponse: mockedModelsResponse,
+    // mockedResponse: mockedModelsResponse,
   });
 
   const { responseData: templateData } = useFetch<Template[]>({
     apiRoute: API_ROUTES.TEMPLATES,
-    mockedResponse: mockedTemplatesResponse,
+    // mockedResponse: mockedTemplatesResponse,
   });
 
   useEffect(() => {
     if (modelsData) {
       const formattedRows = modelsData.data.cards.map((row) => ({
         ...row,
+        model_version: row.model_version?.toString(), // TODO: remove after fix on backend
         id: row.system_model_id,
         hover: true,
       }));

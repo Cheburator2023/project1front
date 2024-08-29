@@ -7,7 +7,7 @@
       "@pages": ["src/pages/*", "src/pages/"],
       "@src/*": ["src/*"],
       "@app/*": ["src/app/*"],
-      "@widgets/*": ["src/widgets/*"],
+      "@widgets": ["src/widgets/*", "src/widgets/"],
       "@features": ["src/features/*", "src/features/"],
       "@shared/*": ["src/shared/*"],
       "*": ["./src/*"],

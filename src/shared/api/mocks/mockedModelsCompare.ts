@@ -1,4 +1,4 @@
-import { Row } from '@pagesHome/TableModels/types';
+import { Row } from "@src/shared/types";
 
 type MockedModelsType = {
   [key: string]: [Partial<Row>, Partial<Row>];

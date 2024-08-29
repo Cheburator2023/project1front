@@ -3,19 +3,16 @@ import { T } from '@admiral-ds/react-ui';
 import _ from 'lodash';
 
 import { Column, COLUMN_TYPE, ColumnsFilter, Row } from '@shared/types';
-import {
-  API_ROUTES,
-  mockedModelsCompareResponse,
-  useFetch,
-  CompareModelsResponseType,
-} from '@shared/api';
+import { API_ROUTES, useFetch, CompareModelsResponseType } from '@shared/api';
 import { filterColumnsByColumnsFilters } from '@shared/helpers';
 import { CellWrapper, CellContentFactory } from '@entities';
+import { switchDateFormat } from '@src/features/ChartsDashboard/helpers'; // TODO: move to shared slice
 
 export const useCompareModels = (
   columnsFilters: Partial<ColumnsFilter>,
-  firstDate: string | null,
-  secondDate: string | null,
+  firstDate: string,
+  secondDate: string,
+  compareOnlyChanged: boolean,
 ) => {
   const cellRef = useRef(null);
 
@@ -26,7 +23,6 @@ export const useCompareModels = (
   );
 
   const [searchString, setSearchString] = useState<string>('');
-  const [compareOnlyChanged, setCompareOnlyChanged] = useState(false);
 
   // Pagination
   const [pageSize, setPageSize] = useState(20);
@@ -39,8 +35,8 @@ export const useCompareModels = (
     error,
   } = useFetch<CompareModelsResponseType>({
     apiRoute: API_ROUTES.COMPARE_MODELS,
-    mockedResponse: mockedModelsCompareResponse,
-    params: { firstDate, secondDate },
+    // mockedResponse: mockedModelsCompareResponse,
+    params: { firstDate: switchDateFormat(firstDate), secondDate: switchDateFormat(secondDate) },
   });
 
   useEffect(() => {
@@ -77,6 +73,7 @@ export const useCompareModels = (
           return [
             {
               ...preparedRow1,
+              model_version: preparedRow1.model_version?.toString(), //TODO: remove after fix on backend
               id: `${key}-1`,
               key: `${key}-1`,
               comparisonKey: key,
@@ -84,6 +81,7 @@ export const useCompareModels = (
             },
             {
               ...preparedRow2,
+              model_version: preparedRow2.model_version?.toString(), //TODO: remove after fix on backend
               id: `${key}-2`,
               key: `${key}-2`,
               comparisonKey: key,
@@ -128,12 +126,12 @@ export const useCompareModels = (
   ): ReactNode => {
     const { comparisonKey } = record;
 
-    const [row1, row2] = compareModelsData?.data?.cards[comparisonKey];
+    const rowsToCompare = compareModelsData?.data?.cards[comparisonKey];
 
     const backgroundColor = record?.id
       ? record.id[record.id?.length - 1] === '1'
         ? undefined
-        : compareValues(row1[field], row2[field])
+        : compareValues(rowsToCompare?.[0][field], rowsToCompare?.[1][field])
       : undefined;
 
     return (
@@ -152,8 +150,6 @@ export const useCompareModels = (
       rowList,
       setRowList,
       columnList,
-      compareOnlyChanged,
-      setCompareOnlyChanged,
       setColumnList,
       handleSearch,
       handleChangePage,

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { T } from '@admiral-ds/react-ui';
 
@@ -14,7 +14,8 @@ import {
   TableCompareModels,
 } from '@features';
 
-import { useTableModels, useCompareModels } from './hooks';
+import { useTableModels } from './hooks';
+import { CompareModelsWidget } from '@src/widgets';
 
 const StatusWrapper = styled.div`
   display: flex;
@@ -25,11 +26,8 @@ const StatusWrapper = styled.div`
 
 const Home = () => {
   const { display, modelsTable, filters, context } = useTableModels();
-  const { compareModelsTable } = useCompareModels(
-    filters.columnsFilters,
-    filters.firstDate,
-    filters.secondDate,
-  );
+
+  const [compareOnlyChanged, setCompareOnlyChanged] = useState(false); // TODO: refactor
 
   if (modelsTable.error) {
     return (
@@ -39,7 +37,7 @@ const Home = () => {
     );
   }
 
-  if (modelsTable.loading || compareModelsTable.loading) {
+  if (modelsTable.loading) {
     return (
       <StatusWrapper>
         <Loading text="Загрузка данных ..." />
@@ -100,36 +98,22 @@ const Home = () => {
       {display.activeScreen === ACTIVE_SCREEN.COMPARE && (
         <>
           <FiltersPanel
-            compareOnlyChanged={compareModelsTable.compareOnlyChanged}
+            compareOnlyChanged={compareOnlyChanged}
+            handleCompareOnlyChanged={setCompareOnlyChanged}
             compareMode={display.compareMode}
             handleChangeCompare={display.handleChangeCompare}
-            handleCompareOnlyChanged={compareModelsTable.setCompareOnlyChanged}
             templates={filters.templates}
             updateActiveScreen={display.setActiveScreen}
             updateRightPanelType={display.setRightPanelType}
           />
           {filters.firstDate && filters.secondDate ? (
-            <>
-              <ActionsPanel
-                handleSearch={compareModelsTable.handleSearch}
-                updateRightPanelType={display.setRightPanelType}
-              />
-              <TableCompareModels
-                rowList={compareModelsTable.rowList}
-                columnList={compareModelsTable.columnList}
-                page={compareModelsTable.page}
-                pageSize={compareModelsTable.pageSize}
-                searchString={compareModelsTable.searchString}
-                updateRowsCount={compareModelsTable.setTotalRows}
-                setCurrentPage={compareModelsTable.setPage}
-              />
-              <Pagination
-                page={compareModelsTable.page}
-                pageSize={compareModelsTable.pageSize}
-                onChangePage={compareModelsTable.handleChangePage}
-                totalElements={compareModelsTable.totalRows}
-              />
-            </>
+            <CompareModelsWidget
+              compareOnlyChanged={compareOnlyChanged}
+              columnsFilters={filters.columnsFilters}
+              firstDate={filters.firstDate}
+              secondDate={filters.secondDate}
+              setRightPanelType={display.setRightPanelType}
+            />
           ) : (
             <div>
               <T font="Subtitle/Subtitle 1">Для сравнения выберите две даты состояния реестра</T>
