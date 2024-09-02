@@ -1,4 +1,5 @@
-import { Row } from "@src/shared/types";
+import { Row } from '@src/shared/types';
+import { CompareModelsResponseType } from 'shared/api';
 
 type MockedModelsType = {
   [key: string]: [Partial<Row>, Partial<Row>];
@@ -20028,7 +20029,7 @@ const mockedModelsCompare: MockedModelsType = {
   ],
 };
 
-export const mockedModelsCompareResponse = {
+export const mockedModelsCompareResponse: CompareModelsResponseType = {
   data: {
     cards: mockedModelsCompare,
   },

@@ -1,8 +1,11 @@
 import React, { useEffect } from 'react';
-import { Column as AdmiralColumn } from '@admiral-ds/react-ui';
+import { Column as AdmiralColumn, T } from '@admiral-ds/react-ui';
+import styled from 'styled-components';
 
 import { COLUMN_TYPE, Column, Row } from '@shared/types';
-import { ColumnFilter } from '@entities';
+import { ErrorStatus, Loading, Pagination } from '@shared/ui/atoms';
+import { RIGHT_PANEL_TYPE } from '@shared/constants';
+import { ActionsPanel, ColumnFilter } from '@entities';
 
 import { CompareTable } from './styles';
 import { useTableChange } from '../hooks';
@@ -12,10 +15,25 @@ interface TableModelsProps {
   columnList: Column[];
   page: number;
   pageSize: number;
+  totalRows: number;
+  error: string | null;
+  loading: boolean;
   searchString: string;
+  firstDate: string | null;
+  secondDate: string | null;
   updateRowsCount: (newRowsCount: number) => void;
   setCurrentPage: (newPage: number) => void;
+  onChangePage: (result: { page: number; pageSize: number }) => void;
+  handleSearch: (newSearchString: string) => void;
+  updateRightPanelType: (value: React.SetStateAction<RIGHT_PANEL_TYPE | null>) => void;
 }
+
+const StatusWrapper = styled.div`
+  display: flex;
+  width: 100%;
+  padding: 50px 0;
+  justify-content: center;
+`;
 
 export const TableCompareModels = React.memo(
   ({
@@ -26,6 +44,14 @@ export const TableCompareModels = React.memo(
     searchString,
     updateRowsCount,
     setCurrentPage,
+    error,
+    loading,
+    onChangePage,
+    handleSearch,
+    totalRows,
+    updateRightPanelType,
+    firstDate,
+    secondDate,
   }: TableModelsProps) => {
     const {
       cols,
@@ -81,20 +107,53 @@ export const TableCompareModels = React.memo(
       updateRowsCount,
     ]);
 
+    if (error) {
+      return (
+        <StatusWrapper>
+          <ErrorStatus text={error} />
+        </StatusWrapper>
+      );
+    }
+
+    if (loading) {
+      return (
+        <StatusWrapper>
+          <Loading text="Загрузка данных ..." />
+        </StatusWrapper>
+      );
+    }
+
     return (
-      <CompareTable
-        displayRowSelectionColumn
-        greyHeader
-        headerLineClamp={1}
-        rowList={rows as Array<Partial<Row> & { id: string }>} // fix types
-        columnList={cols}
-        virtualScroll={{ fixedRowHeight: 40 }}
-        style={{ height: 'calc(100vh - 245px)' }}
-        onSortChange={handleSort}
-        onColumnResize={handleResize}
-        onRowSelectionChange={handleSelectionChange}
-        onColumnDragEnd={handleColumnDragEnd}
-      />
+      <>
+        {totalRows > 0 && firstDate && secondDate && !loading ? (
+          <>
+            <ActionsPanel handleSearch={handleSearch} updateRightPanelType={updateRightPanelType} />
+            <CompareTable
+              displayRowSelectionColumn
+              greyHeader
+              headerLineClamp={1}
+              rowList={rows as Array<Partial<Row> & { id: string }>} // fix types
+              columnList={cols}
+              virtualScroll={{ fixedRowHeight: 40 }}
+              style={{ height: 'calc(100vh - 245px)' }}
+              onSortChange={handleSort}
+              onColumnResize={handleResize}
+              onRowSelectionChange={handleSelectionChange}
+              onColumnDragEnd={handleColumnDragEnd}
+            />
+            <Pagination
+              page={page}
+              pageSize={pageSize}
+              onChangePage={onChangePage}
+              totalElements={totalRows}
+            />
+          </>
+        ) : (
+          <StatusWrapper>
+            <T font="Subtitle/Subtitle 1">Для сравнения выберите две даты состояния реестра</T>
+          </StatusWrapper>
+        )}
+      </>
     );
   },
 );

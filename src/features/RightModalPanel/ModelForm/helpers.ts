@@ -8,7 +8,7 @@ import {
   subBusinessDays,
 } from 'date-fns';
 
-import type { Artifact, ArtifactApi, ArtifactType, ArtifactValue } from '@shared/api';
+import { ArtifactType, type Artifact, type ArtifactApi, type ArtifactValue } from '@shared/api';
 import { ColumnsFilter, Row } from '@shared/types';
 import { initialColumns, RIGHT_PANEL_TYPE, MODEL_FORM_MODE } from '@shared/constants';
 import {

@@ -1,8 +1,17 @@
 import { EMPTY_OPTION, NOT_NULL_OPTION } from '@shared/ui/organisms';
-import { isWithinInterval } from 'date-fns';
+import { format, isValid, isWithinInterval, parse } from 'date-fns';
 
 import { COLUMN_TYPE, Column, ColumnsFilter, Row } from '@shared/types';
-import { initialColumns } from '@shared/constants';
+import { DATE_FORMATS, initialColumns } from '@shared/constants';
+
+const getISODateFormat = (dateString: string) => {
+  for (const dateFormat of DATE_FORMATS) {
+    const parseDate = parse(dateString, dateFormat, new Date());
+    if (isValid(parseDate)) return format(parseDate, 'yyyy-mm-dd');
+  }
+
+  return dateString;
+};
 
 const getTime = (value: unknown) => {
   if (typeof value === 'string') {
@@ -299,4 +308,5 @@ export {
   checkColumnsFiltersForEqual,
   filterColumnsByColumnsFilters,
   filterColumnsFiltersByColumns,
+  getISODateFormat,
 };

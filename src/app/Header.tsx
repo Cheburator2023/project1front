@@ -89,7 +89,7 @@ const Header = ({
 }: HeaderProps) => {
   const sumBtnRef = useRef(null);
 
-  const rootPath = getRootPath();
+  const rootPath = getRootPath(); // TODO: fix root path on home page (need to stay on the same page)
   const { mutationProtectedFetch } = useFetch({});
 
   useEffect(() => {

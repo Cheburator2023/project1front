@@ -1,22 +1,19 @@
 import React, { ReactNode, useEffect, useRef, useState } from 'react';
 import { T } from '@admiral-ds/react-ui';
-import _ from 'lodash';
 
 import { Column, COLUMN_TYPE, ColumnsFilter, Row } from '@shared/types';
 import { API_ROUTES, useFetch, CompareModelsResponseType } from '@shared/api';
 import { filterColumnsByColumnsFilters } from '@shared/helpers';
 import { CellWrapper, CellContentFactory } from '@entities';
-import { switchDateFormat } from '@src/features/ChartsDashboard/helpers'; // TODO: move to shared slice
 
-export const useCompareModels = (
-  columnsFilters: Partial<ColumnsFilter>,
-  firstDate: string,
-  secondDate: string,
-  compareOnlyChanged: boolean,
-) => {
+import { compareValues, prepareFetchParams, processFetchData } from '../helpers';
+
+export const useCompareModels = (columnsFilters: Partial<ColumnsFilter>) => {
   const cellRef = useRef(null);
+  const [compareOnlyChanged, setCompareOnlyChanged] = useState(true);
 
   // Table data
+  const [resData, setResData] = useState<CompareModelsResponseType | undefined>(undefined);
   const [rowList, setRowList] = useState<Array<Partial<Row> & { comparisonKey: string }>>([]);
   const [columnList, setColumnList] = useState<Column[]>(
     filterColumnsByColumnsFilters(columnsFilters),
@@ -24,22 +21,54 @@ export const useCompareModels = (
 
   const [searchString, setSearchString] = useState<string>('');
 
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
   // Pagination
   const [pageSize, setPageSize] = useState(20);
   const [page, setPage] = useState(1);
   const [totalRows, setTotalRows] = useState<number>(0);
 
-  const {
-    responseData: compareModelsData,
-    loading,
-    error,
-  } = useFetch<CompareModelsResponseType>({
-    apiRoute: API_ROUTES.COMPARE_MODELS,
-    // mockedResponse: mockedModelsCompareResponse,
-    params: { firstDate: switchDateFormat(firstDate), secondDate: switchDateFormat(secondDate) },
-  });
+  const { mutationProtectedFetch } = useFetch({});
 
-  useEffect(() => {
+  const handleSubmit = async (
+    firstDate: string,
+    secondDate: string,
+    compareOnlyChanged: boolean,
+  ) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await mutationProtectedFetch<
+        CompareModelsResponseType,
+        CompareModelsResponseType
+      >({
+        fetchApiRoute: API_ROUTES.COMPARE_MODELS,
+        fetchMethod: 'GET',
+        newParams: prepareFetchParams(firstDate, secondDate),
+      });
+
+      if (res?.error) {
+        setError('Ошибка загрузки');
+      }
+
+      setResData(res?.data as CompareModelsResponseType);
+      const formattedRows = await processFetchData(
+        res?.data as CompareModelsResponseType,
+        columnList,
+        compareOnlyChanged,
+      );
+
+      setRowList(formattedRows);
+      setTotalRows(formattedRows.length);
+      setLoading(false);
+    } catch (error) {
+      setError('Ошибка загрузки');
+      setLoading(false);
+    }
+  };
+
+  const updateColumnList = () => {
     const newColumnList = filterColumnsByColumnsFilters(columnsFilters);
     const renderedColumnList = newColumnList.map((column) => {
       return {
@@ -50,51 +79,11 @@ export const useCompareModels = (
     });
 
     setColumnList(renderedColumnList);
-  }, [columnsFilters]);
+  };
 
   useEffect(() => {
-    if (compareModelsData) {
-      const rowNames = columnList.map((column) => column.name);
-
-      const formattedRows = Object.entries(compareModelsData.data.cards).flatMap(
-        ([key, [row1, row2]]) => {
-          const preparedRow1 = row1 ? row1 : rowNames;
-          const preparedRow2 = row2 ? row2 : rowNames;
-
-          if (
-            compareOnlyChanged &&
-            _.isEqual(
-              Object.entries(preparedRow1).filter((row) => rowNames.includes(row[0] as keyof Row)),
-              Object.entries(preparedRow2).filter((row) => rowNames.includes(row[0] as keyof Row)),
-            )
-          )
-            return [];
-
-          return [
-            {
-              ...preparedRow1,
-              model_version: preparedRow1.model_version?.toString(), //TODO: remove after fix on backend
-              id: `${key}-1`,
-              key: `${key}-1`,
-              comparisonKey: key,
-              hover: true,
-            },
-            {
-              ...preparedRow2,
-              model_version: preparedRow2.model_version?.toString(), //TODO: remove after fix on backend
-              id: `${key}-2`,
-              key: `${key}-2`,
-              comparisonKey: key,
-              hover: true,
-            },
-          ];
-        },
-      );
-
-      setRowList(formattedRows);
-      setTotalRows(formattedRows.length);
-    }
-  }, [compareModelsData, compareOnlyChanged]);
+    updateColumnList();
+  }, [columnsFilters, resData]);
 
   const handleChangePage = (result: { page: number; pageSize: number }) => {
     if (result.page !== page) {
@@ -114,10 +103,6 @@ export const useCompareModels = (
     setSearchString(newSearchString);
   };
 
-  const compareValues = (value1: string | null | undefined, value2: string | null | undefined) => {
-    return value1 !== value2 ? '#B5FFA9' : undefined;
-  };
-
   const cellRender = (
     value: string,
     record: Partial<Row> & { comparisonKey: number },
@@ -126,7 +111,7 @@ export const useCompareModels = (
   ): ReactNode => {
     const { comparisonKey } = record;
 
-    const rowsToCompare = compareModelsData?.data?.cards[comparisonKey];
+    const rowsToCompare = resData?.data?.cards[comparisonKey];
 
     const backgroundColor = record?.id
       ? record.id[record.id?.length - 1] === '1'
@@ -153,6 +138,7 @@ export const useCompareModels = (
       setColumnList,
       handleSearch,
       handleChangePage,
+      handleSubmit,
       loading,
       error,
       searchString,
@@ -162,6 +148,8 @@ export const useCompareModels = (
       page,
       setPage,
       totalRows,
+      compareOnlyChanged,
+      setCompareOnlyChanged,
     },
   };
 };

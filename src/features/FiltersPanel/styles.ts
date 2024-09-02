@@ -1,5 +1,4 @@
 import { Button, DateField, Toggle } from '@admiral-ds/react-ui';
-import { SearchSelect } from '@shared/ui/organisms';
 import styled from 'styled-components';
 
 const Container = styled.div`

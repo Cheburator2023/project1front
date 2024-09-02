@@ -16,7 +16,8 @@ export type {
   TemplateAddApi,
   TemplateUpdateApi,
   Artifact,
-  ArtifactType,
   ArtifactValue,
   ModelsResponseType,
 } from './types';
+
+export { ArtifactType } from './types';

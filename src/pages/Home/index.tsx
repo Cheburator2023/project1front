@@ -1,21 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
-import { T } from '@admiral-ds/react-ui';
 
 import { ErrorStatus, Loading, Pagination } from '@shared/ui/atoms';
 import { ACTIVE_SCREEN } from '@shared/constants';
 import { FiltersContext } from '@shared/api';
 import { ActionsPanel } from '@entities';
-import {
-  FiltersPanel,
-  RightModalPanel,
-  TemplateFilters,
-  TableModels,
-  TableCompareModels,
-} from '@features';
+import { FiltersPanel, RightModalPanel, TemplateFilters, TableModels } from '@features';
+import { CompareModelsWidget } from '@widgets';
 
 import { useTableModels } from './hooks';
-import { CompareModelsWidget } from '@src/widgets';
 
 const StatusWrapper = styled.div`
   display: flex;
@@ -26,8 +19,6 @@ const StatusWrapper = styled.div`
 
 const Home = () => {
   const { display, modelsTable, filters, context } = useTableModels();
-
-  const [compareOnlyChanged, setCompareOnlyChanged] = useState(false); // TODO: refactor
 
   if (modelsTable.error) {
     return (
@@ -96,30 +87,16 @@ const Home = () => {
         </>
       )}
       {display.activeScreen === ACTIVE_SCREEN.COMPARE && (
-        <>
-          <FiltersPanel
-            compareOnlyChanged={compareOnlyChanged}
-            handleCompareOnlyChanged={setCompareOnlyChanged}
-            compareMode={display.compareMode}
-            handleChangeCompare={display.handleChangeCompare}
-            templates={filters.templates}
-            updateActiveScreen={display.setActiveScreen}
-            updateRightPanelType={display.setRightPanelType}
-          />
-          {filters.firstDate && filters.secondDate ? (
-            <CompareModelsWidget
-              compareOnlyChanged={compareOnlyChanged}
-              columnsFilters={filters.columnsFilters}
-              firstDate={filters.firstDate}
-              secondDate={filters.secondDate}
-              setRightPanelType={display.setRightPanelType}
-            />
-          ) : (
-            <div>
-              <T font="Subtitle/Subtitle 1">Для сравнения выберите две даты состояния реестра</T>
-            </div>
-          )}
-        </>
+        <CompareModelsWidget
+          columnsFilters={filters.columnsFilters}
+          firstDate={filters.firstDate}
+          secondDate={filters.secondDate}
+          setRightPanelType={display.setRightPanelType}
+          updateActiveScreen={display.setActiveScreen}
+          compareMode={display.compareMode}
+          templates={filters.templates}
+          handleChangeCompare={display.handleChangeCompare}
+        />
       )}
     </FiltersContext.Provider>
   );

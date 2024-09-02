@@ -17,8 +17,10 @@ import { Container, CustomDateField, FiltersDivider, FilterButton, FiltersBox } 
 export interface FiltersPanelProps {
   compareMode?: boolean;
   compareOnlyChanged?: boolean;
+  disabledCompare?: boolean;
   handleChangeCompare: (checked: boolean) => void;
   handleCompareOnlyChanged?: (checked: boolean) => void;
+  handleUpdateCompareList?: () => void;
   templates: Template[];
   updateActiveScreen: React.Dispatch<React.SetStateAction<ACTIVE_SCREEN>>;
   updateRightPanelType: (value: React.SetStateAction<RIGHT_PANEL_TYPE | null>) => void;
@@ -27,7 +29,9 @@ export interface FiltersPanelProps {
 export const FiltersPanel = ({
   compareMode = false,
   compareOnlyChanged = false,
+  disabledCompare = true,
   handleChangeCompare,
+  handleUpdateCompareList = () => null,
   handleCompareOnlyChanged = () => null,
   templates,
   updateActiveScreen,
@@ -79,6 +83,13 @@ export const FiltersPanel = ({
               dropContainerClassName="dropContainerClass"
               onChange={(e) => onChangeSecondDate(e.target.value)}
             />
+            <FilterButton
+              onClick={handleUpdateCompareList}
+              dimension="s"
+              disabled={disabledCompare}
+            >
+              Сравнить
+            </FilterButton>
           </>
         ) : (
           <>

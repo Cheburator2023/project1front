@@ -4,11 +4,13 @@ import { FetchContext } from './FetchContext';
 import { API_ROUTES } from './constants';
 
 export interface MutationProtectedFetchProps<T> {
-  body: T;
+  body?: T;
   fetchApiRoute: API_ROUTES;
-  fetchMethod: 'POST' | 'PUT' | 'DELETE';
+  fetchMethod: 'POST' | 'PUT' | 'DELETE' | 'GET';
   routeParam?: string | number;
   fileName?: string;
+  newParams?: Record<string, string>;
+  mockedResponse?: T;
 }
 interface FetchProps<T> {
   apiRoute?: API_ROUTES;
@@ -80,12 +82,14 @@ export const useFetch = <T>({
 
   return {
     // fetch for CREATE, UPDATE, DELETE operations
-    mutationProtectedFetch: <N, M>({
+    mutationProtectedFetch: async <N, M>({
       body,
       fetchApiRoute,
       fetchMethod,
       routeParam,
       fileName,
+      newParams = {},
+      mockedResponse = undefined,
     }: MutationProtectedFetchProps<N>) => {
       const getRoute = () => {
         if (routeParam && fetchApiRoute) {
@@ -97,8 +101,13 @@ export const useFetch = <T>({
 
       const route = getRoute();
 
+      if (mockedResponse) {
+        await asyncFunc(1000);
+        return Promise.resolve({ data: mockedResponse, error: undefined });
+      }
+
       if (route) {
-        return protectedFetch?.<N, M>(route, params, body, fetchMethod ?? method, fileName);
+        return protectedFetch?.<N, M>(route, newParams, body, fetchMethod ?? method, fileName);
       }
     },
     refetch,

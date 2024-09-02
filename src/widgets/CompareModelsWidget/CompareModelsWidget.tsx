@@ -1,68 +1,63 @@
 import React from 'react';
-import styled from 'styled-components';
 
-import { ErrorStatus, Loading, Pagination } from '@shared/ui/atoms';
-import { RIGHT_PANEL_TYPE } from '@shared/constants';
-import { ActionsPanel } from '@entities';
+import { ACTIVE_SCREEN, RIGHT_PANEL_TYPE } from '@shared/constants';
+import { ColumnsFilter } from '@src/shared/types';
 import { FiltersPanel, TableCompareModels } from '@features';
 
-import { useCompareModels } from './useCompareModels';
-import { ColumnsFilter } from '@src/shared/types';
-
-const StatusWrapper = styled.div`
-  display: flex;
-  width: 100%;
-  padding: 50px 0;
-  justify-content: center;
-`;
+import { useCompareModels } from './hooks';
+import { Template } from 'shared/api';
 
 interface CompareModelsWidgetProps {
   columnsFilters: Partial<ColumnsFilter>;
-  firstDate: string;
-  secondDate: string;
-  compareOnlyChanged: boolean;
+  firstDate: string | null;
+  secondDate: string | null;
+  templates: Template[];
+  compareMode: boolean;
+  handleChangeCompare: (checked: boolean) => void;
+  updateActiveScreen: React.Dispatch<React.SetStateAction<ACTIVE_SCREEN>>;
   setRightPanelType: React.Dispatch<React.SetStateAction<RIGHT_PANEL_TYPE | null>>;
 }
 
 const CompareModelsWidget = React.memo(
-  // TODO: fix the bug where a repeated request fails when dates change
   ({
     columnsFilters,
     firstDate,
     secondDate,
-    compareOnlyChanged,
+    compareMode,
+    handleChangeCompare,
+    templates,
+    updateActiveScreen,
     setRightPanelType,
   }: CompareModelsWidgetProps) => {
-    const { compareModelsTable } = useCompareModels(
-      columnsFilters,
-      firstDate,
-      secondDate,
-      compareOnlyChanged,
-    );
+    const { compareModelsTable } = useCompareModels(columnsFilters);
 
-    if (compareModelsTable.error) {
-      return (
-        <StatusWrapper>
-          <ErrorStatus text={compareModelsTable.error} />
-        </StatusWrapper>
-      );
-    }
-
-    if (compareModelsTable.loading) {
-      return (
-        <StatusWrapper>
-          <Loading text="Загрузка данных ..." />
-        </StatusWrapper>
-      );
-    }
+    const disabledCompare = !firstDate || !secondDate;
 
     return (
       <>
-        <ActionsPanel
-          handleSearch={compareModelsTable.handleSearch}
+        <FiltersPanel
+          compareOnlyChanged={compareModelsTable.compareOnlyChanged}
+          handleCompareOnlyChanged={compareModelsTable.setCompareOnlyChanged}
+          compareMode={compareMode}
+          handleChangeCompare={handleChangeCompare}
+          templates={templates}
+          updateActiveScreen={updateActiveScreen}
           updateRightPanelType={setRightPanelType}
+          disabledCompare={disabledCompare}
+          handleUpdateCompareList={() => {
+            !disabledCompare &&
+              compareModelsTable.handleSubmit(
+                firstDate,
+                secondDate,
+                compareModelsTable.compareOnlyChanged,
+              );
+          }}
         />
         <TableCompareModels
+          firstDate={firstDate}
+          secondDate={secondDate}
+          error={compareModelsTable.error}
+          loading={compareModelsTable.loading}
           rowList={compareModelsTable.rowList}
           columnList={compareModelsTable.columnList}
           page={compareModelsTable.page}
@@ -70,12 +65,10 @@ const CompareModelsWidget = React.memo(
           searchString={compareModelsTable.searchString}
           updateRowsCount={compareModelsTable.setTotalRows}
           setCurrentPage={compareModelsTable.setPage}
-        />
-        <Pagination
-          page={compareModelsTable.page}
-          pageSize={compareModelsTable.pageSize}
+          totalRows={compareModelsTable.totalRows}
           onChangePage={compareModelsTable.handleChangePage}
-          totalElements={compareModelsTable.totalRows}
+          handleSearch={compareModelsTable.handleSearch}
+          updateRightPanelType={setRightPanelType}
         />
       </>
     );
