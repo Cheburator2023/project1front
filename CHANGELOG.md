@@ -1,5 +1,18 @@
 # Semantic Versioning Changelog
 
+# [1.19.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.18.1...v1.19.0) (2024-09-03)
+
+
+### Bug Fixes
+
+* fix build ([77a6d66](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/77a6d665dc079a943850bdfd7c1ce6f6e099a85b))
+* remove mocked response ([93c73d9](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/93c73d98b582f0a36c2f036285b089bda5d36a1c))
+
+
+### Features
+
+* add compare feature ([40a45ae](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/40a45ae23d8d69d47d018f0f2fbaca9a80f5c3c6))
+
 ## [1.18.1](https://bitbucket.region.vtb.ru/scm/sumd/mrms-frontend/compare/v1.18.0...v1.18.1) (2024-07-16)
 
 
