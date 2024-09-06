@@ -45,6 +45,7 @@ function InputFactorySwitcher<T extends string>({
     label,
     placeholder = 'Введите значение',
     id,
+    requireConditions,
     required,
     disabled,
   } = inputFactory;
@@ -293,7 +294,7 @@ function InputFactorySwitcher<T extends string>({
           value={formattedValue}
           placeholder={placeholder}
           required={required}
-          label={label}
+          label={`${label} ${requireConditions ? '++' : ''}`}
           onChange={(e) => onChange?.(name, { type, value: e.target.value })}
         />
       );

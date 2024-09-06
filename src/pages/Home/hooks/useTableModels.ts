@@ -15,6 +15,8 @@ import {
   useFetch,
   ModelsResponseType,
   Template,
+  mockedModelsResponse,
+  mockedTemplatesResponse,
 } from '@shared/api';
 import { checkColumnsFiltersForEqual, filterColumnsByColumnsFilters } from '@shared/helpers';
 
@@ -56,12 +58,12 @@ export const useTableModels = () => {
     error,
   } = useFetch<ModelsResponseType>({
     apiRoute: API_ROUTES.MODELS,
-    // mockedResponse: mockedModelsResponse,
+    mockedResponse: mockedModelsResponse,
   });
 
   const { responseData: templateData } = useFetch<Template[]>({
     apiRoute: API_ROUTES.TEMPLATES,
-    // mockedResponse: mockedTemplatesResponse,
+    mockedResponse: mockedTemplatesResponse,
   });
 
   useEffect(() => {

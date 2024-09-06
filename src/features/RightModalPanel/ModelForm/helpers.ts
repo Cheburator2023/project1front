@@ -24,8 +24,13 @@ import {
   SelectStringOptions,
 } from '@shared/ui/organisms';
 
-import { FormFields, FormFieldsSchema, FormValues } from './types';
-import { ADDITIONAL_DAYS_OUT_QUARTER, ADD_NEW_MODEL_SCHEMA, MONTHS_IN_QUARTER } from './constants';
+import { FormFieldRequireConditions, FormFields, FormFieldsSchema, FormValues } from './types';
+import {
+  ACTIVE_MODEL_SCHEMA,
+  ADDITIONAL_DAYS_OUT_QUARTER,
+  BASE_MODEL_SCHEMA,
+  MONTHS_IN_QUARTER,
+} from './constants';
 
 // A set of functions that help with the conversion of artifacts values for selected options
 const getArtifactValueByValueId = (
@@ -115,18 +120,24 @@ const getSelectOptions = (artifactValues: ArtifactValue[]) => {
 };
 
 // Map initial columns to active columns filters to get filtered and ordered column name list
-const getEditFormFieldsSchema = (columnsFilters: Partial<ColumnsFilter>) => {
+const getEditFormFieldsSchema = (
+  columnsFilters: Partial<ColumnsFilter>,
+  isActiveModel?: boolean,
+) => {
   const activeColumnsFiltersNames = Object.keys(columnsFilters);
 
   return initialColumns.reduce((columnsNames, column) => {
     if (activeColumnsFiltersNames.includes(column.name)) {
-      const additionalFieldParams = ADD_NEW_MODEL_SCHEMA.find(({ name }) => name === column.name);
+      const additionalSchema = isActiveModel ? ACTIVE_MODEL_SCHEMA : BASE_MODEL_SCHEMA;
+
+      const additionalFieldParams = additionalSchema.find(({ name }) => name === column.name);
 
       return [
         ...columnsNames,
         {
           name: column.name,
           required: !!additionalFieldParams?.required,
+          requireConditions: additionalFieldParams?.requireConditions,
           maxLength: additionalFieldParams?.maxLength,
         },
       ];
@@ -221,16 +232,16 @@ const getDisabledStatus = (minDate: Date, maxDate: Date) =>
 // Main mapping function that combine object for proper input format
 const mapArtifactToField = (
   artifact: Artifact,
-  required: boolean = false,
-  maxLength?: number,
+  fieldSchema: FormFieldsSchema[number],
   activeRow?: Partial<Row>,
 ): InputFactoryProps<keyof Row> => {
   const commonAttributes: CommonInputProps<keyof Row> = {
     id: artifact.artefact_id.toString(),
     name: artifact.artefact_tech_label,
     label: artifact.artefact_label,
-    required,
-    maxLength,
+    required: !!fieldSchema?.required,
+    maxLength: fieldSchema.maxLength,
+    requireConditions: fieldSchema?.requireConditions,
     disabled: artifact.is_edit_flg === '0',
     placeholder: artifact.artefact_desc ? artifact.artefact_desc : undefined,
   };
@@ -387,7 +398,7 @@ const getFormSchema = ({
   columnsFilters?: Partial<ColumnsFilter>;
 }) => {
   if (formMode === MODEL_FORM_MODE.ADD) {
-    return ADD_NEW_MODEL_SCHEMA;
+    return BASE_MODEL_SCHEMA;
   }
 
   if (columnsFilters) {
@@ -404,39 +415,36 @@ const getQuarterDateGroupField = (
     id: 'usage_confirm_date_group',
     name: 'usage_confirm_date_group',
     required: false,
-    label: 'Модель используется заказчиком',
+    label: 'Модель используется заказчиком', // TODO: This label should be obtained from the backend in the artifact parameters
     type: INPUT_TYPE.QUARTERLY_DATE_GROUP,
     quartes: quarterDateFields,
   };
 };
 
 const getFormFields = ({
-  formMode,
   artifacts,
-  columnsFilters,
   initialRow,
+  activeFormSchema,
 }: {
-  formMode: MODEL_FORM_MODE;
   artifacts: Artifact[];
-  columnsFilters?: Partial<ColumnsFilter>;
+  activeFormSchema: FormFieldsSchema;
   initialRow?: Partial<Row>;
 }) => {
-  const formSchema = getFormSchema({ formMode, columnsFilters });
-
-  const formFields = formSchema.reduce((fields, fieldSchema) => {
+  const formFields = activeFormSchema.reduce((fields, fieldSchema) => {
     const artifact = artifacts.find(
       ({ artefact_tech_label }) => artefact_tech_label === fieldSchema.name,
     );
 
     if (artifact) {
-      let field = mapArtifactToField(
-        artifact,
-        fieldSchema?.required,
-        fieldSchema?.maxLength,
-        initialRow,
-      );
+      const field = mapArtifactToField(artifact, fieldSchema, initialRow);
 
-      return [...fields, field];
+      const fieldWithExtraParams = {
+        ...field,
+        required: !!fieldSchema?.required,
+        maxLength: fieldSchema?.maxLength,
+      };
+
+      return [...fields, fieldWithExtraParams];
     }
 
     return fields;
@@ -465,7 +473,46 @@ const getFormFields = ({
   return newFormFields;
 };
 
-const getValuesFromParentModel = (fields: FormFields): FormValues =>
+const getFormValue = (value?: InputValue) => {
+  if (value?.type === INPUT_TYPE.SELECT) {
+    return value.value.text;
+  }
+
+  if (value?.type === INPUT_TYPE.STRING) {
+    return !value.value;
+  }
+
+  return null;
+};
+
+const checkRequireStatus = (
+  values: FormValues,
+  required?: boolean,
+  requireConditions?: FormFieldRequireConditions,
+) => {
+  if (required) {
+    return true;
+  }
+
+  if (requireConditions) {
+    return requireConditions.some((conditions) => {
+      const conditionsList = Object.entries(conditions);
+
+      const satisfyConditionsNumber = conditionsList.filter((condition) => {
+        const [name, conditionValue] = condition as [keyof Row, string];
+        const formValueToCheck = getFormValue(values[name]);
+
+        return formValueToCheck === conditionValue;
+      }).length;
+
+      return conditionsList.length === satisfyConditionsNumber;
+    });
+  }
+
+  return false;
+};
+
+const getFormValuesFromFormFields = (fields: FormFields): FormValues =>
   fields.reduce((values, field) => {
     if (field.type !== INPUT_TYPE.QUARTERLY_DATE_GROUP && field.initialValue) {
       return {
@@ -477,44 +524,49 @@ const getValuesFromParentModel = (fields: FormFields): FormValues =>
     return values;
   }, {} as FormValues);
 
-const getNotValidFields = (
+const getInvalidFields = (
   values: FormValues,
+  activeFormSchema: FormFieldsSchema,
   activeRow?: Partial<Row>,
   formMode?: MODEL_FORM_MODE | null,
 ) =>
-  ADD_NEW_MODEL_SCHEMA.filter(({ name, required }) => {
-    if (!required) {
-      return false;
-    }
+  activeFormSchema
+    .filter(({ name, required, requireConditions }) => {
+      const fieldInputValue = values[name];
 
-    const fieldInputValue = values[name];
+      const requiredField = checkRequireStatus(values, required, requireConditions);
 
-    if (!fieldInputValue) {
-      if (formMode === MODEL_FORM_MODE.EDIT) {
-        const initialValue = activeRow?.[name];
-
-        if (initialValue) {
-          return false;
-        }
+      if (!requiredField) {
+        return false;
       }
 
-      return true;
-    }
+      if (!fieldInputValue) {
+        if (formMode === MODEL_FORM_MODE.EDIT) {
+          const initialValue = activeRow?.[name];
 
-    if (fieldInputValue.type === INPUT_TYPE.SELECT) {
-      return !fieldInputValue.value;
-    }
+          if (initialValue) {
+            return false;
+          }
+        }
 
-    if (fieldInputValue.type === INPUT_TYPE.MULTI_SELECT) {
-      return !fieldInputValue.value.length;
-    }
+        return true;
+      }
 
-    if (fieldInputValue.type === INPUT_TYPE.STRING) {
-      return !fieldInputValue.value;
-    }
+      if (fieldInputValue.type === INPUT_TYPE.SELECT) {
+        return !fieldInputValue.value;
+      }
 
-    return fieldInputValue.value === undefined;
-  }).map(({ name }) => name);
+      if (fieldInputValue.type === INPUT_TYPE.MULTI_SELECT) {
+        return !fieldInputValue.value.length;
+      }
+
+      if (fieldInputValue.type === INPUT_TYPE.STRING) {
+        return !fieldInputValue.value;
+      }
+
+      return fieldInputValue.value === undefined;
+    })
+    .map(({ name }) => name);
 
 const getProperFormatValueForSubmit = (inputValue: InputValue) => {
   const { type, value } = inputValue;
@@ -613,8 +665,8 @@ const getFormMode = (activePanelType: RIGHT_PANEL_TYPE) => {
 export {
   getFormMode,
   getFormFields,
-  getNotValidFields,
+  getInvalidFields,
   getArtifactApiItems,
   getParentModelOptions,
-  getValuesFromParentModel,
+  getFormValuesFromFormFields,
 };

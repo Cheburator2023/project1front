@@ -18,6 +18,7 @@ enum COLUMN_TYPE {
 
 type ArtificialRow = {
   usage_confirm_date_group: string | null;
+  is_rating_system: string | null;
 };
 
 type Row = ArtificialRow & {
@@ -209,4 +210,3 @@ export {
   DsStreamOption,
   ModelStatus,
 };
-

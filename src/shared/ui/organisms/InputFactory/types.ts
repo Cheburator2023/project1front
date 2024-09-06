@@ -68,37 +68,38 @@ type InputValue =
   | QuarterlyDateInputValue
   | QuarterlyDateGroupInputValue;
 
-type CommonInputProps<T> = {
+type CommonInputProps<T extends string> = {
   id: string;
   label: string;
   name: T;
   required: boolean;
+  requireConditions?: Array<Partial<Record<T, string>>>;
   placeholder?: string;
   disabled?: boolean;
   maxLength?: number;
 };
 
-type StringInput<T> = CommonInputProps<T> & {
+type StringInput<T extends string> = CommonInputProps<T> & {
   type: INPUT_TYPE.STRING;
   initialValue?: StringInputValue;
   length?: number;
 };
 
-type TextAreaInput<T> = CommonInputProps<T> & {
+type TextAreaInput<T extends string> = CommonInputProps<T> & {
   type: INPUT_TYPE.TEXT_AREA;
   initialValue?: StringInputValue;
   length?: number;
   maxRows?: number;
 };
 
-type DateInput<T> = CommonInputProps<T> & {
+type DateInput<T extends string> = CommonInputProps<T> & {
   type: INPUT_TYPE.DATE;
   initialValue?: DateInputValue;
   minDate?: Date;
   maxDate?: Date;
 };
 
-type QuarterlyDateInput<T> = CommonInputProps<T> & {
+type QuarterlyDateInput<T extends string> = CommonInputProps<T> & {
   type: INPUT_TYPE.QUARTERLY_DATE;
   quarter: number;
   initialValue?: QuarterlyDateInputValue;
@@ -106,12 +107,12 @@ type QuarterlyDateInput<T> = CommonInputProps<T> & {
   maxDate?: Date;
 };
 
-type QuarterlyDateGroupInput<T> = CommonInputProps<T> & {
+type QuarterlyDateGroupInput<T extends string> = CommonInputProps<T> & {
   type: INPUT_TYPE.QUARTERLY_DATE_GROUP;
   quartes: Array<QuarterlyDateInput<T>>;
 };
 
-type NumberInput<T> = CommonInputProps<T> & {
+type NumberInput<T extends string> = CommonInputProps<T> & {
   type: INPUT_TYPE.NUMBER;
   initialValue?: NumberInputValue;
   suffix?: string;
@@ -121,26 +122,26 @@ type NumberInput<T> = CommonInputProps<T> & {
   displayPlusMinusIcons?: boolean;
 };
 
-type FlagInput<T> = CommonInputProps<T> & {
+type FlagInput<T extends string> = CommonInputProps<T> & {
   type: INPUT_TYPE.FLAG;
   initialValue?: FlagInputValue;
 };
 
-type SelectInput<T> = CommonInputProps<T> & {
+type SelectInput<T extends string> = CommonInputProps<T> & {
   type: INPUT_TYPE.SELECT;
   initialValue?: SelectInputValue;
   options: SelectStringProps;
   multiple: false;
 };
 
-type MultiSelectInput<T> = CommonInputProps<T> & {
+type MultiSelectInput<T extends string> = CommonInputProps<T> & {
   type: INPUT_TYPE.MULTI_SELECT;
   initialValue?: MultiSelectInputValue;
   options: SelectStringProps;
   multiple: true;
 };
 
-type InputFactoryProps<T> =
+type InputFactoryProps<T extends string> =
   | StringInput<T>
   | DateInput<T>
   | QuarterlyDateInput<T>

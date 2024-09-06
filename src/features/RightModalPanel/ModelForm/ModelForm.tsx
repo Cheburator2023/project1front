@@ -14,16 +14,12 @@ import {
   FiltersContext,
 } from '@shared/api';
 
-import { FormFields, FormValues } from './types';
-import {
-  getFormMode,
-  getFormFields,
-  getArtifactApiItems,
-  getNotValidFields,
-  getValuesFromParentModel,
-} from './helpers';
+import { FormValues } from './types';
+import { getFormMode, getArtifactApiItems, getInvalidFields } from './helpers';
 import { ButtonContainer, FormContainer } from './styles';
 import { ParentModelSelect } from './ParentModelSelect';
+import { useFormSchema } from './useActiveFormSchema';
+import { useFormFields } from './useFormFields';
 
 export interface ModelFormProps {
   mode: RIGHT_PANEL_TYPE.ADD_MODEL | RIGHT_PANEL_TYPE.EDIT_MODEL;
@@ -49,46 +45,34 @@ export const ModelForm = ({
   const { mutationProtectedFetch } = useFetch({});
 
   const [values, setValues] = useState<FormValues>({});
-  const [fields, setFields] = useState<FormFields>([]);
-  const [notValidFields, setNotValidFields] = useState<Array<keyof Row>>([]);
+  const [invalidFields, setInvalidFields] = useState<Array<keyof Row>>([]);
   const [parentModelId, setParentModelId] = useState<string>();
 
   const [submitLoading, setSubmitLoading] = useState(false);
 
+  const [initialRow, setInitialRow] = useState(activeRow);
+
   const formMode = getFormMode(mode);
 
-  useEffect(() => {
-    let newFields: FormFields = [];
+  // TODO: add transformer from row to values
+  const { formSchema } = useFormSchema({ values, activeRow: initialRow, mode });
 
-    if (formMode === MODEL_FORM_MODE.EDIT) {
-      newFields = getFormFields({
-        formMode,
-        artifacts: artifactsApi.data,
-        columnsFilters,
-        initialRow: activeRow,
-      });
-    }
-
-    if (formMode === MODEL_FORM_MODE.ADD) {
-      newFields = getFormFields({
-        formMode,
-        artifacts: artifactsApi.data,
-      });
-    }
-
-    setFields(newFields);
-  }, [artifactsApi, formMode, activeRow]);
+  const { fields } = useFormFields({
+    formSchema,
+    initialRow,
+    artifacts: artifactsApi.data,
+  });
 
   const handleChange = useCallback((name: keyof Row, value: InputValue) => {
     setValues((prevValues) => ({ ...prevValues, [name]: value }));
   }, []);
 
   const handleSubmit = useCallback(async () => {
-    const newNotValidFields = getNotValidFields(values, activeRow, formMode);
+    const newInvalidFields = getInvalidFields(values, formSchema, activeRow, formMode);
 
-    setNotValidFields(newNotValidFields);
+    setInvalidFields(newInvalidFields);
 
-    if (newNotValidFields.length) {
+    if (newInvalidFields.length) {
       return;
     }
 
@@ -116,8 +100,8 @@ export const ModelForm = ({
           return;
         }
 
-        if (res.data.length) {
-          newRow = res.data[0];
+        if (res.data.length && res.data[0]) {
+          const a = res.data[0];
         }
       }
     }
@@ -140,13 +124,13 @@ export const ModelForm = ({
       onSubmit(newRow, formMode);
       setSubmitLoading(false);
     }
-  }, [values, formMode]);
+  }, [values, formSchema, formMode]);
 
   const formRef = useRef<HTMLFormElement | null>(null);
 
   // Scroll to edit input field
   useEffect(() => {
-    if (formRef.current?.children && editCellName && formMode === MODEL_FORM_MODE.EDIT) {
+    if (formRef.current?.children && editCellName) {
       const editedFieldIndex = fields.findIndex((field) => field.name === editCellName);
 
       if (editedFieldIndex !== -1) {
@@ -157,7 +141,7 @@ export const ModelForm = ({
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editCellName, formRef.current, formMode]);
+  }, [editCellName, formRef.current]);
 
   const handleChangeParentModel = useCallback(
     (_, selectedValue: string[]) => {
@@ -166,15 +150,7 @@ export const ModelForm = ({
       const parentModel = rows.find((row) => row.system_model_id === selectedModelId);
 
       if (parentModel) {
-        const newFields = getFormFields({
-          formMode: MODEL_FORM_MODE.ADD,
-          artifacts: artifactsApi.data,
-          initialRow: parentModel,
-        });
-        const newValues = getValuesFromParentModel(newFields);
-
-        setValues(newValues);
-        setFields(newFields);
+        setInitialRow(parentModel);
         setParentModelId(selectedModelId);
       }
     },
@@ -183,7 +159,7 @@ export const ModelForm = ({
 
   const handleOnClose = useCallback(() => {
     setValues({});
-    setNotValidFields([]);
+    setInvalidFields([]);
     setParentModelId(undefined);
 
     onClose();
@@ -217,11 +193,10 @@ export const ModelForm = ({
               <InputFactory<keyof Row>
                 key={field.id}
                 values={values}
-                autoFocus={editCellName === field.name}
                 onChange={handleChange}
                 inputFactory={field}
                 editFieldName={editCellName}
-                error={notValidFields.includes(field.name)}
+                error={invalidFields.includes(field.name)}
               />
             ))}
           </FormContainer>
