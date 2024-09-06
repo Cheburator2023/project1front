@@ -20,12 +20,8 @@ const getFormSchemaByRow = (activeRow?: Partial<Row>) => {
   return formSchema;
 };
 
-const getFormSchemaByValues = (values?: FormValues, mode) => {
+const getFormSchemaByValues = (values?: FormValues) => {
   let formSchema = BASE_MODEL_SCHEMA;
-
-  if (mode === RIGHT_PANEL_TYPE.EDIT_MODEL) {
-    formSchema = [...BASE_MODEL_SCHEMA, ...BASE_EDIT_MODEL_SCHEMA];
-  }
 
   if (values?.active_model?.value) {
     formSchema = [...BASE_MODEL_SCHEMA, ...ACTIVE_MODEL_SCHEMA];
@@ -39,6 +35,8 @@ const getFormSchemaByValues = (values?: FormValues, mode) => {
 };
 
 export const useFormSchema = ({ activeRow, values, mode }: UseActiveFormSchemaProps) => {
+  console.log('test useFormSchema');
+
   const [formSchema, setFormSchema] = useState<FormFieldsSchema>(getFormSchemaByRow(activeRow));
 
   useEffect(() => {

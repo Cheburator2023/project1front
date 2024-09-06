@@ -17,6 +17,7 @@ enum COLUMN_TYPE {
 }
 
 type ArtificialRow = {
+  relations: string | null;
   usage_confirm_date_group: string | null;
   is_rating_system: string | null;
 };

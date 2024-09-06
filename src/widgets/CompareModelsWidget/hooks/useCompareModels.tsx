@@ -45,6 +45,7 @@ export const useCompareModels = (columnsFilters: Partial<ColumnsFilter>) => {
       >({
         fetchApiRoute: API_ROUTES.COMPARE_MODELS,
         fetchMethod: 'GET',
+        // mockedResponse: mockedModelsCompareResponse,
         newParams: prepareFetchParams(firstDate, secondDate),
       });
 

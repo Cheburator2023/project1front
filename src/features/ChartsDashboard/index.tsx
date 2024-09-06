@@ -70,7 +70,7 @@ const ChartsDashboard = () => {
     error,
   } = useFetch<ModelsResponseType>({
     apiRoute: API_ROUTES.MODELS,
-    mockedResponse: mockedModelsResponse,
+    // mockedResponse: mockedModelsResponse,
   });
 
   const {
@@ -79,7 +79,7 @@ const ChartsDashboard = () => {
     error: errorMetrics,
   } = useFetch<MetricsResponseType>({
     apiRoute: API_ROUTES.METRICS,
-    mockedResponse: mockedMetricsResponse,
+    // mockedResponse: mockedMetricsResponse,
   });
 
   // const [kpiSum, setKpiSum] = useState(initialKPI_SUM);

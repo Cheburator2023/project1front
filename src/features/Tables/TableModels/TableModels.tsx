@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
 import { Column as AdmiralColumn } from '@admiral-ds/react-ui';
 
-import { COLUMN_TYPE, Column, Row } from '@shared/types';
-import { ColumnFilter, CustomCell } from '@entities';
+import { Column, COLUMN_TYPE, Row } from '@shared/types';
+import { CellWrapper, ColumnFilter, CustomCell } from '@entities';
+import { ModelRelationsModal } from '@features';
 
 import { CustomTable } from './styles';
 import { useTableChange } from '../hooks';
@@ -47,11 +48,31 @@ export const TableModels = React.memo(
         setRows(rowList);
         updateRowsCount(rowList.length);
 
+        // TODO: подумать как вынести. ATTENTION нарушение правила импорта!!!
+        const relationsColl: AdmiralColumn & Column = {
+          name: 'relations',
+          title: '',
+          type: COLUMN_TYPE.STRING,
+          width: '48px',
+          sortable: false,
+          sticky: true,
+          cellAlign: 'right',
+          renderCell: (value: string, row: Row) => (
+            <>
+              {value === '1' && row.system_model_id ? (
+                <CellWrapper type={COLUMN_TYPE.STRING}>
+                  <ModelRelationsModal modelId={row.system_model_id} />
+                </CellWrapper>
+              ) : null}
+            </>
+          ),
+        };
+
         const newCols: Array<AdmiralColumn & Column> = columnList.map((column) => ({
           ...column,
           width: '200px',
           sortable: true,
-          sticky: column.name === 'system_model_id',
+          sticky: false,
           cellAlign: column.type === COLUMN_TYPE.NUMBER ? 'right' : 'left',
           renderCell: (value: string, row: Row) => (
             <CustomCell
@@ -74,7 +95,7 @@ export const TableModels = React.memo(
           ),
         }));
 
-        setCols(newCols);
+        setCols([relationsColl, ...newCols]);
       }
     }, [
       rowList,

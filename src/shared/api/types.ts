@@ -27,6 +27,21 @@ export type ModelsResponseType = {
   };
 };
 
+export type Relations = {
+  [key: string]: (Partial<Row> & String) | null; //TODO: add interface for new attributes
+};
+
+type RelationsModel = {
+  modules?: Relations[];
+  calibrations?: Relations[];
+} & Partial<Row>;
+
+export type RelationsModelResponseType = {
+  data: {
+    card: RelationsModel;
+  };
+};
+
 export type MetricsResponseType = {
   distributionByLifecycleStageModels: {
     name: string;

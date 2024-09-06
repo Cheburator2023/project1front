@@ -11,6 +11,7 @@ import {
   RIGHT_PANEL_TYPE,
   initialColumns,
   initialColumnsFilters,
+  SYSTEM_SPECIFIC_FLAGS,
 } from '@shared/constants';
 import { TemplatesFilter } from '@entities';
 
@@ -114,6 +115,10 @@ export const TemplateFilters = ({
   useEffect(() => {
     const filters = Object.keys(columnsFilters);
     const newRows: ATableRow[] = initialColumns
+      .filter(
+        (column) =>
+          !Object.values(SYSTEM_SPECIFIC_FLAGS).includes(column.name as SYSTEM_SPECIFIC_FLAGS),
+      )
       .sort((prevColumn, nextColumn) => {
         const prevIndex = filters.indexOf(prevColumn.name);
         const nextIndex = filters.indexOf(nextColumn.name);

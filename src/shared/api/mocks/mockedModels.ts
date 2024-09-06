@@ -49,6 +49,7 @@ const mockedModels: Array<Partial<Row>> = [
     solution_to_implement_model: null,
     model_status: 'Нет данных',
     model_status_assignee: 'Нет данных',
+    relations: '1',
   },
   {
     system_model_id: '77b87bee-7f46-11ec-ac05-0a580107004b',
@@ -98,6 +99,7 @@ const mockedModels: Array<Partial<Row>> = [
     solution_to_implement_model: null,
     model_status: 'Нет данных',
     model_status_assignee: 'Нет данных',
+    relations: '1',
   },
   {
     system_model_id: '9388ffc4-7f46-11ec-ac05-0a580107004b',

@@ -11,6 +11,8 @@ interface UseFormFieldsProps {
 }
 
 export const useFormFields = ({ formSchema, initialRow, artifacts }: UseFormFieldsProps) => {
+  console.log('useFormFields', useFormFields);
+
   const [fields, setFields] = useState<FormFields>([]);
 
   useEffect(() => {

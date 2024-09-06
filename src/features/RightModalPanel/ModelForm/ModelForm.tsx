@@ -57,11 +57,15 @@ export const ModelForm = ({
   // TODO: add transformer from row to values
   const { formSchema } = useFormSchema({ values, activeRow: initialRow, mode });
 
+  console.log('formSchema', formSchema);
+
   const { fields } = useFormFields({
     formSchema,
     initialRow,
     artifacts: artifactsApi.data,
   });
+
+  console.log('fields', fields);
 
   const handleChange = useCallback((name: keyof Row, value: InputValue) => {
     setValues((prevValues) => ({ ...prevValues, [name]: value }));

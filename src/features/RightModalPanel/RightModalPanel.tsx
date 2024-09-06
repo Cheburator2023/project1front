@@ -2,13 +2,7 @@ import React, { useMemo } from 'react';
 
 import { Row } from '@shared/types';
 import { RIGHT_PANEL_TYPE, MODEL_FORM_MODE } from '@shared/constants';
-import {
-  API_ROUTES,
-  mockedModelsArtifacts,
-  useFetch,
-  ArtifactResponse,
-  Template,
-} from '@shared/api';
+import { API_ROUTES, useFetch, ArtifactResponse, Template } from '@shared/api';
 
 import { ModelForm } from './ModelForm';
 import { HistoryChanges } from './HistoryChanges';
@@ -37,7 +31,7 @@ export const RightModalPanel = ({
 }: RightModalPanelProps) => {
   const { responseData: artifactsData } = useFetch<ArtifactResponse>({
     apiRoute: API_ROUTES.ARTIFACTS,
-    mockedResponse: mockedModelsArtifacts,
+    // mockedResponse: mockedModelsArtifacts,
   });
 
   const activeRow = useMemo(

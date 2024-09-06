@@ -83,7 +83,7 @@ export const HeaderCellComponent = ({
         >
           <TitleContent dimension={dimension} sortable={sortable}>
             <TitleText dimension={dimension} lineClamp={headerLineClamp} title={title} />
-            {extraText && (
+            {extraText && sortable && (
               <TitleText
                 extraText
                 dimension={dimension}
