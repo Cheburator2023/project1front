@@ -575,7 +575,9 @@ export const initialColumns: Array<Column> = [
   {
     name: 'relations',
     title: '',
-    type: COLUMN_TYPE.STRING,
+    width: '48px',
+    sticky: true,
+    type: COLUMN_TYPE.ACTION,
   },
 ];
 

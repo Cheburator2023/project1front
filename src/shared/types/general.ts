@@ -14,6 +14,7 @@ enum COLUMN_TYPE {
   DATE = 'DATE',
   QUARTERLY_DATE = 'QUARTERLY_DATE',
   LINK = 'LINK',
+  ACTION = 'ACTION',
 }
 
 type ArtificialRow = {
@@ -154,6 +155,9 @@ type Column = {
   type: COLUMN_TYPE;
   name: keyof Row;
   title: string;
+  width?: string;
+  sticky?: boolean;
+  sortable?: boolean;
   renderCell?: ColumnAdmiral['renderCell'];
 };
 

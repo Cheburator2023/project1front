@@ -18,6 +18,11 @@ import {
 export const useHomePage = () => {
   const { updateColumnsFilters, downloadReportStatus } = useContext(DownloadReportContext);
 
+  const { responseData: templateData } = useFetch<Template[]>({
+    apiRoute: API_ROUTES.TEMPLATES,
+    // mockedResponse: mockedTemplatesResponse,
+  });
+
   const [activeScreen, setActiveScreen] = useState(ACTIVE_SCREEN.TABLE);
   const [compareMode, setCompareMode] = useState(false);
   const [rightPanelType, setRightPanelType] = useState<RIGHT_PANEL_TYPE | null>(null);
@@ -31,11 +36,6 @@ export const useHomePage = () => {
   const [secondDate, setSecondDate] = useState<string | null>(null);
 
   const [templates, setTemplates] = useState<Template[]>([]);
-
-  const { responseData: templateData } = useFetch<Template[]>({
-    apiRoute: API_ROUTES.TEMPLATES,
-    // mockedResponse: mockedTemplatesResponse,
-  });
 
   useEffect(() => {
     if (templateData) {

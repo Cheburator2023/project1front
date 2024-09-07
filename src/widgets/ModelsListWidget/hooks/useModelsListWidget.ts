@@ -122,8 +122,6 @@ export const useModelsListWidget = (
     setActiveRowId(undefined);
   }, []);
 
-  console.log('useModelsListWidget', rowList);
-
   return {
     data: {
       rowList,

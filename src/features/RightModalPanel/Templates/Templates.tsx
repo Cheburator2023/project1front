@@ -94,7 +94,7 @@ export const Templates = ({ templates, onClose, updateTemplates }: TemplatesProp
     fetchParams,
     getNewTemplates,
   }: {
-    fetchParams: MutationProtectedFetchProps<T>;
+    fetchParams: MutationProtectedFetchProps<T, Template>;
     getNewTemplates?: (templates: Template[], responseTemplate?: Template) => Template[];
   }) {
     setSubmitLoading(true);

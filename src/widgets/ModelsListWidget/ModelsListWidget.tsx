@@ -77,7 +77,7 @@ export const ModelsListWidget = ({
         updateRightPanelType={setRightPanelType}
       />
       <ActionsPanel handleSearch={actions.handleSearch} updateRightPanelType={setRightPanelType} />
-      {/* <TableModels
+      <TableModels
         rowList={data.rowList}
         columnList={data.columnList}
         page={data.page}
@@ -86,7 +86,7 @@ export const ModelsListWidget = ({
         onActionCell={actions.handleClickOnActionCell}
         updateRowsCount={actions.setTotalRows}
         setCurrentPage={actions.setPage}
-      /> */}
+      />
       <Pagination
         page={data.page}
         pageSize={data.pageSize}
