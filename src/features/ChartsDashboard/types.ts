@@ -13,30 +13,6 @@ export type StatisticDataProps = {
   relative?: boolean;
 };
 
-export type MetricsModels = {
-  developedModels: number;
-  implementedModels: number;
-  finalStatusModels: number;
-  sumRmModels: number;
-  totalModels: number;
-  registryCoverageModels: number;
-  riskCoverageFinalStatusModels: number;
-  onMonitoringModels: number;
-  takenOutOfOperationModels: number;
-  stage05A: number;
-  stage05B: number;
-  finalStatusByMonthModels: number[];
-  stalledModelsByMonth: number[];
-  lifecycleStageDistribution: {
-    initialization: number;
-    dataPilot: number;
-    dataSearch: number;
-    model: number;
-    dataBuild: number;
-    integration: number;
-  };
-};
-
 export enum MetricsCaption {
   KPI_SUM = 'КПЭ СУМ',
   TOTAL_MODELS = 'Всего моделей',
@@ -53,17 +29,5 @@ export enum MetricsCaption {
   DISTRIBUTION_BY_LIFECYCLE_STAGE_MODELS = 'Распределение моделей по этапам жцм',
   PILOTS = 'Пилоты',
   DYNAMIC_BY_STREAMS_MODELS = 'Динамика моделей по стримам',
-}
-
-export interface MetricsDeltas {
-  totalModelsDelta: number;
-  implementedModelsDelta: number;
-  developedModelsDelta: number;
-  sumRmModelsDelta: number;
-  finalStatusModelsDelta: number;
-  riskCoverageFinalStatusModelsDelta: number;
-  registryCoverageModelsDelta: number;
-  onMonitoringModelsDelta: number;
-  takenOutOfOperationModelsDelta: number;
 }
 

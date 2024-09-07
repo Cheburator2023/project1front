@@ -1,4 +1,3 @@
-import { rnd } from './helpers';
 import { MetricsCaption } from './types';
 import * as Highcharts from 'highcharts';
 
@@ -122,7 +121,7 @@ const initialChartModelDynamicsByStreams = () => ({
           format: '{y}',
         },
       ],
-      data: [rnd(19, 87)],
+      data: [0],
       name: 'Источники данных',
       color: 'var(--neutral-neutral-50, #8DA0CB)',
     },
@@ -135,7 +134,7 @@ const initialChartModelDynamicsByStreams = () => ({
           format: '{y}',
         },
       ],
-      data: [rnd(19, 87)],
+      data: [0],
       name: 'Валидация',
       color: 'var(--magenta-magenta-30,  #E78AC3)',
     },

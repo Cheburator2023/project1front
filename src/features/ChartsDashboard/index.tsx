@@ -1,27 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import { Button, Field, Option, Spinner } from '@admiral-ds/react-ui';
+import { Button, DateInput, Field, Option, Spinner } from '@admiral-ds/react-ui';
 import { ReactComponent as DownloadOutline } from '@admiral-ds/icons/build/system/DownloadOutline.svg';
 
 import { ErrorStatus, Loading } from '@src/shared/ui/atoms';
 import { dsStreamArtifact } from '@src/shared/types';
-import {
-  API_ROUTES,
-  mockedMetricsResponse,
-  mockedModelsResponse,
-  ModelsResponseType,
-  useFetch,
-} from '@src/shared/api';
+import { API_ROUTES, mockedMetricsResponse, useFetch } from '@src/shared/api';
 import { MetricsResponseType } from '@src/shared/api/types';
 
-import {
-  generateChartData,
-  getPositiveDelta,
-  MetricsAggregator,
-  switchDateFormat,
-  validateDateRange,
-} from './helpers';
+import { generateChartData, switchDateFormat, validateDateRange } from './helpers';
 import {
   initialChartModelDynamicsByStreams,
   initialChartFinalStatusByMonthModels,
@@ -47,7 +35,6 @@ import {
   Column,
   WrapperFilter,
   WrapperTitle,
-  CustomDateField,
   Row,
   StatusWrapper,
   Title,
@@ -63,22 +50,39 @@ import {
 import { MenuIconSelect } from './MenuIconSelect';
 import { MetricsCaption } from './types';
 
+const getQueryParams = (filters: { dateRange?: string; selectedStream: string }) => {
+  const params: Record<string, string> = {};
+
+  if (filters.dateRange) {
+    params.date = filters.dateRange;
+  }
+
+  if (filters.selectedStream && filters.selectedStream !== 'Все стримы') {
+    params.stream = filters.selectedStream;
+  }
+
+  return params;
+};
+
 const ChartsDashboard = () => {
-  const {
-    responseData: modelsData,
-    loading,
-    error,
-  } = useFetch<ModelsResponseType>({
-    apiRoute: API_ROUTES.MODELS,
-    // mockedResponse: mockedModelsResponse,
+  const [filters, setFilters] = useState({
+    dateRange: undefined as string | undefined,
+    selectedStream: 'Все стримы',
+  });
+
+  const [tempFilters, setTempFilters] = useState({
+    tempDateRange: undefined as string | undefined,
+    tempSelectedStream: 'Все стримы',
   });
 
   const {
     responseData: metricsData,
     loading: loadingMetrics,
     error: errorMetrics,
+    refetch,
   } = useFetch<MetricsResponseType>({
     apiRoute: API_ROUTES.METRICS,
+    params: getQueryParams(filters),
     // mockedResponse: mockedMetricsResponse,
   });
 
@@ -121,11 +125,6 @@ const ChartsDashboard = () => {
     initialChartDistributionByLifecycleStageModels(),
   );
 
-  const [dateRange, setDateRange] = useState<[string, string] | undefined>(undefined);
-  const [tempDateRange, setTempDateRange] = useState<[string, string] | undefined>(undefined);
-  const [selectedStream, setSelectedStream] = useState<string>('Все стримы');
-  const [tempSelectedStream, setTempSelectedStream] = useState<string>('Все стримы');
-
   const [isExporting, setIsExporting] = useState(false);
 
   const [dateError, setDateError] = useState<string | null>(null);
@@ -136,84 +135,71 @@ const ChartsDashboard = () => {
   ];
 
   useEffect(() => {
-    if (!modelsData || !metricsData) return;
-
-    const cards = modelsData?.data?.cards;
-    const startDate = dateRange ? dateRange[0] : undefined;
-    const endDate = dateRange ? dateRange[1] : undefined;
-
-    const aggregator = new MetricsAggregator(cards);
-
-    const { currentMetrics, previousMetrics, totalMetrics } = aggregator.aggregate(
-      startDate,
-      endDate,
-      selectedStream,
-    );
-
-    const deltas = aggregator.calculateDeltas(currentMetrics, previousMetrics);
+    if (!metricsData) return;
 
     setTotalModels({
       ...totalModels,
-      value: totalMetrics.totalModels,
-      delta: getPositiveDelta(deltas.totalModelsDelta),
+      value: metricsData.totalModels.count,
+      delta: metricsData.totalModels.delta,
     });
     setImplementedModels({
       ...implementedModels,
-      value: totalMetrics.implementedModels,
-      delta: getPositiveDelta(deltas.implementedModelsDelta),
+      value: metricsData.implementedModels.count,
+      delta: metricsData.implementedModels.delta,
     });
     setDevelopedModels({
       ...developedModels,
-      value: totalMetrics.developedModels,
-      delta: getPositiveDelta(deltas.developedModelsDelta),
+      value: metricsData.developedModels.count,
+      delta: metricsData.developedModels.delta,
     });
     setSumRmModels({
       ...sumRmModels,
-      value: totalMetrics.sumRmModels,
-      delta: getPositiveDelta(deltas.sumRmModelsDelta),
+      value: metricsData.sumRmModels.count,
+      delta: metricsData.sumRmModels.delta,
     });
     setFinalStatusModels({
       ...finalStatusModels,
-      value: totalMetrics.finalStatusModels,
-      delta: getPositiveDelta(deltas.finalStatusModelsDelta),
+      value: metricsData.finalStatusModels.count,
+      delta: metricsData.finalStatusModels.delta,
     });
     setRegistryCoverageModels({
       ...registryCoverageModels,
-      value: totalMetrics.registryCoverageModels,
-      delta: deltas.registryCoverageModelsDelta,
+      value: metricsData.registryCoverageModels.countPercent,
+      delta: metricsData.registryCoverageModels.deltaPercent,
     });
     setRiskCoverageFinalStatusModels({
       ...riskCoverageFinalStatusModels,
-      value: totalMetrics.riskCoverageFinalStatusModels,
-      delta: deltas.riskCoverageFinalStatusModelsDelta,
+      value: metricsData.riskCoverageFinalStatusModels.countPercent,
+      delta: metricsData.riskCoverageFinalStatusModels.deltaPercent,
     });
 
     setOnMonitoringModels({
       ...onMonitoringModels,
-      value: totalMetrics.onMonitoringModels,
-      delta: deltas.onMonitoringModelsDelta,
+      value: metricsData.onMonitoringModels.count,
+      delta: metricsData.onMonitoringModels.deltaPercent,
     });
     setStatChartOnMonitoringModels({
       ...statChartOnMonitoringModels,
       series: [
         {
           ...statChartOnMonitoringModels.series[0],
-          data: generateChartData(deltas.onMonitoringModelsDelta),
+          data: generateChartData(metricsData.onMonitoringModels.deltaPercent),
         },
       ],
     });
 
     setTakenOutOfOperationModels({
       ...takenOutOfOperationModels,
-      value: totalMetrics.takenOutOfOperationModels,
-      delta: deltas.takenOutOfOperationModelsDelta,
+      value: metricsData.takenOutOfOperationModels.count,
+      delta: metricsData.takenOutOfOperationModels.deltaPercent,
     });
+
     setStatChartTakenOutOfOperationModels({
       ...statChartTakenOutOfOperationModels,
       series: [
         {
           ...statChartTakenOutOfOperationModels.series[0],
-          data: generateChartData(deltas.takenOutOfOperationModelsDelta),
+          data: generateChartData(metricsData.takenOutOfOperationModels.deltaPercent),
         },
       ],
     });
@@ -223,7 +209,7 @@ const ChartsDashboard = () => {
       series: [
         {
           ...stalledModelsByMonth.series[0],
-          data: totalMetrics.stalledModelsByMonth,
+          data: metricsData.stalledModelsByMonth,
         },
       ],
     });
@@ -233,11 +219,11 @@ const ChartsDashboard = () => {
       series: [
         {
           ...pilots.series[0],
-          data: [totalMetrics.stage05A, null],
+          data: [metricsData.pilots.stage05A, null],
         },
         {
           ...pilots.series[1],
-          data: [null, totalMetrics.stage05B],
+          data: [null, metricsData.pilots.stage05B],
         },
       ],
     });
@@ -247,7 +233,7 @@ const ChartsDashboard = () => {
       series: [
         {
           ...finalStatusByMonthModels.series[0],
-          data: totalMetrics.finalStatusByMonthModels,
+          data: metricsData.finalStatusByMonthModels,
         },
       ],
     });
@@ -257,50 +243,72 @@ const ChartsDashboard = () => {
       series: [
         {
           ...distributionByLifecycleStageModels.series[0],
-          data: metricsData?.distributionByLifecycleStageModels?.data,
+          data: metricsData?.distributionByLifecycleStageModels,
         },
       ],
     });
-  }, [modelsData, dateRange, selectedStream, metricsData]);
 
-  const handleDateChange = (newDateRange: string | undefined) => {
-    setTempDateRange(newDateRange ? (newDateRange.split(' - ') as [string, string]) : undefined);
-    setDateError(null);
-  };
+    setModelDynamicsByStreams({
+      ...modelDynamicsByStreams,
+      series: [
+        {
+          ...modelDynamicsByStreams.series[0],
+          data: [metricsData.tasks.datasources],
+        },
+        {
+          ...modelDynamicsByStreams.series[1],
+          data: [metricsData.tasks.validation],
+        },
+      ],
+    });
+  }, [metricsData]);
 
-  const handleStreamChange = (stream: string) => {
-    setTempSelectedStream(stream);
-  };
+  const handleDateChange = (newDate: string | undefined) => {
+    setTempFilters((prev) => ({ ...prev, tempDateRange: newDate || undefined }));
 
-  const handleApplyFilters = () => {
-    if (tempDateRange) {
-      const [startDate, endDate] = tempDateRange;
-
-      if (validateDateRange(startDate, endDate)) {
-        const formattedStartDate = switchDateFormat(startDate);
-        const formattedEndDate = switchDateFormat(endDate);
-
-        setDateRange([formattedStartDate, formattedEndDate]);
-        setSelectedStream(tempSelectedStream);
-        setDateError(null);
-      } else {
-        setDateError('Невалидная дата');
-      }
+    if (newDate && !validateDateRange(newDate)) {
+      setDateError('Некорректная дата');
     } else {
-      setDateRange(undefined);
-      setSelectedStream(tempSelectedStream);
       setDateError(null);
     }
   };
 
-  const handleResetFilters = () => {
-    setTempDateRange(undefined);
-    setDateRange(undefined);
+  const handleStreamChange = (stream: string) => {
+    setTempFilters((prev) => ({ ...prev, tempSelectedStream: stream }));
+  };
+
+  const handleApplyFilters = () => {
+    if (tempFilters.tempDateRange && !validateDateRange(tempFilters.tempDateRange)) {
+      setDateError('Некорректная дата');
+      return;
+    }
 
     setDateError(null);
 
-    setTempSelectedStream('Все стримы');
-    setSelectedStream('Все стримы');
+    const filteredParams: Record<string, string> = {};
+
+    if (tempFilters.tempDateRange) {
+      filteredParams.date = switchDateFormat(tempFilters.tempDateRange);
+    }
+
+    if (tempFilters.tempSelectedStream && tempFilters.tempSelectedStream !== 'Все стримы') {
+      filteredParams.stream = tempFilters.tempSelectedStream;
+    }
+
+    setFilters({
+      dateRange: filteredParams.date,
+      selectedStream: filteredParams.stream || 'Все стримы',
+    });
+
+    refetch();
+  };
+
+  const handleResetFilters = () => {
+    setFilters({ dateRange: undefined, selectedStream: 'Все стримы' });
+    setTempFilters({ tempDateRange: undefined, tempSelectedStream: 'Все стримы' });
+    setDateError(null);
+
+    refetch();
   };
 
   const exportToPDF = () => {
@@ -413,10 +421,10 @@ const ChartsDashboard = () => {
     handleExport(value);
   };
 
-  if (error || errorMetrics) {
+  if (errorMetrics) {
     return (
       <StatusWrapper>
-        <ErrorStatus text={error} />
+        <ErrorStatus text={errorMetrics} />
       </StatusWrapper>
     );
   }
@@ -426,21 +434,21 @@ const ChartsDashboard = () => {
       <WrapperFilter>
         <Container>
           <FlexContainerFilter>
-            <CustomDateField
-              type="date-range"
-              dimension="s"
-              id="dates"
-              label="Временный срез:"
-              placeholder="__.__.____ – __.__.____"
-              dropContainerClassName="dropContainerClass"
-              value={tempDateRange ? `${tempDateRange[0]} - ${tempDateRange[1]}` : ''}
-              onChange={(e) => handleDateChange(e.currentTarget.value)}
-              status={dateError ? 'error' : undefined}
-            />
+            <Field label="Временный срез:">
+              <DateInput
+                dimension="s"
+                value={tempFilters.tempDateRange || ''}
+                onChange={(e) => handleDateChange(e.currentTarget.value)}
+                placeholder="__.__.____"
+                style={{ maxWidth: 300 }}
+                dropContainerClassName="dropContainerClass"
+                status={dateError ? 'error' : undefined}
+              />
+            </Field>
             <Field label="Стримы:">
               <CustomSelectField
                 dimension="s"
-                value={tempSelectedStream}
+                value={tempFilters.tempSelectedStream}
                 onChange={(e) => handleStreamChange(e.target.value)}
                 placeholder="Выберите стрим"
                 dropContainerClassName="dropContainerClass"
@@ -493,7 +501,7 @@ const ChartsDashboard = () => {
       </WrapperTitle>
 
       <>
-        {loading || loadingMetrics ? (
+        {loadingMetrics ? (
           <StatusWrapper>
             <Loading text="Загрузка данных ..." />
           </StatusWrapper>
@@ -683,3 +691,4 @@ const ChartsDashboard = () => {
 };
 
 export { ChartsDashboard };
+

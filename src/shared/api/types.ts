@@ -43,9 +43,52 @@ export type RelationsModelResponseType = {
 };
 
 export type MetricsResponseType = {
-  distributionByLifecycleStageModels: {
-    name: string;
-    data: (string | number)[][];
+  distributionByLifecycleStageModels: Array<[string, number]>;
+  developedModels: {
+    count: number;
+    delta: number;
+  };
+  implementedModels: {
+    count: number;
+    delta: number;
+  };
+  finalStatusModels: {
+    count: number;
+    delta: number;
+  };
+  sumRmModels: {
+    count: number;
+    delta: number;
+  };
+  totalModels: {
+    count: number;
+    delta: number;
+  };
+  riskCoverageFinalStatusModels: {
+    countPercent: number;
+    deltaPercent: number;
+  };
+  registryCoverageModels: {
+    countPercent: number;
+    deltaPercent: number;
+  };
+  pilots: {
+    stage05A: number;
+    stage05B: number;
+  };
+  takenOutOfOperationModels: {
+    count: number;
+    deltaPercent: number;
+  };
+  onMonitoringModels: {
+    count: number;
+    deltaPercent: number;
+  };
+  stalledModelsByMonth: number[];
+  finalStatusByMonthModels: number[];
+  tasks: {
+    validation: number;
+    datasources: number;
   };
 };
 
