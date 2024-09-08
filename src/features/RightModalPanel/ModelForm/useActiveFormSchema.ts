@@ -1,49 +1,52 @@
 import { useEffect, useState } from 'react';
 import { FormFieldsSchema, FormValues } from './types';
-import { MODEL_FORM_MODE, RIGHT_PANEL_TYPE } from '@shared/constants';
+import { MODEL_FORM_MODE } from '@shared/constants';
 import { Row } from '@src/shared/types';
-import { BASE_MODEL_SCHEMA, ACTIVE_MODEL_SCHEMA, BASE_EDIT_MODEL_SCHEMA } from './constants';
+import { BASE_MODEL_SCHEMA, ACTIVE_MODEL_SCHEMA } from './constants';
 
 interface UseActiveFormSchemaProps {
-  values: FormValues;
+  values?: FormValues;
   activeRow?: Partial<Row>;
-  mode: RIGHT_PANEL_TYPE;
+  mode: MODEL_FORM_MODE;
 }
 
-const getFormSchemaByRow = (activeRow?: Partial<Row>) => {
+// TODO: Convert data (activeRow and values) to a single format and remove unnecessary conditions
+const getSchema = (activeRow?: Partial<Row>, values?: FormValues) => {
   let formSchema = BASE_MODEL_SCHEMA;
 
-  if (activeRow?.active_model === '1') {
-    formSchema = [...BASE_MODEL_SCHEMA, ...ACTIVE_MODEL_SCHEMA];
+  if (values) {
+    if (values.active_model?.value) {
+      formSchema = [...BASE_MODEL_SCHEMA, ...ACTIVE_MODEL_SCHEMA];
+
+      if (values.rating_system_name?.value) {
+        formSchema = [...formSchema, ...[]]; // for future logic
+      }
+    }
+
+    return formSchema;
   }
 
-  return formSchema;
-};
-
-const getFormSchemaByValues = (values?: FormValues) => {
-  let formSchema = BASE_MODEL_SCHEMA;
-
-  if (values?.active_model?.value) {
-    formSchema = [...BASE_MODEL_SCHEMA, ...ACTIVE_MODEL_SCHEMA];
-
-    if (values.rating_system_name?.value) {
-      formSchema = [...formSchema, ...[]]; // for future logic
+  if (activeRow) {
+    if (activeRow.active_model === '1') {
+      formSchema = [...BASE_MODEL_SCHEMA, ...ACTIVE_MODEL_SCHEMA];
     }
+
+    return formSchema;
   }
 
   return formSchema;
 };
 
 export const useFormSchema = ({ activeRow, values, mode }: UseActiveFormSchemaProps) => {
-  console.log('test useFormSchema');
-
-  const [formSchema, setFormSchema] = useState<FormFieldsSchema>(getFormSchemaByRow(activeRow));
+  const [formSchema, setFormSchema] = useState<FormFieldsSchema>(BASE_MODEL_SCHEMA);
 
   useEffect(() => {
-    const newFormSchema = getFormSchemaByValues(values);
+    if (mode === MODEL_FORM_MODE.EDIT) {
+      const newFormSchema = getSchema(activeRow, values);
 
-    setFormSchema(newFormSchema);
-  }, [values.active_model?.value]);
+      setFormSchema(newFormSchema);
+    }
+  }, [activeRow, values?.active_model?.value, mode]);
 
   return {
     formSchema,

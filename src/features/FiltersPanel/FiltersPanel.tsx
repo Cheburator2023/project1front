@@ -37,8 +37,14 @@ export const FiltersPanel = ({
   updateActiveScreen,
   updateRightPanelType,
 }: FiltersPanelProps) => {
-  const { topFilters, onChangeTopFilters, onChangeFirstDate, onChangeSecondDate } =
-    useContext(FiltersContext);
+  const {
+    topFilters,
+    modelsDownloadingDate,
+    onChangeModelDownloadingDate,
+    onChangeTopFilters,
+    onChangeFirstDate,
+    onChangeSecondDate,
+  } = useContext(FiltersContext);
 
   const handleChange = (name: string, value: string[]) =>
     onChangeTopFilters({ ...topFilters, templates: [], [name]: value });
@@ -101,6 +107,16 @@ export const FiltersPanel = ({
               options={exploitationSelectOptions}
               selectedValues={topFilters.exploitation}
               onChange={handleChange}
+            />
+            <CustomDateField
+              type="date"
+              dimension="s"
+              id="modelsByDates"
+              value={modelsDownloadingDate}
+              label="Выгрузка на определенную дату:"
+              placeholder="Введите дату"
+              dropContainerClassName="dropContainerClass"
+              onChange={(e) => onChangeModelDownloadingDate(e.target.value)}
             />
           </>
         )}

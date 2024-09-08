@@ -294,7 +294,7 @@ function InputFactorySwitcher<T extends string>({
           value={formattedValue}
           placeholder={placeholder}
           required={required}
-          label={`${label} ${requireConditions ? '++' : ''}`}
+          label={label}
           onChange={(e) => onChange?.(name, { type, value: e.target.value })}
         />
       );

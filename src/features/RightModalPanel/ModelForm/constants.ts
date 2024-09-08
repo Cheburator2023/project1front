@@ -95,29 +95,6 @@ export const BASE_MODEL_SCHEMA: FormFieldsSchema = [
   },
 ];
 
-export const BASE_EDIT_MODEL_SCHEMA: FormFieldsSchema = [
-  {
-    name: 'usage_confirm_date_q1',
-    required: false,
-    maxLength: 250,
-  },
-  {
-    name: 'usage_confirm_date_q2',
-    required: false,
-    maxLength: 250,
-  },
-  {
-    name: 'usage_confirm_date_q3',
-    required: false,
-    maxLength: 250,
-  },
-  {
-    name: 'usage_confirm_date_q4',
-    required: false,
-    maxLength: 250,
-  },
-];
-
 export const ACTIVE_MODEL_SCHEMA: FormFieldsSchema = [
   {
     name: 'model_name',
@@ -136,6 +113,12 @@ export const ACTIVE_MODEL_SCHEMA: FormFieldsSchema = [
   {
     name: 'model_type',
     required: true,
+    requireConditions: [
+      {
+        model_type: 'Риск-модели',
+        model_risk_type: 'Кредитный риск',
+      },
+    ],
   },
   {
     name: 'significance_validity',

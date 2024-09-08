@@ -40,11 +40,9 @@ export const ModelForm = ({
   onSubmit,
   onClose,
 }: ModelFormProps) => {
-  const { columnsFilters } = useContext(FiltersContext);
-
   const { mutationProtectedFetch } = useFetch({});
 
-  const [values, setValues] = useState<FormValues>({});
+  const [values, setValues] = useState<FormValues | undefined>();
   const [invalidFields, setInvalidFields] = useState<Array<keyof Row>>([]);
   const [parentModelId, setParentModelId] = useState<string>();
 
@@ -54,25 +52,23 @@ export const ModelForm = ({
 
   const formMode = getFormMode(mode);
 
-  // TODO: add transformer from row to values
-  const { formSchema } = useFormSchema({ values, activeRow: initialRow, mode });
-
-  console.log('formSchema', formSchema);
+  const { formSchema } = useFormSchema({ values, activeRow: initialRow, mode: formMode });
 
   const { fields } = useFormFields({
     formSchema,
+    mode: formMode,
     initialRow,
     artifacts: artifactsApi.data,
   });
 
-  console.log('fields', fields);
+  console.log('formSchema', formSchema);
 
   const handleChange = useCallback((name: keyof Row, value: InputValue) => {
     setValues((prevValues) => ({ ...prevValues, [name]: value }));
   }, []);
 
   const handleSubmit = useCallback(async () => {
-    const newInvalidFields = getInvalidFields(values, formSchema, activeRow, formMode);
+    const newInvalidFields = getInvalidFields(formSchema, values, activeRow, formMode);
 
     setInvalidFields(newInvalidFields);
 

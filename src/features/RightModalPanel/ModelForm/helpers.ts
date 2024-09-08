@@ -24,7 +24,7 @@ import {
   SelectStringOptions,
 } from '@shared/ui/organisms';
 
-import { FormFieldRequireConditions, FormFields, FormFieldsSchema, FormValues } from './types';
+import { FormFieldConditions, FormFields, FormFieldsSchema, FormValues } from './types';
 import {
   ACTIVE_MODEL_SCHEMA,
   ADDITIONAL_DAYS_OUT_QUARTER,
@@ -232,7 +232,7 @@ const getDisabledStatus = (minDate: Date, maxDate: Date) =>
 // Main mapping function that combine object for proper input format
 const mapArtifactToField = (
   artifact: Artifact,
-  fieldSchema: FormFieldsSchema[number],
+  fieldSchema?: FormFieldsSchema[number],
   activeRow?: Partial<Row>,
 ): InputFactoryProps<keyof Row> => {
   const commonAttributes: CommonInputProps<keyof Row> = {
@@ -240,7 +240,7 @@ const mapArtifactToField = (
     name: artifact.artefact_tech_label,
     label: artifact.artefact_label,
     required: !!fieldSchema?.required,
-    maxLength: fieldSchema.maxLength,
+    maxLength: fieldSchema?.maxLength,
     requireConditions: fieldSchema?.requireConditions,
     disabled: artifact.is_edit_flg === '0',
     placeholder: artifact.artefact_desc ? artifact.artefact_desc : undefined,
@@ -424,27 +424,29 @@ const getQuarterDateGroupField = (
 const getFormFields = ({
   artifacts,
   initialRow,
+  mode,
   activeFormSchema,
 }: {
   artifacts: Artifact[];
   activeFormSchema: FormFieldsSchema;
+  mode: MODEL_FORM_MODE;
   initialRow?: Partial<Row>;
 }) => {
-  const formFields = activeFormSchema.reduce((fields, fieldSchema) => {
-    const artifact = artifacts.find(
-      ({ artefact_tech_label }) => artefact_tech_label === fieldSchema.name,
-    );
+  // TODO: Move to separate function
+  const fieldsNamesToGenerate =
+    mode === MODEL_FORM_MODE.ADD
+      ? activeFormSchema.map(({ name }) => name)
+      : initialColumns.map(({ name }) => name);
+
+  const formFields = fieldsNamesToGenerate.reduce((fields, fieldName) => {
+    const artifact = artifacts.find(({ artefact_tech_label }) => artefact_tech_label === fieldName);
+
+    const fieldSchema = activeFormSchema.find(({ name }) => name === fieldName);
 
     if (artifact) {
       const field = mapArtifactToField(artifact, fieldSchema, initialRow);
 
-      const fieldWithExtraParams = {
-        ...field,
-        required: !!fieldSchema?.required,
-        maxLength: fieldSchema?.maxLength,
-      };
-
-      return [...fields, fieldWithExtraParams];
+      return [...fields, field];
     }
 
     return fields;
@@ -486,9 +488,9 @@ const getFormValue = (value?: InputValue) => {
 };
 
 const checkRequireStatus = (
-  values: FormValues,
+  values?: FormValues,
   required?: boolean,
-  requireConditions?: FormFieldRequireConditions,
+  requireConditions?: FormFieldConditions,
 ) => {
   if (required) {
     return true;
@@ -500,7 +502,7 @@ const checkRequireStatus = (
 
       const satisfyConditionsNumber = conditionsList.filter((condition) => {
         const [name, conditionValue] = condition as [keyof Row, string];
-        const formValueToCheck = getFormValue(values[name]);
+        const formValueToCheck = getFormValue(values?.[name]);
 
         return formValueToCheck === conditionValue;
       }).length;
@@ -525,14 +527,14 @@ const getFormValuesFromFormFields = (fields: FormFields): FormValues =>
   }, {} as FormValues);
 
 const getInvalidFields = (
-  values: FormValues,
   activeFormSchema: FormFieldsSchema,
+  values?: FormValues,
   activeRow?: Partial<Row>,
   formMode?: MODEL_FORM_MODE | null,
 ) =>
   activeFormSchema
     .filter(({ name, required, requireConditions }) => {
-      const fieldInputValue = values[name];
+      const fieldInputValue = values?.[name];
 
       const requiredField = checkRequireStatus(values, required, requireConditions);
 
@@ -601,8 +603,8 @@ const getProperFormatValueForSubmit = (inputValue: InputValue) => {
   }
 };
 
-const getArtifactApiItems = (values: FormValues, parentModelId?: string) => {
-  const artifactApiItems = Object.entries(values).reduce((bodyItems, [fieldName, value]) => {
+const getArtifactApiItems = (values?: FormValues, parentModelId?: string) => {
+  const artifactApiItems = Object.entries(values ?? {}).reduce((bodyItems, [fieldName, value]) => {
     const content = getProperFormatValueForSubmit(value);
 
     if (Array.isArray(content)) {
