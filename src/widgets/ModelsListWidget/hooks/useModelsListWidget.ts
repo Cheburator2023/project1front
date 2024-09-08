@@ -1,0 +1,152 @@
+import React, { useCallback, useContext, useEffect, useState } from 'react';
+
+import { Column, ColumnsFilter, Row } from '@shared/types';
+import { initialColumns, MODEL_FORM_MODE, RIGHT_PANEL_TYPE } from '@shared/constants';
+import {
+  API_ROUTES,
+  DownloadReportContext,
+  useFetch,
+  ModelsResponseType,
+  mockedModelsResponse,
+} from '@shared/api';
+import { filterColumnsByColumnsFilters } from '@shared/helpers';
+
+export const useModelsListWidget = (
+  columnsFilters: Partial<ColumnsFilter>,
+  setRightPanelType: React.Dispatch<React.SetStateAction<RIGHT_PANEL_TYPE | null>>,
+) => {
+  const { updateColumnsFilters, downloadReportStatus } = useContext(DownloadReportContext);
+
+  // Cell activities
+  const [activeCellName, setActiveCellName] = useState<keyof Row>();
+  const [activeRowId, setActiveRowId] = useState<string>();
+
+  // Table data
+  const [rowList, setRowList] = useState<Array<Partial<Row>>>([]);
+  const [columnList, setColumnList] = useState<Column[]>(initialColumns);
+
+  const [searchString, setSearchString] = useState<string>('');
+
+  // Pagination
+  const [pageSize, setPageSize] = useState(20);
+  const [page, setPage] = useState(1);
+  const [totalRows, setTotalRows] = useState<number>(0);
+
+  const {
+    responseData: modelsData,
+    loading,
+    error,
+  } = useFetch<ModelsResponseType>({
+    apiRoute: API_ROUTES.MODELS,
+    // mockedResponse: mockedModelsResponse,
+  });
+
+  useEffect(() => {
+    if (modelsData) {
+      const formattedRows = modelsData.data.cards.map((row) => ({
+        ...row,
+        model_version: row.model_version?.toString(), // TODO: remove after fix on backend
+        id: row.system_model_id,
+        hover: true,
+      }));
+
+      setRowList(formattedRows);
+      setTotalRows(formattedRows.length);
+    }
+  }, [modelsData]);
+
+  useEffect(() => {
+    if (downloadReportStatus) {
+      updateColumnsFilters(columnsFilters);
+    }
+  }, [columnsFilters, downloadReportStatus]);
+
+  const handleChangePage = (result: { page: number; pageSize: number }) => {
+    if (result.page !== page) {
+      setPage(result.page);
+    }
+
+    if (result.pageSize !== pageSize) {
+      setPageSize(result.pageSize);
+    }
+  };
+
+  const handleSearch = (newSearchString: string) => {
+    if (page !== 1) {
+      setPage(1);
+    }
+
+    setSearchString(newSearchString);
+  };
+
+  const updateColumnList = () => {
+    const newColumnList = filterColumnsByColumnsFilters(columnsFilters);
+
+    setColumnList(newColumnList);
+  };
+
+  useEffect(() => {
+    updateColumnList();
+  }, [columnsFilters]);
+
+  const handleClickOnActionCell = useCallback(
+    (
+      action: RIGHT_PANEL_TYPE.EDIT_MODEL | RIGHT_PANEL_TYPE.HISTORY_CHANGES,
+      rowId: string,
+      cellName: keyof Row,
+    ) => {
+      setRightPanelType(action);
+      setActiveCellName(cellName);
+      setActiveRowId(rowId);
+    },
+    [rowList],
+  );
+
+  const handleSubmit = useCallback((newRow: Row, formMode: MODEL_FORM_MODE) => {
+    const newRowWithId = { ...newRow, id: newRow.system_model_id, hover: true };
+
+    if (formMode === MODEL_FORM_MODE.EDIT) {
+      setRowList((prevRows) =>
+        prevRows.map((row) =>
+          row?.system_model_id === newRowWithId.system_model_id ? newRowWithId : row,
+        ),
+      );
+    } else {
+      setRowList((prevRows) => [newRowWithId, ...prevRows]);
+    }
+  }, []);
+
+  const handleOnClose = useCallback(() => {
+    setRightPanelType(null);
+    setActiveCellName(undefined);
+    setActiveRowId(undefined);
+  }, []);
+
+  return {
+    data: {
+      rowList,
+      columnList,
+      loading,
+      error,
+      activeRowId,
+      activeCellName,
+      searchString,
+      pageSize,
+      page,
+      totalRows,
+    },
+    actions: {
+      setRowList,
+      setColumnList,
+      handleSearch,
+      handleChangePage,
+      setTotalRows,
+      setPageSize,
+      setPage,
+      updateColumnList,
+      handleClickOnActionCell,
+      handleSubmit,
+      handleOnClose,
+    },
+  };
+};

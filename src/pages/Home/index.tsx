@@ -1,15 +1,14 @@
 import React from 'react';
 import styled from 'styled-components';
-
 import { ErrorStatus, Loading, Pagination } from '@shared/ui/atoms';
 import { ACTIVE_SCREEN } from '@shared/constants';
 import { FiltersContext } from '@shared/api';
 import { ActionsPanel } from '@entities';
 import { FiltersPanel, RightModalPanel, TemplateFilters, TableModels } from '@features';
-import { CompareModelsWidget } from '@widgets';
-
 import { useTableModels } from './hooks';
+import { CompareModelsWidget } from '@src/widgets';
 
+// TODO: вынести в atoms/styled
 const StatusWrapper = styled.div`
   display: flex;
   width: 100%;
@@ -101,5 +100,4 @@ const Home = () => {
     </FiltersContext.Provider>
   );
 };
-
 export { Home };

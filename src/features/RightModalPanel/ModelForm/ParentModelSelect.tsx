@@ -3,8 +3,8 @@ import React, { useMemo } from 'react';
 import { SELECT_TYPE, SelectStringProps } from '@shared/ui/organisms';
 
 import { getParentModelOptions } from './helpers';
-import { Row } from '../../TableModels/types';
 import { CustomSearchSelect } from './styles';
+import { Row } from '@src/shared/types';
 
 export interface ParentModelSelectProps {
   rows: Partial<Row>[];

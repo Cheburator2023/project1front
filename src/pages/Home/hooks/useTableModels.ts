@@ -1,5 +1,4 @@
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
-
 import { Column, ColumnsFilter, Row, TopFilters } from '@shared/types';
 import {
   initialColumns,
@@ -9,18 +8,25 @@ import {
   RIGHT_PANEL_TYPE,
   MODEL_FORM_MODE,
 } from '@shared/constants';
+
 import {
   API_ROUTES,
   DownloadReportContext,
   useFetch,
   ModelsResponseType,
   Template,
+  mockedModelsResponse,
+  mockedTemplatesResponse,
 } from '@shared/api';
-import { checkColumnsFiltersForEqual, filterColumnsByColumnsFilters } from '@shared/helpers';
+
+import {
+  checkColumnsFiltersForEqual,
+  filterColumnsByColumnsFilters,
+  getISODateFormat,
+} from '@shared/helpers';
 
 export const useTableModels = () => {
   const { updateColumnsFilters, downloadReportStatus } = useContext(DownloadReportContext);
-
   const [activeScreen, setActiveScreen] = useState(ACTIVE_SCREEN.TABLE);
   const [compareMode, setCompareMode] = useState(false);
   const [rightPanelType, setRightPanelType] = useState<RIGHT_PANEL_TYPE | null>(null);
@@ -40,43 +46,61 @@ export const useTableModels = () => {
 
   const [firstDate, setFirstDate] = useState<string | null>(null);
   const [secondDate, setSecondDate] = useState<string | null>(null);
-
   const [searchString, setSearchString] = useState<string>('');
 
   // Pagination
   const [pageSize, setPageSize] = useState(20);
   const [page, setPage] = useState(1);
   const [totalRows, setTotalRows] = useState<number>(0);
-
   const [templates, setTemplates] = useState<Template[]>([]);
 
-  const {
-    responseData: modelsData,
-    loading,
-    error,
-  } = useFetch<ModelsResponseType>({
-    apiRoute: API_ROUTES.MODELS,
-    // mockedResponse: mockedModelsResponse,
-  });
+  const [modelsDownloadingDate, setModelsDownloadingDate] = useState<string | undefined>();
+  const [loadingModels, setLoadingModels] = useState(true);
+  const [errorModels, setErrorModels] = useState<string>('');
 
-  const { responseData: templateData } = useFetch<Template[]>({
+  const { responseData: templateData, mutationProtectedFetch } = useFetch<Template[]>({
     apiRoute: API_ROUTES.TEMPLATES,
     // mockedResponse: mockedTemplatesResponse,
   });
 
-  useEffect(() => {
-    if (modelsData) {
-      const formattedRows = modelsData.data.cards.map((row) => ({
-        ...row,
-        model_version: row.model_version?.toString(), // TODO: remove after fix on backend
-        id: row.system_model_id,
-        hover: true,
-      }));
+  const fetchModels = useCallback(async (date?: string) => {
+    setLoadingModels(true);
 
-      setRowList(formattedRows);
-      setTotalRows(formattedRows.length);
+    try {
+      const res = await mutationProtectedFetch<ModelsResponseType, ModelsResponseType>({
+        fetchApiRoute: API_ROUTES.MODELS,
+        fetchMethod: 'GET',
+        newParams: date ? { date: getISODateFormat(date) } : {},
+      });
+
+      if (res && !res?.error) {
+        updateRows(res.data);
+        setErrorModels('');
+      } else if (res) {
+        setErrorModels(res.data.message);
+      }
+
+      setLoadingModels(false);
+    } catch {
+      setErrorModels('Ошибка загрузки моделей');
     }
-  }, [modelsData]);
+  }, []);
+
+  // Initial models loading
+  useEffect(() => {
+    fetchModels();
+  }, [fetchModels]);
+
+  const updateRows = (modelsData: ModelsResponseType) => {
+    const formattedRows = modelsData.data.cards.map((row) => ({
+      ...row,
+      model_version: row.model_version?.toString(), // TODO: remove after fix on backend
+      id: row.system_model_id,
+      hover: true,
+    }));
+    setRowList(formattedRows);
+    setTotalRows(formattedRows.length);
+  };
 
   useEffect(() => {
     if (templateData) {
@@ -90,6 +114,11 @@ export const useTableModels = () => {
     }
   }, [columnsFilters, downloadReportStatus]);
 
+  const handleChangeModelDownloadingDate = useCallback((date: string) => {
+    fetchModels(date);
+    setModelsDownloadingDate(date);
+  }, []);
+
   const handleChangeCompare = (checked: boolean) => {
     checked ? setActiveScreen(ACTIVE_SCREEN.COMPARE) : setActiveScreen(ACTIVE_SCREEN.TABLE);
     setCompareMode(checked);
@@ -99,7 +128,6 @@ export const useTableModels = () => {
     if (result.page !== page) {
       setPage(result.page);
     }
-
     if (result.pageSize !== pageSize) {
       setPageSize(result.pageSize);
     }
@@ -109,17 +137,14 @@ export const useTableModels = () => {
     if (page !== 1) {
       setPage(1);
     }
-
     setSearchString(newSearchString);
   };
 
   const updateColumnList = useCallback(
     (newColumnFilters: Partial<ColumnsFilter>) => {
       const columnsFiltersChanged = !checkColumnsFiltersForEqual(columnsFilters, newColumnFilters);
-
       if (columnsFiltersChanged) {
         const newColumnList = filterColumnsByColumnsFilters(newColumnFilters);
-
         setColumnList(newColumnList);
       }
     },
@@ -138,14 +163,23 @@ export const useTableModels = () => {
     () => ({
       firstDate,
       secondDate,
+      modelsDownloadingDate,
       topFilters,
       columnsFilters,
       onChangeColumnsFilters: handleChangeColumnFilters,
       onChangeTopFilters: (newTopFilters: TopFilters) => setTopFilters(newTopFilters),
       onChangeFirstDate: (newFirstDate: string | null) => setFirstDate(newFirstDate),
       onChangeSecondDate: (newSecondDate: string | null) => setSecondDate(newSecondDate),
+      onChangeModelDownloadingDate: handleChangeModelDownloadingDate,
     }),
-    [columnsFilters, topFilters, handleChangeColumnFilters, firstDate, secondDate],
+    [
+      columnsFilters,
+      topFilters,
+      handleChangeColumnFilters,
+      firstDate,
+      secondDate,
+      modelsDownloadingDate,
+    ],
   );
 
   const handleClickOnActionCell = useCallback(
@@ -163,7 +197,6 @@ export const useTableModels = () => {
 
   const handleSubmit = useCallback((newRow: Row, formMode: MODEL_FORM_MODE) => {
     const newRowWithId = { ...newRow, id: newRow.system_model_id, hover: true };
-
     if (formMode === MODEL_FORM_MODE.EDIT) {
       setRowList((prevRows) =>
         prevRows.map((row) =>
@@ -201,8 +234,8 @@ export const useTableModels = () => {
       updateColumnList,
       handleSearch,
       handleChangePage,
-      loading,
-      error,
+      loading: loadingModels,
+      error: errorModels,
       activeRowId,
       activeCellName,
       searchString,

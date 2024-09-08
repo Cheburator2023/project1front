@@ -24,7 +24,6 @@ export const CompareTable = styled(Table)`
 
   .th {
     padding: 10px 0 8px 8px;
-    min-width: 200px !important;
   }
 
   .th > div > div > div:first-child {

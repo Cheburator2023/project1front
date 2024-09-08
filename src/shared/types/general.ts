@@ -14,10 +14,13 @@ enum COLUMN_TYPE {
   DATE = 'DATE',
   QUARTERLY_DATE = 'QUARTERLY_DATE',
   LINK = 'LINK',
+  ACTION = 'ACTION',
 }
 
 type ArtificialRow = {
+  relations: string | null;
   usage_confirm_date_group: string | null;
+  is_rating_system: string | null;
 };
 
 type Row = ArtificialRow & {
@@ -152,6 +155,9 @@ type Column = {
   type: COLUMN_TYPE;
   name: keyof Row;
   title: string;
+  width?: string;
+  sticky?: boolean;
+  sortable?: boolean;
   renderCell?: ColumnAdmiral['renderCell'];
 };
 
@@ -209,4 +215,3 @@ export {
   DsStreamOption,
   ModelStatus,
 };
-

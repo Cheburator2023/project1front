@@ -3,14 +3,14 @@ import { useContext, useEffect, useState } from 'react';
 import { FetchContext } from './FetchContext';
 import { API_ROUTES } from './constants';
 
-export interface MutationProtectedFetchProps<T> {
+export interface MutationProtectedFetchProps<T, N> {
   body?: T;
   fetchApiRoute: API_ROUTES;
   fetchMethod: 'POST' | 'PUT' | 'DELETE' | 'GET';
   routeParam?: string | number;
   fileName?: string;
   newParams?: Record<string, string>;
-  mockedResponse?: T;
+  mockedResponse?: N;
 }
 interface FetchProps<T> {
   apiRoute?: API_ROUTES;
@@ -90,7 +90,7 @@ export const useFetch = <T>({
       fileName,
       newParams = {},
       mockedResponse = undefined,
-    }: MutationProtectedFetchProps<N>) => {
+    }: MutationProtectedFetchProps<N, M>) => {
       const getRoute = () => {
         if (routeParam && fetchApiRoute) {
           return `${fetchApiRoute}/${routeParam}`;

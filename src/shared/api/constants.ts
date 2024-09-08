@@ -3,6 +3,7 @@ export enum API_ROUTES {
   MODELS_EDIT = '/models/update',
   COMPARE_MODELS = '/models/compare',
   MODEL_ADD = '/model/create',
+  MODEL_RELATIONS = '/model/relations',
   MODEL_ARTIFACT_HISTORY = '/model/artefact/history',
   TEMPLATES = '/templates',
   TEMPLATE_ADD = '/template/create',

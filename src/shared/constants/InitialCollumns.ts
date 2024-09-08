@@ -572,6 +572,13 @@ export const initialColumns: Array<Column> = [
     title: 'Система источник данных',
     type: COLUMN_TYPE.STRING,
   },
+  {
+    name: 'relations',
+    title: '',
+    width: '48px',
+    sticky: true,
+    type: COLUMN_TYPE.ACTION,
+  },
 ];
 
 export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
