@@ -1,5 +1,20 @@
 # Semantic Versioning Changelog
 
+# [1.20.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.19.0...v1.20.0) (2024-09-10)
+
+
+### Bug Fixes
+
+* fix bugs with right panel and relations clmn ([1f9c602](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/1f9c602f1817a29daa686b10480be17b117a384c))
+
+
+### Features
+
+* add downloading models by specific date ([a843941](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/a843941ececdd2d4c94c292df3fd0731eab1e2c2))
+* add model relations feature ([dc0e4f7](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/dc0e4f7e0e15beb6d868c476c0f7ac4ecbebb0f5))
+* add schemas feature ([5ff11a2](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/5ff11a254a40d48f53a7a7b01cd4df47cba1272e))
+* move dashboards calc to server ([5ce0174](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/5ce017413524886f8f9b15bdafa24ed3f8cd6a4a))
+
 # [1.19.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.18.1...v1.19.0) (2024-09-03)
 
 
