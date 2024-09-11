@@ -581,15 +581,17 @@ const getFormFields = ({
 };
 
 const getFormValue = (value?: InputValue) => {
-  if (value?.type === INPUT_TYPE.SELECT) {
-    return value.value?.text;
+  switch (value?.type) {
+    case INPUT_TYPE.SELECT: {
+      return value.value?.text;
+    }
+    case INPUT_TYPE.MULTI_SELECT: {
+      return value.value?.length;
+    }
+    default: {
+      return value?.value;
+    }
   }
-
-  if (value?.type === INPUT_TYPE.STRING) {
-    return value.value;
-  }
-
-  return null;
 };
 
 const checkForSatisfyConditions = (conditionsList: FormFieldConditions, values?: FormValues) =>
@@ -661,6 +663,7 @@ const getInvalidFields = (activeFormSchema: FormFieldsSchema, values?: FormValue
       return false;
     })
     .map(({ name }) => name);
+
 const getProperFormatValueForSubmit = (inputValue: InputValue) => {
   const { type, value } = inputValue;
 
@@ -701,6 +704,10 @@ const getProperFormatValueForSubmit = (inputValue: InputValue) => {
 
 const getArtifactApiItems = (values?: FormValues, parentModelId?: string) => {
   const artifactApiItems = Object.entries(values ?? {}).reduce((bodyItems, [fieldName, value]) => {
+    if (!value) {
+      return bodyItems;
+    }
+
     const content = getProperFormatValueForSubmit(value);
 
     if (Array.isArray(content)) {
