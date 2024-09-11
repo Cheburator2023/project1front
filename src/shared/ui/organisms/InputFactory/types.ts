@@ -1,4 +1,8 @@
 import { SelectStringProps } from '@shared/ui/organisms';
+import {
+  FormFieldConditions,
+  FormFieldValueConditions,
+} from '@src/features/RightModalPanel/ModelForm';
 
 enum INPUT_TYPE {
   STRING = 'STRING',
@@ -73,7 +77,8 @@ type CommonInputProps<T extends string> = {
   label: string;
   name: T;
   required: boolean;
-  requireConditions?: Array<Partial<Record<T, string>>>;
+  requireConditions?: FormFieldConditions; //TODO: fix imports (not allow FSD import rules)
+  valueConditions?: FormFieldValueConditions; //TODO: fix imports (not allow FSD import rules)
   placeholder?: string;
   disabled?: boolean;
   maxLength?: number;
@@ -81,20 +86,17 @@ type CommonInputProps<T extends string> = {
 
 type StringInput<T extends string> = CommonInputProps<T> & {
   type: INPUT_TYPE.STRING;
-  initialValue?: StringInputValue;
   length?: number;
 };
 
 type TextAreaInput<T extends string> = CommonInputProps<T> & {
   type: INPUT_TYPE.TEXT_AREA;
-  initialValue?: StringInputValue;
   length?: number;
   maxRows?: number;
 };
 
 type DateInput<T extends string> = CommonInputProps<T> & {
   type: INPUT_TYPE.DATE;
-  initialValue?: DateInputValue;
   minDate?: Date;
   maxDate?: Date;
 };
@@ -102,7 +104,6 @@ type DateInput<T extends string> = CommonInputProps<T> & {
 type QuarterlyDateInput<T extends string> = CommonInputProps<T> & {
   type: INPUT_TYPE.QUARTERLY_DATE;
   quarter: number;
-  initialValue?: QuarterlyDateInputValue;
   minDate?: Date;
   maxDate?: Date;
 };
@@ -114,7 +115,6 @@ type QuarterlyDateGroupInput<T extends string> = CommonInputProps<T> & {
 
 type NumberInput<T extends string> = CommonInputProps<T> & {
   type: INPUT_TYPE.NUMBER;
-  initialValue?: NumberInputValue;
   suffix?: string;
   precision?: number;
   minValue?: number;
@@ -124,19 +124,16 @@ type NumberInput<T extends string> = CommonInputProps<T> & {
 
 type FlagInput<T extends string> = CommonInputProps<T> & {
   type: INPUT_TYPE.FLAG;
-  initialValue?: FlagInputValue;
 };
 
 type SelectInput<T extends string> = CommonInputProps<T> & {
   type: INPUT_TYPE.SELECT;
-  initialValue?: SelectInputValue;
   options: SelectStringProps;
   multiple: false;
 };
 
 type MultiSelectInput<T extends string> = CommonInputProps<T> & {
   type: INPUT_TYPE.MULTI_SELECT;
-  initialValue?: MultiSelectInputValue;
   options: SelectStringProps;
   multiple: true;
 };

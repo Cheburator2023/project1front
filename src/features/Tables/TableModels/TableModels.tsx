@@ -69,7 +69,6 @@ export const TableModels = React.memo(
                 column={column}
                 value={value}
                 row={row}
-                editable={row?.model_source !== 'sum'}
                 onAction={(action) => {
                   onActionCell(action, row.system_model_id, column.name);
                 }}

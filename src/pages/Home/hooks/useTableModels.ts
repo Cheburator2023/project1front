@@ -70,6 +70,7 @@ export const useTableModels = () => {
       const res = await mutationProtectedFetch<ModelsResponseType, ModelsResponseType>({
         fetchApiRoute: API_ROUTES.MODELS,
         fetchMethod: 'GET',
+        // mockedResponse: mockedModelsResponse,
         newParams: date ? { date: getISODateFormat(date) } : {},
       });
 

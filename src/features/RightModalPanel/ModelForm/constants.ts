@@ -5,11 +5,6 @@ export const ADDITIONAL_DAYS_OUT_QUARTER = 10;
 
 export const BASE_MODEL_SCHEMA: FormFieldsSchema = [
   {
-    name: 'active_model',
-    required: true,
-    maxLength: 250,
-  },
-  {
     name: 'model_name',
     required: true,
     maxLength: 250,
@@ -97,22 +92,16 @@ export const BASE_MODEL_SCHEMA: FormFieldsSchema = [
 
 export const ACTIVE_MODEL_SCHEMA: FormFieldsSchema = [
   {
-    name: 'model_name',
-    required: true,
-    maxLength: 250,
+    name: 'model_type',
+    requireConditions: [
+      {
+        model_type: 'Риск-модели',
+        model_risk_type: 'Кредитный риск',
+      },
+    ],
   },
   {
     name: 'model_desc',
-    required: true,
-    maxLength: 250,
-  },
-  {
-    name: 'group_company',
-    required: true,
-  },
-  {
-    name: 'model_type',
-    required: true,
     requireConditions: [
       {
         model_type: 'Риск-модели',
@@ -122,7 +111,6 @@ export const ACTIVE_MODEL_SCHEMA: FormFieldsSchema = [
   },
   {
     name: 'significance_validity',
-    required: true,
     valueConditions: [
       {
         value: 'Высокая',
@@ -178,7 +166,7 @@ export const ACTIVE_MODEL_SCHEMA: FormFieldsSchema = [
     required: true,
   },
   {
-    name: 'is_rating_system', // should be select with two options: 'yes'/'no'
+    name: 'rating_model',
     requireConditions: [
       {
         model_type: 'Риск-модели',
@@ -201,6 +189,8 @@ export const ACTIVE_MODEL_SCHEMA: FormFieldsSchema = [
   },
 ];
 
+export const NOT_ACTIVE_MODEL_SCHEMA: FormFieldsSchema = [];
+
 export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
   {
     name: 'rating_system_name',
@@ -210,7 +200,7 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
       {
         model_type: 'Риск-модели',
         model_risk_type: 'Кредитный риск',
-        is_rating_system: '1',
+        rating_model: '1',
       },
     ],
   },
@@ -222,7 +212,7 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
       {
         model_type: 'Риск-модели',
         model_risk_type: 'Кредитный риск',
-        is_rating_system: '1',
+        rating_model: '1',
       },
     ],
   },
@@ -234,7 +224,7 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
       {
         model_type: 'Риск-модели',
         model_risk_type: 'Кредитный риск',
-        is_rating_system: '1',
+        rating_model: '1',
       },
     ],
   },
@@ -246,7 +236,7 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
       {
         model_type: 'Риск-модели',
         model_risk_type: 'Кредитный риск',
-        is_rating_system: '1',
+        rating_model: '1',
       },
     ],
   },
@@ -258,7 +248,7 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
       {
         model_type: 'Риск-модели',
         model_risk_type: 'Кредитный риск',
-        is_rating_system: '1',
+        rating_model: '1',
       },
     ],
   },
@@ -270,7 +260,7 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
       {
         model_type: 'Риск-модели',
         model_risk_type: 'Кредитный риск',
-        is_rating_system: '1',
+        rating_model: '1',
       },
     ],
     valueConditions: [
@@ -286,7 +276,7 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
           {
             model_type: 'Риск-модели',
             model_risk_type: 'Кредитный риск',
-            is_rating_system: '1',
+            rating_model: '1',
             classification_of_rs_by_order_of_application_within_pvr:
               'Рейтинговые системы, подлежащие согласованию с Регулятором',
           },
@@ -307,7 +297,7 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
       {
         model_type: 'Риск-модели',
         model_risk_type: 'Кредитный риск',
-        is_rating_system: '1',
+        rating_model: '1',
         impact_coverage: '',
       },
     ],
@@ -331,7 +321,7 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
       {
         model_type: 'Риск-модели',
         model_risk_type: 'Кредитный риск',
-        is_rating_system: '1',
+        rating_model: '1',
         materiality_rate: '',
       },
     ],
@@ -355,7 +345,7 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
       {
         model_type: 'Риск-модели',
         model_risk_type: 'Кредитный риск',
-        is_rating_system: '1',
+        rating_model: '1',
       },
     ],
   },
@@ -367,7 +357,7 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
       {
         model_type: 'Риск-модели',
         model_risk_type: 'Кредитный риск',
-        is_rating_system: '1',
+        rating_model: '1',
       },
     ],
   },
@@ -379,7 +369,7 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
       {
         model_type: 'Риск-модели',
         model_risk_type: 'Кредитный риск',
-        is_rating_system: '1',
+        rating_model: '1',
       },
     ],
   },
@@ -391,7 +381,7 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
       {
         model_type: 'Риск-модели',
         model_risk_type: 'Кредитный риск',
-        is_rating_system: '1',
+        rating_model: '1',
       },
     ],
   },
@@ -403,7 +393,7 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
       {
         model_type: 'Риск-модели',
         model_risk_type: 'Кредитный риск',
-        is_rating_system: '1',
+        rating_model: '1',
       },
     ],
   },
@@ -415,7 +405,7 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
       {
         model_type: 'Риск-модели',
         model_risk_type: 'Кредитный риск',
-        is_rating_system: '1',
+        rating_model: '1',
       },
     ],
   },
@@ -435,7 +425,7 @@ export const RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA: FormFieldsSchema = [
       {
         model_type: 'Риск-модели',
         model_risk_type: 'Кредитный риск',
-        is_rating_system: '1',
+        rating_model: '1',
         classification_of_rs_by_order_of_application_within_pvr:
           'Рейтинговые системы, подлежащие согласованию с Регулятором',
       },
@@ -454,7 +444,7 @@ export const RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA: FormFieldsSchema = [
       {
         model_type: 'Риск-модели',
         model_risk_type: 'Кредитный риск',
-        is_rating_system: '1',
+        rating_model: '1',
         classification_of_rs_by_order_of_application_within_pvr:
           'Рейтинговые системы, подлежащие согласованию с Регулятором',
       },
@@ -473,7 +463,7 @@ export const RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA: FormFieldsSchema = [
       {
         model_type: 'Риск-модели',
         model_risk_type: 'Кредитный риск',
-        is_rating_system: '1',
+        rating_model: '1',
         classification_of_rs_by_order_of_application_within_pvr:
           'Рейтинговые системы, подлежащие согласованию с Регулятором',
       },
@@ -492,7 +482,7 @@ export const RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA: FormFieldsSchema = [
       {
         model_type: 'Риск-модели',
         model_risk_type: 'Кредитный риск',
-        is_rating_system: '1',
+        rating_model: '1',
         classification_of_rs_by_order_of_application_within_pvr:
           'Рейтинговые системы, подлежащие согласованию с Регулятором',
       },
@@ -511,7 +501,7 @@ export const RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA: FormFieldsSchema = [
       {
         model_type: 'Риск-модели',
         model_risk_type: 'Кредитный риск',
-        is_rating_system: '1',
+        rating_model: '1',
         classification_of_rs_by_order_of_application_within_pvr:
           'Рейтинговые системы, подлежащие согласованию с Регулятором',
       },

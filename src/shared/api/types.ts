@@ -192,6 +192,7 @@ export type ArtifactEditResponse = {
 export type ModelEditApi = {
   model_id: string;
   artefacts: ArtifactApi[];
+  model_source: string;
 };
 
 export type ModelHistoryChangesParams = {

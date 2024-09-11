@@ -58,7 +58,7 @@ export interface CustomCellProps {
   column: Column;
   value: string;
   row: Row;
-  editable: boolean;
+  editable?: boolean;
   onAction: (action: RIGHT_PANEL_TYPE.EDIT_MODEL | RIGHT_PANEL_TYPE.HISTORY_CHANGES) => void;
 }
 
@@ -66,7 +66,7 @@ export const CustomCell = ({
   row,
   column,
   value,
-  editable,
+  editable = true,
   onAction,
 }: CustomCellProps): React.ReactElement => {
   const cellRef = useRef(null);

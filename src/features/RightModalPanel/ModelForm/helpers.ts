@@ -9,7 +9,7 @@ import {
 } from 'date-fns';
 
 import { ArtifactType, type Artifact, type ArtifactApi, type ArtifactValue } from '@shared/api';
-import { ColumnsFilter, Row } from '@shared/types';
+import { Row } from '@shared/types';
 import { initialColumns, RIGHT_PANEL_TYPE, MODEL_FORM_MODE } from '@shared/constants';
 import {
   CommonInputProps,
@@ -24,13 +24,107 @@ import {
   SelectStringOptions,
 } from '@shared/ui/organisms';
 
-import { FormFieldConditions, FormFields, FormFieldsSchema, FormValues } from './types';
 import {
-  ACTIVE_MODEL_SCHEMA,
-  ADDITIONAL_DAYS_OUT_QUARTER,
-  BASE_MODEL_SCHEMA,
-  MONTHS_IN_QUARTER,
-} from './constants';
+  FormFieldConditions,
+  FormFieldValueConditions,
+  FormFields,
+  FormFieldsSchema,
+  FormValues,
+} from './types';
+
+import { ADDITIONAL_DAYS_OUT_QUARTER, MONTHS_IN_QUARTER } from './constants';
+
+const getInputValuesFromRow = (artifacts: Artifact[], activeRow: Partial<Row> = {}): FormValues =>
+  Object.entries(activeRow).reduce((inputValues, rowItem) => {
+    const [name, rowValue] = rowItem as [keyof Row, string];
+
+    const artifact = artifacts.find((artifact) => artifact.artefact_tech_label === name);
+
+    if (artifact) {
+      const inputValue = getInputValue(artifact, rowValue);
+
+      return {
+        ...inputValues,
+        [name]: inputValue,
+      };
+    }
+
+    return inputValues;
+  }, {});
+
+const getInputValue = (artifact: Artifact, rowValue: string) => {
+  switch (artifact.artefact_type_desc) {
+    case ArtifactType.BOOLEAN: {
+      const type = INPUT_TYPE.FLAG;
+
+      return { type, value: rowValue === '1' };
+    }
+    case ArtifactType.DROPDOWN: {
+      const options = getSelectOptions(artifact.values);
+
+      return getSelectInitialValue(options, rowValue);
+    }
+    case ArtifactType.MULTI_DROPDOWN: {
+      const options = getSelectOptions(artifact.values);
+
+      return getMultiSelectInitialValue(options, rowValue);
+    }
+    case ArtifactType.QUARTERLY_DATE: {
+      const type = INPUT_TYPE.QUARTERLY_DATE;
+
+      let formattedInitialValue: Date | undefined;
+
+      if (rowValue) {
+        const date = new Date(rowValue);
+
+        if (date.toString() !== 'Invalid Date') {
+          formattedInitialValue = date;
+        }
+      }
+
+      return formattedInitialValue
+        ? {
+            type,
+            value: formattedInitialValue,
+          }
+        : undefined;
+    }
+    case ArtifactType.DATE:
+    case ArtifactType.DATE_ISO8601:
+    case ArtifactType.CASE_DATE: {
+      const type = INPUT_TYPE.DATE;
+
+      let formattedInitialValue: Date | undefined;
+
+      if (rowValue) {
+        const date = new Date(rowValue);
+
+        if (date.toString() !== 'Invalid Date') {
+          formattedInitialValue = date;
+        }
+      }
+
+      return formattedInitialValue
+        ? {
+            type,
+            value: formattedInitialValue,
+          }
+        : undefined;
+    }
+    case ArtifactType.NUMBER: {
+      const type = INPUT_TYPE.NUMBER;
+
+      const validInitialValue = rowValue && !isNaN(Number(rowValue));
+
+      return validInitialValue ? { type, value: Number(rowValue) } : undefined;
+    }
+    default: {
+      const type = INPUT_TYPE.STRING;
+
+      return rowValue ? { type, value: rowValue } : undefined;
+    }
+  }
+};
 
 // A set of functions that help with the conversion of artifacts values for selected options
 const getArtifactValueByValueId = (
@@ -119,34 +213,6 @@ const getSelectOptions = (artifactValues: ArtifactValue[]) => {
   return sortSelectOptions(selectOptions);
 };
 
-// Map initial columns to active columns filters to get filtered and ordered column name list
-const getEditFormFieldsSchema = (
-  columnsFilters: Partial<ColumnsFilter>,
-  isActiveModel?: boolean,
-) => {
-  const activeColumnsFiltersNames = Object.keys(columnsFilters);
-
-  return initialColumns.reduce((columnsNames, column) => {
-    if (activeColumnsFiltersNames.includes(column.name)) {
-      const additionalSchema = isActiveModel ? ACTIVE_MODEL_SCHEMA : BASE_MODEL_SCHEMA;
-
-      const additionalFieldParams = additionalSchema.find(({ name }) => name === column.name);
-
-      return [
-        ...columnsNames,
-        {
-          name: column.name,
-          required: !!additionalFieldParams?.required,
-          requireConditions: additionalFieldParams?.requireConditions,
-          maxLength: additionalFieldParams?.maxLength,
-        },
-      ];
-    }
-
-    return columnsNames;
-  }, [] as FormFieldsSchema);
-};
-
 const getSelectInitialValue = (
   options: SelectOption[],
   initialValue?: string | null,
@@ -213,16 +279,6 @@ const getDateLimits = (startDate: Date, quarter: number) => {
   };
 };
 
-export const getStartDateInCurrentYear = (startDate: Date) => {
-  const yearsFromStartDate = differenceInYears(Date.now(), startDate);
-
-  if (yearsFromStartDate) {
-    return addYears(startDate, yearsFromStartDate);
-  }
-
-  return startDate;
-};
-
 const getDisabledStatus = (minDate: Date, maxDate: Date) =>
   !isWithinInterval(Date.now(), {
     start: minDate,
@@ -242,6 +298,7 @@ const mapArtifactToField = (
     required: !!fieldSchema?.required,
     maxLength: fieldSchema?.maxLength,
     requireConditions: fieldSchema?.requireConditions,
+    valueConditions: fieldSchema?.valueConditions,
     disabled: artifact.is_edit_flg === '0',
     placeholder: artifact.artefact_desc ? artifact.artefact_desc : undefined,
   };
@@ -254,20 +311,16 @@ const mapArtifactToField = (
 
       return {
         ...commonAttributes,
-        initialValue: { type, value: activeRowValue === '1' },
         type,
       };
     }
     case ArtifactType.DROPDOWN: {
       const type = INPUT_TYPE.SELECT;
 
-      const options = getSelectOptions(artifact.values);
-
       return {
         ...commonAttributes,
         type,
         multiple: false,
-        initialValue: getSelectInitialValue(options, activeRowValue),
         options: {
           type: SELECT_TYPE.STRING,
           options: getSelectOptions(artifact.values),
@@ -277,15 +330,13 @@ const mapArtifactToField = (
     case ArtifactType.MULTI_DROPDOWN: {
       const type = INPUT_TYPE.MULTI_SELECT;
 
-      const options = getSelectOptions(artifact.values);
       return {
         ...commonAttributes,
         type,
         multiple: true,
-        initialValue: getMultiSelectInitialValue(options, activeRowValue),
         options: {
           type: SELECT_TYPE.STRING,
-          options,
+          options: getSelectOptions(artifact.values),
         },
       };
     }
@@ -333,79 +384,29 @@ const mapArtifactToField = (
         maxDate,
         disabled: quarterDisabledStatus,
         type,
-        initialValue: formattedInitialValue
-          ? {
-              type,
-              value: formattedInitialValue,
-            }
-          : undefined,
       };
     }
     case ArtifactType.DATE:
     case ArtifactType.DATE_ISO8601:
     case ArtifactType.CASE_DATE: {
-      const type = INPUT_TYPE.DATE;
-
-      let formattedInitialValue: Date | undefined;
-
-      if (activeRowValue) {
-        const date = new Date(activeRowValue);
-
-        if (date.toString() !== 'Invalid Date') {
-          formattedInitialValue = date;
-        }
-      }
-
       return {
         ...commonAttributes,
-        type,
-        initialValue: formattedInitialValue
-          ? {
-              type,
-              value: formattedInitialValue,
-            }
-          : undefined,
+        type: INPUT_TYPE.DATE,
       };
     }
     case ArtifactType.NUMBER: {
-      const type = INPUT_TYPE.NUMBER;
-
-      const validInitialValue = activeRowValue && !isNaN(Number(activeRowValue));
-
       return {
         ...commonAttributes,
         type: INPUT_TYPE.NUMBER,
-        initialValue: validInitialValue ? { type, value: Number(activeRowValue) } : undefined,
       };
     }
     default: {
-      const type = INPUT_TYPE.STRING;
-
       return {
         ...commonAttributes,
-        type,
-        initialValue: activeRowValue ? { type, value: activeRowValue } : undefined,
+        type: INPUT_TYPE.STRING,
       };
     }
   }
-};
-
-const getFormSchema = ({
-  formMode,
-  columnsFilters,
-}: {
-  formMode: MODEL_FORM_MODE;
-  columnsFilters?: Partial<ColumnsFilter>;
-}) => {
-  if (formMode === MODEL_FORM_MODE.ADD) {
-    return BASE_MODEL_SCHEMA;
-  }
-
-  if (columnsFilters) {
-    return getEditFormFieldsSchema(columnsFilters);
-  }
-
-  return [];
 };
 
 const getQuarterDateGroupField = (
@@ -477,15 +478,30 @@ const getFormFields = ({
 
 const getFormValue = (value?: InputValue) => {
   if (value?.type === INPUT_TYPE.SELECT) {
-    return value.value.text;
+    return value.value?.text;
   }
 
   if (value?.type === INPUT_TYPE.STRING) {
-    return !value.value;
+    return value.value;
   }
 
   return null;
 };
+
+const checkForSatisfyConditions = (conditionsList: FormFieldConditions, values?: FormValues) =>
+  conditionsList.some((conditions) => {
+    const conditionsList = Object.entries(conditions);
+
+    const satisfyConditionsNumber = conditionsList.filter((condition) => {
+      const [name, conditionValue] = condition as [keyof Row, string];
+
+      const formValueToCheck = getFormValue(values?.[name]);
+
+      return formValueToCheck === conditionValue;
+    }).length;
+
+    return conditionsList.length === satisfyConditionsNumber;
+  });
 
 const checkRequireStatus = (
   values?: FormValues,
@@ -497,76 +513,48 @@ const checkRequireStatus = (
   }
 
   if (requireConditions) {
-    return requireConditions.some((conditions) => {
-      const conditionsList = Object.entries(conditions);
-
-      const satisfyConditionsNumber = conditionsList.filter((condition) => {
-        const [name, conditionValue] = condition as [keyof Row, string];
-        const formValueToCheck = getFormValue(values?.[name]);
-
-        return formValueToCheck === conditionValue;
-      }).length;
-
-      return conditionsList.length === satisfyConditionsNumber;
-    });
+    return checkForSatisfyConditions(requireConditions, values);
   }
 
   return false;
 };
 
-const getFormValuesFromFormFields = (fields: FormFields): FormValues =>
-  fields.reduce((values, field) => {
-    if (field.type !== INPUT_TYPE.QUARTERLY_DATE_GROUP && field.initialValue) {
-      return {
-        ...values,
-        [field.name]: field.initialValue,
-      };
-    }
-
-    return values;
-  }, {} as FormValues);
-
-const getInvalidFields = (
-  activeFormSchema: FormFieldsSchema,
+// Check for require specific value
+const checkRequireValueStatus = (
   values?: FormValues,
-  activeRow?: Partial<Row>,
-  formMode?: MODEL_FORM_MODE | null,
-) =>
+  valueConditions?: FormFieldValueConditions,
+) => {
+  if (valueConditions) {
+    for (let index = 0; index < valueConditions.length; index++) {
+      const currentCondition = valueConditions[index];
+
+      if (checkForSatisfyConditions(currentCondition.conditions, values)) {
+        return currentCondition.value;
+      }
+    }
+  }
+};
+
+const getInvalidFields = (activeFormSchema: FormFieldsSchema, values?: FormValues) =>
   activeFormSchema
-    .filter(({ name, required, requireConditions }) => {
-      const fieldInputValue = values?.[name];
+    .filter(({ name, required, requireConditions, valueConditions }) => {
+      const formValue = getFormValue(values?.[name]);
 
       const requiredField = checkRequireStatus(values, required, requireConditions);
 
-      if (!requiredField) {
-        return false;
+      if (requiredField) {
+        if (!formValue) {
+          return true;
+        }
       }
 
-      if (!fieldInputValue) {
-        if (formMode === MODEL_FORM_MODE.EDIT) {
-          const initialValue = activeRow?.[name];
+      const valueToCompare = checkRequireValueStatus(values, valueConditions);
 
-          if (initialValue) {
-            return false;
-          }
-        }
-
+      if (valueToCompare && formValue !== valueToCompare) {
         return true;
       }
 
-      if (fieldInputValue.type === INPUT_TYPE.SELECT) {
-        return !fieldInputValue.value;
-      }
-
-      if (fieldInputValue.type === INPUT_TYPE.MULTI_SELECT) {
-        return !fieldInputValue.value.length;
-      }
-
-      if (fieldInputValue.type === INPUT_TYPE.STRING) {
-        return !fieldInputValue.value;
-      }
-
-      return fieldInputValue.value === undefined;
+      return false;
     })
     .map(({ name }) => name);
 
@@ -670,5 +658,5 @@ export {
   getInvalidFields,
   getArtifactApiItems,
   getParentModelOptions,
-  getFormValuesFromFormFields,
+  getInputValuesFromRow,
 };

@@ -132,6 +132,11 @@ export const initialColumns: Array<Column> = [
     type: COLUMN_TYPE.STRING,
   },
   {
+    name: 'rating_model',
+    title: 'Рейтинговая модель',
+    type: COLUMN_TYPE.STRING,
+  },
+  {
     name: 'model_indicator',
     title: 'Индикатор модели',
     type: COLUMN_TYPE.STRING,
@@ -608,6 +613,7 @@ export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
   regulatory_code_model_pvr: [],
   internal_model_number: [],
   active_model: [],
+  rating_model: [],
   model_indicator: [],
   calibration_version: [],
   calibration_date: [],

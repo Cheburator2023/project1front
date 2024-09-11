@@ -3,15 +3,11 @@ import { SelectStringOptions } from '@shared/ui/organisms';
 import { format } from 'date-fns';
 
 import {
-  DateInputValue,
-  FlagInputValue,
   INPUT_TYPE,
   InputValue,
   MultiSelectInputValue,
   NumberInputValue,
-  QuarterlyDateInputValue,
   SelectInputValue,
-  StringInputValue,
 } from './types';
 
 export const getSelectValues = (valueIds: string[], options: SelectStringOptions) =>
@@ -45,7 +41,7 @@ export const formatValuesForSelect = (selectValue?: SelectInputValue | MultiSele
   const { type, value } = selectValue;
 
   if (type === INPUT_TYPE.SELECT) {
-    return value.id ? [value.id] : undefined;
+    return value?.id ? [value.id] : undefined;
   }
 
   if (type === INPUT_TYPE.MULTI_SELECT) {
@@ -54,64 +50,34 @@ export const formatValuesForSelect = (selectValue?: SelectInputValue | MultiSele
 };
 
 export const getNumberValue = (value?: InputValue, initialValue?: NumberInputValue) => {
-  if (!value) {
-    return initialValue?.value;
-  }
-
-  if (value.type === INPUT_TYPE.NUMBER) {
+  if (value?.type === INPUT_TYPE.NUMBER) {
     return value.value;
   }
 };
 
-export const getStringValue = (value?: InputValue, initialValue?: StringInputValue) => {
-  if (!value) {
-    return initialValue?.value;
-  }
-
-  if (value.type === INPUT_TYPE.STRING || value.type === INPUT_TYPE.TEXT_AREA) {
+export const getStringValue = (value?: InputValue) => {
+  if (value?.type === INPUT_TYPE.STRING || value?.type === INPUT_TYPE.TEXT_AREA) {
     return value.value;
   }
 };
 
-export const getDateValue = (
-  value?: InputValue,
-  initialValue?: DateInputValue | QuarterlyDateInputValue,
-) => {
-  let dateValue;
-
-  if (!value && initialValue?.value) {
-    dateValue = format(initialValue.value, 'dd.MM.yyyy');
-  }
-
+export const getDateValue = (value?: InputValue) => {
   if (
     value?.value &&
     (value.type === INPUT_TYPE.DATE || value.type === INPUT_TYPE.QUARTERLY_DATE)
   ) {
-    dateValue = format(value.value, 'dd.MM.yyyy');
+    return format(value.value, 'dd.MM.yyyy');
   }
-
-  return dateValue;
 };
 
-export const getFlagValue = (value?: InputValue, initialValue?: FlagInputValue) => {
-  if (!value) {
-    return initialValue?.value;
-  }
-
-  if (value.type === INPUT_TYPE.FLAG) {
+export const getFlagValue = (value?: InputValue) => {
+  if (value?.type === INPUT_TYPE.FLAG) {
     return value.value;
   }
 };
 
-export const getSelectValue = (
-  value?: InputValue,
-  initialValue?: SelectInputValue | MultiSelectInputValue,
-) => {
-  if (!value) {
-    return formatValuesForSelect(initialValue);
-  }
-
-  if (value.type === INPUT_TYPE.SELECT || value.type === INPUT_TYPE.MULTI_SELECT) {
+export const getSelectValue = (value?: InputValue) => {
+  if (value?.type === INPUT_TYPE.SELECT || value?.type === INPUT_TYPE.MULTI_SELECT) {
     return formatValuesForSelect(value);
   }
 };

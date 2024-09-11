@@ -46,6 +46,7 @@ function InputFactorySwitcher<T extends string>({
     placeholder = 'Введите значение',
     id,
     requireConditions,
+    valueConditions,
     required,
     disabled,
   } = inputFactory;
@@ -61,10 +62,9 @@ function InputFactorySwitcher<T extends string>({
         displayPlusMinusIcons,
         precision = 0,
         suffix = '',
-        initialValue,
       } = inputFactory;
 
-      const formattedValue = getNumberValue(value, initialValue);
+      const formattedValue = getNumberValue(value);
 
       return (
         <NumberInputField
@@ -89,9 +89,9 @@ function InputFactorySwitcher<T extends string>({
       );
     }
     case INPUT_TYPE.DATE: {
-      const { maxDate, minDate, initialValue } = inputFactory;
+      const { maxDate, minDate } = inputFactory;
 
-      const dateValue = getDateValue(value, initialValue);
+      const dateValue = getDateValue(value);
 
       return (
         <DateField
@@ -138,7 +138,7 @@ function InputFactorySwitcher<T extends string>({
             }}
           >
             {quartes.map((quarter) => {
-              const quarterDateValue = getDateValue(values?.[quarter.name], quarter?.initialValue);
+              const quarterDateValue = getDateValue(values?.[quarter.name]);
 
               return (
                 <DateField
@@ -172,9 +172,9 @@ function InputFactorySwitcher<T extends string>({
       );
     }
     case INPUT_TYPE.TEXT_AREA: {
-      const { length, maxRows, initialValue } = inputFactory;
+      const { length, maxRows } = inputFactory;
 
-      const formattedValue = getStringValue(value, initialValue);
+      const formattedValue = getStringValue(value);
 
       return (
         <TextField
@@ -195,16 +195,36 @@ function InputFactorySwitcher<T extends string>({
       );
     }
     case INPUT_TYPE.SELECT: {
-      const { options, initialValue } = inputFactory;
+      const { options } = inputFactory;
 
-      const formattedValue = getSelectValue(value, initialValue);
+      const formattedValue = getSelectValue(value);
+
+      const getExtraText = () => {
+        if (error) {
+          return 'Обязательное поле';
+        }
+
+        if (requireConditions) {
+          if (valueConditions) {
+            return '* есть условия для заполнения';
+          }
+
+          return '* есть условия для обязательного заполнения';
+        }
+
+        if (valueConditions) {
+          return '* есть условия для обязательного значения';
+        }
+
+        return '';
+      };
 
       return (
         <SearchSelect
           key={name}
           autoFocus={autoFocus}
           error={error}
-          extraText={error ? 'Обязательное поле' : undefined}
+          extraText={getExtraText()}
           disabled={disabled}
           name={`${name}`}
           multiple={false}
@@ -223,9 +243,29 @@ function InputFactorySwitcher<T extends string>({
       );
     }
     case INPUT_TYPE.MULTI_SELECT: {
-      const { options, initialValue } = inputFactory;
+      const { options } = inputFactory;
 
-      const formattedValue = getSelectValue(value, initialValue);
+      const formattedValue = getSelectValue(value);
+
+      const getExtraText = () => {
+        if (error) {
+          return 'Обязательное поле';
+        }
+
+        if (requireConditions) {
+          if (valueConditions) {
+            return '* есть условия для заполнения';
+          }
+
+          return '* есть условия для обязательного заполнения';
+        }
+
+        if (valueConditions) {
+          return '* есть условия для обязательного значения';
+        }
+
+        return '';
+      };
 
       return (
         <SearchSelect
@@ -233,7 +273,7 @@ function InputFactorySwitcher<T extends string>({
           name={`${name}`}
           displayClearIcon
           error={error}
-          extraText={error ? 'Обязательное поле' : undefined}
+          extraText={getExtraText()}
           disabled={disabled}
           autoFocus={autoFocus}
           required={required}
@@ -250,9 +290,7 @@ function InputFactorySwitcher<T extends string>({
       );
     }
     case INPUT_TYPE.FLAG: {
-      const { initialValue } = inputFactory;
-
-      const formattedValue = getFlagValue(value, initialValue);
+      const formattedValue = getFlagValue(value);
 
       return (
         <Field
@@ -277,15 +315,35 @@ function InputFactorySwitcher<T extends string>({
       );
     }
     case INPUT_TYPE.STRING: {
-      const { length, initialValue } = inputFactory;
+      const { length } = inputFactory;
 
-      const formattedValue = getStringValue(value, initialValue);
+      const formattedValue = getStringValue(value);
+
+      const getExtraText = () => {
+        if (error) {
+          return 'Обязательное поле';
+        }
+
+        if (requireConditions) {
+          if (valueConditions) {
+            return '* есть условия для заполнения';
+          }
+
+          return '* есть условия для обязательного заполнения';
+        }
+
+        if (valueConditions) {
+          return '* есть условия для обязательного значения';
+        }
+
+        return null;
+      };
 
       return (
         <InputField
           ref={ref}
           status={error ? 'error' : undefined}
-          extraText={error && 'Обязательное поле'}
+          extraText={getExtraText()}
           disabled={disabled}
           autoFocus={autoFocus}
           key={id}

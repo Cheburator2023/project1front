@@ -5,17 +5,15 @@ import { Row } from '@shared/types';
 import { StatusScreen } from '@shared/ui/molecules';
 import { RIGHT_PANEL_TYPE, MODEL_FORM_MODE } from '@shared/constants';
 import { InputFactory, InputValue, RightPanel } from '@shared/ui/organisms';
-import {
-  API_ROUTES,
-  useFetch,
-  ArtifactApi,
-  ArtifactResponse,
-  ModelEditApi,
-  FiltersContext,
-} from '@shared/api';
+import { API_ROUTES, useFetch, ArtifactApi, ArtifactResponse, ModelEditApi } from '@shared/api';
 
 import { FormValues } from './types';
-import { getFormMode, getArtifactApiItems, getInvalidFields } from './helpers';
+import {
+  getFormMode,
+  getArtifactApiItems,
+  getInvalidFields,
+  getInputValuesFromRow,
+} from './helpers';
 import { ButtonContainer, FormContainer } from './styles';
 import { ParentModelSelect } from './ParentModelSelect';
 import { useFormSchema } from './useActiveFormSchema';
@@ -52,7 +50,7 @@ export const ModelForm = ({
 
   const formMode = getFormMode(mode);
 
-  const { formSchema } = useFormSchema({ values, activeRow: initialRow, mode: formMode });
+  const { formSchema } = useFormSchema({ values, initialRow, mode: formMode });
 
   const { fields } = useFormFields({
     formSchema,
@@ -61,14 +59,18 @@ export const ModelForm = ({
     artifacts: artifactsApi.data,
   });
 
-  console.log('formSchema', formSchema);
+  useEffect(() => {
+    const initialValues = getInputValuesFromRow(artifactsApi.data, initialRow);
+
+    setValues(initialValues);
+  }, [initialRow, artifactsApi]);
 
   const handleChange = useCallback((name: keyof Row, value: InputValue) => {
     setValues((prevValues) => ({ ...prevValues, [name]: value }));
   }, []);
 
   const handleSubmit = useCallback(async () => {
-    const newInvalidFields = getInvalidFields(formSchema, values, activeRow, formMode);
+    const newInvalidFields = getInvalidFields(formSchema, values);
 
     setInvalidFields(newInvalidFields);
 
@@ -81,15 +83,16 @@ export const ModelForm = ({
 
     setSubmitLoading(true);
 
-    if (formMode === MODEL_FORM_MODE.EDIT && activeRow) {
-      const modelId = activeRow.system_model_id;
+    if (formMode === MODEL_FORM_MODE.EDIT && initialRow) {
+      const { system_model_id, model_source } = initialRow;
 
-      if (modelId) {
+      if (system_model_id && model_source) {
         const res = await mutationProtectedFetch<ModelEditApi[], Row[]>({
           body: [
             {
-              model_id: modelId,
+              model_id: system_model_id,
               artefacts: artifactApiItems,
+              model_source,
             },
           ],
           fetchApiRoute: API_ROUTES.MODELS_EDIT,

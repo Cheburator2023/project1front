@@ -26,13 +26,14 @@ type ArtificialRow = {
 type Row = ArtificialRow & {
   system_model_id: string;
   id: string;
+  model_source: string;
+  rating_model: string | null;
   create_date: string | null;
   usage_confirm_date_q1: string | null;
   usage_confirm_date_q2: string | null;
   usage_confirm_date_q3: string | null;
   usage_confirm_date_q4: string | null;
   root_model_id: string | null;
-  model_source: string | null;
   model_version_id: string | null;
   auto_validation_result: string | null;
   uuid: string | null;

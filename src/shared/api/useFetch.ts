@@ -30,7 +30,7 @@ export const useFetch = <T>({
   params,
   mockedResponse,
   method = 'GET',
-  delay = 500,
+  delay = 200,
 }: FetchProps<T>) => {
   const [responseData, setResponseData] = useState<T | undefined>(mockedResponse);
   const [loading, setLoading] = useState(false);
