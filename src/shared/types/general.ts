@@ -13,6 +13,8 @@ enum COLUMN_TYPE {
   NUMBER = 'NUMBER',
   DATE = 'DATE',
   QUARTERLY_DATE = 'QUARTERLY_DATE',
+  QUARTERLY_FLAG = 'QUARTERLY_FLAG',
+  PERCENT_NUMBER = 'PERCENT_NUMBER',
   LINK = 'LINK',
   ACTION = 'ACTION',
 }
@@ -33,6 +35,20 @@ type Row = ArtificialRow & {
   usage_confirm_date_q2: string | null;
   usage_confirm_date_q3: string | null;
   usage_confirm_date_q4: string | null;
+  usage_confirm_flag_q1: string | null;
+  usage_confirm_flag_q2: string | null;
+  usage_confirm_flag_q3: string | null;
+  usage_confirm_flag_q4: string | null;
+  allocation_kib_comment: string | null;
+  allocation_smb_comment: string | null;
+  allocation_rb_comment: string | null;
+  allocation_kc_comment: string | null;
+  allocation_other_comment: string | null;
+  allocation_kib_usage: string | null;
+  allocation_smb_usage: string | null;
+  allocation_rb_usage: string | null;
+  allocation_kc_usage: string | null;
+  allocation_other_usage: string | null;
   root_model_id: string | null;
   model_version_id: string | null;
   auto_validation_result: string | null;

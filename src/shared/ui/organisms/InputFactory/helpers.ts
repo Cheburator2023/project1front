@@ -6,7 +6,8 @@ import {
   INPUT_TYPE,
   InputValue,
   MultiSelectInputValue,
-  NumberInputValue,
+  PercentInput,
+  QuarterlyDropdownInputValue,
   SelectInputValue,
 } from './types';
 
@@ -33,32 +34,42 @@ export const getSelectValues = (valueIds: string[], options: SelectStringOptions
     }[],
   );
 
-export const formatValuesForSelect = (selectValue?: SelectInputValue | MultiSelectInputValue) => {
-  if (!selectValue) {
+export const formatValuesForSelect = (
+  selectValue?: SelectInputValue | MultiSelectInputValue | QuarterlyDropdownInputValue,
+) => {
+  if (!selectValue || !selectValue.value) {
     return;
   }
 
   const { type, value } = selectValue;
 
-  if (type === INPUT_TYPE.SELECT) {
-    return value?.id ? [value.id] : undefined;
+  if (type === INPUT_TYPE.SELECT || type === INPUT_TYPE.QUARTERLY_DROPDOWN) {
+    return value.id ? [value.id] : undefined;
   }
 
   if (type === INPUT_TYPE.MULTI_SELECT) {
     return value.length ? value.map(({ id }) => id) : undefined;
   }
+
+  return;
 };
 
-export const getNumberValue = (value?: InputValue, initialValue?: NumberInputValue) => {
+export const getNumberValue = (value?: InputValue) => {
   if (value?.type === INPUT_TYPE.NUMBER) {
     return value.value;
   }
 };
 
-export const getStringValue = (value?: InputValue) => {
-  if (value?.type === INPUT_TYPE.STRING || value?.type === INPUT_TYPE.TEXT_AREA) {
-    return value.value;
+export const getStringValue = (value?: InputValue): string => {
+  if (
+    value?.type === INPUT_TYPE.STRING ||
+    value?.type === INPUT_TYPE.TEXT_AREA ||
+    value?.type === INPUT_TYPE.PERCENT
+  ) {
+    return value.value ?? '';
   }
+
+  return '';
 };
 
 export const getDateValue = (value?: InputValue) => {
@@ -77,7 +88,31 @@ export const getFlagValue = (value?: InputValue) => {
 };
 
 export const getSelectValue = (value?: InputValue) => {
-  if (value?.type === INPUT_TYPE.SELECT || value?.type === INPUT_TYPE.MULTI_SELECT) {
+  if (
+    value?.type === INPUT_TYPE.SELECT ||
+    value?.type === INPUT_TYPE.MULTI_SELECT ||
+    value?.type === INPUT_TYPE.QUARTERLY_DROPDOWN
+  ) {
     return formatValuesForSelect(value);
   }
+};
+// TODO: refactoring
+export const getFieldValueAsNumber = (rawValue: unknown): number => {
+  if (typeof rawValue === 'string' || typeof rawValue === 'number') {
+    const parsedValue = parseFloat(String(rawValue));
+    return isNaN(parsedValue) ? 0 : parsedValue;
+  }
+  return 0;
+};
+
+export const calculateTotalPercentage = <T extends string>(
+  fields: Array<PercentInput<T>>,
+  values: Partial<Record<string, InputValue>>,
+): number => {
+  return fields.reduce((total, field) => {
+    const rawValue = values?.[field.name]?.value || 0;
+    const fieldValue = getFieldValueAsNumber(rawValue);
+
+    return total + fieldValue;
+  }, 0);
 };

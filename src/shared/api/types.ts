@@ -121,6 +121,8 @@ export enum ArtifactType {
   CASE_DATE = 'case_date',
   DATE = 'date',
   QUARTERLY_DATE = 'quarterly_date',
+  QUARTERLY_DROPDOWN = 'quarterly_dropdown',
+  PERCENTAGE = 'percentage',
   FILE_OBJECT_STORAGE = 'file_object_storage',
   FILE_GIT = 'file_git',
   FILE_NEXUS = 'file_nexus',
@@ -137,7 +139,16 @@ export type ArtifactValue = {
   artefact_value_id: number;
   artefact_parent_value_id: number | null;
   artefact_value: string;
+  is_active_flag?: string;
 };
+
+//TODO: need to review
+export enum ArtifactGroup {
+  CUSTOMER_USAGE = 'Модель используется заказчиком',
+  CONFIRMATION_DATE = 'Дата подтверждения использования',
+  ALLOCATION_COMMENT = 'Комментарий к аллокации применения',
+  ALLOCATION_USAGE = 'Аллокация применения',
+}
 
 type ArtifactFlag = undefined | null | '0' | '1';
 
@@ -169,6 +180,7 @@ export type Artifact = {
   artefact_type_desc: ArtifactType;
   values: Array<ArtifactValue>;
   start_date_depend_artefact?: keyof Row;
+  group?: ArtifactGroup;
 };
 
 export type ArtifactResponse = {

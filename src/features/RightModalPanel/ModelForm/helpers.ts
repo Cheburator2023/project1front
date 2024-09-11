@@ -17,11 +17,11 @@ import {
   InputFactoryProps,
   InputValue,
   MultiSelectInputValue,
-  QuarterlyDateInput,
   SelectInputValue,
   SELECT_TYPE,
   SelectOption,
   SelectStringOptions,
+  QuarterlyDropdownInputValue,
 } from '@shared/ui/organisms';
 
 import {
@@ -32,8 +32,8 @@ import {
   FormValues,
 } from './types';
 
-import { ADDITIONAL_DAYS_OUT_QUARTER, MONTHS_IN_QUARTER } from './constants';
-
+import { BASE_MODEL_SCHEMA } from './constants';
+import { ArtifactGroup } from '@src/shared/api/types';
 const getInputValuesFromRow = (artifacts: Artifact[], activeRow: Partial<Row> = {}): FormValues =>
   Object.entries(activeRow).reduce((inputValues, rowItem) => {
     const [name, rowValue] = rowItem as [keyof Row, string];
@@ -59,6 +59,7 @@ const getInputValue = (artifact: Artifact, rowValue: string) => {
 
       return { type, value: rowValue === '1' };
     }
+    case ArtifactType.QUARTERLY_DROPDOWN:
     case ArtifactType.DROPDOWN: {
       const options = getSelectOptions(artifact.values);
 
@@ -117,6 +118,11 @@ const getInputValue = (artifact: Artifact, rowValue: string) => {
       const validInitialValue = rowValue && !isNaN(Number(rowValue));
 
       return validInitialValue ? { type, value: Number(rowValue) } : undefined;
+    }
+    case ArtifactType.PERCENTAGE: {
+      const type = INPUT_TYPE.PERCENT;
+
+      return rowValue ? { type, value: rowValue } : undefined;
     }
     default: {
       const type = INPUT_TYPE.STRING;
@@ -261,29 +267,37 @@ const getMultiSelectInitialValue = (
 };
 
 const getDateLimits = (startDate: Date, quarter: number) => {
-  const firstDateOfCurrentYear = startOfYear(new Date());
+  const firstDateOfCurrentYear = startOfYear(startDate); // Начало года
 
-  const minDate = addMonths(firstDateOfCurrentYear, (quarter - 1) * MONTHS_IN_QUARTER);
-  const maxDate = addMonths(minDate, MONTHS_IN_QUARTER);
+  // Минимальная дата — первый день квартала
+  const minDate = addMonths(firstDateOfCurrentYear, (quarter - 1) * 3);
 
-  if (isWithinInterval(startDate, { start: minDate, end: maxDate })) {
-    return {
-      minDate: startDate,
-      maxDate: maxDate,
-    };
-  }
+  // Максимальная дата — последний день квартала
+  const maxDate = addMonths(minDate, 3);
+  const lastDayOfQuarter = subBusinessDays(maxDate, 1); // Последний день квартала
 
   return {
     minDate,
-    maxDate,
+    maxDate: lastDayOfQuarter,
   };
 };
 
-const getDisabledStatus = (minDate: Date, maxDate: Date) =>
-  !isWithinInterval(Date.now(), {
+export const getStartDateInCurrentYear = (startDate: Date) => {
+  const yearsFromStartDate = differenceInYears(Date.now(), startDate);
+
+  if (yearsFromStartDate) {
+    return addYears(startDate, yearsFromStartDate);
+  }
+
+  return startDate;
+};
+
+const getDisabledStatus = (minDate: Date, maxDate: Date) => {
+  return !isWithinInterval(Date.now(), {
     start: minDate,
-    end: subBusinessDays(maxDate, ADDITIONAL_DAYS_OUT_QUARTER),
+    end: maxDate,
   });
+};
 
 // Main mapping function that combine object for proper input format
 const mapArtifactToField = (
@@ -301,6 +315,7 @@ const mapArtifactToField = (
     valueConditions: fieldSchema?.valueConditions,
     disabled: artifact.is_edit_flg === '0',
     placeholder: artifact.artefact_desc ? artifact.artefact_desc : undefined,
+    group: artifact.group,
   };
 
   const activeRowValue = activeRow?.[artifact?.artefact_tech_label];
@@ -327,6 +342,44 @@ const mapArtifactToField = (
         },
       };
     }
+
+    case ArtifactType.QUARTERLY_DROPDOWN: {
+      const type = INPUT_TYPE.QUARTERLY_DROPDOWN;
+
+      let startDate = new Date();
+
+      // Получение стартовой даты
+      if (artifact?.start_date_depend_artefact && activeRow) {
+        const artifactStartDateValue = activeRow[artifact.start_date_depend_artefact];
+
+        if (artifactStartDateValue) {
+          const date = new Date(artifactStartDateValue);
+
+          if (date.toString() !== 'Invalid Date') {
+            startDate = date;
+          }
+        }
+      }
+
+      // Получение номера квартала из tech_label
+      const fields = Number(artifact.artefact_tech_label[artifact.artefact_tech_label.length - 1]);
+
+      // Вычисление минимальной и максимальной даты для квартала
+      const { minDate, maxDate } = getDateLimits(startDate, fields);
+      const quarterDisabledStatus = getDisabledStatus(minDate, maxDate);
+
+      return {
+        ...commonAttributes,
+        type,
+        multiple: false,
+        disabled: quarterDisabledStatus,
+        options: {
+          type: SELECT_TYPE.STRING,
+          options: getSelectOptions(artifact.values),
+        },
+      };
+    }
+
     case ArtifactType.MULTI_DROPDOWN: {
       const type = INPUT_TYPE.MULTI_SELECT;
 
@@ -340,6 +393,16 @@ const mapArtifactToField = (
         },
       };
     }
+
+    case ArtifactType.PERCENTAGE: {
+      const type = INPUT_TYPE.PERCENT;
+
+      return {
+        ...commonAttributes,
+        type,
+      };
+    }
+
     case ArtifactType.QUARTERLY_DATE: {
       const type = INPUT_TYPE.QUARTERLY_DATE;
 
@@ -371,15 +434,15 @@ const mapArtifactToField = (
       // ****
 
       // Get quarter number by tech label helper ****
-      const quarter = Number(artifact.artefact_tech_label[artifact.artefact_tech_label.length - 1]);
+      const fields = Number(artifact.artefact_tech_label[artifact.artefact_tech_label.length - 1]);
       // ****
 
-      const { minDate, maxDate } = getDateLimits(startDate, quarter);
+      const { minDate, maxDate } = getDateLimits(startDate, fields);
       const quarterDisabledStatus = getDisabledStatus(minDate, maxDate);
 
       return {
         ...commonAttributes,
-        quarter,
+        fields,
         minDate,
         maxDate,
         disabled: quarterDisabledStatus,
@@ -400,6 +463,7 @@ const mapArtifactToField = (
         type: INPUT_TYPE.NUMBER,
       };
     }
+
     default: {
       return {
         ...commonAttributes,
@@ -409,19 +473,57 @@ const mapArtifactToField = (
   }
 };
 
-const getQuarterDateGroupField = (
-  quarterDateFields: QuarterlyDateInput<keyof Row>[],
-): InputFactoryProps<keyof Row> => {
+const getGroupField = (
+  fields: InputFactoryProps<keyof Row>[],
+  groupLabel: string,
+  groupType: INPUT_TYPE,
+): any => {
   return {
-    id: 'usage_confirm_date_group',
-    name: 'usage_confirm_date_group',
-    required: false,
-    label: 'Модель используется заказчиком', // TODO: This label should be obtained from the backend in the artifact parameters
-    type: INPUT_TYPE.QUARTERLY_DATE_GROUP,
-    quartes: quarterDateFields,
+    id: `${groupLabel}_group`,
+    name: `${groupLabel}_group`,
+    label: groupLabel,
+    type: groupType,
+    fields: fields,
   };
 };
 
+// Функция для фильтрации полей по группе
+const getGroupedFields = (fields: FormFields, groupLabel: string): FormFields => {
+  return fields.filter((field) => field.group === groupLabel);
+};
+
+// Функция для получения типа группы
+const getGroupType = (group: ArtifactGroup): INPUT_TYPE => {
+  switch (group) {
+    case ArtifactGroup.CONFIRMATION_DATE:
+      return INPUT_TYPE.QUARTERLY_DATE_GROUP;
+    case ArtifactGroup.CUSTOMER_USAGE:
+      return INPUT_TYPE.QUARTERLY_DROPDOWN_GROUP;
+    case ArtifactGroup.ALLOCATION_COMMENT:
+      return INPUT_TYPE.STRING_GROUP;
+    case ArtifactGroup.ALLOCATION_USAGE:
+      return INPUT_TYPE.PERCENT_GROUP;
+    default:
+      return INPUT_TYPE.STRING;
+  }
+};
+
+// Функция для создания нового группового поля
+const createNewGroupField = (
+  formFields: FormFields,
+  groupLabel: string,
+  groupType: INPUT_TYPE,
+): InputFactoryProps<keyof Row> => {
+  const groupedFields = getGroupedFields(formFields, groupLabel);
+  return getGroupField(groupedFields, groupLabel, groupType);
+};
+
+// Функция для получения имени группы
+const getGroupLabel = (field: InputFactoryProps<keyof Row>): string => {
+  return field.group || '';
+};
+
+// Основная функция для генерации полей формы
 const getFormFields = ({
   artifacts,
   initialRow,
@@ -433,47 +535,49 @@ const getFormFields = ({
   mode: MODEL_FORM_MODE;
   initialRow?: Partial<Row>;
 }) => {
-  // TODO: Move to separate function
   const fieldsNamesToGenerate =
     mode === MODEL_FORM_MODE.ADD
-      ? activeFormSchema.map(({ name }) => name)
+      ? BASE_MODEL_SCHEMA.map(({ name }) => name)
       : initialColumns.map(({ name }) => name);
 
+  // Генерация полей
   const formFields = fieldsNamesToGenerate.reduce((fields, fieldName) => {
     const artifact = artifacts.find(({ artefact_tech_label }) => artefact_tech_label === fieldName);
-
     const fieldSchema = activeFormSchema.find(({ name }) => name === fieldName);
 
     if (artifact) {
       const field = mapArtifactToField(artifact, fieldSchema, initialRow);
-
       return [...fields, field];
     }
 
     return fields;
   }, [] as FormFields);
 
-  // TODO: move it to prev reduce
-  const newFormFields = formFields.reduce((fields, field) => {
-    if (field.type === INPUT_TYPE.QUARTERLY_DATE) {
-      // Skip prev quartes, wait for last one
-      if (field.quarter === 4) {
-        const quarterDateFields = formFields.filter(
-          (field) => field.type === INPUT_TYPE.QUARTERLY_DATE,
-        ) as QuarterlyDateInput<keyof Row>[];
+  // Используем Set для отслеживания созданных групп
+  const createdGroups = new Set<string>();
 
-        const newQuarterDateGroupField = getQuarterDateGroupField(quarterDateFields);
+  // Генерация финального списка полей с группами
+  const finalFormFields = formFields.reduce((fields, field) => {
+    const groupLabel = getGroupLabel(field);
 
-        return [...fields, newQuarterDateGroupField];
-      }
+    // Если поле принадлежит группе и эта группа еще не создана
+    if (field.group && !createdGroups.has(groupLabel)) {
+      const groupType = getGroupType(field.group as ArtifactGroup);
+      const newGroupField = createNewGroupField(formFields, groupLabel, groupType);
+      createdGroups.add(groupLabel);
+      return [...fields, newGroupField];
+    }
 
+    // Если поле принадлежит группе, которая уже создана — пропускаем его
+    if (field.group && createdGroups.has(groupLabel)) {
       return fields;
     }
 
+    // Добавляем поле, если оно не принадлежит группе
     return [...fields, field];
   }, [] as FormFields);
 
-  return newFormFields;
+  return finalFormFields;
 };
 
 const getFormValue = (value?: InputValue) => {
@@ -557,7 +661,6 @@ const getInvalidFields = (activeFormSchema: FormFieldsSchema, values?: FormValue
       return false;
     })
     .map(({ name }) => name);
-
 const getProperFormatValueForSubmit = (inputValue: InputValue) => {
   const { type, value } = inputValue;
 
@@ -574,6 +677,11 @@ const getProperFormatValueForSubmit = (inputValue: InputValue) => {
         artefact_value_id: null,
       };
     case INPUT_TYPE.SELECT:
+      return {
+        artefact_string_value: value.text,
+        artefact_value_id: Number(value.id),
+      };
+    case INPUT_TYPE.QUARTERLY_DROPDOWN:
       return {
         artefact_string_value: value.text,
         artefact_value_id: Number(value.id),

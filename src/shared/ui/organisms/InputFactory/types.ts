@@ -1,4 +1,4 @@
-import { SelectStringProps } from '@shared/ui/organisms';
+import { SELECT_TYPE, SelectOption, SelectStringProps } from '@shared/ui/organisms';
 import {
   FormFieldConditions,
   FormFieldValueConditions,
@@ -6,9 +6,14 @@ import {
 
 enum INPUT_TYPE {
   STRING = 'STRING',
+  STRING_GROUP = 'STRING_GROUP',
   DATE = 'DATE',
   QUARTERLY_DATE = 'QUARTERLY_DATE',
   QUARTERLY_DATE_GROUP = 'QUARTERLY_DATE_GROUP',
+  PERCENT = 'PERCENT',
+  PERCENT_GROUP = 'PERCENT_GROUP',
+  QUARTERLY_DROPDOWN = 'QUARTERLY_DROPDOWN',
+  QUARTERLY_DROPDOWN_GROUP = 'QUARTERLY_DROPDOWN_GROUP',
   NUMBER = 'NUMBER',
   FLAG = 'FLAG',
   TEXT_AREA = 'TEXT_AREA',
@@ -62,6 +67,34 @@ type QuarterlyDateGroupInputValue = {
   value: QuarterlyDateInputValue[];
 };
 
+type StringGroupInputValue = {
+  type: INPUT_TYPE.STRING_GROUP;
+  value: StringInputValue[];
+};
+
+type PercentInputValue = {
+  type: INPUT_TYPE.PERCENT;
+  value: string | null;
+};
+
+type QuarterlyPercentGroupInputValue = {
+  type: INPUT_TYPE.PERCENT_GROUP;
+  value: PercentInputValue[];
+};
+
+type QuarterlyDropdownInputValue = {
+  type: INPUT_TYPE.QUARTERLY_DROPDOWN;
+  value: {
+    id: string;
+    text: string;
+  };
+};
+
+type QuarterlyDropdownGroupInputValue = {
+  type: INPUT_TYPE.QUARTERLY_DROPDOWN_GROUP;
+  value: QuarterlyDropdownInputValue[];
+};
+
 type InputValue =
   | FlagInputValue
   | StringInputValue
@@ -70,7 +103,13 @@ type InputValue =
   | SelectInputValue
   | DateInputValue
   | QuarterlyDateInputValue
-  | QuarterlyDateGroupInputValue;
+  | QuarterlyDateGroupInputValue
+  | PercentInputValue
+  | QuarterlyPercentGroupInputValue
+  | QuarterlyDateGroupInputValue
+  | StringGroupInputValue
+  | QuarterlyDropdownInputValue
+  | QuarterlyDropdownGroupInputValue;
 
 type CommonInputProps<T extends string> = {
   id: string;
@@ -82,6 +121,7 @@ type CommonInputProps<T extends string> = {
   placeholder?: string;
   disabled?: boolean;
   maxLength?: number;
+  group?: string;
 };
 
 type StringInput<T extends string> = CommonInputProps<T> & {
@@ -101,16 +141,44 @@ type DateInput<T extends string> = CommonInputProps<T> & {
   maxDate?: Date;
 };
 
+type QuarterlyDropdwonInput<T extends string> = CommonInputProps<T> & {
+  type: INPUT_TYPE.QUARTERLY_DROPDOWN;
+  options: {
+    type: SELECT_TYPE.STRING;
+    options: SelectOption[];
+  };
+  multiple: false;
+};
+
+type QuarterlyDropdwonGroupInput<T extends string> = CommonInputProps<T> & {
+  type: INPUT_TYPE.QUARTERLY_DROPDOWN_GROUP;
+  fields: Array<QuarterlyDropdwonInput<T>>;
+};
+
+type PercentInput<T extends string> = CommonInputProps<T> & {
+  type: INPUT_TYPE.PERCENT;
+};
+
+type PercentGroupInput<T extends string> = CommonInputProps<T> & {
+  type: INPUT_TYPE.PERCENT_GROUP;
+  fields: Array<PercentInput<T>>;
+};
+
+type StringGroupInput<T extends string> = CommonInputProps<T> & {
+  type: INPUT_TYPE.STRING_GROUP;
+  fields: Array<StringInput<T>>;
+};
+
 type QuarterlyDateInput<T extends string> = CommonInputProps<T> & {
   type: INPUT_TYPE.QUARTERLY_DATE;
-  quarter: number;
+  fields: number;
   minDate?: Date;
   maxDate?: Date;
 };
 
 type QuarterlyDateGroupInput<T extends string> = CommonInputProps<T> & {
   type: INPUT_TYPE.QUARTERLY_DATE_GROUP;
-  quartes: Array<QuarterlyDateInput<T>>;
+  fields: Array<QuarterlyDateInput<T>>;
 };
 
 type NumberInput<T extends string> = CommonInputProps<T> & {
@@ -138,11 +206,26 @@ type MultiSelectInput<T extends string> = CommonInputProps<T> & {
   multiple: true;
 };
 
+// TODO: refactor
+type GroupFieldProps<T extends string> = {
+  id: `${T}_group`;
+  name: `${T}_group`;
+  required: boolean;
+  label: string;
+  type: INPUT_TYPE;
+  fields: InputFactoryProps<T>[];
+};
+
 type InputFactoryProps<T extends string> =
   | StringInput<T>
   | DateInput<T>
   | QuarterlyDateInput<T>
   | QuarterlyDateGroupInput<T>
+  | StringGroupInput<T>
+  | PercentInput<T>
+  | PercentGroupInput<T>
+  | QuarterlyDropdwonInput<T>
+  | QuarterlyDropdwonGroupInput<T>
   | NumberInput<T>
   | FlagInput<T>
   | TextAreaInput<T>
@@ -156,17 +239,25 @@ export {
   SelectInputValue,
   NumberInputValue,
   DateInputValue,
-  QuarterlyDateInputValue,
-  QuarterlyDateGroupInputValue,
   StringInputValue,
   MultiSelectInputValue,
   FlagInputValue,
   StringInput,
   DateInput,
-  QuarterlyDateInput,
+  QuarterlyDropdownGroupInputValue,
+  QuarterlyDropdownInputValue,
+  QuarterlyDropdwonGroupInput,
+  QuarterlyDropdwonInput,
+  QuarterlyDateGroupInputValue,
+  PercentInputValue,
+  QuarterlyPercentGroupInputValue,
+  StringGroupInputValue,
+  QuarterlyDateInputValue,
   QuarterlyDateGroupInput,
+  QuarterlyDateInput,
   NumberInput,
   FlagInput,
+  PercentInput,
   TextAreaInput,
   SelectInput,
   MultiSelectInput,

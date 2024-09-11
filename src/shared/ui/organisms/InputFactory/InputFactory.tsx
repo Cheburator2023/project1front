@@ -1,5 +1,5 @@
 import React from 'react';
-import { parse } from 'date-fns';
+import { isWithinInterval, parse } from 'date-fns';
 import {
   CheckboxField,
   DateField,
@@ -14,6 +14,7 @@ import { SearchSelect } from '@shared/ui/organisms';
 import { INPUT_TYPE, InputFactoryProps, InputValue } from './types';
 
 import {
+  calculateTotalPercentage,
   getDateValue,
   getFlagValue,
   getNumberValue,
@@ -117,83 +118,7 @@ function InputFactorySwitcher<T extends string>({
         />
       );
     }
-    case INPUT_TYPE.QUARTERLY_DATE_GROUP: {
-      const { quartes } = inputFactory;
 
-      return (
-        <Field
-          id={id}
-          key={id}
-          required={required}
-          status={error ? 'error' : undefined}
-          extraText={error && 'Обязательное поле'}
-          label={label}
-        >
-          <div
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              justifyContent: 'space-between',
-              rowGap: '10px',
-            }}
-          >
-            {quartes.map((quarter) => {
-              const quarterDateValue = getDateValue(values?.[quarter.name]);
-
-              return (
-                <DateField
-                  key={quarter.id}
-                  ref={ref}
-                  style={{ maxWidth: '140px' }}
-                  autoFocus={editFieldName === quarter.name}
-                  status={error ? 'error' : undefined}
-                  extraText={error && 'Обязательное поле'}
-                  disabled={quarter.disabled}
-                  dimension="s"
-                  placeholder="Укажите дату"
-                  required={quarter.required}
-                  label={quarter.label}
-                  value={quarterDateValue}
-                  maxDate={quarter.maxDate}
-                  minDate={quarter.minDate}
-                  onChange={(e) =>
-                    onChange?.(quarter.name, {
-                      type: quarter.type,
-                      value: e.target.value
-                        ? parse(e.target.value, 'dd.MM.yyyy', new Date())
-                        : null,
-                    })
-                  }
-                />
-              );
-            })}
-          </div>
-        </Field>
-      );
-    }
-    case INPUT_TYPE.TEXT_AREA: {
-      const { length, maxRows } = inputFactory;
-
-      const formattedValue = getStringValue(value);
-
-      return (
-        <TextField
-          autoFocus={autoFocus}
-          key={id}
-          status={error ? 'error' : undefined}
-          extraText={error && 'Обязательное поле'}
-          disabled={disabled}
-          dimension="s"
-          value={formattedValue}
-          placeholder={placeholder}
-          required={required}
-          label={label}
-          maxLength={length}
-          maxRows={maxRows}
-          onChange={(e) => onChange?.(name, { type, value: e.target.value })}
-        />
-      );
-    }
     case INPUT_TYPE.SELECT: {
       const { options } = inputFactory;
 
@@ -216,7 +141,7 @@ function InputFactorySwitcher<T extends string>({
           return '* есть условия для обязательного значения';
         }
 
-        return '';
+        return;
       };
 
       return (
@@ -239,6 +164,279 @@ function InputFactorySwitcher<T extends string>({
               value: getSelectValues(selectedValue, options.options)[0],
             })
           }
+        />
+      );
+    }
+
+    case INPUT_TYPE.QUARTERLY_DROPDOWN_GROUP: {
+      const { fields } = inputFactory;
+
+      return (
+        <Field
+          id={id}
+          key={id}
+          required={required}
+          status={error ? 'error' : undefined}
+          extraText={error && 'Обязательное поле'}
+          label={label}
+        >
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              rowGap: '10px',
+              columnGap: '20px',
+            }}
+          >
+            {fields?.map((field) => {
+              const formattedValue = getSelectValue(values?.[field.name]);
+
+              return (
+                <SearchSelect
+                  key={field.id}
+                  autoFocus={editFieldName === field.name}
+                  error={error}
+                  multiple={false}
+                  extraText={error ? 'Обязательное поле' : undefined}
+                  disabled={field.disabled}
+                  required={field.required}
+                  label={field.label}
+                  options={field.options}
+                  selectedValues={formattedValue}
+                  name={`${field.name}`}
+                  onChange={(_, selectedValue) =>
+                    onChange?.(field.name, {
+                      type: field.type,
+                      value: getSelectValues(selectedValue, field.options.options)[0],
+                    })
+                  }
+                />
+              );
+            })}
+          </div>
+        </Field>
+      );
+    }
+
+    case INPUT_TYPE.PERCENT_GROUP: {
+      const { fields } = inputFactory;
+
+      const totalPercentage = calculateTotalPercentage(fields, values || {});
+
+      const hasError = totalPercentage > 100;
+
+      return (
+        <Field
+          id={id}
+          key={id}
+          required={required}
+          status={hasError ? 'error' : undefined}
+          extraText={hasError ? 'Сумма процентов не может превышать 100%' : undefined}
+          label={label}
+        >
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              rowGap: '10px',
+              columnGap: '20px',
+            }}
+          >
+            {fields?.map((field) => {
+              const fieldValue = getStringValue(values?.[field.name]);
+
+              return (
+                <InputField
+                  key={field.id}
+                  ref={ref}
+                  autoFocus={editFieldName === field.name}
+                  status={hasError ? 'error' : undefined}
+                  disabled={field.disabled}
+                  dimension="s"
+                  placeholder="(%)"
+                  required={field.required}
+                  label={field.label}
+                  value={fieldValue}
+                  inputMode="numeric"
+                  pattern="^(100|[1-9]?[0-9])$"
+                  min={0}
+                  max={100}
+                  onChange={(e) =>
+                    onChange?.(field.name, {
+                      type: field.type,
+                      value: e.target.value,
+                    })
+                  }
+                />
+              );
+            })}
+          </div>
+        </Field>
+      );
+    }
+
+    case INPUT_TYPE.STRING_GROUP: {
+      const { fields } = inputFactory;
+
+      return (
+        <Field
+          id={id}
+          key={id}
+          required={required}
+          status={error ? 'error' : undefined}
+          extraText={error && 'Обязательное поле'}
+          label={label}
+        >
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              rowGap: '10px',
+              columnGap: '20px',
+            }}
+          >
+            {fields?.map((field) => {
+              const fieldValue = getStringValue(values?.[field.name]);
+
+              return (
+                <InputField
+                  key={field.id}
+                  ref={ref}
+                  autoFocus={editFieldName === field.name}
+                  status={error ? 'error' : undefined}
+                  extraText={error && 'Обязательное поле'}
+                  disabled={field.disabled}
+                  dimension="s"
+                  placeholder="Введите значение"
+                  required={field.required}
+                  label={field.label}
+                  value={fieldValue}
+                  onChange={(e) =>
+                    onChange?.(field.name, {
+                      type: field.type,
+                      value: e.target.value,
+                    })
+                  }
+                />
+              );
+            })}
+          </div>
+        </Field>
+      );
+    }
+
+    case INPUT_TYPE.QUARTERLY_DATE_GROUP: {
+      const { fields } = inputFactory;
+
+      return (
+        <Field
+          id={id}
+          key={id}
+          required={required}
+          status={error ? 'error' : undefined}
+          extraText={error && 'Введите корректную дату в пределах квартала'}
+          label={label}
+        >
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '10px',
+            }}
+          >
+            {fields.map((field) => {
+              const quarterDateValue = getDateValue(values?.[field.name]);
+              const { minDate, maxDate } = field;
+
+              const [hasError, setHasError] = React.useState(false);
+              // TODO: refactoring
+              const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+                const inputValue = e.target.value;
+                const parsedDate = inputValue ? parse(inputValue, 'dd.MM.yyyy', new Date()) : null;
+
+                const isValidDate =
+                  parsedDate && isWithinInterval(parsedDate, { start: minDate!, end: maxDate! });
+
+                if (isValidDate) {
+                  setHasError(false);
+                  onChange?.(field.name, {
+                    type: field.type,
+                    value: parsedDate,
+                  });
+                } else {
+                  setHasError(true);
+                  onChange?.(field.name, {
+                    type: field.type,
+                    value: null,
+                  });
+                }
+              };
+
+              return (
+                <DateField
+                  key={field.id}
+                  ref={ref}
+                  style={{ maxWidth: '140px' }}
+                  autoFocus={editFieldName === field.name}
+                  status={hasError ? 'error' : undefined}
+                  extraText={hasError ? 'Введите корректную дату в пределах квартала' : undefined}
+                  disabled={field.disabled}
+                  dimension="s"
+                  placeholder="Укажите дату"
+                  required={field.required}
+                  label={field.label}
+                  value={quarterDateValue}
+                  maxDate={field.maxDate}
+                  minDate={field.minDate}
+                  onChange={handleDateChange}
+                />
+              );
+            })}
+          </div>
+        </Field>
+      );
+    }
+
+    case INPUT_TYPE.TEXT_AREA: {
+      const { length, maxRows } = inputFactory;
+
+      const formattedValue = getStringValue(value);
+
+      const getExtraText = () => {
+        if (error) {
+          return 'Обязательное поле';
+        }
+
+        if (requireConditions) {
+          if (valueConditions) {
+            return '* есть условия для заполнения';
+          }
+
+          return '* есть условия для обязательного заполнения';
+        }
+
+        if (valueConditions) {
+          return '* есть условия для обязательного значения';
+        }
+
+        return null;
+      };
+
+      return (
+        <TextField
+          autoFocus={autoFocus}
+          key={id}
+          status={error ? 'error' : undefined}
+          extraText={getExtraText()}
+          disabled={disabled}
+          dimension="s"
+          value={formattedValue}
+          placeholder={placeholder}
+          required={required}
+          label={label}
+          maxLength={length}
+          maxRows={maxRows}
+          onChange={(e) => onChange?.(name, { type, value: e.target.value })}
         />
       );
     }
