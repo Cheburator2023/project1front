@@ -1,5 +1,18 @@
 # Semantic Versioning Changelog
 
+# [1.21.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.20.0...v1.21.0) (2024-09-11)
+
+
+### Bug Fixes
+
+* fix bug with form fields ([1feb720](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/1feb7204555af05644dea62503b9c041237143ed))
+
+
+### Features
+
+* add allocation feature ([377b5b1](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/377b5b19218693ba57bf25397737415fd668d0b8))
+* add related schemas feature ([ae78ba9](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/ae78ba905fc410c18888d5db1f831155574a7901))
+
 # [1.20.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.19.0...v1.20.0) (2024-09-10)
 
 
