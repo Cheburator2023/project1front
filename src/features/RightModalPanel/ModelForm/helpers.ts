@@ -586,12 +586,20 @@ const getFormValue = (value?: InputValue) => {
       return value.value?.text;
     }
     case INPUT_TYPE.MULTI_SELECT: {
-      return value.value?.length;
+      return value.value.map(({ text }) => text);
     }
     default: {
-      return value?.value;
+      return value?.value?.toString() || '';
     }
   }
+};
+
+const compareValues = (value1: string | string[], value2: string) => {
+  if (Array.isArray(value1)) {
+    return value1.includes(value2);
+  }
+
+  return value1 === value2;
 };
 
 const checkForSatisfyConditions = (conditionsList: FormFieldConditions, values?: FormValues) =>
@@ -603,7 +611,7 @@ const checkForSatisfyConditions = (conditionsList: FormFieldConditions, values?:
 
       const formValueToCheck = getFormValue(values?.[name]);
 
-      return formValueToCheck === conditionValue;
+      return compareValues(formValueToCheck, conditionValue);
     }).length;
 
     return conditionsList.length === satisfyConditionsNumber;
@@ -656,7 +664,7 @@ const getInvalidFields = (activeFormSchema: FormFieldsSchema, values?: FormValue
 
       const valueToCompare = checkRequireValueStatus(values, valueConditions);
 
-      if (valueToCompare && formValue !== valueToCompare) {
+      if (valueToCompare && !compareValues(formValue, valueToCompare)) {
         return true;
       }
 

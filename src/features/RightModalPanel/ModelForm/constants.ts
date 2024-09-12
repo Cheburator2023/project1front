@@ -50,10 +50,6 @@ export const BASE_MODEL_SCHEMA: FormFieldsSchema = [
     required: true,
   },
   {
-    name: 'model_indicator',
-    required: true,
-  },
-  {
     name: 'custom_model_type',
     required: false,
   },
@@ -108,6 +104,10 @@ export const ACTIVE_MODEL_SCHEMA: FormFieldsSchema = [
         model_risk_type: 'Кредитный риск',
       },
     ],
+  },
+  {
+    name: 'model_indicator',
+    required: true,
   },
   {
     name: 'significance_validity',

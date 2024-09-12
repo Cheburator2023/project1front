@@ -9,8 +9,6 @@ import { ReactComponent as ExitIcon } from '@admiral-ds/icons/build/system/ExitS
 import { ReactComponent as ArrowsHorizontalOutline } from '@admiral-ds/icons/build/system/ArrowsHorizontalOutline.svg';
 import { ReactComponent as PersonSolid } from '@admiral-ds/icons/build/system/PersonSolid.svg';
 
-import { getRootPath } from './helpers';
-
 import { Loading, Tooltip } from '@shared/ui/atoms';
 import { IconButton } from '@shared/ui/molecules';
 import { ColumnsFilter } from 'shared/types';
@@ -89,7 +87,6 @@ const Header = ({
 }: HeaderProps) => {
   const sumBtnRef = useRef(null);
 
-  const rootPath = getRootPath(); // TODO: fix root path on home page (need to stay on the same page)
   const { mutationProtectedFetch } = useFetch({});
 
   useEffect(() => {
@@ -115,7 +112,7 @@ const Header = ({
 
   return (
     <Container>
-      <Link to={rootPath}>
+      <Link to={'/sum-rm'}>
         <Logo>
           <LogoIcon />
           <CustomLabel font="Caption/Caption 1">Реестр моделей</CustomLabel>
