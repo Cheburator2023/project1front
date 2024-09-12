@@ -27,6 +27,8 @@ export type ModelsResponseType = {
   };
 };
 
+export type ModelEditResponseType = ErrorResponse | SuccessResponse<ModelsResponseType>;
+
 export type Relations = {
   [key: string]: (Partial<Row> & String) | null; //TODO: add interface for new attributes
 };

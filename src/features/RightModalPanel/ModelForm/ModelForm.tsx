@@ -18,6 +18,7 @@ import { ButtonContainer, FormContainer } from './styles';
 import { ParentModelSelect } from './ParentModelSelect';
 import { useFormSchema } from './useActiveFormSchema';
 import { useFormFields } from './useFormFields';
+import { ModelEditResponseType } from '@src/shared/api/types';
 
 export interface ModelFormProps {
   mode: RIGHT_PANEL_TYPE.ADD_MODEL | RIGHT_PANEL_TYPE.EDIT_MODEL;
@@ -45,6 +46,7 @@ export const ModelForm = ({
   const [parentModelId, setParentModelId] = useState<string>();
 
   const [submitLoading, setSubmitLoading] = useState(false);
+  const [submitError, setSubmitError] = useState<string>();
 
   const [initialRow, setInitialRow] = useState(activeRow);
 
@@ -87,7 +89,8 @@ export const ModelForm = ({
       const { system_model_id, model_source } = initialRow;
 
       if (system_model_id && model_source) {
-        const res = await mutationProtectedFetch<ModelEditApi[], Row[]>({
+        //TODO: fix response type and structure
+        const res = await mutationProtectedFetch<ModelEditApi[], { data: { cards: Row[] } }>({
           body: [
             {
               model_id: system_model_id,
@@ -100,11 +103,12 @@ export const ModelForm = ({
         });
 
         if (!res || res.error) {
+          setSubmitError('Произошла ошибка при обновлении модели');
           return;
         }
 
-        if (res.data.length && res.data[0]) {
-          const a = res.data[0];
+        if (res.data.data.cards && res.data.data.cards[0]) {
+          newRow = res.data.data.cards[0];
         }
       }
     }
@@ -117,6 +121,7 @@ export const ModelForm = ({
       });
 
       if (!res || res.error) {
+        setSubmitError('Произошла ошибка при добавлении модели');
         return;
       }
 
@@ -126,6 +131,7 @@ export const ModelForm = ({
     if (newRow && formMode) {
       onSubmit(newRow, formMode);
       setSubmitLoading(false);
+      setSubmitError('');
     }
   }, [values, formSchema, formMode]);
 
@@ -188,6 +194,7 @@ export const ModelForm = ({
         <StatusScreen
           loadingLabel="Данные сохраняются..."
           successLabel="Успешно сохранено"
+          error={submitError}
           apiLoading={submitLoading}
           onFinished={handleOnClose}
         >
