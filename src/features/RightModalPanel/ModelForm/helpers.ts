@@ -1,11 +1,12 @@
 import {
   addMonths,
   addYears,
+  differenceInBusinessDays,
   differenceInYears,
+  endOfQuarter,
   format,
   isWithinInterval,
   startOfYear,
-  subBusinessDays,
 } from 'date-fns';
 
 import { ArtifactType, type Artifact, type ArtifactApi, type ArtifactValue } from '@shared/api';
@@ -21,7 +22,6 @@ import {
   SELECT_TYPE,
   SelectOption,
   SelectStringOptions,
-  QuarterlyDropdownInputValue,
 } from '@shared/ui/organisms';
 
 import {
@@ -266,22 +266,6 @@ const getMultiSelectInitialValue = (
   };
 };
 
-const getDateLimits = (startDate: Date, quarter: number) => {
-  const firstDateOfCurrentYear = startOfYear(startDate); // Начало года
-
-  // Минимальная дата — первый день квартала
-  const minDate = addMonths(firstDateOfCurrentYear, (quarter - 1) * 3);
-
-  // Максимальная дата — последний день квартала
-  const maxDate = addMonths(minDate, 3);
-  const lastDayOfQuarter = subBusinessDays(maxDate, 1); // Последний день квартала
-
-  return {
-    minDate,
-    maxDate: lastDayOfQuarter,
-  };
-};
-
 export const getStartDateInCurrentYear = (startDate: Date) => {
   const yearsFromStartDate = differenceInYears(Date.now(), startDate);
 
@@ -292,8 +276,24 @@ export const getStartDateInCurrentYear = (startDate: Date) => {
   return startDate;
 };
 
+const getDateLimits = (quarter: number) => {
+  const currentYear = new Date().getFullYear();
+  const firstDateOfCurrentYear = startOfYear(new Date(currentYear, 0, 1));
+
+  const minDate = addMonths(firstDateOfCurrentYear, (quarter - 1) * 3);
+
+  const lastDayOfQuarter = endOfQuarter(minDate);
+
+  return {
+    minDate,
+    maxDate: lastDayOfQuarter,
+  };
+};
+
 const getDisabledStatus = (minDate: Date, maxDate: Date) => {
-  return !isWithinInterval(Date.now(), {
+  const currentDate = new Date();
+
+  return !isWithinInterval(currentDate, {
     start: minDate,
     end: maxDate,
   });
@@ -365,7 +365,7 @@ const mapArtifactToField = (
       const fields = Number(artifact.artefact_tech_label[artifact.artefact_tech_label.length - 1]);
 
       // Вычисление минимальной и максимальной даты для квартала
-      const { minDate, maxDate } = getDateLimits(startDate, fields);
+      const { minDate, maxDate } = getDateLimits(fields);
       const quarterDisabledStatus = getDisabledStatus(minDate, maxDate);
 
       return {
@@ -437,7 +437,7 @@ const mapArtifactToField = (
       const fields = Number(artifact.artefact_tech_label[artifact.artefact_tech_label.length - 1]);
       // ****
 
-      const { minDate, maxDate } = getDateLimits(startDate, fields);
+      const { minDate, maxDate } = getDateLimits(fields);
       const quarterDisabledStatus = getDisabledStatus(minDate, maxDate);
 
       return {
@@ -594,12 +594,12 @@ const getFormValue = (value?: InputValue) => {
   }
 };
 
-const compareValues = (value1: string | string[], value2: string) => {
-  if (Array.isArray(value1)) {
-    return value1.includes(value2);
+const checkForEqualValues = (formValue: string | string[], conditionValue: string) => {
+  if (Array.isArray(formValue)) {
+    return formValue.includes(conditionValue);
   }
 
-  return value1 === value2;
+  return formValue === conditionValue;
 };
 
 const checkForSatisfyConditions = (conditionsList: FormFieldConditions, values?: FormValues) =>
@@ -611,7 +611,7 @@ const checkForSatisfyConditions = (conditionsList: FormFieldConditions, values?:
 
       const formValueToCheck = getFormValue(values?.[name]);
 
-      return compareValues(formValueToCheck, conditionValue);
+      return checkForEqualValues(formValueToCheck, conditionValue);
     }).length;
 
     return conditionsList.length === satisfyConditionsNumber;
@@ -664,7 +664,7 @@ const getInvalidFields = (activeFormSchema: FormFieldsSchema, values?: FormValue
 
       const valueToCompare = checkRequireValueStatus(values, valueConditions);
 
-      if (valueToCompare && !compareValues(formValue, valueToCompare)) {
+      if (valueToCompare && !checkForEqualValues(formValue, valueToCompare)) {
         return true;
       }
 

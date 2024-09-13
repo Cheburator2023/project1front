@@ -16,8 +16,6 @@ import {
   initialChartStalledModelsByMonth,
   initialChartPilots,
   initialChartDistributionByLifecycleStageModels,
-  initialChartOnMonitoringModels,
-  inititalChartTakenOutOfOperationModels,
   initialTotalModels,
   initialImplementedModels,
   initialDevelopedModels,
@@ -100,15 +98,8 @@ const ChartsDashboard = () => {
   );
 
   const [onMonitoringModels, setOnMonitoringModels] = useState(initialOnMonitoringModels);
-  const [statChartOnMonitoringModels, setStatChartOnMonitoringModels] = useState(
-    initialChartOnMonitoringModels(),
-  );
-
   const [takenOutOfOperationModels, setTakenOutOfOperationModels] = useState(
     initialTakenOutOfOperationModels,
-  );
-  const [statChartTakenOutOfOperationModels, setStatChartTakenOutOfOperationModels] = useState(
-    inititalChartTakenOutOfOperationModels(),
   );
 
   const [modelDynamicsByStreams, setModelDynamicsByStreams] = useState(
@@ -178,30 +169,11 @@ const ChartsDashboard = () => {
       value: metricsData.onMonitoringModels.count,
       delta: metricsData.onMonitoringModels.deltaPercent,
     });
-    setStatChartOnMonitoringModels({
-      ...statChartOnMonitoringModels,
-      series: [
-        {
-          ...statChartOnMonitoringModels.series[0],
-          data: generateChartData(metricsData.onMonitoringModels.deltaPercent),
-        },
-      ],
-    });
 
     setTakenOutOfOperationModels({
       ...takenOutOfOperationModels,
       value: metricsData.takenOutOfOperationModels.count,
       delta: metricsData.takenOutOfOperationModels.deltaPercent,
-    });
-
-    setStatChartTakenOutOfOperationModels({
-      ...statChartTakenOutOfOperationModels,
-      series: [
-        {
-          ...statChartTakenOutOfOperationModels.series[0],
-          data: generateChartData(metricsData.takenOutOfOperationModels.deltaPercent),
-        },
-      ],
     });
 
     setStalledModelsByMonth({
@@ -525,7 +497,7 @@ const ChartsDashboard = () => {
                       relative={totalModels.relative}
                       size="stat-sm"
                       styles={{
-                        width: 'auto',
+                        width: '100%',
                       }}
                     />
                     <MetricDisplay
@@ -535,7 +507,7 @@ const ChartsDashboard = () => {
                       relative={implementedModels.relative}
                       size="stat-sm"
                       styles={{
-                        width: 'auto',
+                        width: '100%',
                       }}
                     />
                     <MetricDisplay
@@ -545,7 +517,7 @@ const ChartsDashboard = () => {
                       relative={developedModels.relative}
                       size="stat-sm"
                       styles={{
-                        width: 'auto',
+                        width: '100%',
                       }}
                     />
                     <MetricDisplay
@@ -555,7 +527,7 @@ const ChartsDashboard = () => {
                       relative={sumRmModels.relative}
                       size="stat-sm"
                       styles={{
-                        width: 'auto',
+                        width: '100%',
                       }}
                     />
                     <MetricDisplay
@@ -565,7 +537,7 @@ const ChartsDashboard = () => {
                       relative={finalStatusModels.relative}
                       size="stat-sm"
                       styles={{
-                        width: 'auto',
+                        width: '100%',
                       }}
                     />
                   </GridRow>
@@ -591,7 +563,7 @@ const ChartsDashboard = () => {
                       }}
                     />
                   </Row>
-                  <Row>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr' }}>
                     <MetricDisplay
                       caption={MetricsCaption.DISTRIBUTION_BY_LIFECYCLE_STAGE_MODELS}
                       showMetrics={false}
@@ -613,35 +585,38 @@ const ChartsDashboard = () => {
                         title: { font: 'Additional/M', color: 'Neutral/Neutral 90' },
                       }}
                     />
+                    <div style={{ display: 'grid' }}>
+                      <MetricDisplay
+                        caption={onMonitoringModels.caption}
+                        value={onMonitoringModels.value}
+                        delta={onMonitoringModels.delta}
+                        relative={onMonitoringModels.relative}
+                        isDeltaPercentage
+                        size="stat-md"
+                        styles={{
+                          frame: { withBorder: true },
+                          title: { color: 'Neutral/Neutral 90', css: { marginBottom: '17px' } },
+                          width: '100%',
+                          height: 'auto',
+                        }}
+                      />
 
-                    <MetricDisplay
-                      caption={onMonitoringModels.caption}
-                      value={onMonitoringModels.value}
-                      delta={onMonitoringModels.delta}
-                      relative={onMonitoringModels.relative}
-                      isDeltaPercentage
-                      size="stat-md"
-                      styles={{
-                        frame: { withBorder: true },
-                        title: { color: 'Neutral/Neutral 90', css: { marginBottom: '17px' } },
-                      }}
-                      chartOptions={statChartOnMonitoringModels}
-                    />
-
-                    <MetricDisplay
-                      caption={takenOutOfOperationModels.caption}
-                      value={takenOutOfOperationModels.value}
-                      delta={takenOutOfOperationModels.delta}
-                      relative={takenOutOfOperationModels.relative}
-                      isDeltaPercentage
-                      size="stat-md"
-                      styles={{
-                        frame: { withBorder: true },
-                        title: { color: 'Neutral/Neutral 90', css: { marginBottom: '17px' } },
-                      }}
-                      chartOptions={statChartTakenOutOfOperationModels}
-                    />
-                  </Row>
+                      <MetricDisplay
+                        caption={takenOutOfOperationModels.caption}
+                        value={takenOutOfOperationModels.value}
+                        delta={takenOutOfOperationModels.delta}
+                        relative={takenOutOfOperationModels.relative}
+                        isDeltaPercentage
+                        size="stat-md"
+                        styles={{
+                          frame: { withBorder: true },
+                          title: { color: 'Neutral/Neutral 90', css: { marginBottom: '17px' } },
+                          width: '100%',
+                          height: 'auto',
+                        }}
+                      />
+                    </div>
+                  </div>
                 </Column>
                 <Column>
                   <MetricDisplay

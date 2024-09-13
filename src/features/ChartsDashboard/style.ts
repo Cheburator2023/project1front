@@ -41,6 +41,7 @@ export const Frame = styled.div<{
   withBorder?: boolean;
   css?: any;
   width?: string | number;
+  height?: string | number;
 }>`
   z-index: 7;
   box-sizing: border-box;
@@ -51,7 +52,7 @@ export const Frame = styled.div<{
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  width: ${({ width, size }) =>
+  max-width: ${({ width, size }) =>
     width
       ? typeof width === 'string' || typeof width === 'number'
         ? width
@@ -65,8 +66,12 @@ export const Frame = styled.div<{
       : size === 'stat-lg'
       ? '308px'
       : '198px'};
-  height: ${({ size }) =>
-    size === 'chart-lg' || size === 'chart-md'
+  height: ${({ height, size }) =>
+    height
+      ? typeof height === 'string' || typeof height === 'number'
+        ? height
+        : `${height}px`
+      : size === 'chart-lg' || size === 'chart-md'
       ? '238px'
       : size === 'chart-sm'
       ? '335px'

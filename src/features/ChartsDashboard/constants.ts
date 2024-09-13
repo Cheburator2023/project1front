@@ -478,115 +478,6 @@ const initialChartDistributionByLifecycleStageModels = () => ({
   ],
 });
 
-const initialChartOnMonitoringModels = () => ({
-  chart: {
-    type: 'areaspline',
-    height: 130,
-    marginTop: 0,
-    backgroundColor: 'transparent',
-  },
-  accessibility: {
-    enabled: true,
-  },
-  credits: {
-    enabled: false,
-  },
-  title: {
-    text: '',
-  },
-  legend: {
-    enabled: false,
-  },
-  tooltip: {
-    enabled: false,
-  },
-  xAxis: {
-    visible: false,
-  },
-  yAxis: {
-    visible: false,
-  },
-  plotOptions: {
-    areaspline: {
-      enableMouseTracking: false,
-    },
-  },
-  series: [
-    {
-      type: 'areaspline',
-      data: [0, 0, 0, 0],
-      color: '#18A0FB',
-      marker: {
-        enabled: false,
-      },
-      dataLabels: {
-        enabled: false,
-      },
-      fillColor: {
-        linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
-        stops: [
-          [0, 'rgba(14, 156, 255, 0.3)'],
-          [1, 'rgba(14, 156, 255, 0)'],
-        ],
-      },
-    } as Highcharts.SeriesAreasplineOptions,
-  ],
-});
-
-const inititalChartTakenOutOfOperationModels = () => ({
-  chart: {
-    type: 'areaspline',
-    height: 130,
-    marginTop: 0,
-  },
-  accessibility: {
-    enabled: true,
-  },
-  credits: {
-    enabled: false,
-  },
-  title: {
-    text: '',
-  },
-  legend: {
-    enabled: false,
-  },
-  tooltip: {
-    enabled: false,
-  },
-  xAxis: {
-    visible: false,
-  },
-  yAxis: {
-    visible: false,
-  },
-  plotOptions: {
-    areaspline: {
-      enableMouseTracking: false,
-    },
-  },
-  series: [
-    {
-      type: 'areaspline',
-      data: [0, 0, 0, 0],
-      color: 'var(--warning-warning-40, #FB1818)',
-      marker: {
-        enabled: false,
-      },
-      dataLabels: {
-        enabled: false,
-      },
-      fillColor: {
-        linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
-        stops: [
-          [0, 'rgba(255, 13, 13, 0.3)'],
-          [1, 'rgba(255, 13, 13, 0)'],
-        ],
-      },
-    } as Highcharts.SeriesAreasplineOptions,
-  ],
-});
-
 export {
   initialKPI_SUM,
   initialTotalModels,
@@ -603,7 +494,5 @@ export {
   initialChartStalledModelsByMonth,
   initialChartPilots,
   initialChartDistributionByLifecycleStageModels,
-  initialChartOnMonitoringModels,
-  inititalChartTakenOutOfOperationModels,
 };
 

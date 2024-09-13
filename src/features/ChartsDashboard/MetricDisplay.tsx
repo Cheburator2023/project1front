@@ -23,6 +23,7 @@ interface MetricDisplayProps {
     value?: Partial<TProps>;
     delta?: Partial<TProps>;
     width?: string;
+    height?: string;
   };
 }
 
@@ -42,6 +43,7 @@ const MetricDisplay: React.FC<MetricDisplayProps> = ({
     withBorder={styles?.frame?.withBorder}
     style={styles?.frame}
     width={styles?.width}
+    height={styles?.height}
   >
     <Row>
       <Title
