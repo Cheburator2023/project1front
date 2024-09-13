@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.21.4](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.21.3...v1.21.4) (2024-09-13)
+
+
+### Bug Fixes
+
+* fix date input styles in allocation group ([66280f8](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/66280f8480d1ab5423099a6b2936c7c904eb9796))
+
 ## [1.21.3](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.21.2...v1.21.3) (2024-09-13)
 
 
