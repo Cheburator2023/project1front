@@ -376,7 +376,7 @@ function InputFactorySwitcher<T extends string>({
                 <DateField
                   key={field.id}
                   ref={ref}
-                  style={{ maxWidth: '140px' }}
+                  style={{ minWidth: '140px' }}
                   autoFocus={editFieldName === field.name}
                   status={hasError ? 'error' : undefined}
                   extraText={hasError ? 'Введите корректную дату в пределах квартала' : undefined}
