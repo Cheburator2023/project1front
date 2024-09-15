@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Button, T } from '@admiral-ds/react-ui';
 
 import { Row } from '@shared/types';
@@ -18,7 +18,6 @@ import { ButtonContainer, FormContainer } from './styles';
 import { ParentModelSelect } from './ParentModelSelect';
 import { useFormSchema } from './useActiveFormSchema';
 import { useFormFields } from './useFormFields';
-import { ModelEditResponseType } from '@src/shared/api/types';
 
 export interface ModelFormProps {
   mode: RIGHT_PANEL_TYPE.ADD_MODEL | RIGHT_PANEL_TYPE.EDIT_MODEL;
@@ -236,3 +235,4 @@ export const ModelForm = ({
     />
   );
 };
+

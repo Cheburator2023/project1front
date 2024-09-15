@@ -96,7 +96,7 @@ export const getSelectValue = (value?: InputValue) => {
     return formatValuesForSelect(value);
   }
 };
-// TODO: refactoring
+
 export const getFieldValueAsNumber = (rawValue: unknown): number => {
   if (typeof rawValue === 'string' || typeof rawValue === 'number') {
     const parsedValue = parseFloat(String(rawValue));

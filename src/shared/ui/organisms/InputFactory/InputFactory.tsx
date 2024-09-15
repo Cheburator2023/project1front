@@ -223,7 +223,19 @@ function InputFactorySwitcher<T extends string>({
 
       const totalPercentage = calculateTotalPercentage(fields, values || {});
 
-      const hasError = totalPercentage > 100;
+      const hasFilledFields = fields.some((field) => {
+        const rawValue = values?.[field.name]?.value;
+        return rawValue !== undefined && rawValue !== '';
+      });
+
+      const hasError = hasFilledFields && (totalPercentage > 100 || totalPercentage < 100);
+
+      const errorMessage =
+        totalPercentage > 100
+          ? 'Сумма процентов не может превышать 100%'
+          : totalPercentage < 100
+          ? 'Сумма процентов не может быть меньше 100%'
+          : undefined;
 
       return (
         <Field
@@ -231,7 +243,7 @@ function InputFactorySwitcher<T extends string>({
           key={id}
           required={required}
           status={hasError ? 'error' : undefined}
-          extraText={hasError ? 'Сумма процентов не может превышать 100%' : undefined}
+          extraText={errorMessage}
           label={label}
         >
           <div

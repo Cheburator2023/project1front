@@ -290,8 +290,25 @@ const getDateLimits = (quarter: number) => {
   };
 };
 
-const getDisabledStatus = (minDate: Date, maxDate: Date) => {
+const getDisabledStatus = (minDate: Date, maxDate: Date, quarter: number) => {
   const currentDate = new Date();
+
+  const currentQuarter = Math.floor((currentDate.getMonth() + 3) / 3);
+
+  if (quarter > currentQuarter) {
+    return true;
+  }
+
+  if (quarter < currentQuarter - 1) {
+    return true;
+  }
+
+  const startOfCurrentQuarter = new Date(currentDate.getFullYear(), (currentQuarter - 1) * 3, 1);
+  const monthAfterStartOfCurrentQuarter = addMonths(startOfCurrentQuarter, 1);
+
+  if (currentDate < monthAfterStartOfCurrentQuarter && quarter === currentQuarter - 1) {
+    return false;
+  }
 
   return !isWithinInterval(currentDate, {
     start: minDate,
@@ -366,7 +383,7 @@ const mapArtifactToField = (
 
       // Вычисление минимальной и максимальной даты для квартала
       const { minDate, maxDate } = getDateLimits(fields);
-      const quarterDisabledStatus = getDisabledStatus(minDate, maxDate);
+      const quarterDisabledStatus = getDisabledStatus(minDate, maxDate, fields);
 
       return {
         ...commonAttributes,
@@ -438,7 +455,7 @@ const mapArtifactToField = (
       // ****
 
       const { minDate, maxDate } = getDateLimits(fields);
-      const quarterDisabledStatus = getDisabledStatus(minDate, maxDate);
+      const quarterDisabledStatus = getDisabledStatus(minDate, maxDate, fields);
 
       return {
         ...commonAttributes,
