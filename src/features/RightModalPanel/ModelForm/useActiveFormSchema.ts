@@ -7,6 +7,7 @@ import {
   ACTIVE_MODEL_SCHEMA,
   RATING_SYSTEM_MODEL_SCHEMA,
   RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA,
+  NOT_ACTIVE_MODEL_SCHEMA,
 } from './constants';
 import { INPUT_TYPE } from '@src/shared/ui/organisms';
 
@@ -55,11 +56,15 @@ const getSchema = (activeRow?: Partial<Row>, values?: FormValues) => {
           values.classification_of_rs_by_order_of_application_within_pvr.type ===
             INPUT_TYPE.SELECT &&
           values.classification_of_rs_by_order_of_application_within_pvr?.value?.text ===
-            'Рейтинговые системы, подлежащие согласованию с Регулятором'
+            'Рейтинговые системы, подлежащие согласованию Регулятором'
         ) {
           formSchema = getUnionSchema(formSchema, RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA);
         }
       }
+    }
+
+    if (activeRow?.active_model === '1' && !values.active_model?.value) {
+      formSchema = getUnionSchema(formSchema, NOT_ACTIVE_MODEL_SCHEMA);
     }
 
     return formSchema;
@@ -77,7 +82,13 @@ export const useFormSchema = ({ initialRow, values, mode }: UseActiveFormSchemaP
 
       setFormSchema(newFormSchema);
     }
-  }, [initialRow, mode, values?.active_model?.value, values?.rating_model]);
+  }, [
+    initialRow,
+    mode,
+    values?.active_model?.value,
+    values?.rating_model,
+    values?.classification_of_rs_by_order_of_application_within_pvr,
+  ]);
 
   return {
     formSchema,

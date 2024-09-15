@@ -583,10 +583,10 @@ const getFormFields = ({
 const getFormValue = (value?: InputValue) => {
   switch (value?.type) {
     case INPUT_TYPE.SELECT: {
-      return value.value?.text;
+      return value.value?.text || '';
     }
     case INPUT_TYPE.MULTI_SELECT: {
-      return value.value.map(({ text }) => text);
+      return value?.value?.map(({ text }) => text) || '';
     }
     default: {
       return value?.value?.toString() || '';
@@ -594,7 +594,7 @@ const getFormValue = (value?: InputValue) => {
   }
 };
 
-const checkForEqualValues = (formValue: string | string[], conditionValue: string) => {
+const checkForEqualValues = (formValue: string | string[], conditionValue: string = '') => {
   if (Array.isArray(formValue)) {
     return formValue.includes(conditionValue);
   }
@@ -664,7 +664,7 @@ const getInvalidFields = (activeFormSchema: FormFieldsSchema, values?: FormValue
 
       const valueToCompare = checkRequireValueStatus(values, valueConditions);
 
-      if (valueToCompare && !checkForEqualValues(formValue, valueToCompare)) {
+      if (valueToCompare !== undefined && !checkForEqualValues(formValue, valueToCompare)) {
         return true;
       }
 
