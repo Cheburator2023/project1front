@@ -1,5 +1,13 @@
 # Semantic Versioning Changelog
 
+## [1.21.5](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.21.4...v1.21.5) (2024-09-15)
+
+
+### Bug Fixes
+
+* fix allocations ([a4abb6b](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/a4abb6be1963459fcd28fa5d754e1c3776aa96e1))
+* fix model schemas ([650b0bf](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/650b0bf8dc9369a533360391e06419fc22b197f4))
+
 ## [1.21.4](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.21.3...v1.21.4) (2024-09-13)
 
 
