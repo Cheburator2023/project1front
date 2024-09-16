@@ -1,5 +1,13 @@
 # Semantic Versioning Changelog
 
+## [1.21.6](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.21.5...v1.21.6) (2024-09-16)
+
+
+### Bug Fixes
+
+* add code for auto-fill field in form ([67f8e88](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/67f8e887ac74aa46b08e9ee3ceef55ffaf27948f))
+* fix dashboards ([a3a8cef](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/a3a8cef1e8e3d8d6820de9d1bcc6edde5614fcf4))
+
 ## [1.21.5](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.21.4...v1.21.5) (2024-09-15)
 
 
