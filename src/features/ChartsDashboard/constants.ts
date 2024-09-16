@@ -1,5 +1,56 @@
+import { SELECT_TYPE, SelectStringProps } from '@src/shared/ui/organisms';
 import { MetricsCaption } from './types';
 import * as Highcharts from 'highcharts';
+
+const dsStreamArtifactOptions = {
+  type: SELECT_TYPE.STRING,
+  options: [
+    {
+      value: 'Управление моделирования партнерств и ИТ-процессов',
+      text: 'Управление моделирования партнерств и ИТ-процессов',
+    },
+    {
+      value: 'Моделирование RnD',
+      text: 'Моделирование RnD',
+    },
+    {
+      value: 'Управление моделирования РБ',
+      text: 'Управление моделирования РБ',
+    },
+    {
+      value: 'Управление моделирования КИБ и СМБ',
+      text: 'Управление моделирования КИБ и СМБ',
+    },
+    {
+      value: 'Модели партнерств и платформы больших данных',
+      text: 'Модели партнерств и платформы больших данных',
+    },
+    {
+      value: 'Моделирование РБ',
+      text: 'Моделирование РБ',
+    },
+    {
+      value: 'Моделирование КИБ и СМБ',
+      text: 'Моделирование КИБ и СМБ',
+    },
+    {
+      value: 'Модель ЦРС',
+      text: 'Модель ЦРС',
+    },
+    {
+      value: 'Управление перспективных алгоритмов машинного обучения',
+      text: 'Управление перспективных алгоритмов машинного обучения',
+    },
+    {
+      value: 'Управление процессных и финансовых моделей',
+      text: 'Управление процессных и финансовых моделей',
+    },
+    {
+      value: 'Финансовове моделирование',
+      text: 'Финансовове моделирование',
+    },
+  ],
+} as SelectStringProps;
 
 const initialKPI_SUM = { caption: MetricsCaption.KPI_SUM, value: 0, delta: 0, relative: true };
 const initialTotalModels = {
@@ -494,5 +545,6 @@ export {
   initialChartStalledModelsByMonth,
   initialChartPilots,
   initialChartDistributionByLifecycleStageModels,
+  dsStreamArtifactOptions,
 };
 

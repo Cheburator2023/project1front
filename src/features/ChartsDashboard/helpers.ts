@@ -1,4 +1,4 @@
-import { isAfter, isValid, parse } from 'date-fns';
+import { format, isAfter, isValid, parse } from 'date-fns';
 
 const generateChartData = (delta: number): number[] => {
   const metricValue = Math.abs(delta);
@@ -20,20 +20,30 @@ const generateChartData = (delta: number): number[] => {
 
 const switchDateFormat = (dateString: string) => {
   if (dateString.includes('.')) {
-    const [day, month, year] = dateString.split('.');
-    return `${year}-${month}-${day}`;
+    const parsedDate = parse(dateString, 'dd.MM.yyyy', new Date());
+    return format(parsedDate, 'yyyy-MM-dd');
+  }
+
+  if (dateString.includes('-')) {
+    const parsedDate = parse(dateString, 'yyyy-MM-dd', new Date());
+    return format(parsedDate, 'yyyy-MM-dd');
   }
 
   return dateString;
 };
 
-const validateDateRange = (date: string): boolean => {
-  const parsedDate = parse(date, 'dd.MM.yyyy', new Date());
-  const today = new Date();
+const validateDateRange = (startDate: string, endDate: string): boolean => {
+  const parsedStartDate = parse(startDate, 'dd.MM.yyyy', new Date());
+  const parsedEndDate = parse(endDate, 'dd.MM.yyyy', new Date());
+  const currentDate = new Date();
 
-  // Проверяем, что дата корректная и не в будущем
-  return isValid(parsedDate) && !isAfter(parsedDate, today);
+  return (
+    isValid(parsedStartDate) &&
+    isValid(parsedEndDate) &&
+    parsedStartDate <= currentDate &&
+    parsedEndDate <= currentDate &&
+    parsedStartDate <= parsedEndDate
+  );
 };
-
 export { generateChartData, switchDateFormat, validateDateRange };
 

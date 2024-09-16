@@ -10,6 +10,7 @@ import {
   typography,
 } from '@admiral-ds/react-ui';
 import { type FrameSizeType } from './types';
+import { SearchSelect } from '@src/shared/ui/organisms';
 
 const TextProps = css<TProps>`
   font-variant-numeric: lining-nums tabular-nums;
@@ -182,11 +183,22 @@ export const Back = styled.div`
   background: ${({ theme }) => theme.color['Foundation/Blue/B50']};
   display: flex;
   flex-flow: row nowrap;
-  height: calc(100vh - 120px);
+  height: calc(100vh - 184px);
 `;
 
 export const FlexContainerExport = styled.div`
   display: flex;
   align-items: center;
+`;
+
+export const CustomSearchSelect = styled(SearchSelect)`
+  .searchSelect {
+    width: 330px;
+    border-radius: 4px;
+    padding: 4px 8px;
+    box-sizing: border-box;
+    margin-right: 12px;
+    align-items: center;
+  }
 `;
 

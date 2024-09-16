@@ -1,15 +1,14 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import { Button, DateInput, Field, Option, Spinner } from '@admiral-ds/react-ui';
+import { Button, Spinner } from '@admiral-ds/react-ui';
 import { ReactComponent as DownloadOutline } from '@admiral-ds/icons/build/system/DownloadOutline.svg';
 
 import { ErrorStatus, Loading } from '@src/shared/ui/atoms';
-import { dsStreamArtifact } from '@src/shared/types';
 import { API_ROUTES, mockedMetricsResponse, useFetch } from '@src/shared/api';
 import { MetricsResponseType } from '@src/shared/api/types';
 
-import { generateChartData, switchDateFormat, validateDateRange } from './helpers';
+import { switchDateFormat, validateDateRange } from './helpers';
 import {
   initialChartModelDynamicsByStreams,
   initialChartFinalStatusByMonthModels,
@@ -26,6 +25,7 @@ import {
   initialKPI_SUM,
   initialOnMonitoringModels,
   initialTakenOutOfOperationModels,
+  dsStreamArtifactOptions,
 } from './constants';
 import MetricDisplay from './MetricDisplay';
 import './styles.css';
@@ -42,35 +42,51 @@ import {
   Back,
   Cover,
   FlexContainerExport,
-  CustomSelectField,
   GridRow,
+  CustomDateField,
+  CustomSearchSelect,
 } from './style';
 import { MenuIconSelect } from './MenuIconSelect';
 import { MetricsCaption } from './types';
 
-const getQueryParams = (filters: { dateRange?: string; selectedStream: string }) => {
-  const params: Record<string, string> = {};
+const getQueryParams = (filters: {
+  startDate?: string;
+  endDate?: string;
+  selectedStreams?: string[];
+}) => {
+  const params: Record<string, any> = {};
 
-  if (filters.dateRange) {
-    params.date = filters.dateRange;
+  if (filters.startDate) {
+    params.startDate = filters.startDate;
   }
 
-  if (filters.selectedStream && filters.selectedStream !== 'Все стримы') {
-    params.stream = filters.selectedStream;
+  if (filters.endDate) {
+    params.endDate = filters.endDate;
+  }
+
+  const hasStreamsSelected = filters.selectedStreams && filters.selectedStreams.length > 0;
+  const allStreamsSelected =
+    filters.selectedStreams?.length === dsStreamArtifactOptions.options.length;
+
+  if (hasStreamsSelected && !allStreamsSelected) {
+    filters?.selectedStreams?.forEach((stream, index) => {
+      params[`stream[${index}]`] = stream;
+    });
   }
 
   return params;
 };
-
 const ChartsDashboard = () => {
   const [filters, setFilters] = useState({
-    dateRange: undefined as string | undefined,
-    selectedStream: 'Все стримы',
+    startDate: undefined as string | undefined,
+    endDate: undefined as string | undefined,
+    selectedStreams: [] as string[],
   });
 
   const [tempFilters, setTempFilters] = useState({
-    tempDateRange: undefined as string | undefined,
-    tempSelectedStream: 'Все стримы',
+    tempStartDate: undefined as string | undefined,
+    tempEndDate: undefined as string | undefined,
+    tempSelectedStreams: dsStreamArtifactOptions.options.map((option) => option.value),
   });
 
   const {
@@ -118,7 +134,7 @@ const ChartsDashboard = () => {
 
   const [isExporting, setIsExporting] = useState(false);
 
-  const [dateError, setDateError] = useState<string | null>(null);
+  const [dateError, setDateError] = useState<boolean>(false);
 
   const itemsExport = [
     { id: 'pdf', label: 'Экспортировать в PDF', value: 'PDF' },
@@ -235,51 +251,68 @@ const ChartsDashboard = () => {
     });
   }, [metricsData]);
 
-  const handleDateChange = (newDate: string | undefined) => {
-    setTempFilters((prev) => ({ ...prev, tempDateRange: newDate || undefined }));
+  const handleDateChange = (newDateRange: string | undefined) => {
+    if (newDateRange) {
+      const [startDate, endDate] = newDateRange.split(' - ');
+      setTempFilters((prev) => ({
+        ...prev,
+        tempStartDate: startDate,
+        tempEndDate: endDate,
+      }));
 
-    if (newDate && !validateDateRange(newDate)) {
-      setDateError('Некорректная дата');
+      if (validateDateRange(startDate, endDate)) {
+        setDateError(false);
+      } else {
+        setDateError(true);
+      }
     } else {
-      setDateError(null);
+      setTempFilters((prev) => ({
+        ...prev,
+        tempStartDate: undefined,
+        tempEndDate: undefined,
+      }));
+      setDateError(false);
     }
   };
 
-  const handleStreamChange = (stream: string) => {
-    setTempFilters((prev) => ({ ...prev, tempSelectedStream: stream }));
+  const handleStreamChange = (name: string, selectedStreams: string[]) => {
+    setTempFilters((prev) => ({
+      ...prev,
+      [name]: selectedStreams,
+    }));
   };
 
   const handleApplyFilters = () => {
-    if (tempFilters.tempDateRange && !validateDateRange(tempFilters.tempDateRange)) {
-      setDateError('Некорректная дата');
-      return;
+    const { tempStartDate, tempEndDate, tempSelectedStreams } = tempFilters;
+
+    if (!dateError) {
+      const formattedStartDate = tempStartDate ? switchDateFormat(tempStartDate) : undefined;
+      const formattedEndDate = tempEndDate ? switchDateFormat(tempEndDate) : undefined;
+
+      setFilters({
+        startDate: formattedStartDate,
+        endDate: formattedEndDate,
+        selectedStreams: tempSelectedStreams,
+      });
+
+      refetch();
     }
-
-    setDateError(null);
-
-    const filteredParams: Record<string, string> = {};
-
-    if (tempFilters.tempDateRange) {
-      filteredParams.date = switchDateFormat(tempFilters.tempDateRange);
-    }
-
-    if (tempFilters.tempSelectedStream && tempFilters.tempSelectedStream !== 'Все стримы') {
-      filteredParams.stream = tempFilters.tempSelectedStream;
-    }
-
-    setFilters({
-      dateRange: filteredParams.date,
-      selectedStream: filteredParams.stream || 'Все стримы',
-    });
-
-    refetch();
   };
 
   const handleResetFilters = () => {
-    setFilters({ dateRange: undefined, selectedStream: 'Все стримы' });
-    setTempFilters({ tempDateRange: undefined, tempSelectedStream: 'Все стримы' });
-    setDateError(null);
+    setFilters({
+      startDate: undefined,
+      endDate: undefined,
+      selectedStreams: [],
+    });
 
+    setTempFilters({
+      tempStartDate: undefined,
+      tempEndDate: undefined,
+      tempSelectedStreams: dsStreamArtifactOptions.options.map((option) => option.value),
+    });
+
+    setDateError(false);
     refetch();
   };
 
@@ -406,32 +439,30 @@ const ChartsDashboard = () => {
       <WrapperFilter>
         <Container>
           <FlexContainerFilter>
-            <Field label="Временный срез:">
-              <DateInput
-                dimension="s"
-                value={tempFilters.tempDateRange || ''}
-                onChange={(e) => handleDateChange(e.currentTarget.value)}
-                placeholder="__.__.____"
-                style={{ maxWidth: 300 }}
-                dropContainerClassName="dropContainerClass"
-                status={dateError ? 'error' : undefined}
-              />
-            </Field>
-            <Field label="Стримы:">
-              <CustomSelectField
-                dimension="s"
-                value={tempFilters.tempSelectedStream}
-                onChange={(e) => handleStreamChange(e.target.value)}
-                placeholder="Выберите стрим"
-                dropContainerClassName="dropContainerClass"
-              >
-                {dsStreamArtifact?.values.map((option) => (
-                  <Option key={option.artefact_value} value={option.artefact_value}>
-                    {option.artefact_value}
-                  </Option>
-                ))}
-              </CustomSelectField>
-            </Field>
+            <CustomDateField
+              type="date-range"
+              dimension="s"
+              id="dates"
+              label="Временный срез:"
+              placeholder="__.__.____ – __.__.____"
+              dropContainerClassName="dropContainerClass"
+              value={
+                tempFilters?.tempStartDate && tempFilters.tempEndDate
+                  ? `${tempFilters.tempStartDate} - ${tempFilters.tempEndDate}`
+                  : ''
+              }
+              onChange={(e) => handleDateChange(e.currentTarget.value)}
+              status={dateError ? 'error' : undefined}
+            />
+
+            <CustomSearchSelect
+              id="streams"
+              label="Стримы:"
+              name="tempSelectedStreams"
+              options={dsStreamArtifactOptions}
+              selectedValues={tempFilters.tempSelectedStreams}
+              onChange={handleStreamChange}
+            />
 
             <ButtonContainer>
               <Button dimension="s" onClick={handleApplyFilters} value="Submit" type="submit">

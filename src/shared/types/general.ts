@@ -192,34 +192,6 @@ enum ModelSource {
   SUM_RM = 'sum-rm',
 }
 
-type DsStreamOption = {
-  artefact_value: string;
-};
-
-type DsStreamArtifact = {
-  values: DsStreamOption[];
-};
-
-export const dsStreamArtifact: DsStreamArtifact = {
-  values: [
-    {
-      artefact_value: 'Управление моделирования РБ',
-    },
-    {
-      artefact_value: 'Управление моделирования КИБ и СМБ',
-    },
-    {
-      artefact_value: 'Управление перспективных алгоритмов машинного обучения',
-    },
-    {
-      artefact_value: 'Управление процессных и финансовых моделей',
-    },
-    {
-      artefact_value: 'Управление моделирования партнерств и ИТ-процессов',
-    },
-  ],
-};
-
 export {
   COLUMN_TYPE,
   Row,
@@ -228,7 +200,5 @@ export {
   ColumnsFilter,
   TopFilters,
   ModelSource,
-  DsStreamArtifact,
-  DsStreamOption,
   ModelStatus,
 };
