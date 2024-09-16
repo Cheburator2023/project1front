@@ -300,7 +300,7 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
     ],
   },
   {
-    name: 'materiality_rate', // Проверить кейс
+    name: 'materiality_rate',
     maxLength: 250,
     requireConditions: [
       { model_type: 'Модели ВПОДК', model_risk_type: 'Кредитный риск', impact_coverage: '' },

@@ -4,7 +4,7 @@ import { Button, T } from '@admiral-ds/react-ui';
 import { Row } from '@shared/types';
 import { StatusScreen } from '@shared/ui/molecules';
 import { RIGHT_PANEL_TYPE, MODEL_FORM_MODE } from '@shared/constants';
-import { InputFactory, InputValue, RightPanel } from '@shared/ui/organisms';
+import { INPUT_TYPE, InputFactory, InputValue, RightPanel } from '@shared/ui/organisms';
 import { API_ROUTES, useFetch, ArtifactApi, ArtifactResponse, ModelEditApi } from '@shared/api';
 
 import { FormValues } from './types';
@@ -67,7 +67,31 @@ export const ModelForm = ({
   }, [initialRow, artifactsApi]);
 
   const handleChange = useCallback((name: keyof Row, value: InputValue) => {
-    setValues((prevValues) => ({ ...prevValues, [name]: value }));
+    let newValues = { [name]: value };
+    // TODO: move this logic to artifact
+    if (name === 'model_type') {
+      const model_risk_type: InputValue = {
+        type: INPUT_TYPE.SELECT,
+        value: {
+          id: '479',
+          text: 'Бизнес',
+        },
+      };
+
+      if (value.type === INPUT_TYPE.SELECT && value.value?.text === 'Бизнес-модели') {
+        newValues = { ...newValues, model_risk_type };
+      }
+
+      if (value.type === INPUT_TYPE.MULTI_SELECT) {
+        const checkForValue = value?.value.find((item) => item.text === 'Бизнес-модели');
+
+        if (checkForValue) {
+          newValues = { ...newValues, model_risk_type };
+        }
+      }
+    }
+
+    setValues((prevValues) => ({ ...prevValues, ...newValues }));
   }, []);
 
   const handleSubmit = useCallback(async () => {
@@ -235,4 +259,3 @@ export const ModelForm = ({
     />
   );
 };
-
