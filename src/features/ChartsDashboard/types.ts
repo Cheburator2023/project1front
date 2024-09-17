@@ -20,7 +20,7 @@ export enum MetricsCaption {
   DEVELOPED_MODELS = 'Разработанные модели',
   SUM_RM_MODELS = 'Модели в MPM СУМ',
   FINAL_STATUS_MODELS = 'Модели с финальным статусом',
-  REGISTRY_COVERAGE_MODELS = 'Доля моделей, покрытых системой управления реестром моделей',
+  REGISTRY_COVERAGE_MODELS = 'Доля моделей, покрытых системой управления модельным риском',
   RISK_COVERAGE_FINAL_STATUS_MODELS = 'Доля моделей, покрытых системой управления модельным риском, с финальным статусом',
   ON_MONITORING_MODELS = 'Модели на мониторинге',
   TAKEN_OUT_OF_OPERATION_MODELS = 'Кол-во моделей, выведенных из эксп.',
@@ -30,4 +30,3 @@ export enum MetricsCaption {
   PILOTS = 'Пилоты',
   DYNAMIC_BY_STREAMS_MODELS = 'Динамика моделей по стримам',
 }
-
