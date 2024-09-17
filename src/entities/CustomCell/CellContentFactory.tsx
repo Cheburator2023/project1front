@@ -37,7 +37,7 @@ export const CellContentFactory = ({
         return emptyValue;
       }
 
-      return format(date, 'yyyy-MM-dd k:mm');
+      return format(date, 'yyyy-MM-dd');
     }
 
     default:
