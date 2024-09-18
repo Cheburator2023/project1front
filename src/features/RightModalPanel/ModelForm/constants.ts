@@ -451,7 +451,6 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
   },
 ];
 
-// TODO: add transition to next schema
 export const RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA: FormFieldsSchema = [
   {
     name: 'regulatory_code_rs_pvr',

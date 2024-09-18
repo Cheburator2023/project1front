@@ -69,25 +69,26 @@ export const ModelForm = ({
   const handleChange = useCallback((name: keyof Row, value: InputValue) => {
     let newValues = { [name]: value };
     // TODO: move this logic to artifact
-    if (name === 'model_type') {
-      const model_risk_type: InputValue = {
-        type: INPUT_TYPE.SELECT,
-        value: {
-          id: '479',
-          text: 'Бизнес',
-        },
-      };
-
-      if (value.type === INPUT_TYPE.SELECT && value.value?.text === 'Бизнес-модели') {
-        newValues = { ...newValues, model_risk_type };
-      }
-
-      if (value.type === INPUT_TYPE.MULTI_SELECT) {
-        const checkForValue = value?.value.find((item) => item.text === 'Бизнес-модели');
-
-        if (checkForValue) {
-          newValues = { ...newValues, model_risk_type };
-        }
+    if (name === 'model_type' && value.type === INPUT_TYPE.SELECT) {
+      if (value.value?.text === 'Бизнес-модель') {
+        newValues = {
+          ...newValues,
+          model_risk_type: {
+            type: INPUT_TYPE.SELECT,
+            value: {
+              id: '479',
+              text: 'Бизнес',
+            },
+          },
+        };
+      } else {
+        newValues = {
+          ...newValues,
+          model_risk_type: {
+            type: INPUT_TYPE.SELECT,
+            value: undefined,
+          },
+        };
       }
     }
 

@@ -23,7 +23,7 @@ enum INPUT_TYPE {
 
 type SelectInputValue = {
   type: INPUT_TYPE.SELECT;
-  value: {
+  value?: {
     id: string;
     text: string;
   };
