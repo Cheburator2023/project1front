@@ -1,5 +1,14 @@
 # Semantic Versioning Changelog
 
+## [1.21.7](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.21.6...v1.21.7) (2024-09-18)
+
+
+### Bug Fixes
+
+* fix dashboard chart label ([48b617a](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/48b617a9c5e63519f16653d89de23d5ea36113df))
+* fix form auto-filling ([5e8fb68](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/5e8fb680445c36a2dde87dac10bdb3f05b31382a))
+* remove hours and minutes in table dates ([8831e6c](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/8831e6cd23895fb86f735990dbb40447292e5da7))
+
 ## [1.21.6](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.21.5...v1.21.6) (2024-09-16)
 
 
