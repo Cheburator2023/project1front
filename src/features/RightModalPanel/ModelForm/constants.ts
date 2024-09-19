@@ -89,12 +89,7 @@ export const BASE_MODEL_SCHEMA: FormFieldsSchema = [
 export const ACTIVE_MODEL_SCHEMA: FormFieldsSchema = [
   {
     name: 'model_type',
-    requireConditions: [
-      {
-        model_type: 'Риск-модели',
-        model_risk_type: 'Кредитный риск',
-      },
-    ],
+    required: true,
   },
   {
     name: 'model_desc',

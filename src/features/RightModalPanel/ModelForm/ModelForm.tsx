@@ -70,7 +70,7 @@ export const ModelForm = ({
     let newValues = { [name]: value };
     // TODO: move this logic to artifact
     if (name === 'model_type' && value.type === INPUT_TYPE.SELECT) {
-      if (value.value?.text === 'Бизнес-модель') {
+      if (value.value?.text === 'Бизнес-модели') {
         newValues = {
           ...newValues,
           model_risk_type: {
