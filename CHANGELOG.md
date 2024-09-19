@@ -1,5 +1,13 @@
 # Semantic Versioning Changelog
 
+## [1.21.8](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.21.7...v1.21.8) (2024-09-19)
+
+
+### Bug Fixes
+
+* fix schema and select fields ([ecd4e7e](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/ecd4e7e012d35616dc96d13004e1385e75fba5c8))
+* fix styles for select component ([2f45f1b](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/2f45f1bf0755fe762d2d751741117ddede8f0d4b))
+
 ## [1.21.7](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.21.6...v1.21.7) (2024-09-18)
 
 
