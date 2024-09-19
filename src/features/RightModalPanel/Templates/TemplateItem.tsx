@@ -27,7 +27,7 @@ const Content = styled.div`
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  text-wrap: nowrap;
+  white-space: nowrap;
   width: 100%;
 `;
 

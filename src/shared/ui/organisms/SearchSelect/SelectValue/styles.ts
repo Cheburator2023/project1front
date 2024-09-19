@@ -15,7 +15,7 @@ const TagsContainer = styled.div`
 const MultiSelectContainer = styled.div`
   display: block;
   flex-wrap: nowrap;
-  text-wrap: nowrap;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   margin-left: 0;
@@ -24,7 +24,7 @@ const MultiSelectContainer = styled.div`
 const SingleSelectContainer = styled.div`
   display: flex;
   flex-direction: row;
-  text-wrap: nowrap;
+  white-space: nowrap;
   align-items: center;
   width: 100%;
   justify-content: space-between;

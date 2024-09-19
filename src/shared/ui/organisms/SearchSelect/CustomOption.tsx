@@ -14,11 +14,11 @@ export const Container = styled.label`
   cursor: pointer;
   user-select: none;
   overflow: hidden;
-  text-wrap: nowrap;
+  white-space: nowrap;
 
   div {
     overflow: hidden;
-    text-wrap: nowrap;
+    white-space: nowrap;
     text-overflow: ellipsis;
   }
 
@@ -30,7 +30,7 @@ export const Container = styled.label`
 
 const Label = styled(T)`
   overflow: hidden;
-  text-wrap: nowrap;
+  white-space: nowrap;
   text-overflow: ellipsis;
 `;
 
