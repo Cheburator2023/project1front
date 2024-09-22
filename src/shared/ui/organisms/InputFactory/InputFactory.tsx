@@ -94,11 +94,23 @@ function InputFactorySwitcher<T extends string>({
 
       const dateValue = getDateValue(value);
 
+      const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const inputValue = e.target.value;
+        const parsedDate = inputValue ? parse(inputValue, 'dd.MM.yyyy', new Date()) : null;
+
+        onChange?.(name, {
+          type,
+          value: parsedDate?.toString() !== 'Invalid Date' ? parsedDate : null,
+        });
+      };
+
       return (
         <DateField
           ref={ref}
           autoFocus={autoFocus}
           key={id}
+          disableCopying
+          displayClearIcon
           status={error ? 'error' : undefined}
           extraText={error && 'Обязательное поле'}
           disabled={disabled}
@@ -109,12 +121,7 @@ function InputFactorySwitcher<T extends string>({
           value={dateValue}
           maxDate={maxDate}
           minDate={minDate}
-          onChange={(e) =>
-            onChange?.(name, {
-              type,
-              value: e.target.value ? parse(e.target.value, 'dd.MM.yyyy', new Date()) : null,
-            })
-          }
+          onChange={handleChange}
         />
       );
     }
@@ -398,6 +405,8 @@ function InputFactorySwitcher<T extends string>({
                   required={field.required}
                   label={field.label}
                   value={quarterDateValue}
+                  disableCopying
+                  displayClearIcon
                   maxDate={field.maxDate}
                   minDate={field.minDate}
                   onChange={handleDateChange}
