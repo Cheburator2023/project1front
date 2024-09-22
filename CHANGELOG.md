@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.21.9](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.21.8...v1.21.9) (2024-09-22)
+
+
+### Bug Fixes
+
+* fix bug with date input in forms ([dbcd9fe](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/dbcd9fe8925c5e91212f3fc199de18ee21d55bbd))
+
 ## [1.21.8](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.21.7...v1.21.8) (2024-09-19)
 
 
