@@ -93,19 +93,11 @@ export const ACTIVE_MODEL_SCHEMA: FormFieldsSchema = [
   },
   {
     name: 'model_desc',
-    requireConditions: [
-      {
-        model_type: 'Риск-модели',
-        model_risk_type: 'Кредитный риск',
-      },
-    ],
-  },
-  {
-    name: 'model_indicator',
     required: true,
   },
   {
     name: 'significance_validity',
+    required: true,
     valueConditions: [
       {
         value: 'Высокая',
@@ -200,6 +192,20 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
         model_type: 'Риск-модели',
         model_risk_type: 'Кредитный риск',
         rating_model: 'Да',
+      },
+    ],
+  },
+  {
+    name: 'significance_validity',
+    valueConditions: [
+      {
+        value: 'Высокая',
+        conditions: [
+          {
+            classification_of_rs_by_order_of_application_within_pvr:
+              'Рейтинговые системы, подлежащие согласованию Регулятором',
+          },
+        ],
       },
     ],
   },

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@admiral-ds/react-ui';
 
 import { COLUMN_TYPE, Column, ColumnsFilter, Row } from '@shared/types';
@@ -23,6 +23,10 @@ export const ColumnFilter = React.memo(
         : columnsFilters?.[column.name];
 
     const [value, setValue] = useState<string[] | string | undefined>(initialValue);
+
+    useEffect(() => {
+      setValue(initialValue);
+    }, [columnsFilters, initialValue]);
 
     switch (column.type) {
       case COLUMN_TYPE.QUARTERLY_DATE:

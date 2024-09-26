@@ -28,10 +28,22 @@ const compare = (
   colType: COLUMN_TYPE,
   sort: 'asc' | 'desc',
 ) => {
-  const aValue = a[colName] ?? 0;
-  const bValue = b[colName] ?? 0;
+  const aValue = a[colName];
+  const bValue = b[colName];
+
+  if (aValue == null && bValue == null) {
+    return 0;
+  }
 
   if (sort === 'asc') {
+    if (aValue == null) {
+      return 1;
+    }
+
+    if (bValue == null) {
+      return -1;
+    }
+
     switch (colType) {
       case COLUMN_TYPE.DATE: {
         return getTime(aValue) - getTime(bValue);
@@ -48,6 +60,14 @@ const compare = (
         return 0;
     }
   } else {
+    if (aValue == null) {
+      return -1;
+    }
+
+    if (bValue == null) {
+      return 1;
+    }
+
     switch (colType) {
       case COLUMN_TYPE.DATE:
         return getTime(bValue) - getTime(aValue);
