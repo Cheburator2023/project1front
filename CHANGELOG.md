@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.21.10](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.21.9...v1.21.10) (2024-09-26)
+
+
+### Bug Fixes
+
+* fix bugs with filters and forms ([c1c52e7](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/c1c52e79dfdc455cd40ed22a43713e0dfb6b8028))
+
 ## [1.21.9](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.21.8...v1.21.9) (2024-09-22)
 
 
