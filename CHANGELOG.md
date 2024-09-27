@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.21.11](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.21.10...v1.21.11) (2024-09-27)
+
+
+### Bug Fixes
+
+* rating model field ([261e56f](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/261e56f8b13a43b5325b51c807667e816cedefdb))
+
 ## [1.21.10](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.21.9...v1.21.10) (2024-09-26)
 
 
