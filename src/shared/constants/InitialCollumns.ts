@@ -132,6 +132,11 @@ export const initialColumns: Array<Column> = [
     type: COLUMN_TYPE.STRING,
   },
   {
+    name: 'rating_model',
+    title: 'Модель входит в рейтинговую систему?',
+    type: COLUMN_TYPE.STRING,
+  },
+  {
     name: 'model_indicator',
     title: 'Индикатор модели',
     type: COLUMN_TYPE.STRING,
