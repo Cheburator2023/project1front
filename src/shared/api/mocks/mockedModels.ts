@@ -68,6 +68,7 @@ const mockedModels: Array<Partial<Row>> = [
     allocation_rb_comment: null,
     allocation_kc_comment: null,
     allocation_other_comment: null,
+    date_of_introduction_into_operation: "2022-01-27 10:55:17"
   },
   {
     system_model_id: '77b87bee-7f46-11ec-ac05-0a580107004b',

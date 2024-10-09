@@ -2,7 +2,7 @@ import React, { ReactNode, useEffect, useRef, useState } from 'react';
 import { T } from '@admiral-ds/react-ui';
 
 import { Column, COLUMN_TYPE, ColumnsFilter, Row } from '@shared/types';
-import { API_ROUTES, useFetch, CompareModelsResponseType } from '@shared/api';
+import { API_ROUTES, useFetch, CompareModelsResponseType, mockedModelsCompareResponse } from '@shared/api';
 import { filterColumnsByColumnsFilters } from '@shared/helpers';
 import { CellWrapper, CellContentFactory } from '@entities';
 
