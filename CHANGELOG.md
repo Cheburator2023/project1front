@@ -1,5 +1,17 @@
 # Semantic Versioning Changelog
 
+# [1.22.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.21.11...v1.22.0) (2024-10-09)
+
+
+### Bug Fixes
+
+* Исправление фильтрации по стримам ([7c33fcb](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/7c33fcb290eb79339404f7df81794e5af7974756))
+
+
+### Features
+
+* Дашборды. Новое поле date_of_introduction_into_operation. Fix ([8461a9b](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/8461a9bf869889ae5c6e6d05a76f402cf3d2e590))
+
 ## [1.21.11](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.21.10...v1.21.11) (2024-09-27)
 
 
