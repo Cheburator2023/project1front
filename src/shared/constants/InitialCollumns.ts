@@ -628,6 +628,11 @@ export const initialColumns: Array<Column> = [
     type: COLUMN_TYPE.DATE,
   },
   {
+    name: 'date_of_introduction_into_operation',
+    title: 'Дата релиза',
+    type: COLUMN_TYPE.DATE,
+  },
+  {
     name: 'model_status',
     title: 'Этап ЖЦМ',
     type: COLUMN_TYPE.STRING,
@@ -782,6 +787,7 @@ export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
   model_epic_11_date: [],
   model_epic_12: [],
   model_epic_12_date: [],
+  date_of_introduction_into_operation: [],
   model_status: [],
   model_status_assignee: [],
   pvr: [],
