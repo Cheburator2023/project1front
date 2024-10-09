@@ -2,6 +2,32 @@ import { Artifact, ArtifactResponse, ArtifactType, ArtifactGroup } from '../type
 
 const mockedArtifacts: Artifact[] = [
   {
+    artefact_id: 2112,
+    artefact_tech_label: 'date_of_introduction_into_operation',
+    artefact_label: 'Дата релиза',
+    artefact_desc: '',
+    artefact_context: null,
+    is_main_info_flg: '0',
+    is_class_flg: '0',
+    is_edit_flg: '1',
+    artefact_type_id: '4',
+    artefact_business_group_id: 1,
+    is_multi_fill_flg: '0',
+    artefact_parent_id: null,
+    artefact_parent_value: null,
+    artefact_default_value: null,
+    is_default_value_flg: null,
+    artefact_hint: 'Укажите дату релиза',
+    artefact_regular_expression: null,
+    artefact_value: null,
+    artefact_value_label: null,
+    is_active_flg: null,
+    artefact_parent_value_id: null,
+    artefact_type_desc: ArtifactType.DATE,
+    values: []
+  },
+
+  {
     artefact_id: 2110,
     artefact_tech_label: 'rating_model',
     artefact_label: 'Рейтинговая модель',
