@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.22.1](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.22.0...v1.22.1) (2024-10-10)
+
+
+### Bug Fixes
+
+* Фикс бага - разработанные модели ([514c112](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/514c112a5394f358669a4d3054deea35d63e41a1))
+
 # [1.22.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.21.11...v1.22.0) (2024-10-09)
 
 
