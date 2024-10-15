@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.22.2](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.22.1...v1.22.2) (2024-10-15)
+
+
+### Bug Fixes
+
+* **template:** add new field ([968d910](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/968d910880d27e635f2444817dc94d73bf4be70c))
+
 ## [1.22.1](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.22.0...v1.22.1) (2024-10-10)
 
 
