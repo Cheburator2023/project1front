@@ -643,6 +643,11 @@ export const initialColumns: Array<Column> = [
     type: COLUMN_TYPE.STRING,
   },
   {
+    name: 'developing_model_reason',
+    title: 'Основание для разработки',
+    type: COLUMN_TYPE.STRING,
+  },
+  {
     name: 'pvr',
     title: 'ПВР',
     type: COLUMN_TYPE.STRING,
