@@ -1,6 +1,6 @@
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { Button, TableRow as ATableRow, T, Chips } from '@admiral-ds/react-ui';
-import { ReactComponent as FilterOutline } from '@admiral-ds/icons/build/system/FilterOutline.svg';
+
+import { Button, TableRow as ATableRow, T, Toggle } from '@admiral-ds/react-ui';
 import { ReactComponent as CloseOutline } from '@admiral-ds/icons/build/service/CloseOutline.svg';
 
 import { COLUMN_TYPE, ColumnsFilter, Row } from '@shared/types';
@@ -11,19 +11,18 @@ import {
   RIGHT_PANEL_TYPE,
   initialColumns,
   initialColumnsFilters,
-  SYSTEM_SPECIFIC_FLAGS,
 } from '@shared/constants';
-import { TemplatesFilter } from '@entities';
+import { TemplatesFilter, FilterButtonCount } from '@entities';
+import { useFilters } from '@src/shared/hooks';
 
 import {
   ActionPanelLeft,
   ActionPanelRight,
   ActionPanelWrapper,
   ActiveTemplate,
-  BadgeCustom,
+  ChipsCustom,
   Wrapper,
 } from './styles';
-import { getActiveFiltersCount } from './helpers';
 
 export interface TemplateFiltersProps {
   templates: Template[];
@@ -40,6 +39,10 @@ export const TemplateFilters = ({
     useContext(FiltersContext);
 
   const [rows, setRows] = useState<ATableRow[]>([]);
+  const [showFilterTemplate, setShowFilterTemplate] = useState(true);
+
+  const { modifiedFilters, activeTemplate, getFilteredColumns, resetFilters, isModified } =
+    useFilters(columnsFilters, templates, topFilters.templates);
 
   // refactor
   const handleRemoveColumnFilterValue = useCallback(
@@ -56,7 +59,7 @@ export const TemplateFilters = ({
         };
 
         onChangeColumnsFilters(newColumnsFilters);
-        onChangeTopFilters({ ...topFilters, templates: [] });
+        onChangeTopFilters({ ...topFilters });
       }
     },
     [columnsFilters],
@@ -77,16 +80,20 @@ export const TemplateFilters = ({
         renderCell(filters: string[], row: ATableRow & { id: keyof Row }): React.ReactNode {
           const filterType = initialColumns.find((column) => column.name === row.id)?.type;
 
+          const isTemplate = topFilters.templates.length > 0 && !modifiedFilters.has(row.id);
+
           if (filterType === COLUMN_TYPE.DATE) {
             return (
               <div style={{ display: 'flex', flexDirection: 'row' }}>
                 {filters.length ? (
-                  <Chips
+                  <ChipsCustom
+                    isTemplate={isTemplate}
                     dimension="s"
+                    appearance="filled"
                     onClose={() => handleRemoveColumnFilterValue(row.id, undefined, filterType)}
                   >
                     {filters[0]} - {filters[1]}
-                  </Chips>
+                  </ChipsCustom>
                 ) : null}
               </div>
             );
@@ -95,30 +102,29 @@ export const TemplateFilters = ({
           return (
             <div style={{ display: 'flex', flexDirection: 'row' }}>
               {filters.map((filterValue) => (
-                <Chips
+                <ChipsCustom
+                  isTemplate={isTemplate}
                   style={{ marginRight: '5px' }}
                   key={filterValue}
                   dimension="s"
+                  appearance="filled"
                   onClose={() => handleRemoveColumnFilterValue(row.id, filterValue)}
                 >
                   {filterValue}
-                </Chips>
+                </ChipsCustom>
               ))}
             </div>
           );
         },
       },
     ],
-    [handleRemoveColumnFilterValue],
+    [handleRemoveColumnFilterValue, modifiedFilters],
   );
 
   useEffect(() => {
     const filters = Object.keys(columnsFilters);
-    const newRows: ATableRow[] = initialColumns
-      .filter(
-        (column) =>
-          !Object.values(SYSTEM_SPECIFIC_FLAGS).includes(column.name as SYSTEM_SPECIFIC_FLAGS),
-      )
+
+    const newRows: ATableRow[] = getFilteredColumns(initialColumns, showFilterTemplate)
       .sort((prevColumn, nextColumn) => {
         const prevIndex = filters.indexOf(prevColumn.name);
         const nextIndex = filters.indexOf(nextColumn.name);
@@ -137,15 +143,17 @@ export const TemplateFilters = ({
 
         return 0;
       })
-      .map((column) => ({
-        id: column.name,
-        name: column.title,
-        selected: !!columnsFilters[column.name],
-        value: columnsFilters[column.name] ?? [],
-      }));
+      .map((column) => {
+        return {
+          id: column.name,
+          name: column.title,
+          selected: !!columnsFilters[column.name],
+          value: columnsFilters[column.name] ?? [],
+        };
+      });
 
     setRows(newRows);
-  }, [columnsFilters]);
+  }, [columnsFilters, showFilterTemplate, modifiedFilters]);
 
   const handleDragRows = (rowId: string, nextRowId: string | null, _: string | null) => {
     const currentRow = rows.find((row) => row.id === rowId);
@@ -211,33 +219,26 @@ export const TemplateFilters = ({
   };
 
   const handleResetFilters = () => {
+    resetFilters();
     onChangeColumnsFilters(initialColumnsFilters);
     onChangeTopFilters({ ...topFilters, templates: [] });
   };
 
-  const activeFiltersCount = useMemo(() => getActiveFiltersCount(columnsFilters), [columnsFilters]);
+  const handleToggleChange = () => {
+    setShowFilterTemplate((prev) => !prev);
+  };
 
   return (
     <Wrapper>
       <ActionPanelWrapper>
         <ActionPanelLeft>
-          <div>
-            <Button
-              dimension="s"
-              icon={<FilterOutline />}
-              onClick={() => updateActiveScreen(ACTIVE_SCREEN.TABLE)}
-              appearance={topFilters.templates.length ? 'success' : 'primary'}
-              displayAsSquare
-            />
-
-            <BadgeCustom
-              appearance={topFilters.templates.length ? 'success' : 'info'}
-              dimension="s"
-            >
-              {activeFiltersCount}
-            </BadgeCustom>
-          </div>
-
+          <FilterButtonCount
+            topFilters={topFilters}
+            updateActiveScreen={updateActiveScreen}
+            columnsFilters={columnsFilters}
+            activeScreen={ACTIVE_SCREEN.TABLE}
+            templates={templates}
+          />
           <T style={{ marginLeft: '10px' }} font="Subtitle/Subtitle 2">
             Фильтры
           </T>
@@ -253,15 +254,25 @@ export const TemplateFilters = ({
               updateRightPanelType={updateRightPanelType}
             />
           </ActiveTemplate>
-          <div>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            {activeTemplate && (
+              <Toggle
+                checked={showFilterTemplate}
+                dimension="s"
+                labelPosition="right"
+                onChange={handleToggleChange}
+              >
+                Показать фильтры шаблона
+              </Toggle>
+            )}
             <Button
-              style={{ marginRight: '10px' }}
+              style={{ marginRight: '10px', marginLeft: '10px' }}
               onClick={handleResetFilters}
-              appearance="primary"
+              appearance="danger"
               dimension="s"
             >
               <T font="Button/Button 2" color="Special/Static White" as="div">
-                По умолчанию
+                Очистить фильтры
               </T>
             </Button>
             <Button

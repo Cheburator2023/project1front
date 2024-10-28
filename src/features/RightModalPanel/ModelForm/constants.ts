@@ -1,7 +1,28 @@
+import { Row } from '@src/shared/types';
 import { FormFieldsSchema } from './types';
 
 export const MONTHS_IN_QUARTER = 3;
 export const ADDITIONAL_DAYS_OUT_QUARTER = 10;
+export const ALLOCATION_FIELDS_NAMES: Array<keyof Row> = [
+  'usage_confirm_date_q1',
+  'usage_confirm_date_q2',
+  'usage_confirm_date_q3',
+  'usage_confirm_date_q4',
+  'usage_confirm_flag_q1',
+  'usage_confirm_flag_q2',
+  'usage_confirm_flag_q3',
+  'usage_confirm_flag_q4',
+  'allocation_kib_usage',
+  'allocation_smb_usage',
+  'allocation_rb_usage',
+  'allocation_kc_usage',
+  'allocation_other_usage',
+  'allocation_kib_comment',
+  'allocation_smb_comment',
+  'allocation_rb_comment',
+  'allocation_kc_comment',
+  'allocation_other_comment',
+];
 
 export const BASE_MODEL_SCHEMA: FormFieldsSchema = [
   {

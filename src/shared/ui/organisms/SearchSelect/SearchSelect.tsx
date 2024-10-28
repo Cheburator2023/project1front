@@ -47,6 +47,7 @@ export interface SearchSelectProps {
   selectAllEnabled?: boolean;
   renderDropDownBottomPanel?: () => React.ReactNode;
   onAddNewOption?: (newOptionValue: string) => void;
+  modified?: boolean;
 }
 
 export const SearchSelect = ({
@@ -73,6 +74,7 @@ export const SearchSelect = ({
   selectNotNullEnabled = false,
   selectEmptyEnabled = false,
   selectAllEnabled = true,
+  modified = false,
   renderDropDownBottomPanel,
   onAddNewOption,
 }: SearchSelectProps) => {
@@ -212,6 +214,7 @@ export const SearchSelect = ({
                 active={active}
                 selectedAllValues={selectedAllValues}
                 value={value}
+                modified={modified}
               />
             )
           }

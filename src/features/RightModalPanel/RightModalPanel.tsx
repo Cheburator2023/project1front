@@ -2,7 +2,13 @@ import React, { useMemo } from 'react';
 
 import { Row } from '@shared/types';
 import { RIGHT_PANEL_TYPE, MODEL_FORM_MODE } from '@shared/constants';
-import { API_ROUTES, useFetch, ArtifactResponse, Template, mockedModelsArtifacts } from '@shared/api';
+import {
+  API_ROUTES,
+  useFetch,
+  ArtifactResponse,
+  Template,
+  mockedModelsArtifacts,
+} from '@shared/api';
 
 import { ModelForm } from './ModelForm';
 import { HistoryChanges } from './HistoryChanges';

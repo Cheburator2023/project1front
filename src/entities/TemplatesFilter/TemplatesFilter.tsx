@@ -4,6 +4,7 @@ import { Button } from '@admiral-ds/react-ui';
 import { Template, FiltersContext } from '@shared/api';
 import { SELECT_TYPE, CustomSearchSelect } from '@shared/ui/organisms';
 import { initialColumnsFilters, initialTopFilters, RIGHT_PANEL_TYPE } from '@shared/constants';
+import { useFilters } from '@src/shared/hooks';
 
 import { getGroupsOptions } from './helpers';
 
@@ -22,8 +23,10 @@ export const TemplatesFilter = ({
   error = '',
   updateRightPanelType,
 }: TemplatesFilterProps) => {
-  const { topFilters, columnsFilters, onChangeTopFilters, onChangeColumnsFilters } =
+  const { topFilters, onChangeTopFilters, onChangeColumnsFilters, columnsFilters } =
     useContext(FiltersContext);
+
+  const { isModifiedFilter } = useFilters(columnsFilters, templates, topFilters.templates);
 
   const groupedOptions = useMemo(() => {
     if (templates) {
@@ -72,6 +75,7 @@ export const TemplatesFilter = ({
         groups: groupedOptions,
       }}
       onChange={handleChange}
+      modified={isModifiedFilter}
       renderDropDownBottomPanel={() =>
         !!topFilters.templates.length ? (
           <Button onClick={handleResetFilters} dimension="s" appearance="secondary">
@@ -86,3 +90,4 @@ export const TemplatesFilter = ({
     />
   );
 };
+

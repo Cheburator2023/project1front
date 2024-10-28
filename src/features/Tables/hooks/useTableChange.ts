@@ -84,7 +84,7 @@ export const useTableChange = ({
         };
 
         onChangeColumnsFilters(newColumnsFilters);
-        onChangeTopFilters({ ...topFilters, templates: [] });
+        onChangeTopFilters({ ...topFilters, templates: topFilters.templates || [] });
       }
     },
     [columnsFilters, topFilters, onChangeColumnsFilters, onChangeTopFilters],
