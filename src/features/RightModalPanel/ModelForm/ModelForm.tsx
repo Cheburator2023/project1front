@@ -13,11 +13,13 @@ import {
   getArtifactApiItems,
   getInvalidFields,
   getInputValuesFromRow,
+  getProperFormatValueForSubmit,
 } from './helpers';
 import { ButtonContainer, FormContainer } from './styles';
 import { ParentModelSelect } from './ParentModelSelect';
 import { useFormSchema } from './useActiveFormSchema';
 import { useFormFields } from './useFormFields';
+import { ALLOCATION_FIELDS_NAMES } from './constants';
 
 export interface ModelFormProps {
   mode: RIGHT_PANEL_TYPE.ADD_MODEL | RIGHT_PANEL_TYPE.EDIT_MODEL;
@@ -95,12 +97,28 @@ export const ModelForm = ({
     setValues((prevValues) => ({ ...prevValues, ...newValues }));
   }, []);
 
+  // TODO: Temporary solution to solve the problem of editing allocations in models that do not have all required fields. This is a technical debt that needs to be fixed.
+  const checkForAllocationFieldsChanged = () =>
+    ALLOCATION_FIELDS_NAMES.some((allocationFieldName) => {
+      const initialValue = initialRow?.[allocationFieldName] || '';
+      const newValue = values?.[allocationFieldName];
+
+      if (newValue) {
+        const formattedValue = getProperFormatValueForSubmit(newValue);
+
+        if (!Array.isArray(formattedValue)) {
+          return initialValue !== formattedValue.artefact_string_value;
+        }
+      }
+    });
+
   const handleSubmit = useCallback(async () => {
     const newInvalidFields = getInvalidFields(formSchema, values);
+    const isAllocationFieldsChanged = checkForAllocationFieldsChanged();
 
-    setInvalidFields(newInvalidFields);
+    setInvalidFields(isAllocationFieldsChanged ? [] : newInvalidFields);
 
-    if (newInvalidFields.length) {
+    if (newInvalidFields.length && !isAllocationFieldsChanged) {
       return;
     }
 

@@ -1,16 +1,15 @@
 import React, { useContext } from 'react';
-import { Checkbox, T, Toggle } from '@admiral-ds/react-ui';
-import { ReactComponent as FilterOutline } from '@admiral-ds/icons/build/system/FilterOutline.svg';
-
+import { Button, Checkbox, T, Toggle } from '@admiral-ds/react-ui';
 import { Template, FiltersContext } from '@shared/api';
 import { CustomSearchSelect } from '@shared/ui/organisms';
 import {
   ACTIVE_SCREEN,
   RIGHT_PANEL_TYPE,
   exploitationSelectOptions,
+  initialColumnsFilters,
   modelsSelectOptions,
 } from '@shared/constants';
-import { TemplatesFilter } from '@entities';
+import { TemplatesFilter, FilterButtonCount } from '@entities';
 
 import { Container, CustomDateField, FiltersDivider, FilterButton, FiltersBox } from './styles';
 
@@ -41,24 +40,35 @@ export const FiltersPanel = ({
     topFilters,
     modelsDownloadingDate,
     onChangeModelDownloadingDate,
+    onChangeColumnsFilters,
     onChangeTopFilters,
     onChangeFirstDate,
     onChangeSecondDate,
+    columnsFilters,
   } = useContext(FiltersContext);
 
-  const handleChange = (name: string, value: string[]) =>
+  const handleChange = (name: string, value: string[]) => {
     onChangeTopFilters({ ...topFilters, templates: [], [name]: value });
+  };
+
+  const handleResetFilters = () => {
+    onChangeColumnsFilters(initialColumnsFilters);
+    onChangeTopFilters({ ...topFilters, templates: [] });
+  };
 
   return (
     <Container style={{ justifyContent: 'space-between' }}>
       <FiltersBox>
-        <FilterButton
-          dimension="s"
-          icon={<FilterOutline />}
-          onClick={() => updateActiveScreen(ACTIVE_SCREEN.TEMPLATE_FILTERS)}
-          appearance={topFilters.templates.length ? 'success' : 'primary'}
-          displayAsSquare
-        />
+        <div style={{ marginTop: '24px', marginRight: '20px' }}>
+          <FilterButtonCount
+            topFilters={topFilters}
+            updateActiveScreen={updateActiveScreen}
+            columnsFilters={columnsFilters}
+            activeScreen={ACTIVE_SCREEN.TEMPLATE_FILTERS}
+            templates={templates}
+          />
+        </div>
+
         <CustomSearchSelect
           id="objectTypeRegistry"
           maxRowCount={1}
@@ -140,6 +150,16 @@ export const FiltersPanel = ({
             onChange={(event) => handleCompareOnlyChanged(event.target.checked)}
           />
           <T font="Body/Body 2 Short">Только измененные</T>
+          <Button
+            dimension="s"
+            appearance="primary"
+            onClick={handleResetFilters}
+            style={{ padding: '0 7px' }}
+          >
+            <T font="Button/Button 2" color="Special/Static White" as="div">
+              Очистить фильтры
+            </T>
+          </Button>
         </FiltersBox>
       </FiltersBox>
     </Container>

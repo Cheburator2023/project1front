@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from "react";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
-import { Button, Spinner } from "@admiral-ds/react-ui";
-import { ReactComponent as DownloadOutline } from "@admiral-ds/icons/build/system/DownloadOutline.svg";
+import React, { useEffect, useState } from 'react';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+import { Button, Spinner } from '@admiral-ds/react-ui';
+import { ReactComponent as DownloadOutline } from '@admiral-ds/icons/build/system/DownloadOutline.svg';
 
-import { ErrorStatus, Loading } from "@src/shared/ui/atoms";
-import { API_ROUTES, mockedMetricsResponse, useFetch } from "@src/shared/api";
-import { MetricsResponseType } from "@src/shared/api/types";
+import { ErrorStatus, Loading } from '@src/shared/ui/atoms';
+import { API_ROUTES, mockedMetricsResponse, useFetch } from '@src/shared/api';
+import { MetricsResponseType } from '@src/shared/api/types';
 
-import { switchDateFormat, validateDateRange } from "./helpers";
+import { switchDateFormat, validateDateRange } from './helpers';
 import {
   initialChartModelDynamicsByStreams,
   initialChartFinalStatusByMonthModels,
@@ -26,9 +26,9 @@ import {
   initialOnMonitoringModels,
   initialTakenOutOfOperationModels,
   dsStreamArtifactOptions,
-} from "./constants";
-import MetricDisplay from "./MetricDisplay";
-import "./styles.css";
+} from './constants';
+import MetricDisplay from './MetricDisplay';
+import './styles.css';
 import {
   Column,
   WrapperFilter,
@@ -45,9 +45,9 @@ import {
   GridRow,
   CustomDateField,
   CustomSearchSelect,
-} from "./style";
-import { MenuIconSelect } from "./MenuIconSelect";
-import { MetricsCaption } from "./types";
+} from './style';
+import { MenuIconSelect } from './MenuIconSelect';
+import { MetricsCaption } from './types';
 
 const getQueryParams = (filters: {
   startDate?: string;
@@ -64,8 +64,7 @@ const getQueryParams = (filters: {
     params.endDate = filters.endDate;
   }
 
-  const hasStreamsSelected =
-    filters.selectedStreams && filters.selectedStreams.length > 0;
+  const hasStreamsSelected = filters.selectedStreams && filters.selectedStreams.length > 0;
   const allStreamsSelected =
     filters.selectedStreams?.length === dsStreamArtifactOptions.options.length;
 
@@ -92,9 +91,7 @@ const ChartsDashboard = () => {
   const [tempFilters, setTempFilters] = useState({
     tempStartDate: undefined as string | undefined,
     tempEndDate: undefined as string | undefined,
-    tempSelectedStreams: dsStreamArtifactOptions.options.map(
-      (option) => option.value
-    ),
+    tempSelectedStreams: dsStreamArtifactOptions.options.map((option) => option.value),
   });
 
   const {
@@ -110,51 +107,43 @@ const ChartsDashboard = () => {
 
   // const [kpiSum, setKpiSum] = useState(initialKPI_SUM);
   const [totalModels, setTotalModels] = useState(initialTotalModels);
-  const [implementedModels, setImplementedModels] = useState(
-    initialImplementedModels
-  );
-  const [developedModels, setDevelopedModels] = useState(
-    initialDevelopedModels
-  );
+  const [implementedModels, setImplementedModels] = useState(initialImplementedModels);
+  const [developedModels, setDevelopedModels] = useState(initialDevelopedModels);
   const [sumRmModels, setSumRmModels] = useState(initialSumRmModels);
-  const [finalStatusModels, setFinalStatusModels] = useState(
-    initialFinalStatusModels
-  );
+  const [finalStatusModels, setFinalStatusModels] = useState(initialFinalStatusModels);
   const [registryCoverageModels, setRegistryCoverageModels] = useState(
-    initialRegistryCoverageModels
+    initialRegistryCoverageModels,
   );
-  const [riskCoverageFinalStatusModels, setRiskCoverageFinalStatusModels] =
-    useState(initialRiskCoverageFinalStatusModels);
+  const [riskCoverageFinalStatusModels, setRiskCoverageFinalStatusModels] = useState(
+    initialRiskCoverageFinalStatusModels,
+  );
 
-  const [onMonitoringModels, setOnMonitoringModels] = useState(
-    initialOnMonitoringModels
-  );
+  const [onMonitoringModels, setOnMonitoringModels] = useState(initialOnMonitoringModels);
   const [takenOutOfOperationModels, setTakenOutOfOperationModels] = useState(
-    initialTakenOutOfOperationModels
+    initialTakenOutOfOperationModels,
   );
 
   const [modelDynamicsByStreams, setModelDynamicsByStreams] = useState(
-    initialChartModelDynamicsByStreams()
+    initialChartModelDynamicsByStreams(),
   );
   const [finalStatusByMonthModels, setFinalStatusByMonthModels] = useState(
-    initialChartFinalStatusByMonthModels()
+    initialChartFinalStatusByMonthModels(),
   );
   const [stalledModelsByMonth, setStalledModelsByMonth] = useState(
-    initialChartStalledModelsByMonth()
+    initialChartStalledModelsByMonth(),
   );
   const [pilots, setPilots] = useState(initialChartPilots());
-  const [
-    distributionByLifecycleStageModels,
-    setDistributionByLifecycleStageModels,
-  ] = useState(initialChartDistributionByLifecycleStageModels());
+  const [distributionByLifecycleStageModels, setDistributionByLifecycleStageModels] = useState(
+    initialChartDistributionByLifecycleStageModels(),
+  );
 
   const [isExporting, setIsExporting] = useState(false);
 
   const [dateError, setDateError] = useState<boolean>(false);
 
   const itemsExport = [
-    { id: "pdf", label: "Экспортировать в PDF", value: "PDF" },
-    { id: "png", label: "Экспортировать в PNG", value: "PNG" },
+    { id: 'pdf', label: 'Экспортировать в PDF', value: 'PDF' },
+    { id: 'png', label: 'Экспортировать в PNG', value: 'PNG' },
   ];
 
   useEffect(() => {
@@ -269,7 +258,7 @@ const ChartsDashboard = () => {
 
   const handleDateChange = (newDateRange: string | undefined) => {
     if (newDateRange) {
-      const [startDate, endDate] = newDateRange.split(" - ");
+      const [startDate, endDate] = newDateRange.split(' - ');
       setTempFilters((prev) => ({
         ...prev,
         tempStartDate: startDate,
@@ -302,12 +291,8 @@ const ChartsDashboard = () => {
     const { tempStartDate, tempEndDate, tempSelectedStreams } = tempFilters;
 
     if (!dateError) {
-      const formattedStartDate = tempStartDate
-        ? switchDateFormat(tempStartDate)
-        : undefined;
-      const formattedEndDate = tempEndDate
-        ? switchDateFormat(tempEndDate)
-        : undefined;
+      const formattedStartDate = tempStartDate ? switchDateFormat(tempStartDate) : undefined;
+      const formattedEndDate = tempEndDate ? switchDateFormat(tempEndDate) : undefined;
 
       setFilters({
         startDate: formattedStartDate,
@@ -329,9 +314,7 @@ const ChartsDashboard = () => {
     setTempFilters({
       tempStartDate: undefined,
       tempEndDate: undefined,
-      tempSelectedStreams: dsStreamArtifactOptions.options.map(
-        (option) => option.value
-      ),
+      tempSelectedStreams: dsStreamArtifactOptions.options.map((option) => option.value),
     });
 
     setDateError(false);
@@ -340,33 +323,33 @@ const ChartsDashboard = () => {
 
   const exportToPDF = () => {
     setIsExporting(true);
-    const pdf = new jsPDF("l", "mm", "a4");
-    const dashboardElement = document.getElementById("dashboard-container");
-    const dashboardName = "Dashboard";
+    const pdf = new jsPDF('l', 'mm', 'a4');
+    const dashboardElement = document.getElementById('dashboard-container');
+    const dashboardName = 'Dashboard';
     const today = new Date();
-    const dateStr = `${String(today.getDate()).padStart(2, "0")}.${String(
-      today.getMonth() + 1
-    ).padStart(2, "0")}.${today.getFullYear()}`;
+    const dateStr = `${String(today.getDate()).padStart(2, '0')}.${String(
+      today.getMonth() + 1,
+    ).padStart(2, '0')}.${today.getFullYear()}`;
 
     if (!dashboardElement) {
       return;
     }
 
     html2canvas(dashboardElement, { scale: 1 }).then((canvas) => {
-      const imgData = canvas.toDataURL("image/png");
+      const imgData = canvas.toDataURL('image/png');
       const imgWidth = 297;
       const pageHeight = 210;
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
       let heightLeft = imgHeight;
       let position = 0;
 
-      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
       heightLeft -= pageHeight;
 
       while (heightLeft > 0) {
         position = heightLeft - imgHeight;
         pdf.addPage();
-        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
         heightLeft -= pageHeight;
       }
 
@@ -378,12 +361,12 @@ const ChartsDashboard = () => {
 
   const exportToPNG = () => {
     setIsExporting(true);
-    const dashboardElement = document.getElementById("dashboard-container");
-    const dashboardName = "Dashboard";
+    const dashboardElement = document.getElementById('dashboard-container');
+    const dashboardName = 'Dashboard';
     const today = new Date();
-    const dateStr = `${String(today.getDate()).padStart(2, "0")}.${String(
-      today.getMonth() + 1
-    ).padStart(2, "0")}.${today.getFullYear()}`;
+    const dateStr = `${String(today.getDate()).padStart(2, '0')}.${String(
+      today.getMonth() + 1,
+    ).padStart(2, '0')}.${today.getFullYear()}`;
 
     if (!dashboardElement) {
       return;
@@ -398,8 +381,8 @@ const ChartsDashboard = () => {
       let pageNumber = 1;
 
       while (heightLeft > 0) {
-        const canvasPage = document.createElement("canvas");
-        const ctx = canvasPage.getContext("2d");
+        const canvasPage = document.createElement('canvas');
+        const ctx = canvasPage.getContext('2d');
         const actualHeight = Math.min(canvas.height - position, canvas.height);
 
         canvasPage.width = canvas.width;
@@ -415,14 +398,14 @@ const ChartsDashboard = () => {
             0,
             0,
             canvas.width,
-            actualHeight
+            actualHeight,
           );
         }
 
-        const pageImageData = canvasPage.toDataURL("image/png");
+        const pageImageData = canvasPage.toDataURL('image/png');
         const fileName = `${dashboardName} ${pageNumber} ${dateStr}.png`;
 
-        const link = document.createElement("a");
+        const link = document.createElement('a');
         link.href = pageImageData;
         link.download = fileName;
         link.click();
@@ -437,9 +420,9 @@ const ChartsDashboard = () => {
   };
 
   const handleExport = (format: string) => {
-    if (format === "PDF") {
+    if (format === 'PDF') {
       exportToPDF();
-    } else if (format === "PNG") {
+    } else if (format === 'PNG') {
       exportToPNG();
     }
   };
@@ -471,10 +454,10 @@ const ChartsDashboard = () => {
               value={
                 tempFilters?.tempStartDate && tempFilters.tempEndDate
                   ? `${tempFilters.tempStartDate} - ${tempFilters.tempEndDate}`
-                  : ""
+                  : ''
               }
               onChange={(e) => handleDateChange(e.currentTarget.value)}
-              status={dateError ? "error" : undefined}
+              status={dateError ? 'error' : undefined}
             />
 
             <CustomSearchSelect
@@ -487,12 +470,7 @@ const ChartsDashboard = () => {
             />
 
             <ButtonContainer>
-              <Button
-                dimension="s"
-                onClick={handleApplyFilters}
-                value="Submit"
-                type="submit"
-              >
+              <Button dimension="s" onClick={handleApplyFilters} value="Submit" type="submit">
                 Применить
               </Button>
               <Button
@@ -515,7 +493,7 @@ const ChartsDashboard = () => {
               Графики и диаграмы
             </Title>
 
-            <div style={{ position: "relative", right: "60px" }}>
+            <div style={{ position: 'relative', right: '60px' }}>
               {isExporting ? (
                 <Spinner dimension="ms" />
               ) : (
@@ -555,7 +533,7 @@ const ChartsDashboard = () => {
                       relative={totalModels.relative}
                       size="stat-sm"
                       styles={{
-                        width: "100%",
+                        width: '100%',
                       }}
                     />
                     <MetricDisplay
@@ -565,7 +543,7 @@ const ChartsDashboard = () => {
                       relative={implementedModels.relative}
                       size="stat-sm"
                       styles={{
-                        width: "100%",
+                        width: '100%',
                       }}
                     />
                     <MetricDisplay
@@ -575,7 +553,7 @@ const ChartsDashboard = () => {
                       relative={developedModels.relative}
                       size="stat-sm"
                       styles={{
-                        width: "100%",
+                        width: '100%',
                       }}
                     />
                     <MetricDisplay
@@ -585,7 +563,7 @@ const ChartsDashboard = () => {
                       relative={sumRmModels.relative}
                       size="stat-sm"
                       styles={{
-                        width: "100%",
+                        width: '100%',
                       }}
                     />
                     <MetricDisplay
@@ -595,7 +573,7 @@ const ChartsDashboard = () => {
                       relative={finalStatusModels.relative}
                       size="stat-sm"
                       styles={{
-                        width: "100%",
+                        width: '100%',
                       }}
                     />
                   </GridRow>
@@ -608,8 +586,8 @@ const ChartsDashboard = () => {
                       styles={{
                         frame: { withBorder: true },
                         title: {
-                          font: "Additional/M",
-                          color: "Neutral/Neutral 90",
+                          font: 'Additional/M',
+                          color: 'Neutral/Neutral 90',
                         },
                       }}
                     />
@@ -621,30 +599,28 @@ const ChartsDashboard = () => {
                       styles={{
                         frame: { withBorder: true },
                         title: {
-                          font: "Additional/M",
-                          color: "Neutral/Neutral 90",
+                          font: 'Additional/M',
+                          color: 'Neutral/Neutral 90',
                         },
                       }}
                     />
                   </Row>
                   <div
                     style={{
-                      display: "grid",
-                      gridTemplateColumns: "1fr 1fr 1fr",
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 1fr 1fr',
                     }}
                   >
                     <MetricDisplay
-                      caption={
-                        MetricsCaption.DISTRIBUTION_BY_LIFECYCLE_STAGE_MODELS
-                      }
+                      caption={MetricsCaption.DISTRIBUTION_BY_LIFECYCLE_STAGE_MODELS}
                       showMetrics={false}
                       size="chart-md"
                       chartOptions={distributionByLifecycleStageModels}
                       styles={{
                         frame: { withBorder: true },
                         title: {
-                          font: "Additional/M",
-                          color: "Neutral/Neutral 90",
+                          font: 'Additional/M',
+                          color: 'Neutral/Neutral 90',
                         },
                       }}
                     />
@@ -657,12 +633,12 @@ const ChartsDashboard = () => {
                       styles={{
                         frame: { withBorder: true },
                         title: {
-                          font: "Additional/M",
-                          color: "Neutral/Neutral 90",
+                          font: 'Additional/M',
+                          color: 'Neutral/Neutral 90',
                         },
                       }}
                     />
-                    <div style={{ display: "grid" }}>
+                    <div style={{ display: 'grid' }}>
                       <MetricDisplay
                         caption={onMonitoringModels.caption}
                         value={onMonitoringModels.value}
@@ -673,11 +649,11 @@ const ChartsDashboard = () => {
                         styles={{
                           frame: { withBorder: true },
                           title: {
-                            color: "Neutral/Neutral 90",
-                            css: { marginBottom: "17px" },
+                            color: 'Neutral/Neutral 90',
+                            css: { marginBottom: '17px' },
                           },
-                          width: "100%",
-                          height: "auto",
+                          width: '100%',
+                          height: 'auto',
                         }}
                       />
 
@@ -691,11 +667,11 @@ const ChartsDashboard = () => {
                         styles={{
                           frame: { withBorder: true },
                           title: {
-                            color: "Neutral/Neutral 90",
-                            css: { marginBottom: "17px" },
+                            color: 'Neutral/Neutral 90',
+                            css: { marginBottom: '17px' },
                           },
-                          width: "100%",
-                          height: "auto",
+                          width: '100%',
+                          height: 'auto',
                         }}
                       />
                     </div>
@@ -710,8 +686,8 @@ const ChartsDashboard = () => {
                     styles={{
                       frame: { withBorder: true },
                       title: {
-                        font: "Additional/M",
-                        color: "Neutral/Neutral 90",
+                        font: 'Additional/M',
+                        color: 'Neutral/Neutral 90',
                       },
                     }}
                   />
@@ -725,7 +701,7 @@ const ChartsDashboard = () => {
                     size="stat-lg"
                     styles={{
                       frame: { withBorder: true },
-                      title: { font: "Additional/S" },
+                      title: { font: 'Additional/S' },
                     }}
                   />
 
@@ -738,7 +714,7 @@ const ChartsDashboard = () => {
                     size="stat-lg"
                     styles={{
                       frame: { withBorder: true },
-                      title: { font: "Additional/S" },
+                      title: { font: 'Additional/S' },
                     }}
                   />
                 </Column>
@@ -752,3 +728,4 @@ const ChartsDashboard = () => {
 };
 
 export { ChartsDashboard };
+

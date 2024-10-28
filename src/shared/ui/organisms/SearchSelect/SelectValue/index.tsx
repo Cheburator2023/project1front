@@ -18,10 +18,11 @@ interface SelectValueProps {
   selectedAllValues: boolean;
   active?: boolean;
   value?: string | string[];
+  modified?: boolean;
 }
 
 export const SelectValue = React.memo(
-  ({ value, selectedAllValues, active, options }: SelectValueProps) => {
+  ({ value, selectedAllValues, active, options, modified }: SelectValueProps) => {
     const isValueArray = Array.isArray(value);
 
     if (!isValueArray) {
@@ -47,8 +48,14 @@ export const SelectValue = React.memo(
             >
               {active ? selectedValueText : 'Не активен'}
             </div>
-            {active ? (
-              <IconButton tooltip="Шаблон активен" color="#1BA049" icon={<CheckSolid />} />
+            {active && modified ? (
+              <IconButton
+                tooltip="Фильтры шаблона были изменены"
+                color="#0062FF"
+                icon={<InfoSolid />}
+              />
+            ) : active ? (
+              <IconButton tooltip="Шаблон активен" color="#0062FF" icon={<CheckSolid />} />
             ) : (
               <IconButton tooltip="Шаблон не активен" color="#0062FF" icon={<InfoSolid />} />
             )}
@@ -88,3 +95,4 @@ export const SelectValue = React.memo(
 );
 
 SelectValue.displayName = 'SelectValue';
+
