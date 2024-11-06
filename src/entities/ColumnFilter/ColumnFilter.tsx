@@ -53,11 +53,14 @@ export const ColumnFilter = React.memo(
         const arrayValue = Array.isArray(value) ? value : [value];
         onChangeColumnsFilter(column.name, arrayValue);
 
-        if (shouldResetTemplateOnInitialValueChange(value, initialTemplateValue)) {
+        if (
+          shouldResetTemplateOnInitialValueChange(arrayValue, initialTemplateValue, column.name)
+        ) {
           onChangeTopFilters({ ...topFilters, templates: [] });
         }
       }
     };
+
     switch (column.type) {
       case COLUMN_TYPE.QUARTERLY_DATE:
       case COLUMN_TYPE.DATE: {
