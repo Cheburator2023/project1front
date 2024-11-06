@@ -1,5 +1,14 @@
 # Semantic Versioning Changelog
 
+# [1.24.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.23.0...v1.24.0) (2024-11-06)
+
+
+### Features
+
+* upd templates filters ([f5ff601](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/f5ff6019b4a7713b325e4d247ae175ec5e839d8a))
+* upd templates filters ([89c1814](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/89c1814b76cb7e67340e5a8f943e72988ed90602))
+* upd templates filters ([b4d9a41](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/b4d9a41f3033d6ab6d876b6b37ca1f1ab021ca3a))
+
 # [1.23.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.22.2...v1.23.0) (2024-10-28)
 
 
