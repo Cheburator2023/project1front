@@ -20,7 +20,7 @@ export const useHomePage = () => {
 
   const { responseData: templateData } = useFetch<Template[]>({
     apiRoute: API_ROUTES.TEMPLATES,
-    mockedResponse: mockedTemplatesResponse,
+    // mockedResponse: mockedTemplatesResponse,
   });
 
   const [activeScreen, setActiveScreen] = useState(ACTIVE_SCREEN.TABLE);

@@ -38,7 +38,7 @@ export const useModelsListWidget = (
     error,
   } = useFetch<ModelsResponseType>({
     apiRoute: API_ROUTES.MODELS,
-    mockedResponse: mockedModelsResponse,
+    // mockedResponse: mockedModelsResponse,
   });
 
   useEffect(() => {

@@ -60,7 +60,7 @@ export const useTableModels = () => {
 
   const { responseData: templateData, mutationProtectedFetch } = useFetch<Template[]>({
     apiRoute: API_ROUTES.TEMPLATES,
-    mockedResponse: mockedTemplatesResponse,
+    // mockedResponse: mockedTemplatesResponse,
   });
 
   const fetchModels = useCallback(async (date?: string) => {
@@ -70,7 +70,7 @@ export const useTableModels = () => {
       const res = await mutationProtectedFetch<ModelsResponseType, ModelsResponseType>({
         fetchApiRoute: API_ROUTES.MODELS,
         fetchMethod: 'GET',
-        mockedResponse: mockedModelsResponse,
+        // mockedResponse: mockedModelsResponse,
         newParams: date ? { date: getISODateFormat(date) } : {},
       });
 
