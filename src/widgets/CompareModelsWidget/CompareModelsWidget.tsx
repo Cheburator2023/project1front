@@ -5,7 +5,7 @@ import { ColumnsFilter } from '@src/shared/types';
 import { FiltersPanel, TableCompareModels } from '@features';
 
 import { useCompareModels } from './hooks';
-import { Template } from 'shared/api';
+import { Template } from '../../shared/api';
 
 interface CompareModelsWidgetProps {
   columnsFilters: Partial<ColumnsFilter>;
@@ -45,12 +45,13 @@ const CompareModelsWidget = React.memo(
           updateRightPanelType={setRightPanelType}
           disabledCompare={disabledCompare}
           handleUpdateCompareList={() => {
-            !disabledCompare &&
+            if (!disabledCompare) {
               compareModelsTable.handleSubmit(
                 firstDate,
                 secondDate,
                 compareModelsTable.compareOnlyChanged,
               );
+            }
           }}
         />
         <TableCompareModels

@@ -30,3 +30,4 @@ export enum MetricsCaption {
   PILOTS = 'Пилоты',
   DYNAMIC_BY_STREAMS_MODELS = 'Динамика моделей по стримам',
 }
+

@@ -2,7 +2,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import { throttle } from './helpers';
-import type { TableProps } from './';
+import type { TableProps } from '.';
 
 const RESIZER_WIDTH = '17px';
 
@@ -118,3 +118,4 @@ export function RowWidthResizer({
     </ResizerWrapper>
   );
 }
+

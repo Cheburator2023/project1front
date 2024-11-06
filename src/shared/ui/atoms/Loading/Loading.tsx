@@ -22,3 +22,4 @@ export const Loading = ({ text, spinnerSize = 'm' }: LoadingProps) => (
     <Spinner dimension={spinnerSize} />
   </Wrapper>
 );
+

@@ -9,8 +9,8 @@ import {
   TYPOGRAPHY,
   typography,
 } from '@admiral-ds/react-ui';
-import { type FrameSizeType } from './types';
 import { SearchSelect } from '@src/shared/ui/organisms';
+import { type FrameSizeType } from './types';
 
 const TextProps = css<TProps>`
   font-variant-numeric: lining-nums tabular-nums;

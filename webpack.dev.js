@@ -1,7 +1,11 @@
-const { merge } = require('webpack-merge')
-const path = require('path')
+const { merge } = require('webpack-merge');
+const path = require('path');
+const webpack = require('webpack');
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
-const common = require('./webpack.common.js')
+const { DefinePlugin } = webpack;
+
+const common = require('./webpack.common.js');
 
 module.exports = merge(common, {
   mode: 'development',
@@ -10,11 +14,18 @@ module.exports = merge(common, {
   optimization: {
     minimize: false,
   },
+  plugins: [
+    new ReactRefreshWebpackPlugin({ overlay: false }),
+    new DefinePlugin({
+      'process.env.MOCKED_REQUESTS': JSON.stringify(process.env.MOCKED_REQUESTS),
+    }),
+  ],
   devServer: {
-    static: {
-      directory: path.join(__dirname, 'dist'),
-    },
+    static: './',
     port: 8001,
-    historyApiFallback: true,
+    historyApiFallback: { disableDotRule: true },
+    hot: true,
+    allowedHosts: ['all'],
   },
-})
+});
+

@@ -13,9 +13,8 @@ const generateChartData = (delta: number): number[] => {
 
   if (delta > 0) {
     return [firstValue, secondValue, thirdValue, metricValue];
-  } else {
-    return [metricValue, thirdValue, secondValue, firstValue];
   }
+  return [metricValue, thirdValue, secondValue, firstValue];
 };
 
 const switchDateFormat = (dateString: string) => {

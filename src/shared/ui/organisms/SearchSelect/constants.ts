@@ -9,3 +9,4 @@ const EMPTY_OPTION = {
 };
 
 export { NOT_NULL_OPTION, EMPTY_OPTION };
+

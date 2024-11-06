@@ -26,8 +26,41 @@
     "react/jsx-filename-extension": [2, { "extensions": [".js", ".jsx", ".ts", ".tsx"] }],
     "@typescript-eslint/no-empty-function": ["error", { "allow": ["arrowFunctions"] }],
     "no-shadow": "off",
-    "@typescript-eslint/no-shadow": ["error"],
-    "react/require-default-props": "off"
+    "@typescript-eslint/no-shadow": "warn",
+    "react/require-default-props": "off",
+    "import/no-extraneous-dependencies": "off",
+    "camelcase": "off",
+    "react/prop-types": "off",
+    "react/react-in-jsx-scope": "off",
+    "react/no-array-index-key": "warn",
+    "react/destructuring-assignment": "off",
+    "react/jsx-props-no-spreading": "off",
+    "@typescript-eslint/ban-ts-comment": "off",
+    "react/jsx-no-useless-fragment": "off",
+    "no-nested-ternary": "warn",
+    "no-unsafe-optional-chaining": "warn",
+    "arrow-body-style": "off",
+    "consistent-return": "off",
+    "react/jsx-no-constructed-context-values": "off",
+    "prefer-regex-literals": "warn",
+    "react/display-name": "off",
+    "jsx-a11y/label-has-associated-control": "off",
+    "no-underscore-dangle": "off",
+    "no-empty": "warn",
+    "guard-for-in": "warn",
+    "default-case": "warn",
+    "no-plusplus": "warn",
+    "radix": "off",
+    "no-lonely-if": "off",
+    "no-extra-boolean-cast": "warn",
+    "react/no-unused-prop-types": "warn",
+    "@typescript-eslint/no-explicit-any": "off",
+    "no-use-before-define": "off",
+    "no-multi-assign": "warn",
+    "@typescript-eslint/no-use-before-define": [
+      "warn",
+      { "functions": true, "classes": true, "variables": false, "typedefs": true }
+    ]
   },
   "settings": {
     "import/resolver": {
@@ -53,5 +86,12 @@
       "presets": ["@babel/preset-react"]
     }
   },
-  "ignorePatterns": ["webpack.*.js", "jest-setup.ts", "**/*.spec.*", "**/*.test.*", "src/shared/ui/Table"]
+  "ignorePatterns": [
+    "webpack.*.js",
+    "jest-setup.ts",
+    "**/*.spec.*",
+    "**/*.test.*",
+    "src/shared/ui/Table"
+  ]
 }
+

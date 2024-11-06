@@ -106,3 +106,4 @@ export const VirtualBody = React.forwardRef<HTMLDivElement, VirtualBodyProps>(
     );
   },
 );
+

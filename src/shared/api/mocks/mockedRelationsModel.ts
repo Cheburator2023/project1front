@@ -1,4 +1,4 @@
-import { RelationsModelResponseType } from 'shared/api/types';
+import { RelationsModelResponseType } from '../types';
 
 export const mockedRelationsResponse: RelationsModelResponseType = {
   data: {

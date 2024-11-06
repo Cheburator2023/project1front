@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Checkbox } from '@admiral-ds/react-ui';
 
-import type { TableRow } from '../';
+import type { TableRow } from '..';
 import type { RegularRowProps } from './RegularRow';
 import {
   ExpandCell,
@@ -105,3 +105,4 @@ export const GroupRow = ({
     </>
   );
 };
+

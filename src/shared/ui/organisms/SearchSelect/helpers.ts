@@ -1,5 +1,24 @@
 import { EMPTY_OPTION, NOT_NULL_OPTION } from './constants';
-import { OptionsFactoryProps, SELECT_TYPE, SelectTemplatesOptions } from './types';
+import { OptionsFactoryProps, SELECT_TYPE, SelectOption, SelectTemplatesOptions } from './types';
+
+export function findAllNestedOptionsRecursively(__options: SelectOption[], __id: string): string[] {
+  const nestedIds: string[] = [];
+
+  function recursiveSearch(_id: string) {
+    __options.forEach((option) => {
+      if (option.value === _id) {
+        if (option.nestedValueIds) {
+          nestedIds.push(...option.nestedValueIds.map(String));
+          option.nestedValueIds.forEach((nestedId) => recursiveSearch(String(nestedId)));
+        }
+      }
+    });
+  }
+
+  recursiveSearch(__id);
+
+  return nestedIds;
+}
 
 export const byMainOptions = (value: string) =>
   value !== NOT_NULL_OPTION.value && value !== EMPTY_OPTION.value;
@@ -84,3 +103,4 @@ export const getPlaceholder = (loading?: boolean, error?: boolean) => {
 
   return 'Не выбрано';
 };
+

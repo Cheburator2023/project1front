@@ -59,3 +59,4 @@ export const ActionsPanel = ({ updateRightPanelType, handleSearch }: ActionsPane
     </Container>
   );
 };
+
