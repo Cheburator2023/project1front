@@ -1,5 +1,5 @@
 import * as React from 'react';
-import type { TableProps } from '../Table';
+import type { TableProps } from '.';
 
 import { OverflowMenuWrapper } from './style';
 
@@ -44,3 +44,4 @@ export const OverflowMenu: React.FC<OverflowMenuProps> = ({
     </OverflowMenuWrapper>
   );
 };
+

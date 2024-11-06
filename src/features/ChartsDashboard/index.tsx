@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
+import JS_PDF from 'jspdf';
 import { Button, Spinner } from '@admiral-ds/react-ui';
 import { ReactComponent as DownloadOutline } from '@admiral-ds/icons/build/system/DownloadOutline.svg';
 
@@ -97,7 +97,7 @@ const ChartsDashboard = () => {
   } = useFetch<MetricsResponseType>({
     apiRoute: API_ROUTES.METRICS,
     params: getQueryParams(filters),
-    // mockedResponse: mockedMetricsResponse,
+    mockedResponse: mockedMetricsResponse,
   });
 
   // const [kpiSum, setKpiSum] = useState(initialKPI_SUM);
@@ -318,7 +318,7 @@ const ChartsDashboard = () => {
 
   const exportToPDF = () => {
     setIsExporting(true);
-    const pdf = new jsPDF('l', 'mm', 'a4');
+    const pdf = new JS_PDF('l', 'mm', 'a4');
     const dashboardElement = document.getElementById('dashboard-container');
     const dashboardName = 'Dashboard';
     const today = new Date();

@@ -2,8 +2,15 @@ import React, { useMemo } from 'react';
 
 import { Row } from '@shared/types';
 import { RIGHT_PANEL_TYPE, MODEL_FORM_MODE } from '@shared/constants';
-import { API_ROUTES, useFetch, ArtifactResponse, Template } from '@shared/api';
+import {
+  API_ROUTES,
+  useFetch,
+  ArtifactResponse,
+  Template,
+  mockedModelsArtifacts,
+} from '@shared/api';
 
+import { Spinner } from '@admiral-ds/react-ui';
 import { ModelForm } from './ModelForm';
 import { HistoryChanges } from './HistoryChanges';
 import { Templates } from './Templates';
@@ -30,9 +37,9 @@ export const RightModalPanel = React.memo(
     onClose,
     onSubmit,
   }: RightModalPanelProps) => {
-    const { responseData: artifactsData } = useFetch<ArtifactResponse>({
+    const { responseData: artifactsData } = useFetch<ArtifactResponse | undefined>({
       apiRoute: API_ROUTES.ARTIFACTS,
-      // mockedResponse: mockedModelsArtifacts,
+      mockedResponse: mockedModelsArtifacts,
     });
 
     const activeRow = useMemo(
@@ -63,20 +70,16 @@ export const RightModalPanel = React.memo(
       activeStatus === RIGHT_PANEL_TYPE.ADD_MODEL ||
       activeStatus === RIGHT_PANEL_TYPE.EDIT_MODEL
     ) {
-      if (!artifactsData) {
-        return null;
-      }
-
       if (activeStatus === RIGHT_PANEL_TYPE.ADD_MODEL) {
-        return (
+        return artifactsData?.data ? (
           <ModelForm
             rows={rows}
             mode={activeStatus}
-            artifactsApi={artifactsData}
+            artifacts={artifactsData.data}
             onClose={onClose}
             onSubmit={onSubmit}
           />
-        );
+        ) : null;
       }
 
       if (activeStatus === RIGHT_PANEL_TYPE.EDIT_MODEL) {
@@ -84,16 +87,18 @@ export const RightModalPanel = React.memo(
           return null;
         }
 
-        return (
+        return artifactsData?.data ? (
           <ModelForm
             rows={rows}
             mode={activeStatus}
-            artifactsApi={artifactsData}
+            artifacts={artifactsData.data}
             activeRow={activeRow}
             editCellName={activeCellName}
             onClose={onClose}
             onSubmit={onSubmit}
           />
+        ) : (
+          <Spinner />
         );
       }
     }

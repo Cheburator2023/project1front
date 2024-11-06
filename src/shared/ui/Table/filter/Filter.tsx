@@ -2,7 +2,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { StyledDropdownContainer, keyboardKey, refSetter } from '@admiral-ds/react-ui';
 
-import type { TableProps, Column } from '../';
+import type { TableProps, Column } from '..';
 
 import { Button } from './Button';
 
@@ -39,7 +39,11 @@ export const Filter = React.forwardRef<HTMLButtonElement, FilterCompProps>(
 
     const reverseMenu = () => {
       setMenuOpened((prevOpened) => {
-        prevOpened ? onFilterMenuClose?.() : onFilterMenuOpen?.();
+        if (prevOpened) {
+          onFilterMenuClose?.();
+        } else {
+          onFilterMenuOpen?.();
+        }
         return !prevOpened;
       });
     };
@@ -104,3 +108,4 @@ export const Filter = React.forwardRef<HTMLButtonElement, FilterCompProps>(
     );
   },
 );
+

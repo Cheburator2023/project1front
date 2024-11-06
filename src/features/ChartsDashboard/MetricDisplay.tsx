@@ -1,11 +1,11 @@
 import React from 'react';
 import HighchartsReact from 'highcharts-react-official';
 import * as Highcharts from 'highcharts';
-import { Frame, Row, Title, Value, Delta } from './style';
 import { TProps } from '@admiral-ds/react-ui';
 
 import { ReactComponent as ArrowUp } from '@shared/ui/icons/ArrowUpSolid.svg';
 import { ReactComponent as ArrowDown } from '@shared/ui/icons/ArrowDownSolid.svg';
+import { Frame, Row, Title, Value, Delta } from './style';
 import { FrameSizeType } from './types';
 
 interface MetricDisplayProps {

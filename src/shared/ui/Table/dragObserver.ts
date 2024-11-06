@@ -41,7 +41,7 @@ export function dragObserver(
   let _mirror: HTMLElement | null; // mirror image
   let _source: HTMLElement | null; // source container
   let _item: HTMLElement | null; // item being dragged
-  let _itemId: string = '';
+  let _itemId = '';
   let _initialSibling: HTMLElement | null; // reference sibling when grabbed
   let _currentSibling: HTMLElement | null; // reference sibling now
   let _lastDropTarget: HTMLElement | null = null; // last container item was over
@@ -121,7 +121,7 @@ export function dragObserver(
     }
 
     // if mouse does not move
-    if (e.movementX == 0 && e.movementY == 0) return;
+    if (e.movementX === 0 && e.movementY === 0) return;
 
     const grabbed = _grabbed; // call to end() unsets _grabbed
     eventualMovements(true);
@@ -168,7 +168,7 @@ export function dragObserver(
     _source = context.source;
     _item = context.item;
     _itemId =
-      o.direction == 'vertical' ? context.item?.dataset?.row : context.item?.dataset?.thColumn;
+      o.direction === 'vertical' ? context.item?.dataset?.row : context.item?.dataset?.thColumn;
     _currentTarget = context.item;
     _initialSibling = _currentSibling = context.item.nextElementSibling;
 
@@ -275,7 +275,8 @@ export function dragObserver(
 
     const clientX = getCoord('clientX', e) || 0;
     const clientY = getCoord('clientY', e) || 0;
-    let x, y;
+    let x;
+    let y;
     if (o.direction === 'vertical') {
       x = clientX - (o.dimension === 's' || o.dimension === 'm' ? 18 : 24);
       y = clientY - _mirror.getBoundingClientRect().height / 2;
@@ -284,8 +285,8 @@ export function dragObserver(
       y = clientY - _mirror.getBoundingClientRect().height / 2;
     }
 
-    _mirror.style.left = x + 'px';
-    _mirror.style.top = y + 'px';
+    _mirror.style.left = `${x}px`;
+    _mirror.style.top = `${y}px`;
 
     const elementBehindCursor = getElementBehindPoint(_mirror, clientX, clientY);
     const dropTarget = findDropTarget(elementBehindCursor, clientX, clientY);
@@ -299,7 +300,6 @@ export function dragObserver(
       _mirror.dataset.cursor = 'normal';
     }
 
-    let reference;
     const immediate = getImmediateChild(dropTarget, elementBehindCursor);
 
     // if _currentTarget has not changed, do not calculate the reference
@@ -307,10 +307,9 @@ export function dragObserver(
     if (_currentTarget?.isEqualNode(immediate) || immediate == null) {
       updateCurrentTarget(immediate);
       return;
-    } else {
-      updateCurrentTarget(immediate);
-      reference = getReference(dropTarget, immediate, clientX, clientY);
     }
+    updateCurrentTarget(immediate);
+    const reference = getReference(dropTarget, immediate, clientX, clientY);
 
     if (
       _item &&
@@ -331,7 +330,7 @@ export function dragObserver(
     if (o.direction === 'vertical') {
       delete _currentTarget?.dataset.groupover;
 
-      if (immediate?.dataset?.group == 'true') {
+      if (immediate?.dataset?.group === 'true') {
         immediate.dataset.groupover = 'true';
       }
     }
@@ -407,10 +406,10 @@ export function dragObserver(
       for (let i = 0; i < len; i++) {
         const el = dropTarget.children[i];
         const rect = el.getBoundingClientRect();
-        if (horizontal && typeof itemRight == 'number' && x >= rect.left && x < rect.right) {
+        if (horizontal && typeof itemRight === 'number' && x >= rect.left && x < rect.right) {
           return itemRight <= x ? el.nextElementSibling : el;
         }
-        if (!horizontal && typeof itemBottom == 'number' && y >= rect.top && y < rect.bottom) {
+        if (!horizontal && typeof itemBottom === 'number' && y >= rect.top && y < rect.bottom) {
           return itemBottom <= y ? el.nextElementSibling : el;
         }
       }
@@ -420,10 +419,10 @@ export function dragObserver(
     function inside() {
       // faster, but only available if dropped inside a child element
       const rect = target.getBoundingClientRect();
-      if (horizontal && typeof itemRight == 'number') {
+      if (horizontal && typeof itemRight === 'number') {
         return resolve(x >= rect.left && x < rect.right && itemRight <= x);
       }
-      if (!horizontal && typeof itemBottom == 'number') {
+      if (!horizontal && typeof itemBottom === 'number') {
         return resolve(y >= rect.top && y < rect.bottom && itemBottom <= y);
       }
       return null;
@@ -514,3 +513,4 @@ function getCoord(coord: 'pageX' | 'pageY' | 'clientX' | 'clientY', e: any) {
   const host = getEventHost(e);
   return host[coord];
 }
+

@@ -73,7 +73,7 @@ export const TemplatesFilter = ({
       }}
       onChange={handleChange}
       renderDropDownBottomPanel={() =>
-        !!topFilters.templates.length ? (
+        topFilters.templates.length ? (
           <Button onClick={handleResetFilters} dimension="s" appearance="secondary">
             Сбросить
           </Button>
@@ -86,3 +86,4 @@ export const TemplatesFilter = ({
     />
   );
 };
+

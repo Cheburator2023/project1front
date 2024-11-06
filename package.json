@@ -7,6 +7,7 @@
     "build": "webpack --config webpack.prod.js",
     "serve": "cd dist && PORT=8001 npx serve",
     "start": "webpack-dev-server --mode development --live-reload --config webpack.dev.js",
+    "dev:mocked": "cross-env MOCKED_REQUESTS=true webpack-dev-server --mode development --live-reload --config webpack.dev.js",
     "clean": "rm -rf dist",
     "test": "jest --maxWorkers 2 --no-cache --passWithNoTests",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx,.json src",
@@ -27,7 +28,8 @@
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-router-dom": "6.2.1",
-    "styled-components": "5.3.1"
+    "styled-components": "5.3.1",
+    "zustand": "4.3.8"
   },
   "devDependencies": {
     "@babel/core": "7.16.5",
@@ -70,7 +72,11 @@
     "webpack": "5.65.0",
     "webpack-cli": "4.10.0",
     "webpack-dev-server": "4.7.1",
-    "webpack-merge": "5.8.0"
+    "webpack-merge": "5.8.0",
+    "tsconfig-paths-webpack-plugin": "3.5.1",
+    "@pmmmwh/react-refresh-webpack-plugin": "0.5.0",
+    "react-refresh": "0.10.0",
+    "cross-env": "7.0.3"
   },
   "jest": {
     "testEnvironment": "jsdom",

@@ -1,6 +1,6 @@
 import { SELECT_TYPE, SelectStringProps } from '@src/shared/ui/organisms';
-import { MetricsCaption } from './types';
 import * as Highcharts from 'highcharts';
+import { MetricsCaption } from './types';
 
 const dsStreamArtifactOptions = {
   type: SELECT_TYPE.STRING,

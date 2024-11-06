@@ -11,3 +11,4 @@ export const getActiveFiltersCount = (columnsFilters: Partial<ColumnsFilter>) =>
 
     return filters;
   }).length;
+

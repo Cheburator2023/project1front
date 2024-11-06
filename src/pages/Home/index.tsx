@@ -6,7 +6,7 @@ import { FiltersContext } from '@shared/api';
 import { ActionsPanel } from '@entities';
 import { FiltersPanel, RightModalPanel, TemplateFilters, TableModels } from '@features';
 import { useTableModels } from './hooks';
-import { CompareModelsWidget } from '@src/widgets';
+import { CompareModelsWidget } from '../../widgets';
 
 // TODO: вынести в atoms/styled
 const StatusWrapper = styled.div`

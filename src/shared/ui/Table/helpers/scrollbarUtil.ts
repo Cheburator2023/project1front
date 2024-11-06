@@ -25,3 +25,4 @@ export const getScrollbarSize = () => {
   document.body.removeChild(scrollbox);
   return scrollBarWidth || 16;
 };
+

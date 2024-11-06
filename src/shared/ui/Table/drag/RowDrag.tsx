@@ -1,11 +1,10 @@
 import React, { useState, useContext, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import type { TableProps } from '../';
+import { DropdownContext } from '@admiral-ds/react-ui';
+import type { TableProps, GroupRows } from '..';
 
 import { dragObserver } from '../dragObserver';
 import { MirrorRow } from '../style';
-import type { GroupRows } from '../';
-import { DropdownContext } from '@admiral-ds/react-ui';
 import { observeRect } from '../helpers';
 
 type RowDragProps = {
@@ -93,12 +92,12 @@ export const RowDrag = ({
         const immediateFirstRowInGroup = immediate?.dataset?.firstRowInGroup;
 
         // навелись мышкой на заголовок группы
-        if (immediateRowId && immediateGroup == 'true') {
+        if (immediateRowId && immediateGroup === 'true') {
           // перетаскиваемая строка не является частью этой группы или
           // перетаскиваемая строка находится внутри этой группы, но не на первой позиции
           if (
             rowInGroup !== immediateRowId ||
-            (rowInGroup == immediateRowId && immediateFirstRowInGroup !== rowId)
+            (rowInGroup === immediateRowId && immediateFirstRowInGroup !== rowId)
           ) {
             const nextRowId = immediateFirstRowInGroup ?? beforeRowId;
             rowDragCallback.current?.(rowId, nextRowId, immediateRowId);
@@ -172,3 +171,4 @@ export const RowDrag = ({
       )
     : null;
 };
+

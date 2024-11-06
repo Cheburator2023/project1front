@@ -1,6 +1,6 @@
 import { typography } from '@admiral-ds/react-ui';
 import { css } from 'styled-components';
-import type { TableProps } from './';
+import type { TableProps } from '.';
 
 // padding-bottom меньше padding-top на 1px, т.к. 1px остается для border-bottom ячейки
 // padding-right больше padding-left на 1px, т.к. 1px остается для линии resizerа
@@ -123,3 +123,4 @@ export const overflowMenuStyle = css<{ $offset: number; dimension: TableProps['d
     }
   }}
 `;
+

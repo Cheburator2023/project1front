@@ -3,7 +3,7 @@ import type { HTMLAttributes } from 'react';
 
 import { ExpandedRow, ExpandedRowContent, Row, SimpleRow } from '../style';
 import { OverflowMenu } from '../OverflowMenu';
-import type { Dimension, RowId, TableRow } from '../';
+import type { Dimension, RowId, TableRow } from '..';
 
 export interface RowWrapperProps extends HTMLAttributes<HTMLDivElement> {
   /** Размер таблицы */
@@ -118,3 +118,4 @@ export const RowWrapper = ({
     </Row>
   );
 };
+

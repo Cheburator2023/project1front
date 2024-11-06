@@ -1,5 +1,5 @@
-import { Column, Row } from 'shared/types';
-import { RIGHT_PANEL_TYPE } from 'shared/constants';
+import { Column, Row } from '@shared/types';
+import { RIGHT_PANEL_TYPE } from '@shared/constants';
 
 export interface TableModelsProps {
   rowList: Array<Partial<Row>>;

@@ -60,17 +60,29 @@ export const useTableModels = () => {
 
   const { responseData: templateData, mutationProtectedFetch } = useFetch<Template[]>({
     apiRoute: API_ROUTES.TEMPLATES,
-    // mockedResponse: mockedTemplatesResponse,
+    mockedResponse: mockedTemplatesResponse,
   });
+
+  const updateRows = (modelsData: ModelsResponseType) => {
+    const formattedRows = modelsData.data.cards.map((row) => ({
+      ...row,
+      model_version: row.model_version?.toString(), // TODO: remove after fix on backend
+      id: row.system_model_id,
+      hover: true,
+    }));
+    setRowList(formattedRows);
+    setTotalRows(formattedRows.length);
+  };
 
   const fetchModels = useCallback(async (date?: string) => {
     setLoadingModels(true);
 
     try {
-      const res = await mutationProtectedFetch<ModelsResponseType, ModelsResponseType>({
+      // TODO: fix types
+      const res: any = await mutationProtectedFetch<ModelsResponseType, ModelsResponseType>({
         fetchApiRoute: API_ROUTES.MODELS,
         fetchMethod: 'GET',
-        // mockedResponse: mockedModelsResponse,
+        mockedResponse: mockedModelsResponse,
         newParams: date ? { date: getISODateFormat(date) } : {},
       });
 
@@ -92,17 +104,6 @@ export const useTableModels = () => {
     fetchModels();
   }, [fetchModels]);
 
-  const updateRows = (modelsData: ModelsResponseType) => {
-    const formattedRows = modelsData.data.cards.map((row) => ({
-      ...row,
-      model_version: row.model_version?.toString(), // TODO: remove after fix on backend
-      id: row.system_model_id,
-      hover: true,
-    }));
-    setRowList(formattedRows);
-    setTotalRows(formattedRows.length);
-  };
-
   useEffect(() => {
     if (templateData) {
       setTemplates(templateData);
@@ -121,7 +122,11 @@ export const useTableModels = () => {
   }, []);
 
   const handleChangeCompare = (checked: boolean) => {
-    checked ? setActiveScreen(ACTIVE_SCREEN.COMPARE) : setActiveScreen(ACTIVE_SCREEN.TABLE);
+    if (checked) {
+      setActiveScreen(ACTIVE_SCREEN.COMPARE);
+    } else {
+      setActiveScreen(ACTIVE_SCREEN.TABLE);
+    }
     setCompareMode(checked);
   };
 
@@ -145,7 +150,7 @@ export const useTableModels = () => {
     (newColumnFilters: Partial<ColumnsFilter>) => {
       const columnsFiltersChanged = !checkColumnsFiltersForEqual(columnsFilters, newColumnFilters);
       if (columnsFiltersChanged) {
-        const newColumnList = filterColumnsByColumnsFilters(newColumnFilters);
+        const newColumnList = filterColumnsByColumnsFilters(newColumnFilters, initialColumns);
         setColumnList(newColumnList);
       }
     },
@@ -269,3 +274,4 @@ export const useTableModels = () => {
     },
   };
 };
+

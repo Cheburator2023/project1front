@@ -1,7 +1,9 @@
+/* eslint-disable no-nested-ternary */
+/* eslint-disable default-param-last */
+/* eslint-disable no-use-before-define */
 import {
   addMonths,
   addYears,
-  differenceInBusinessDays,
   differenceInYears,
   endOfQuarter,
   format,
@@ -24,6 +26,9 @@ import {
   SelectStringOptions,
 } from '@shared/ui/organisms';
 
+import { ArtifactGroup } from '@src/shared/api/types';
+import { concat, pick, uniqBy } from 'lodash';
+import { CUSTOMER_MAP, CUSTOMER_TYPE } from '@src/shared/constants/customers';
 import {
   FormFieldConditions,
   FormFieldValueConditions,
@@ -32,8 +37,29 @@ import {
   FormValues,
 } from './types';
 
-import { BASE_MODEL_SCHEMA } from './constants';
-import { ArtifactGroup } from '@src/shared/api/types';
+import {
+  ACTIVE_MODEL_SCHEMA,
+  BASE_MODEL_SCHEMA,
+  NOT_ACTIVE_MODEL_SCHEMA,
+  RATING_SYSTEM_MODEL_SCHEMA,
+  RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA,
+  SCHEMA_NAME_MAP,
+} from './constants';
+
+export const markSchema = (
+  schema: FormFieldsSchema,
+  schemaFromNameMap: {
+    key: string;
+    title: string;
+    schemaOrder: number;
+  },
+): FormFieldsSchema =>
+  schema.map((item) => ({
+    ...item,
+    schemaKey: schemaFromNameMap.key,
+    schemaOrder: schemaFromNameMap.schemaOrder,
+  }));
+
 const getInputValuesFromRow = (artifacts: Artifact[], activeRow: Partial<Row> = {}): FormValues =>
   Object.entries(activeRow).reduce((inputValues, rowItem) => {
     const [name, rowValue] = rowItem as [keyof Row, string];
@@ -115,7 +141,7 @@ const getInputValue = (artifact: Artifact, rowValue: string) => {
     case ArtifactType.NUMBER: {
       const type = INPUT_TYPE.NUMBER;
 
-      const validInitialValue = rowValue && !isNaN(Number(rowValue));
+      const validInitialValue = rowValue && !Number.isNaN(Number(rowValue));
 
       return validInitialValue ? { type, value: Number(rowValue) } : undefined;
     }
@@ -137,6 +163,30 @@ const getArtifactValueByValueId = (
   artifactValues: ArtifactValue[],
   artifactParentValueId: number,
 ) => artifactValues.find(({ artefact_value_id }) => artefact_value_id === artifactParentValueId);
+
+const getParentsChildrenIds = (artifactValues: ArtifactValue[]) =>
+  artifactValues.reduce((parentsChildrenValues, currentArtifactValue) => {
+    if (currentArtifactValue?.artefact_parent_value_id) {
+      const currentParentValue = getArtifactValueByValueId(
+        artifactValues,
+        currentArtifactValue.artefact_parent_value_id,
+      )?.artefact_value;
+
+      if (currentParentValue) {
+        const currentParentChildrenValues = parentsChildrenValues?.[currentParentValue] ?? [];
+
+        return {
+          ...parentsChildrenValues,
+          [currentParentValue]: [
+            ...currentParentChildrenValues,
+            currentArtifactValue.artefact_value_id,
+          ],
+        };
+      }
+    }
+
+    return parentsChildrenValues;
+  }, {} as Record<string, number[]>);
 
 const getParentsChildrenValues = (artifactValues: ArtifactValue[]) =>
   artifactValues.reduce((parentsChildrenValues, currentArtifactValue) => {
@@ -161,6 +211,28 @@ const getParentsChildrenValues = (artifactValues: ArtifactValue[]) =>
 
     return parentsChildrenValues;
   }, {} as Record<string, string[]>);
+
+const getParentsValuesIds = (
+  artifactValues: ArtifactValue[],
+  artefactParentValueId?: number | null,
+  parentValues: number[] = [],
+): number[] => {
+  if (artefactParentValueId) {
+    const parent = getArtifactValueByValueId(artifactValues, artefactParentValueId);
+
+    if (parent) {
+      const result = getParentsValuesIds(artifactValues, parent?.artefact_parent_value_id, [
+        parent.artefact_value_id,
+        ...parentValues,
+      ]);
+      return result;
+    }
+
+    return parentValues;
+  }
+
+  return parentValues;
+};
 
 const getParentsValues = (
   artifactValues: ArtifactValue[],
@@ -206,14 +278,21 @@ const sortSelectOptions = (selectOptions: SelectOption[]) => {
 
 const getSelectOptions = (artifactValues: ArtifactValue[]) => {
   const parentsChildrenValues = getParentsChildrenValues(artifactValues);
+  const parentsChildrenIds = getParentsChildrenIds(artifactValues);
 
   const selectOptions = artifactValues.map(
-    ({ artefact_value, artefact_value_id, artefact_parent_value_id }) => ({
-      text: artefact_value,
-      value: artefact_value_id.toString(),
-      parentsValues: getParentsValues(artifactValues, artefact_parent_value_id),
-      nestedValues: parentsChildrenValues?.[artefact_value],
-    }),
+    ({ artefact_value, artefact_value_id, artefact_parent_value_id }) => {
+      const parentsValueIds = getParentsValuesIds(artifactValues, artefact_parent_value_id);
+
+      return {
+        text: artefact_value,
+        value: artefact_value_id.toString(),
+        parentsValues: getParentsValues(artifactValues, artefact_parent_value_id),
+        parentsValueIds,
+        nestedValues: parentsChildrenValues?.[artefact_value],
+        nestedValueIds: parentsChildrenIds?.[artefact_value],
+      };
+    },
   );
 
   return sortSelectOptions(selectOptions);
@@ -333,6 +412,8 @@ const mapArtifactToField = (
     disabled: artifact.is_edit_flg === '0',
     placeholder: artifact.artefact_desc ? artifact.artefact_desc : undefined,
     group: artifact.group,
+    schemaKey: fieldSchema?.schemaKey || SCHEMA_NAME_MAP.REST_MODEL_SCHEMA.key,
+    schemaOrder: fieldSchema?.schemaOrder || SCHEMA_NAME_MAP.REST_MODEL_SCHEMA.schemaOrder,
   };
 
   const activeRowValue = activeRow?.[artifact?.artefact_tech_label];
@@ -500,7 +581,7 @@ const getGroupField = (
     name: `${groupLabel}_group`,
     label: groupLabel,
     type: groupType,
-    fields: fields,
+    fields,
   };
 };
 
@@ -545,22 +626,69 @@ const getFormFields = ({
   artifacts,
   initialRow,
   mode,
-  activeFormSchema,
+  currentFormSchema,
+  showAllFields = false,
+  currentCustomer = CUSTOMER_MAP.EVERY_CUSTOMER,
+  activeModelByDefault,
 }: {
   artifacts: Artifact[];
-  activeFormSchema: FormFieldsSchema;
+  currentFormSchema: FormFieldsSchema;
   mode: MODEL_FORM_MODE;
   initialRow?: Partial<Row>;
+  showAllFields?: boolean;
+  currentCustomer: CUSTOMER_TYPE;
+  activeModelByDefault?: boolean;
 }) => {
+  const isActive = currentFormSchema.some(
+    ({ schemaKey }) => schemaKey === SCHEMA_NAME_MAP.ACTIVE_MODEL_SCHEMA.key,
+  );
+  const isRatingSystem = currentFormSchema.some(
+    ({ schemaKey }) => schemaKey === SCHEMA_NAME_MAP.RATING_SYSTEM_MODEL_SCHEMA.key,
+  );
+  const isRatingSystemRegulatorApprove = currentFormSchema.some(
+    ({ schemaKey }) =>
+      schemaKey === SCHEMA_NAME_MAP.RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA.key,
+  );
+  const isNotActive = currentFormSchema.some(
+    ({ schemaKey }) => schemaKey === SCHEMA_NAME_MAP.NOT_ACTIVE_MODEL_SCHEMA.key,
+  );
+
+  // TODO: TESTING FOR UMRV
+  const mergedUniqueArrayOfAllAttrsForDebug = uniqBy(
+    concat(
+      BASE_MODEL_SCHEMA,
+      ACTIVE_MODEL_SCHEMA,
+      RATING_SYSTEM_MODEL_SCHEMA,
+      RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA,
+      initialColumns,
+    ),
+    'name',
+  );
+
+  const mergedModels = uniqBy(
+    concat(
+      BASE_MODEL_SCHEMA,
+      isActive ? ACTIVE_MODEL_SCHEMA : [],
+      isNotActive ? NOT_ACTIVE_MODEL_SCHEMA : [],
+      isRatingSystem ? RATING_SYSTEM_MODEL_SCHEMA : [],
+      isRatingSystemRegulatorApprove ? RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA : [],
+    ),
+    'name',
+  ).filter(({ customers }) => customers?.find((customer) => customer === currentCustomer));
+
   const fieldsNamesToGenerate =
-    mode === MODEL_FORM_MODE.ADD
+    showAllFields && process.env.NODE_ENV === 'development'
+      ? mergedUniqueArrayOfAllAttrsForDebug.map(({ name }) => name)
+      : currentCustomer === CUSTOMER_MAP.UMRV && mode === MODEL_FORM_MODE.ADD
+      ? mergedModels.map(({ name }) => name)
+      : mode === MODEL_FORM_MODE.ADD
       ? BASE_MODEL_SCHEMA.map(({ name }) => name)
       : initialColumns.map(({ name }) => name);
 
   // Генерация полей
   const formFields = fieldsNamesToGenerate.reduce((fields, fieldName) => {
     const artifact = artifacts.find(({ artefact_tech_label }) => artefact_tech_label === fieldName);
-    const fieldSchema = activeFormSchema.find(({ name }) => name === fieldName);
+    const fieldSchema = currentFormSchema.find(({ name }) => name === fieldName);
 
     if (artifact) {
       const field = mapArtifactToField(artifact, fieldSchema, initialRow);
@@ -600,7 +728,9 @@ const getFormFields = ({
 const getFormValue = (value?: InputValue) => {
   switch (value?.type) {
     case INPUT_TYPE.SELECT: {
-      return value.value?.text || '';
+      return Array.isArray(value.value)
+        ? value?.value?.map(({ text }) => text) || ''
+        : value.value?.text || '';
     }
     case INPUT_TYPE.MULTI_SELECT: {
       return value?.value?.map(({ text }) => text) || '';
@@ -611,7 +741,7 @@ const getFormValue = (value?: InputValue) => {
   }
 };
 
-const checkForEqualValues = (formValue: string | string[], conditionValue: string = '') => {
+const checkForEqualValues = (formValue: string | string[], conditionValue = '') => {
   if (Array.isArray(formValue)) {
     return formValue.includes(conditionValue);
   }
@@ -705,10 +835,16 @@ const getProperFormatValueForSubmit = (inputValue: InputValue) => {
         artefact_value_id: null,
       };
     case INPUT_TYPE.SELECT:
-      return {
-        artefact_string_value: value.text,
-        artefact_value_id: Number(value.id),
-      };
+      // TODO: REFACTOR add new type for new type of select
+      return Array.isArray(value)
+        ? value.map(({ id, text }) => ({
+            artefact_string_value: text,
+            artefact_value_id: Number(id),
+          }))
+        : {
+            artefact_string_value: value?.text,
+            artefact_value_id: Number(value?.id),
+          };
     case INPUT_TYPE.QUARTERLY_DROPDOWN:
       return {
         artefact_string_value: value.text,
@@ -728,31 +864,34 @@ const getProperFormatValueForSubmit = (inputValue: InputValue) => {
 };
 
 const getArtifactApiItems = (values?: FormValues, parentModelId?: string) => {
-  const artifactApiItems = Object.entries(values ?? {}).reduce((bodyItems, [fieldName, value]) => {
-    if (!value) {
-      return bodyItems;
-    }
+  const artifactApiItems = Object.entries(values ?? {}).reduce(
+    (bodyItems, [fieldName, value]): any => {
+      if (!value) {
+        return bodyItems;
+      }
 
-    const content = getProperFormatValueForSubmit(value);
+      const content = getProperFormatValueForSubmit(value);
 
-    if (Array.isArray(content)) {
+      if (Array.isArray(content)) {
+        return [
+          ...bodyItems,
+          ...content.map((item) => ({
+            artefact_tech_label: fieldName,
+            ...item,
+          })),
+        ];
+      }
+
       return [
         ...bodyItems,
-        ...content.map((item) => ({
+        {
           artefact_tech_label: fieldName,
-          ...item,
-        })),
+          ...content,
+        },
       ];
-    }
-
-    return [
-      ...bodyItems,
-      {
-        artefact_tech_label: fieldName,
-        ...content,
-      },
-    ];
-  }, [] as ArtifactApi[]);
+    },
+    [] as ArtifactApi[],
+  );
 
   if (parentModelId) {
     return [
@@ -800,3 +939,4 @@ export {
   getParentModelOptions,
   getInputValuesFromRow,
 };
+

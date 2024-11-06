@@ -20,7 +20,16 @@ export function observeRect(
       const run = () => {
         const { bottom, height, left, right, top, width, x, y } = node.getBoundingClientRect();
 
-        const newRect = { bottom, height, left, right, top, width, x: x || left, y: y || top } as DOMRect;
+        const newRect = {
+          bottom,
+          height,
+          left,
+          right,
+          top,
+          width,
+          x: x || left,
+          y: y || top,
+        } as DOMRect;
 
         if (rectChanged(newRect, state.rect)) {
           state.rect = newRect;
@@ -37,3 +46,4 @@ export function observeRect(
     },
   };
 }
+

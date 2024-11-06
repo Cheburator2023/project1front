@@ -1,10 +1,10 @@
 import styled, { css } from 'styled-components';
 import { ReactComponent as ArrowUpOutline } from '@admiral-ds/icons/build/system/ArrowUpOutline.svg';
 import { ReactComponent as ChevronDownOutline } from '@admiral-ds/icons/build/system/ChevronDownOutline.svg';
-import { ReactComponent as DragOutline } from './icons/dragIcon.svg';
 import { IconPlacement, typography } from '@admiral-ds/react-ui';
+import { ReactComponent as DragOutline } from './icons/dragIcon.svg';
 
-import type { TableProps } from './';
+import type { TableProps } from '.';
 import {
   cellStyle,
   disabledRow,
@@ -262,6 +262,24 @@ export const HeaderCell = styled.div<{ dimension: TableProps['dimension'] }>`
   align-items: flex-start;
 `;
 
+export const HeaderCellTitle = styled.div<{ sort: 'asc' | 'desc' | 'initial' }>`
+  display: inline-flex;
+  align-items: flex-start;
+  width: 100%;
+  overflow: hidden;
+  &:hover {
+    *[fill^='#'] {
+      fill: ${({ theme, sort }) =>
+        sort === 'initial' ? theme.color['Neutral/Neutral 50'] : theme.color['Primary/Primary 70']};
+    }
+
+    ${SortOrder} {
+      color: ${({ theme, sort }) =>
+        sort === 'initial' ? theme.color['Neutral/Neutral 50'] : theme.color['Primary/Primary 70']};
+    }
+  }
+`;
+
 export const HeaderCellContent = styled.div<{ cellAlign: 'left' | 'right' }>`
   box-sizing: border-box;
   display: flex;
@@ -283,25 +301,6 @@ export const HeaderCellSpacer = styled.div<{ width?: string }>`
   align-self: stretch;
   width: ${(p) => (p.width ? p.width : '12px')};
   flex-shrink: 0;
-`;
-
-export const HeaderCellTitle = styled.div<{ sort: 'asc' | 'desc' | 'initial' }>`
-  display: inline-flex;
-  align-items: flex-start;
-  width: 100%;
-  overflow: hidden;
-  &:hover {
-    *[fill^='#'] {
-      fill: ${({ theme, sort }) =>
-        sort === 'initial' ? theme.color['Neutral/Neutral 50'] : theme.color['Primary/Primary 70']};
-    }
-    
-    ${SortOrder} {
-      color: ${({ theme, sort }) =>
-        sort === 'initial' ? theme.color['Neutral/Neutral 50'] : theme.color['Primary/Primary 70']};
-    };
-    }
-  }
 `;
 
 export const TitleContent = styled.div<{ dimension: TableProps['dimension']; sortable?: boolean }>`
@@ -420,7 +419,7 @@ export const HeaderCellsWrapper = styled.div<{
   display: flex;
   flex: 0 0 auto;
   width: calc(
-    100% - ${(p) => getTechColumnsWidth(p.dimension, p.selectionColumn, p.expansionColumn) + 'px'}
+    100% - ${(p) => `${getTechColumnsWidth(p.dimension, p.selectionColumn, p.expansionColumn)}px`}
   );
 `;
 
@@ -544,3 +543,4 @@ export const DragIcon = styled(DragOutline)<{ $disabled?: boolean }>`
         : `var(--admiral-color-Neutral_Neutral50, ${theme.color['Neutral/Neutral 50']})`};
   }
 `;
+

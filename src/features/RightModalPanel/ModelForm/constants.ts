@@ -1,102 +1,184 @@
+import { CUSTOMER_MAP } from '@src/shared/constants/customers';
 import { FormFieldsSchema } from './types';
 
 export const MONTHS_IN_QUARTER = 3;
 export const ADDITIONAL_DAYS_OUT_QUARTER = 10;
+
+type SchemaNameMap = {
+  [key: string]: {
+    title: string;
+    schemaOrder: number;
+    key: string;
+  };
+};
+
+export const SCHEMA_NAME_MAP: SchemaNameMap = {
+  BASE_MODEL_SCHEMA: { key: 'BASE_MODEL_SCHEMA', title: 'Базовые атрибуты', schemaOrder: 1 },
+  ACTIVE_MODEL_SCHEMA: {
+    key: 'ACTIVE_MODEL_SCHEMA',
+    title: 'Атрибуты активной модели',
+    schemaOrder: 2,
+  },
+  NOT_ACTIVE_MODEL_SCHEMA: {
+    key: 'NOT_ACTIVE_MODEL_SCHEMA',
+    title: 'Атрибуты неактивной модели',
+    schemaOrder: 3,
+  },
+  RATING_SYSTEM_MODEL_SCHEMA: {
+    key: 'RATING_SYSTEM_MODEL_SCHEMA',
+    title: 'Атрибуты рейтинговой системы',
+    schemaOrder: 4,
+  },
+  RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA: {
+    key: 'RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA',
+    title: 'Атрибуты рейтинговой системы, подлежащей согласованию Регулятором',
+    schemaOrder: 5,
+  },
+  REST_MODEL_SCHEMA: { key: 'REST_MODEL_SCHEMA', title: 'Прочие атрибуты', schemaOrder: 6 },
+};
 
 export const BASE_MODEL_SCHEMA: FormFieldsSchema = [
   {
     name: 'model_name',
     required: true,
     maxLength: 250,
-  },
-  {
-    name: 'model_name_dadm',
-    required: false,
-    maxLength: 250,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
   },
   {
     name: 'model_desc',
     required: true,
     maxLength: 250,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
   },
   {
     name: 'business_customer',
     required: true,
     maxLength: 255,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
   },
   {
     name: 'business_customer_departament',
     required: true,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
+  },
+  {
+    name: 'group_company',
+    required: true,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
+  },
+  {
+    name: 'significance_validity',
+    required: true,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
+  },
+  {
+    name: 'model_name_dadm',
+    required: false,
+    maxLength: 250,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
   },
   {
     name: 'ds_department',
     required: false,
     maxLength: 255,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
   },
   {
     name: 'ds_stream',
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
     required: false,
   },
   {
     name: 'product_name',
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
     required: false,
   },
   {
     name: 'developing_model_reason',
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
     required: false,
-  },
-  {
-    name: 'group_company',
-    required: true,
   },
   {
     name: 'custom_model_type',
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
     required: false,
-  },
-  {
-    name: 'significance_validity',
-    required: true,
-  },
-  {
-    name: 'provides_piloting',
-    required: false,
-  },
-  {
-    name: 'operational_monitoring',
-    required: false,
-  },
-  {
-    name: 'analytical_monitoring',
-    required: false,
-  },
-  {
-    name: 'target',
-    required: false,
-    maxLength: 100,
-  },
-  {
-    name: 'model_changes_info',
-    required: false,
-    maxLength: 250,
   },
   {
     name: 'rfd',
     required: false,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
     maxLength: 250,
+  },
+  ///
+  {
+    name: 'provides_piloting',
+    customers: [CUSTOMER_MAP.EVERY_CUSTOMER],
+    required: false,
+    disabled: {
+      forCustomer: CUSTOMER_MAP.UMRV,
+    },
+  },
+  {
+    name: 'operational_monitoring',
+    customers: [CUSTOMER_MAP.EVERY_CUSTOMER],
+    required: false,
+    disabled: {
+      forCustomer: CUSTOMER_MAP.UMRV,
+    },
+  },
+  {
+    name: 'analytical_monitoring',
+    customers: [CUSTOMER_MAP.EVERY_CUSTOMER],
+    required: false,
+    disabled: {
+      forCustomer: CUSTOMER_MAP.UMRV,
+    },
+  },
+  {
+    name: 'target',
+    required: false,
+    customers: [CUSTOMER_MAP.EVERY_CUSTOMER],
+    maxLength: 100,
+    disabled: {
+      forCustomer: CUSTOMER_MAP.UMRV,
+    },
+  },
+  {
+    name: 'model_changes_info',
+    required: false,
+    customers: [CUSTOMER_MAP.EVERY_CUSTOMER],
+    maxLength: 250,
+    disabled: {
+      forCustomer: CUSTOMER_MAP.UMRV,
+    },
   },
 ];
 
 export const ACTIVE_MODEL_SCHEMA: FormFieldsSchema = [
   {
+    name: 'model_name',
+    required: true,
+    maxLength: 250,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
+  },
+  {
+    name: 'group_company',
+    required: true,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
+  },
+  {
     name: 'model_type',
     required: true,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
   },
   {
     name: 'model_desc',
     required: true,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
   },
   {
     name: 'significance_validity',
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
     required: true,
     valueConditions: [
       {
@@ -112,48 +194,59 @@ export const ACTIVE_MODEL_SCHEMA: FormFieldsSchema = [
   },
   {
     name: 'responsible_for_significance_validity',
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
     required: true,
     maxLength: 250,
   },
   {
     name: 'implementation_segment',
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
     required: true,
     maxLength: 250,
   },
   {
     name: 'business_customer',
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
     required: true,
     maxLength: 250,
   },
   {
     name: 'business_customer_departament',
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
     required: true,
   },
   {
     name: 'implementation_validity',
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
     required: true,
   },
   {
     name: 'validity_approve',
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
     required: true,
     maxLength: 250,
   },
   {
     name: 'ds_department',
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
     required: true,
     maxLength: 250,
   },
   {
     name: 'analize_text_about_developing',
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
     required: true,
     maxLength: 250,
   },
   {
     name: 'model_risk_type',
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
     required: true,
+    maxLength: 250,
   },
   {
     name: 'rating_model',
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
     requireConditions: [
       {
         model_type: 'Риск-модели',
@@ -174,11 +267,13 @@ export const NOT_ACTIVE_MODEL_SCHEMA: FormFieldsSchema = [
   {
     name: 'remove_date',
     required: true,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
   },
   {
     name: 'remove_decision',
     required: true,
     maxLength: 250,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
   },
 ];
 
@@ -186,6 +281,7 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
   {
     name: 'rating_system_name',
     maxLength: 250,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
     requireConditions: [
       { model_type: 'Модели ВПОДК', model_risk_type: 'Кредитный риск' },
       {
@@ -197,6 +293,8 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
   },
   {
     name: 'significance_validity',
+    required: true,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
     valueConditions: [
       {
         value: 'Высокая',
@@ -212,6 +310,7 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
   {
     name: 'description_rating_system',
     maxLength: 250,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
     requireConditions: [
       { model_type: 'Модели ВПОДК', model_risk_type: 'Кредитный риск' },
       {
@@ -224,6 +323,7 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
   {
     name: 'model_indicator',
     maxLength: 250,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
     requireConditions: [
       { model_type: 'Модели ВПОДК', model_risk_type: 'Кредитный риск' },
       {
@@ -236,6 +336,7 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
   {
     name: 'calibration_version',
     maxLength: 250,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
     requireConditions: [
       { model_type: 'Модели ВПОДК', model_risk_type: 'Кредитный риск' },
       {
@@ -248,6 +349,7 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
   {
     name: 'calibration_date',
     maxLength: 250,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
     requireConditions: [
       { model_type: 'Модели ВПОДК', model_risk_type: 'Кредитный риск' },
       {
@@ -260,6 +362,7 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
   {
     name: 'degree_of_regulatory_supervision',
     maxLength: 250,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
     requireConditions: [
       { model_type: 'Модели ВПОДК', model_risk_type: 'Кредитный риск' },
       {
@@ -302,7 +405,9 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
   },
   {
     name: 'materiality_rate',
+    // Уровень материальности
     maxLength: 250,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
     requireConditions: [
       { model_type: 'Модели ВПОДК', model_risk_type: 'Кредитный риск', impact_coverage: '' },
       {
@@ -341,7 +446,9 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
   },
   {
     name: 'impact_coverage',
+    // охват последствий
     maxLength: 250,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
     requireConditions: [
       { model_type: 'Модели ВПОДК', model_risk_type: 'Кредитный риск', materiality_rate: '' },
       {
@@ -381,6 +488,7 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
   {
     name: 'model_id_from_model_owner',
     maxLength: 250,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
     requireConditions: [
       { model_type: 'Модели ВПОДК', model_risk_type: 'Кредитный риск' },
       {
@@ -393,6 +501,7 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
   {
     name: 'classification_rs_algorithm_by_asset_classes',
     maxLength: 250,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
     requireConditions: [
       { model_type: 'Модели ВПОДК', model_risk_type: 'Кредитный риск' },
       {
@@ -405,6 +514,7 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
   {
     name: 'classification_of_rs_by_order_of_application_within_pvr',
     maxLength: 250,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
     requireConditions: [
       { model_type: 'Модели ВПОДК', model_risk_type: 'Кредитный риск' },
       {
@@ -417,6 +527,7 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
   {
     name: 'credit_risk_component',
     maxLength: 250,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
     requireConditions: [
       { model_type: 'Модели ВПОДК', model_risk_type: 'Кредитный риск' },
       {
@@ -429,6 +540,7 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
   {
     name: 'goals_using_results_of_work_rs',
     maxLength: 250,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
     requireConditions: [
       { model_type: 'Модели ВПОДК', model_risk_type: 'Кредитный риск' },
       {
@@ -441,6 +553,7 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
   {
     name: 'name_and_version_rating_system',
     maxLength: 250,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
     requireConditions: [
       { model_type: 'Модели ВПОДК', model_risk_type: 'Кредитный риск' },
       {
@@ -456,6 +569,8 @@ export const RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA: FormFieldsSchema = [
   {
     name: 'regulatory_code_rs_pvr',
     maxLength: 250,
+    required: true,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
     requireConditions: [
       {
         model_type: 'Модели ВПОДК',
@@ -475,6 +590,8 @@ export const RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA: FormFieldsSchema = [
   {
     name: 'regulatory_code_model_pvr',
     maxLength: 250,
+    required: true,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
     requireConditions: [
       {
         model_type: 'Модели ВПОДК',
@@ -494,6 +611,8 @@ export const RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA: FormFieldsSchema = [
   {
     name: 'internal_model_number',
     maxLength: 250,
+    required: true,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
     requireConditions: [
       {
         model_type: 'Модели ВПОДК',
@@ -513,6 +632,8 @@ export const RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA: FormFieldsSchema = [
   {
     name: 'regulatory_class',
     maxLength: 250,
+    required: true,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
     requireConditions: [
       {
         model_type: 'Модели ВПОДК',
@@ -532,6 +653,8 @@ export const RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA: FormFieldsSchema = [
   {
     name: 'regulatory_subclass',
     maxLength: 250,
+    required: true,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
     requireConditions: [
       {
         model_type: 'Модели ВПОДК',
@@ -549,3 +672,4 @@ export const RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA: FormFieldsSchema = [
     ],
   },
 ];
+

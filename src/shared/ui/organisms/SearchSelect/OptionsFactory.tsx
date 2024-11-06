@@ -6,7 +6,7 @@ import { ReactComponent as PersonSolid } from '@admiral-ds/icons/build/system/Pe
 import { ReactComponent as PeopleSolid } from '@admiral-ds/icons/build/system/PeopleSolid.svg';
 // import { ReactComponent as ChevronRightOutline } from '@admiral-ds/icons/build/system/ChevronRightOutline.svg';
 
-import { SELECT_TYPE, OptionsFactoryProps } from './types';
+import { SELECT_TYPE, OptionsFactoryProps, SelectOption } from './types';
 import { CustomOption } from './CustomOption';
 import { NOT_NULL_OPTION, EMPTY_OPTION } from './constants';
 
@@ -43,6 +43,7 @@ interface OptionsFactoryI {
   selectNotNullEnabled: boolean;
   selectEmptyEnabled: boolean;
   selectedValues?: string[];
+  onClickItem?: (v: SelectOption, selectedValues?: string[]) => void;
 }
 
 export const OptionsFactory = ({
@@ -50,6 +51,7 @@ export const OptionsFactory = ({
   selectedValues,
   selectEmptyEnabled,
   selectNotNullEnabled,
+  onClickItem,
 }: OptionsFactoryI): JSX.Element => {
   const { type: selectType } = optionsProps;
 
@@ -127,22 +129,34 @@ export const OptionsFactory = ({
           )}
           {options
             .filter(({ visible = true }) => visible)
-            .map(({ value, text, disabled }) => (
-              <Option
-                key={value}
-                disabled={disabled}
-                value={value}
-                renderOption={(p) => (
-                  <CustomOption
-                    text={text}
-                    checked={!!selectedValues?.includes(value)}
-                    onChange={() => p.onClickItem?.()}
-                  />
-                )}
-              />
-            ))}
+            .map((option) => {
+              const { value, text, disabled, parentsValueIds } = option;
+              return (
+                <Option
+                  key={value}
+                  disabled={disabled}
+                  value={value}
+                  renderOption={(p) => {
+                    const padding = 20 * (Number(parentsValueIds?.length) + 1 || 1);
+
+                    return (
+                      <CustomOption
+                        text={text}
+                        style={{ paddingLeft: padding }}
+                        checked={!!selectedValues?.includes(value)}
+                        onChange={() => {
+                          onClickItem?.(option, selectedValues);
+                          return p.onClickItem?.();
+                        }}
+                      />
+                    );
+                  }}
+                />
+              );
+            })}
         </div>
       );
     }
   }
 };
+

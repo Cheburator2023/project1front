@@ -13,7 +13,7 @@ const Overlay = styled.div`
   width: 100%;
 `;
 
-const Panel = styled.div`
+const Panel = styled.div<{ width?: string }>`
   z-index: 1;
   float: right;
   background-color: #fff;
@@ -22,7 +22,7 @@ const Panel = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
-  width: 368px;
+  width: ${({ width = '400px' }) => width};
 `;
 
 const Header = styled.div`
@@ -67,3 +67,4 @@ const StatusWrapper = styled.div`
 `;
 
 export { Overlay, Panel, Header, HeaderRow, Body, Footer, StatusWrapper };
+
