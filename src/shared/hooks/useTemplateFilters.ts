@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-
 import { Column, ColumnsFilter } from '@src/shared/types';
 import { getActiveTemplate, getModifiedFilters, isSystemSpecificFilter } from '@src/shared/helpers';
 import { Template } from '@shared/api';
@@ -54,19 +53,21 @@ export const useTemplateFilters = (
     setModifiedFilters(new Set());
   };
 
+  const shouldResetTemplateOnInitialFilterRemove = (columnFilterName: string): boolean => {
+    return isTemplateFilter(columnFilterName) && !modifiedFilters.has(columnFilterName);
+  };
+
   const shouldResetTemplateOnInitialValueChange = (
     value: string | string[] | undefined,
     initialTemplateValue: string[],
+    columnName: string,
   ): boolean => {
     return (
       Array.isArray(initialTemplateValue) &&
       initialTemplateValue.length > 0 &&
+      shouldResetTemplateOnInitialFilterRemove(columnName) &&
       (!value?.length || JSON.stringify(value) !== JSON.stringify(initialTemplateValue))
     );
-  };
-
-  const shouldResetTemplateOnInitialFilterRemove = (columnFilterName: string): boolean => {
-    return isTemplateFilter(columnFilterName) && !modifiedFilters.has(columnFilterName);
   };
 
   return {
