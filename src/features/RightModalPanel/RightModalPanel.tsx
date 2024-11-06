@@ -38,7 +38,7 @@ export const RightModalPanel = React.memo(
   }: RightModalPanelProps) => {
     const { responseData: artifactsData } = useFetch<ArtifactResponse>({
       apiRoute: API_ROUTES.ARTIFACTS,
-      // mockedResponse: mockedModelsArtifacts,
+      mockedResponse: mockedModelsArtifacts,
     });
 
     const activeRow = useMemo(

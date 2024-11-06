@@ -20,6 +20,7 @@ export const TableModels = React.memo(
     onActionCell,
     updateRowsCount,
     setCurrentPage,
+    templates,
   }: TableModelsProps) => {
     const {
       cols,
@@ -33,6 +34,8 @@ export const TableModels = React.memo(
       handleColumnDragEnd,
       columnsFilters,
       onChangeColumnsFilters,
+      onChangeTopFilters,
+      topFilters,
     } = useTableChange({
       rowList,
       setCurrentPage,
@@ -41,6 +44,7 @@ export const TableModels = React.memo(
       pageSize,
       searchString,
       columnList,
+      templates,
     });
 
     useEffect(() => {
@@ -81,6 +85,9 @@ export const TableModels = React.memo(
                 rowList={rowList}
                 columnsFilters={columnsFilters}
                 onChangeColumnsFilter={handleChangeColumnsFilter}
+                onChangeTopFilters={onChangeTopFilters}
+                topFilters={topFilters}
+                templates={templates}
               />
             ) : null,
         }));
@@ -94,6 +101,9 @@ export const TableModels = React.memo(
       onChangeColumnsFilters,
       handleChangeColumnsFilter,
       updateRowsCount,
+      onChangeTopFilters,
+      topFilters,
+      templates,
     ]);
 
     return (

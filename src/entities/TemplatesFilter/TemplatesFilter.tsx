@@ -4,7 +4,7 @@ import { Button } from '@admiral-ds/react-ui';
 import { Template, FiltersContext } from '@shared/api';
 import { SELECT_TYPE, CustomSearchSelect } from '@shared/ui/organisms';
 import { initialColumnsFilters, initialTopFilters, RIGHT_PANEL_TYPE } from '@shared/constants';
-import { useFilters } from '@src/shared/hooks';
+import { useTemplateFilters } from '@src/shared/hooks';
 
 import { getGroupsOptions } from './helpers';
 
@@ -26,7 +26,7 @@ export const TemplatesFilter = ({
   const { topFilters, onChangeTopFilters, onChangeColumnsFilters, columnsFilters } =
     useContext(FiltersContext);
 
-  const { isModifiedFilter } = useFilters(columnsFilters, templates, topFilters.templates);
+  const { isModifiedFilter } = useTemplateFilters(columnsFilters, templates, topFilters.templates);
 
   const groupedOptions = useMemo(() => {
     if (templates) {
