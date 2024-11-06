@@ -1,33 +1,63 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from '@admiral-ds/react-ui';
 
-import { COLUMN_TYPE, Column, ColumnsFilter, Row } from '@shared/types';
+import { COLUMN_TYPE, Column, ColumnsFilter, Row, TopFilters } from '@shared/types';
 import { SELECT_TYPE } from '@shared/ui/organisms';
 import { getColumnFilterOptions, getFilteredRowsByColumnsFilter } from '@shared/helpers';
 
 import { CustomDateField, CustomSearchSelect } from './styles';
 import { getDateRange, getFormattedDateValue } from './helpers';
+import { useTemplateFilters } from '@src/shared/hooks';
+import { Template } from '@src/shared/api/types';
 
 export interface ColumnFilterProps {
   column: Column;
   rowList: Partial<Row>[];
   columnsFilters: Partial<ColumnsFilter>;
   onChangeColumnsFilter: (rowFieldName: string, selectValue: string[]) => void;
+  onChangeTopFilters: (filters: any) => void;
+  topFilters: TopFilters;
+  templates: Template[];
 }
 
 export const ColumnFilter = React.memo(
-  ({ column, rowList, columnsFilters, onChangeColumnsFilter }: ColumnFilterProps) => {
+  ({
+    column,
+    rowList,
+    columnsFilters,
+    onChangeColumnsFilter,
+    onChangeTopFilters,
+    topFilters,
+    templates,
+  }: ColumnFilterProps) => {
     const initialValue =
       column.type === COLUMN_TYPE.DATE
         ? getFormattedDateValue(columnsFilters?.[column.name])
         : columnsFilters?.[column.name];
 
     const [value, setValue] = useState<string[] | string | undefined>(initialValue);
+    const initialTemplateValue = columnsFilters?.[column.name] || [];
+
+    const { shouldResetTemplateOnInitialValueChange } = useTemplateFilters(
+      columnsFilters,
+      templates,
+      topFilters.templates,
+    );
 
     useEffect(() => {
       setValue(initialValue);
     }, [columnsFilters, initialValue]);
 
+    const handleApplyFilter = () => {
+      if (value) {
+        const arrayValue = Array.isArray(value) ? value : [value];
+        onChangeColumnsFilter(column.name, arrayValue);
+
+        if (shouldResetTemplateOnInitialValueChange(value, initialTemplateValue)) {
+          onChangeTopFilters({ ...topFilters, templates: [] });
+        }
+      }
+    };
     switch (column.type) {
       case COLUMN_TYPE.QUARTERLY_DATE:
       case COLUMN_TYPE.DATE: {
@@ -35,7 +65,6 @@ export const ColumnFilter = React.memo(
 
         return (
           <div
-            // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
             onClick={(
               e: React.MouseEvent<HTMLDivElement, MouseEvent> | React.KeyboardEvent<HTMLDivElement>,
             ) => {
@@ -95,7 +124,9 @@ export const ColumnFilter = React.memo(
             key={`${filteredRowsIds.length}`}
             name={column.name}
             selectedValues={value}
-            onChange={(_, newValue) => setValue(newValue)}
+            onChange={(_, newValue) => {
+              setValue(newValue);
+            }}
             selectNotNullEnabled
             selectEmptyEnabled
             virtualScrollEnabled
@@ -104,10 +135,7 @@ export const ColumnFilter = React.memo(
               options,
             }}
             renderDropDownBottomPanel={() => (
-              <Button
-                onClick={() => value && onChangeColumnsFilter(column.name, value)}
-                dimension="s"
-              >
+              <Button onClick={handleApplyFilter} dimension="s">
                 Применить
               </Button>
             )}

@@ -76,6 +76,7 @@ const Home = () => {
             onActionCell={modelsTable.handleClickOnActionCell}
             updateRowsCount={modelsTable.setTotalRows}
             setCurrentPage={modelsTable.setPage}
+            templates={filters.templates}
           />
           <Pagination
             page={modelsTable.page}

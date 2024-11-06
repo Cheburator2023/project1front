@@ -1,2 +1,2 @@
 export * from './helpers';
-export * from './filterTemplate';
+export * from './templateFilters';

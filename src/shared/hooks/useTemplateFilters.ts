@@ -4,7 +4,7 @@ import { Column, ColumnsFilter } from '@src/shared/types';
 import { getActiveTemplate, getModifiedFilters, isSystemSpecificFilter } from '@src/shared/helpers';
 import { Template } from '@shared/api';
 
-export const useFilters = (
+export const useTemplateFilters = (
   columnsFilters: Partial<ColumnsFilter>,
   templates: Template[],
   topFilters: string[],
@@ -54,12 +54,30 @@ export const useFilters = (
     setModifiedFilters(new Set());
   };
 
+  const shouldResetTemplateOnInitialValueChange = (
+    value: string | string[] | undefined,
+    initialTemplateValue: string[],
+  ): boolean => {
+    return (
+      Array.isArray(initialTemplateValue) &&
+      initialTemplateValue.length > 0 &&
+      (!value?.length || JSON.stringify(value) !== JSON.stringify(initialTemplateValue))
+    );
+  };
+
+  const shouldResetTemplateOnInitialFilterRemove = (columnFilterName: string): boolean => {
+    return isTemplateFilter(columnFilterName) && !modifiedFilters.has(columnFilterName);
+  };
+
   return {
     modifiedFilters,
     activeTemplate,
     getFilteredColumns,
     resetFilters,
     isModifiedFilter,
+    isTemplateFilter,
+    shouldResetTemplateOnInitialFilterRemove,
+    shouldResetTemplateOnInitialValueChange,
   };
 };
 

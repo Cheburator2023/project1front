@@ -1,5 +1,6 @@
 import { Column, Row } from 'shared/types';
 import { RIGHT_PANEL_TYPE } from 'shared/constants';
+import { Template } from '@src/shared/api/types';
 
 export interface TableModelsProps {
   rowList: Array<Partial<Row>>;
@@ -14,6 +15,7 @@ export interface TableModelsProps {
   ) => void;
   updateRowsCount: (newRowsCount: number) => void;
   setCurrentPage: (newPage: number) => void;
+  templates: Template[];
 }
 
 export type TableChangeProps = Omit<TableModelsProps, 'onActionCell'>;
