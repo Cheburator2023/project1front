@@ -102,7 +102,7 @@ const ChartsDashboard = () => {
   } = useFetch<MetricsResponseType>({
     apiRoute: API_ROUTES.METRICS,
     params: getQueryParams(filters),
-    // mockedResponse: mockedMetricsResponse,
+    mockedResponse: mockedMetricsResponse,
   });
 
   // const [kpiSum, setKpiSum] = useState(initialKPI_SUM);

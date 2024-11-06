@@ -10,7 +10,7 @@ const isSystemSpecificFilter = (filterId: string): boolean => {
   return Object.values(SYSTEM_SPECIFIC_FLAGS).includes(filterId as SYSTEM_SPECIFIC_FLAGS);
 };
 
-const isFilterDifferentFromTempalte = (
+const isFilterDifferentFromTemplate = (
   columnName: string,
   filters: string[],
   activeTemplate?: Template,
@@ -25,7 +25,7 @@ const isFilterDifferentFromTempalte = (
 
 const getModifiedFilters = (columnsFilters: Partial<ColumnsFilter>, activeTemplate?: Template) => {
   return Object.entries(columnsFilters).filter(([columnName, filters]) =>
-    isFilterDifferentFromTempalte(columnName, filters, activeTemplate),
+    isFilterDifferentFromTemplate(columnName, filters, activeTemplate),
   );
 };
 
@@ -56,7 +56,7 @@ const getActiveFiltersCount = (
 
 export {
   getActiveTemplate,
-  isFilterDifferentFromTempalte,
+  isFilterDifferentFromTemplate,
   getModifiedFilters,
   processFiltersByType,
   getActiveFiltersCount,

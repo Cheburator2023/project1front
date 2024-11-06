@@ -142,7 +142,7 @@ export const RelationsBody = (props: TreeProps & { modelId: string }) => {
       >({
         fetchApiRoute: API_ROUTES.MODEL_RELATIONS,
         fetchMethod: 'GET',
-        // mockedResponse: mockedRelationsResponse,
+        mockedResponse: mockedRelationsResponse,
         newParams: { model_id: props.modelId },
       });
 

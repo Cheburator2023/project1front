@@ -13,7 +13,7 @@ import {
   initialColumnsFilters,
 } from '@shared/constants';
 import { TemplatesFilter, FilterButtonCount } from '@entities';
-import { useFilters } from '@src/shared/hooks';
+import { useTemplateFilters } from '@src/shared/hooks';
 
 import {
   ActionPanelLeft,
@@ -41,8 +41,13 @@ export const TemplateFilters = ({
   const [rows, setRows] = useState<ATableRow[]>([]);
   const [showFilterTemplate, setShowFilterTemplate] = useState(true);
 
-  const { modifiedFilters, activeTemplate, getFilteredColumns, resetFilters, isModified } =
-    useFilters(columnsFilters, templates, topFilters.templates);
+  const {
+    modifiedFilters,
+    activeTemplate,
+    getFilteredColumns,
+    resetFilters,
+    shouldResetTemplateOnInitialFilterRemove,
+  } = useTemplateFilters(columnsFilters, templates, topFilters.templates);
 
   // refactor
   const handleRemoveColumnFilterValue = useCallback(
@@ -61,8 +66,12 @@ export const TemplateFilters = ({
         onChangeColumnsFilters(newColumnsFilters);
         onChangeTopFilters({ ...topFilters });
       }
+
+      if (shouldResetTemplateOnInitialFilterRemove(columnFilterName)) {
+        onChangeTopFilters({ ...topFilters, templates: [] });
+      }
     },
-    [columnsFilters],
+    [columnsFilters, topFilters, modifiedFilters, onChangeColumnsFilters, onChangeTopFilters],
   );
 
   const cols = useMemo(
