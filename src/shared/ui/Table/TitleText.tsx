@@ -58,3 +58,4 @@ export const TitleText: React.FC<TitleTextProps> = ({ lineClamp, dimension, extr
     </>
   );
 };
+

@@ -72,3 +72,4 @@ const exploitationSelectOptions = {
 } as SelectStringProps;
 
 export { tagsSelectOptions, modelsSelectOptions, exploitationSelectOptions, initialTopFilters };
+

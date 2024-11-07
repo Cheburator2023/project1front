@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 
-import { SelectTagsProps, RightPanel } from '@shared/ui/organisms';
-
-import { CustomSearchSelect } from '../styles';
+import { SelectTagsProps, RightPanel, CustomSearchSelect } from '@shared/ui/organisms';
 
 interface TagsFilterProps {
   options: SelectTagsProps;
@@ -28,6 +26,7 @@ export const TagsFilter = ({
   //   }));
   // };
 
+  // TODO: CustomSearchSelect проверить - отсутствовал импорт из ../styles
   return (
     <>
       <CustomSearchSelect
@@ -76,3 +75,4 @@ export const TagsFilter = ({
     </>
   );
 };
+

@@ -1,12 +1,27 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Button, T } from '@admiral-ds/react-ui';
+/* eslint-disable no-unneeded-ternary */
+import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { Button, CheckboxField, Flex, Option, Select, T } from '@admiral-ds/react-ui';
+import { useKeycloak } from '@react-keycloak/web';
 
 import { Row } from '@shared/types';
 import { StatusScreen } from '@shared/ui/molecules';
 import { RIGHT_PANEL_TYPE, MODEL_FORM_MODE } from '@shared/constants';
-import { INPUT_TYPE, InputFactory, InputValue, RightPanel } from '@shared/ui/organisms';
-import { API_ROUTES, useFetch, ArtifactApi, ArtifactResponse, ModelEditApi } from '@shared/api';
+import {
+  INPUT_TYPE,
+  InputFactory,
+  InputValue,
+  RightPanel,
+  SELECT_TYPE,
+} from '@shared/ui/organisms';
+import { API_ROUTES, useFetch, ArtifactApi, ModelEditApi } from '@shared/api';
 
+import { groupBy } from 'lodash';
+import { Flexbox, Spacer } from '@shared/ui/atoms';
+import { Artifact, CustomError } from '@shared/api/types';
+
+import { useAppInjectStore } from '@shared/stores/appInjectStore';
+import { CUSTOMER_MAP } from '@shared/constants/customers';
+import { useScrollTo } from '@src/shared/hooks/useScrollTo';
 import { FormValues } from './types';
 import {
   getFormMode,
@@ -17,62 +32,84 @@ import {
 } from './helpers';
 import { ButtonContainer, FormContainer } from './styles';
 import { ParentModelSelect } from './ParentModelSelect';
-import { useFormSchema } from './useActiveFormSchema';
+import { useActiveFormSchema } from './useActiveFormSchema';
 import { useFormFields } from './useFormFields';
-import { ALLOCATION_FIELDS_NAMES } from './constants';
+import { ALLOCATION_FIELDS_NAMES, SCHEMA_NAME_MAP } from './constants';
+import { ModelFormDotMenu } from './ModelFormDotMenu';
+
+type SubmitType = { checkOnly?: boolean };
 
 export interface ModelFormProps {
   mode: RIGHT_PANEL_TYPE.ADD_MODEL | RIGHT_PANEL_TYPE.EDIT_MODEL;
-  artifactsApi: ArtifactResponse;
+  artifacts: Artifact[];
   editCellName?: keyof Row;
   rows: Partial<Row>[];
   activeRow?: Partial<Row>;
-  onSubmit: (newRow: Row, formMode: MODEL_FORM_MODE) => void;
+  // TODO: check this types
+  onSubmit: (newRow: CustomError | Row | ArtifactApi[], formMode: MODEL_FORM_MODE) => void;
   onClose: () => void;
 }
 
 export const ModelForm = ({
   mode,
   rows,
-  artifactsApi,
+  artifacts,
   editCellName,
   activeRow,
   onSubmit,
   onClose,
 }: ModelFormProps) => {
   const { mutationProtectedFetch } = useFetch({});
+  const formMode = getFormMode(mode);
+  const { setCurrentCustomer, currentCustomer } = useAppInjectStore();
 
   const [values, setValues] = useState<FormValues | undefined>();
   const [invalidFields, setInvalidFields] = useState<Array<keyof Row>>([]);
+  const [dirtyFields, setDirtyFields] = useState<Array<keyof Row>>([]);
   const [parentModelId, setParentModelId] = useState<string>();
-
+  const [selectedColSize, setSelectedColSize] = useState<string>('2');
   const [submitLoading, setSubmitLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string>();
-
   const [initialRow, setInitialRow] = useState(activeRow);
+  const [expandedPanel, setExpandPanel] = useState(true);
+  const [showAllFields, setShowAllFields] = useState(false);
+  const [activeModelByDefault, setActiveModelByDefault] = useState<boolean | undefined>(undefined);
 
-  const formMode = getFormMode(mode);
+  const errorElemRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLFormElement | null>(null);
 
-  const { formSchema } = useFormSchema({ values, initialRow, mode: formMode });
+  const scrollToActiveError = useScrollTo(errorElemRef, formRef);
+
+  const { formSchema } = useActiveFormSchema({
+    values,
+    initialRow,
+    mode: formMode,
+    activeModelByDefault,
+  });
 
   const { fields } = useFormFields({
     formSchema,
     mode: formMode,
     initialRow,
-    artifacts: artifactsApi.data,
+    artifacts,
+    showAllFields,
+    currentCustomer,
+    activeModelByDefault,
   });
 
-  useEffect(() => {
-    const initialValues = getInputValuesFromRow(artifactsApi.data, initialRow);
-
-    setValues(initialValues);
-  }, [initialRow, artifactsApi]);
+  const IS_FORM_MODE_ADD = formMode === MODEL_FORM_MODE.ADD;
+  const title = IS_FORM_MODE_ADD ? 'Новая модель' : 'Редактирование модели';
+  const groupedBySchemaName = groupBy(fields, 'schemaKey');
 
   const handleChange = useCallback((name: keyof Row, value: InputValue) => {
     let newValues = { [name]: value };
     // TODO: move this logic to artifact
     if (name === 'model_type' && value.type === INPUT_TYPE.SELECT) {
-      if (value.value?.text === 'Бизнес-модели') {
+      if (
+        Array.isArray(value.value)
+          ? value.value.some((item) => item.text === 'Бизнес-модели')
+          : value.value?.text === 'Бизнес-модели'
+      ) {
         newValues = {
           ...newValues,
           model_risk_type: {
@@ -94,6 +131,8 @@ export const ModelForm = ({
       }
     }
 
+    setDirtyFields((prevDirtyFields) => [...prevDirtyFields, name]);
+
     setValues((prevValues) => ({ ...prevValues, ...newValues }));
   }, []);
 
@@ -110,74 +149,140 @@ export const ModelForm = ({
           return initialValue !== formattedValue.artefact_string_value;
         }
       }
+      return null;
     });
 
-  const handleSubmit = useCallback(async () => {
-    const newInvalidFields = getInvalidFields(formSchema, values);
-    const isAllocationFieldsChanged = checkForAllocationFieldsChanged();
+  const handleSubmit = useCallback(
+    async ({ checkOnly = false }: SubmitType) => {
+      const valuesWithAddedOutsideControls: FormValues = {
+        ...values,
+        active_model: { type: INPUT_TYPE.FLAG, value: activeModelByDefault || false },
+      };
+      const newInvalidFields = getInvalidFields(formSchema, valuesWithAddedOutsideControls);
 
-    setInvalidFields(isAllocationFieldsChanged ? [] : newInvalidFields);
+      scrollToActiveError();
 
-    if (newInvalidFields.length && !isAllocationFieldsChanged) {
-      return;
-    }
+      setInvalidFields(newInvalidFields);
+      const isAllocationFieldsChanged = checkForAllocationFieldsChanged();
 
-    const artifactApiItems = getArtifactApiItems(values, parentModelId);
-    let newRow: Row | undefined;
+      setInvalidFields(isAllocationFieldsChanged ? [] : newInvalidFields);
 
-    setSubmitLoading(true);
-
-    if (formMode === MODEL_FORM_MODE.EDIT && initialRow) {
-      const { system_model_id, model_source } = initialRow;
-
-      if (system_model_id && model_source) {
-        //TODO: fix response type and structure
-        const res = await mutationProtectedFetch<ModelEditApi[], { data: { cards: Row[] } }>({
-          body: [
-            {
-              model_id: system_model_id,
-              artefacts: artifactApiItems,
-              model_source,
-            },
-          ],
-          fetchApiRoute: API_ROUTES.MODELS_EDIT,
-          fetchMethod: 'PUT',
-        });
-
-        if (!res || res.error) {
-          setSubmitError('Произошла ошибка при обновлении модели');
-          return;
-        }
-
-        if (res.data.data.cards && res.data.data.cards[0]) {
-          newRow = res.data.data.cards[0];
-        }
-      }
-    }
-
-    if (formMode === MODEL_FORM_MODE.ADD) {
-      const res = await mutationProtectedFetch<ArtifactApi[], Row>({
-        body: artifactApiItems,
-        fetchApiRoute: API_ROUTES.MODEL_ADD,
-        fetchMethod: 'POST',
-      });
-
-      if (!res || res.error) {
-        setSubmitError('Произошла ошибка при добавлении модели');
+      if (newInvalidFields.length && !isAllocationFieldsChanged) {
         return;
       }
 
-      newRow = res.data;
-    }
+      if (newInvalidFields.length) {
+        return;
+      }
 
-    if (newRow && formMode) {
-      onSubmit(newRow, formMode);
-      setSubmitLoading(false);
-      setSubmitError('');
-    }
-  }, [values, formSchema, formMode]);
+      const artifactApiItems = getArtifactApiItems(valuesWithAddedOutsideControls, parentModelId);
+      // TODO: check this types
+      let newRow: CustomError | Row | ArtifactApi[] | undefined;
 
-  const formRef = useRef<HTMLFormElement | null>(null);
+      setSubmitLoading(checkOnly ? false : true);
+
+      if (!IS_FORM_MODE_ADD && initialRow && !checkOnly) {
+        const { system_model_id, model_source } = initialRow;
+
+        if (system_model_id && model_source) {
+          // TODO: fix response type and structure and input type ModelEditApi[]
+          const res: any = await mutationProtectedFetch<ModelEditApi[], { data: { cards: Row[] } }>(
+            {
+              body: [
+                {
+                  model_id: system_model_id,
+                  artefacts: artifactApiItems,
+                  model_source,
+                },
+              ],
+              fetchApiRoute: API_ROUTES.MODELS_EDIT,
+              fetchMethod: 'PUT',
+            },
+          );
+
+          if (!res || res.error) {
+            setSubmitError('Произошла ошибка при обновлении модели');
+            return;
+          }
+
+          if (res?.data?.data?.cards && res.data.data.cards[0]) {
+            newRow = res.data.data.cards[0];
+          }
+        }
+      }
+
+      if (IS_FORM_MODE_ADD && !checkOnly) {
+        const res = await mutationProtectedFetch<ArtifactApi[], Row>({
+          body: artifactApiItems,
+          fetchApiRoute: API_ROUTES.MODEL_ADD,
+          fetchMethod: 'POST',
+        });
+
+        if (!res || res.error) {
+          setSubmitError('Произошла ошибка при добавлении модели');
+          return;
+        }
+
+        newRow = res.data;
+      }
+
+      if (newRow && formMode) {
+        onSubmit(newRow, formMode);
+        setSubmitLoading(false);
+        setSubmitError('');
+      }
+    },
+    [values, formSchema, formMode, activeModelByDefault],
+  );
+
+  const handleChangeParentModel = useCallback(
+    (_, selectedValue: string[]) => {
+      const selectedModelId = selectedValue[0];
+
+      const parentModel = rows.find((row) => row.system_model_id === selectedModelId);
+
+      if (parentModel) {
+        setInitialRow(parentModel);
+        setParentModelId(selectedModelId);
+      }
+    },
+    [rows, artifacts],
+  );
+
+  const setSelectedColSizeHandler = (e: ChangeEvent<HTMLSelectElement>) => {
+    setSelectedColSize(e.target.value);
+  };
+
+  const handleOnClose = useCallback(() => {
+    setValues({});
+    setInvalidFields([]);
+    setParentModelId(undefined);
+
+    onClose();
+  }, [onClose]);
+
+  const activeModelCheckboxHandler = async (e: any) => {
+    const isChecked = e?.target?.checked;
+    setActiveModelByDefault(e?.target?.checked);
+    setCurrentCustomer(CUSTOMER_MAP.UMRV);
+    if (!isChecked) {
+      setValues({});
+    }
+    // setDirtyFields((prevDirtyFields) => [...prevDirtyFields, fields[0].name]);
+    await handleSubmit({ checkOnly: true });
+  };
+
+  useEffect(() => {
+    const initialValues = getInputValuesFromRow(artifacts, initialRow);
+
+    setValues(initialValues);
+  }, [initialRow, artifacts]);
+
+  useEffect(() => {
+    if (values?.active_model?.value) {
+      setActiveModelByDefault(true);
+    }
+  }, [values?.active_model?.value]);
 
   // Scroll to edit input field
   useEffect(() => {
@@ -194,43 +299,52 @@ export const ModelForm = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editCellName, formRef.current]);
 
-  const handleChangeParentModel = useCallback(
-    (_, selectedValue: string[]) => {
-      const selectedModelId = selectedValue[0];
-
-      const parentModel = rows.find((row) => row.system_model_id === selectedModelId);
-
-      if (parentModel) {
-        setInitialRow(parentModel);
-        setParentModelId(selectedModelId);
-      }
-    },
-    [rows, artifactsApi],
-  );
-
-  const handleOnClose = useCallback(() => {
-    setValues({});
-    setInvalidFields([]);
-    setParentModelId(undefined);
-
-    onClose();
-  }, [onClose]);
-
-  const title = formMode === MODEL_FORM_MODE.ADD ? 'Новая модель' : 'Редактирование модели';
+  useEffect(() => {
+    if (dirtyFields.length) {
+      const newInvalidFields = getInvalidFields(formSchema, values);
+      setInvalidFields(newInvalidFields);
+    }
+  }, [values, dirtyFields, formSchema]);
 
   return (
     <RightPanel
       title={title}
       showPanel
+      headerRightTitleContent={
+        <ModelFormDotMenu
+          expandedPanel={expandedPanel}
+          selectedColSize={selectedColSize}
+          setSelectedColSizeHandler={setSelectedColSizeHandler}
+          showAllFields={showAllFields}
+          setShowAllFields={setShowAllFields}
+        />
+      }
       onClose={handleOnClose}
+      expanded={expandedPanel}
+      onExpanded={() => setExpandPanel(!expandedPanel)}
       header={
-        formMode === MODEL_FORM_MODE.ADD && (
-          <ParentModelSelect
-            rows={rows}
-            selectedModel={parentModelId}
-            onSelectParentModel={handleChangeParentModel}
-          />
-        )
+        <Flexbox flexDirection="column">
+          <Flexbox width="100%" justifyContent="space-between" alignItems="center">
+            {IS_FORM_MODE_ADD && (
+              <ParentModelSelect
+                rows={rows}
+                selectedModel={parentModelId}
+                onSelectParentModel={handleChangeParentModel}
+              />
+            )}
+          </Flexbox>
+          <Spacer />
+          <Flexbox width="100%" justifyContent="space-between" alignItems="center">
+            <CheckboxField
+              id="activeModelByDefault_checkbox"
+              dimension="s"
+              checked={activeModelByDefault}
+              onChange={activeModelCheckboxHandler}
+            >
+              Действующая Модель/Модуль
+            </CheckboxField>
+          </Flexbox>
+        </Flexbox>
       }
       body={
         <StatusScreen
@@ -241,26 +355,62 @@ export const ModelForm = ({
           onFinished={handleOnClose}
         >
           <FormContainer ref={formRef}>
-            {fields.map((field) => (
-              <InputFactory<keyof Row>
-                key={field.id}
-                values={values}
-                onChange={handleChange}
-                inputFactory={field}
-                editFieldName={editCellName}
-                error={invalidFields.includes(field.name)}
-              />
-            ))}
+            {Object.keys(groupedBySchemaName).map((schemaKey) => {
+              const fieldsByGroup = groupedBySchemaName[schemaKey || 'Аллокация'];
+              const schemaTitle = SCHEMA_NAME_MAP[schemaKey]?.title;
+
+              return (
+                <div key={schemaKey}>
+                  <T font="Subtitle/Subtitle 2">{schemaTitle || 'Аллокация'}</T>
+                  <Spacer />
+                  <Flexbox wrap="wrap" gap={20}>
+                    {fieldsByGroup.map((field) => {
+                      return (
+                        <Flexbox
+                          flexBasis={
+                            expandedPanel
+                              ? `calc(${100 / Number(selectedColSize)}% - 20px)`
+                              : '100%'
+                          }
+                          width={
+                            expandedPanel
+                              ? `calc(${100 / Number(selectedColSize)}% - 20px)`
+                              : '100%'
+                          }
+                          fillChild
+                          key={field.name}
+                          ref={errorElemRef}
+                        >
+                          <InputFactory<keyof Row>
+                            values={values}
+                            onChange={handleChange}
+                            inputFactory={field as any}
+                            editFieldName={editCellName}
+                            error={invalidFields.includes(field.name)}
+                            artifacts={artifacts}
+                          />
+                        </Flexbox>
+                      );
+                    })}
+                  </Flexbox>
+                </div>
+              );
+            })}
           </FormContainer>
         </StatusScreen>
       }
       footer={
         <>
           <T font="Caption/Caption 1" color="Neutral/Neutral 50" as="div">
-            * Поля обязательные для сохранения
+            <span style={{ color: '#D92020' }}>*</span> Поля обязательные для сохранения
           </T>
           <ButtonContainer>
-            <Button dimension="s" onClick={handleSubmit} value="Submit" type="submit">
+            <Button
+              dimension="s"
+              onClick={() => handleSubmit({ checkOnly: false })}
+              value="Submit"
+              type="submit"
+            >
               Сохранить
             </Button>
             <Button
@@ -278,3 +428,4 @@ export const ModelForm = ({
     />
   );
 };
+

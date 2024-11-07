@@ -80,6 +80,22 @@ export const RelationsBody = (props: TreeProps & { modelId: string }) => {
   const [selectedItemData, setSelectedItemData] = useState<Relations | null>(null);
   const [resData, setResData] = useState<RelationsModelResponseType | null>(null);
 
+  const extractDataFromId = (id: string) => {
+    if (!resData) return null;
+
+    if (id.startsWith('module-')) {
+      const index = parseInt(id.split('-')[1], 10);
+      return resData?.data?.card?.modules?.[index];
+    }
+
+    if (id.startsWith('calibration-')) {
+      const index = parseInt(id.split('-')[1], 10);
+      return resData?.data?.card?.calibrations?.[index];
+    }
+
+    return null;
+  };
+
   const handleSelect = (id: string | null) => {
     if (!id) {
       return;
@@ -89,7 +105,7 @@ export const RelationsBody = (props: TreeProps & { modelId: string }) => {
 
     const selectedData = !isItemUnselected && extractDataFromId(id);
 
-    setSelectedItemData(selectedData ? selectedData : null);
+    setSelectedItemData(selectedData || null);
 
     setSelectedId(id);
 
@@ -111,22 +127,6 @@ export const RelationsBody = (props: TreeProps & { modelId: string }) => {
     );
   };
 
-  const extractDataFromId = (id: string) => {
-    if (!resData) return null;
-
-    if (id.startsWith('module-')) {
-      const index = parseInt(id.split('-')[1], 10);
-      return resData?.data?.card?.modules[index];
-    }
-
-    if (id.startsWith('calibration-')) {
-      const index = parseInt(id.split('-')[1], 10);
-      return resData?.data?.card?.calibrations[index];
-    }
-
-    return null;
-  };
-
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -142,7 +142,7 @@ export const RelationsBody = (props: TreeProps & { modelId: string }) => {
       >({
         fetchApiRoute: API_ROUTES.MODEL_RELATIONS,
         fetchMethod: 'GET',
-        // mockedResponse: mockedRelationsResponse,
+        mockedResponse: mockedRelationsResponse,
         newParams: { model_id: props.modelId },
       });
 
@@ -156,14 +156,14 @@ export const RelationsBody = (props: TreeProps & { modelId: string }) => {
       const treeRelations: Array<TreeItemProps> = [
         {
           render: (options: TreeNodeRenderOptionProps) => (
-            <RelationsTreeNode key={'1'} label={resData?.data?.card.model_name} {...options} />
+            <RelationsTreeNode key="1" label={resData?.data?.card.model_name} {...options} />
           ),
           id: '1',
           checked: false,
           children: [
             {
               render: (options: TreeNodeRenderOptionProps) => (
-                <RelationsTreeNode key={'1-1'} label="Модули" {...options} />
+                <RelationsTreeNode key="1-1" label="Модули" {...options} />
               ),
               id: '1-1',
               checked: false,
@@ -183,7 +183,7 @@ export const RelationsBody = (props: TreeProps & { modelId: string }) => {
             },
             {
               render: (options: TreeNodeRenderOptionProps) => (
-                <RelationsTreeNode key={'1-2'} label="Калибровки" {...options} />
+                <RelationsTreeNode key="1-2" label="Калибровки" {...options} />
               ),
               id: '1-2',
               checked: false,
@@ -213,6 +213,8 @@ export const RelationsBody = (props: TreeProps & { modelId: string }) => {
   };
 
   useEffect(() => {
+    // TODO: проверить void
+    // eslint-disable-next-line no-void
     void handleUpdateData();
   }, [props.modelId]);
 
@@ -255,15 +257,16 @@ export const RelationsBody = (props: TreeProps & { modelId: string }) => {
           <div style={{ margin: '16px' }}>
             {selectedItemData ? (
               <>
-                {Object.entries(selectedItemData).map((item) => (
+                {Object.entries(selectedItemData).map((item, idx) => (
                   <InputField
+                    key={idx}
                     style={{ marginBottom: '15px' }}
                     width={368}
                     readOnly
                     label={
                       initialColumns.find((column) => column.name === item[0])?.title ?? item[0]
                     }
-                    value={item[1] ?? ''}
+                    value={item?.[1]?.toString() ?? ''}
                   />
                 ))}
               </>

@@ -35,3 +35,4 @@ export const HistoryChangeItem = styled.div`
     color: ${({ theme }) => theme.color['Neutral/Neutral 90']};
   }
 `;
+

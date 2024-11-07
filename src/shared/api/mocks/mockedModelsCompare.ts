@@ -1,5 +1,5 @@
 import { Row } from '@src/shared/types';
-import { CompareModelsResponseType } from 'shared/api';
+import { CompareModelsResponseType } from '../types';
 
 type MockedModelsType = {
   [key: string]: [Partial<Row>, Partial<Row>];

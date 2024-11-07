@@ -6,3 +6,4 @@ export const checkOverflow = (textContainer: HTMLElement | null): boolean => {
     );
   return false;
 };
+

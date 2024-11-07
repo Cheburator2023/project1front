@@ -1,9 +1,9 @@
 import { getISODateFormat } from '@shared/helpers';
 
-import { COMPARE_COLOR } from './constants';
 import _ from 'lodash';
 import { Column, Row } from '@shared/types';
 import { CompareModelsResponseType } from '@shared/api';
+import { COMPARE_COLOR } from './constants';
 
 export const compareValues = (
   value1: string | null | undefined,
@@ -31,8 +31,8 @@ export const processFetchData = async (
   });
 
   const formattedRows = Object.entries(cards).flatMap(([key, [row1, row2]]) => {
-    const preparedRow1 = row1 ? row1 : rowNames;
-    const preparedRow2 = row2 ? row2 : rowNames;
+    const preparedRow1 = row1 || rowNames;
+    const preparedRow2 = row2 || rowNames;
 
     if (
       compareOnlyChanged &&
@@ -46,6 +46,8 @@ export const processFetchData = async (
     return [
       {
         ...preparedRow1,
+        // TODO: fix types
+        // @ts-ignore
         model_version: preparedRow1?.model_version?.toString(), // TODO: remove after fix on backend
         id: `${key}-1`,
         key: `${key}-1`,
@@ -54,6 +56,8 @@ export const processFetchData = async (
       },
       {
         ...preparedRow2,
+        // TODO: fix types
+        // @ts-ignore
         model_version: preparedRow2?.model_version?.toString(), // TODO: remove after fix on backend
         id: `${key}-2`,
         key: `${key}-2`,

@@ -1,12 +1,14 @@
 import React, { useCallback, useState, useMemo, useEffect } from 'react';
 import { Button, Field } from '@admiral-ds/react-ui';
 
-import { OptionsFactoryProps, SELECT_TYPE } from './types';
+import styled from 'styled-components';
+import { OptionsFactoryProps, SELECT_TYPE, SelectOption } from './types';
 import { OptionsFactory } from './OptionsFactory';
 import { SelectValue } from './SelectValue';
 import {
   byMainOptions,
   checkForUniqueValue,
+  findAllNestedOptionsRecursively,
   getFilteredOptionsBySearch,
   getOptionsValues,
   getPlaceholder,
@@ -19,7 +21,7 @@ import {
 } from './styles';
 import { CustomOption } from './CustomOption';
 import { EMPTY_OPTION, NOT_NULL_OPTION } from './constants';
-import styled from 'styled-components';
+import { INPUT_TYPE } from '../InputFactory';
 
 export interface SearchSelectProps {
   name: string;
@@ -39,7 +41,7 @@ export interface SearchSelectProps {
   displayClearIcon?: boolean;
   loading?: boolean;
   error?: boolean;
-  extraText?: string;
+  extraText?: string | React.ReactNode;
   multiple?: boolean;
   addNewOptionEnabled?: boolean;
   selectNotNullEnabled?: boolean;
@@ -48,10 +50,10 @@ export interface SearchSelectProps {
   renderDropDownBottomPanel?: () => React.ReactNode;
   onAddNewOption?: (newOptionValue: string) => void;
   modified?: boolean;
+  selectType?: INPUT_TYPE;
 }
 
 export const SearchSelect = ({
-  key,
   name,
   onChange,
   options,
@@ -75,10 +77,13 @@ export const SearchSelect = ({
   selectEmptyEnabled = false,
   selectAllEnabled = true,
   modified = false,
+  selectType,
   renderDropDownBottomPanel,
   onAddNewOption,
 }: SearchSelectProps) => {
   const optionsValues = useMemo(() => getOptionsValues(options), [options]);
+  const { options: _options }: { options: SelectOption[] } = options as any;
+  const isTree = _options?.some((option) => option.nestedValues || option.parentsValues);
 
   const [selectOptions, setSelectOptions] = useState(options);
 
@@ -109,30 +114,37 @@ export const SearchSelect = ({
   }, [optionsValues, selectedValues]);
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    let newSelectedValues = Array.from(e.target.selectedOptions).map((option) => option.value);
+    const currentId = e.target.value;
+    const selectedOptions = e.target.selectedOptions;
+    let newSelectedValues = Array.from(selectedOptions).map((option) => option.value);
+    const { options: _options }: { options: SelectOption[] } = options as any;
 
-    if (selectedAllValues && newSelectedValues.length !== optionsValues?.length) {
-      setSelectedAllValues(false);
-    } else if (!selectedAllValues && newSelectedValues.length === optionsValues?.length) {
-      setSelectedAllValues(true);
+    if (!isTree) {
+      if (selectedAllValues && newSelectedValues.length !== optionsValues?.length) {
+        setSelectedAllValues(false);
+      } else if (!selectedAllValues && newSelectedValues.length === optionsValues?.length) {
+        setSelectedAllValues(true);
+      }
+
+      // Unselect option for single select
+      if (!multiple && selectedValues?.includes(newSelectedValues[0])) {
+        newSelectedValues = [];
+      }
+
+      // Add selected options that are out of the scope of the search
+      if (searchValue) {
+        const selectOptionsValues = getOptionsValues(selectOptions);
+
+        const prevSelectedValues =
+          selectedValues?.filter((value) => !selectOptionsValues.includes(value)) ?? [];
+
+        newSelectedValues = [...prevSelectedValues, ...newSelectedValues];
+      }
+
+      onChange(name, newSelectedValues);
+    } else if (!currentId) {
+      onChange(name, newSelectedValues);
     }
-
-    // Unselect option for single select
-    if (!multiple && selectedValues?.includes(newSelectedValues[0])) {
-      newSelectedValues = [];
-    }
-
-    // Add selected options that are out of the scope of the search
-    if (searchValue) {
-      const selectOptionsValues = getOptionsValues(selectOptions);
-
-      const prevSelectedValues =
-        selectedValues?.filter((value) => !selectOptionsValues.includes(value)) ?? [];
-
-      newSelectedValues = [...prevSelectedValues, ...newSelectedValues];
-    }
-
-    onChange(name, newSelectedValues);
   };
 
   const handleChangeSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -175,9 +187,46 @@ export const SearchSelect = ({
     [options, searchValue, addNewOptionEnabled],
   );
 
+  const onClickItemHandler = (selectedOption: SelectOption, _selectedValues?: string[]) => {
+    let newSelectedValues = _selectedValues || [];
+
+    const currentId = selectedOption.value;
+    const allCurrentlyNested = findAllNestedOptionsRecursively(_options, currentId);
+
+    if (multiple) {
+      if (selectType === INPUT_TYPE.SELECT) {
+        // if type is SELECT and is nested/parented make single selection with all the parents
+        const allCurrentParents = selectedOption.parentsValueIds || [];
+        newSelectedValues = [...allCurrentParents, currentId].map(
+          (value) => value.toString() || '',
+        );
+        onChange(name, newSelectedValues);
+      } else if (newSelectedValues.includes(currentId)) {
+        // if clicked option is off - find all nested options and remove them and remove self
+        newSelectedValues = newSelectedValues
+          .filter((value) => value !== currentId)
+          .filter((value) => !allCurrentlyNested.includes(value));
+        onChange(name, newSelectedValues);
+      } else {
+        // if clicked option is on - find all nested options and add them and self
+        newSelectedValues = [...newSelectedValues, ...allCurrentlyNested, currentId].filter(
+          (value) => value,
+        );
+        onChange(name, newSelectedValues);
+      }
+    } else {
+      newSelectedValues = [...allCurrentlyNested, currentId].filter((value) => value);
+      onChange(name, newSelectedValues);
+    }
+  };
+
   return (
-    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
-    <div key={key} className={className} onClick={handlePreventEvent}>
+    <div
+      className={className}
+      onClick={handlePreventEvent}
+      onKeyDown={handlePreventEvent}
+      role="presentation"
+    >
       <Field
         required={required}
         status={error ? 'error' : undefined}
@@ -252,6 +301,7 @@ export const SearchSelect = ({
             selectNotNullEnabled={selectNotNullEnabled}
             selectEmptyEnabled={selectEmptyEnabled}
             selectedValues={selectedValues}
+            onClickItem={onClickItemHandler}
           />
         </CustomSelect>
       </Field>
@@ -269,3 +319,4 @@ export const CustomSearchSelect = styled(SearchSelect)`
     align-items: center;
   }
 `;
+

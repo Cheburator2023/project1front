@@ -44,14 +44,18 @@ export const formatValuesForSelect = (
   const { type, value } = selectValue;
 
   if (type === INPUT_TYPE.SELECT || type === INPUT_TYPE.QUARTERLY_DROPDOWN) {
-    return value.id ? [value.id] : undefined;
+    return Array.isArray(value)
+      ? value.length
+        ? value.map(({ id }) => id)
+        : undefined
+      : value.id
+      ? [value.id]
+      : undefined;
   }
 
   if (type === INPUT_TYPE.MULTI_SELECT) {
     return value.length ? value.map(({ id }) => id) : undefined;
   }
-
-  return;
 };
 
 export const getNumberValue = (value?: InputValue) => {
@@ -100,7 +104,7 @@ export const getSelectValue = (value?: InputValue) => {
 export const getFieldValueAsNumber = (rawValue: unknown): number => {
   if (typeof rawValue === 'string' || typeof rawValue === 'number') {
     const parsedValue = parseFloat(String(rawValue));
-    return isNaN(parsedValue) ? 0 : parsedValue;
+    return Number.isNaN(parsedValue) ? 0 : parsedValue;
   }
   return 0;
 };

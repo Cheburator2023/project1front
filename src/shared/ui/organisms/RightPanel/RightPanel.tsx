@@ -1,16 +1,20 @@
-import { T } from '@admiral-ds/react-ui';
-import React, { useCallback, useEffect } from 'react';
+import { Flex, T } from '@admiral-ds/react-ui';
+import React, { useCallback, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ReactComponent as CloseOutline } from '@admiral-ds/icons/build/service/CloseOutline.svg';
+import { ReactComponent as ChevronLeftOutline } from '@admiral-ds/icons/build/system/ChevronLeftOutline.svg';
+import { ReactComponent as ChevronRightOutline } from '@admiral-ds/icons/build/system/ChevronRightOutline.svg';
 
 import { ErrorStatus, Loading } from '@shared/ui/atoms';
 import { IconButton } from '@shared/ui/molecules';
 
 import { Overlay, Panel, Header, HeaderRow, Body, Footer, StatusWrapper } from './styles';
+import { Flexbox } from '../../atoms/Flexbox';
 
 export interface RightPanelProps {
   title: string;
   error?: string;
+  expanded?: boolean;
   loading?: boolean;
   subTitle?: string;
   showPanel: boolean;
@@ -18,17 +22,22 @@ export interface RightPanelProps {
   body?: React.ReactNode;
   footer?: React.ReactNode;
   onClose: () => void;
+  onExpanded?: () => void;
+  headerRightTitleContent?: React.ReactNode;
 }
 
 export const RightPanel = ({
   showPanel,
   title = 'Заголовок панели',
+  expanded = false,
+  onExpanded,
   header,
   body,
   error,
   loading,
   footer,
   onClose,
+  headerRightTitleContent,
 }: RightPanelProps) => {
   const escFunction = useCallback(
     (event: KeyboardEvent) => {
@@ -38,6 +47,10 @@ export const RightPanel = ({
     },
     [onClose],
   );
+
+  const onExpandHandler = useCallback(() => {
+    onExpanded?.();
+  }, [expanded]);
 
   // eslint-disable-next-line consistent-return
   useEffect(() => {
@@ -68,18 +81,30 @@ export const RightPanel = ({
 
   return createPortal(
     <Overlay>
-      <Panel>
+      <Panel width={expanded ? '90%' : '400px'}>
         <Header>
           <HeaderRow>
-            <T font="Subtitle/Subtitle 2" as="div">
-              {title}
-            </T>
             <IconButton
               dimension="lBig"
-              icon={<CloseOutline />}
-              tooltip="Закрыть"
-              onClick={onClose}
+              icon={expanded ? <ChevronRightOutline /> : <ChevronLeftOutline />}
+              tooltip="Развернуть панель"
+              onClick={onExpandHandler}
             />
+
+            <Flexbox justifyContent="center" alignItems="center">
+              <T font="Subtitle/Subtitle 2" as="div">
+                {title}
+              </T>
+            </Flexbox>
+            <Flexbox alignItems="center">
+              <div>{headerRightTitleContent}</div>
+              <IconButton
+                dimension="lBig"
+                icon={<CloseOutline />}
+                tooltip="Закрыть"
+                onClick={onClose}
+              />
+            </Flexbox>
           </HeaderRow>
           {header}
         </Header>
@@ -90,3 +115,4 @@ export const RightPanel = ({
     document.body,
   );
 };
+

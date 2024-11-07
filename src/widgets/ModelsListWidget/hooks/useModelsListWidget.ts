@@ -38,7 +38,7 @@ export const useModelsListWidget = (
     error,
   } = useFetch<ModelsResponseType>({
     apiRoute: API_ROUTES.MODELS,
-    // mockedResponse: mockedModelsResponse,
+    mockedResponse: mockedModelsResponse,
   });
 
   useEffect(() => {
@@ -80,7 +80,7 @@ export const useModelsListWidget = (
   };
 
   const updateColumnList = () => {
-    const newColumnList = filterColumnsByColumnsFilters(columnsFilters);
+    const newColumnList = filterColumnsByColumnsFilters(columnsFilters, initialColumns);
 
     setColumnList(newColumnList);
   };

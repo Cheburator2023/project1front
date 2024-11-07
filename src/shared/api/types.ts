@@ -30,7 +30,7 @@ export type ModelsResponseType = {
 export type ModelEditResponseType = ErrorResponse | SuccessResponse<ModelsResponseType>;
 
 export type Relations = {
-  [key: string]: (Partial<Row> & String) | null; //TODO: add interface for new attributes
+  [key: string]: (Partial<Row> & string) | null; // TODO: add interface for new attributes
 };
 
 type RelationsModel = {
@@ -100,7 +100,7 @@ export type Template = {
   group_id?: number;
   template_name: string;
   group_label?: string;
-  template_value: Partial<ColumnsFilter>;
+  template_value?: Partial<ColumnsFilter>;
   isOwner?: boolean;
   public?: boolean;
 };
@@ -136,6 +136,8 @@ export enum ArtifactType {
   USER = 'user',
 }
 
+export type ArtifactTypeUnion = `${ArtifactType}`;
+
 export type ArtifactValue = {
   artefact_id?: number;
   artefact_value_id: number;
@@ -144,7 +146,7 @@ export type ArtifactValue = {
   is_active_flag?: string;
 };
 
-//TODO: need to review
+// TODO: need to review
 export enum ArtifactGroup {
   CUSTOMER_USAGE = 'Модель используется заказчиком',
   CONFIRMATION_DATE = 'Дата подтверждения использования',
@@ -152,13 +154,15 @@ export enum ArtifactGroup {
   ALLOCATION_USAGE = 'Аллокация применения',
 }
 
+export type ArtifactGroupUnion = `${ArtifactGroup}`;
+
 type ArtifactFlag = undefined | null | '0' | '1';
 
 export type Artifact = {
   artefact_id: number;
   artefact_tech_label: keyof Row;
   artefact_context?: null | string;
-  artefact_parent_id?: null | string;
+  artefact_parent_id?: null | string | number;
   artefact_parent_value?: null | string;
   artefact_parent_value_id?: null | string;
   artefact_default_value?: null | string;
@@ -171,7 +175,7 @@ export type Artifact = {
   artefact_label: string;
   artefact_desc?: string | null;
   artefact_hint?: string | null;
-  artefact_type_id?: string;
+  artefact_type_id?: string | number;
   task_name?: string;
   bpmn_name?: string;
   is_edit_flg: ArtifactFlag;
@@ -179,14 +183,14 @@ export type Artifact = {
   is_class_flg?: ArtifactFlag;
   is_main_info_flg?: ArtifactFlag;
   is_multi_fill_flg?: ArtifactFlag;
-  artefact_type_desc: ArtifactType;
+  artefact_type_desc: ArtifactTypeUnion;
   values: Array<ArtifactValue>;
   start_date_depend_artefact?: keyof Row;
-  group?: ArtifactGroup;
+  group?: ArtifactGroupUnion;
 };
 
 export type ArtifactResponse = {
-  data: Array<Artifact>;
+  data?: Array<Artifact>;
 };
 
 export type ArtifactApi = {
@@ -231,3 +235,4 @@ export type ModelHistoryChangesResponse = {
 export type ReportApi = {
   filters: Partial<ColumnsFilter>;
 };
+

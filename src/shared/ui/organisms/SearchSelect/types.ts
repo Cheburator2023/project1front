@@ -2,6 +2,7 @@ enum SELECT_TYPE {
   TEMPLATES = 'TEMPLATES',
   TAGS = 'TAGS',
   STRING = 'STRING',
+  STRING_WITH_PARENTS = 'STRING_WITH_PARENTS',
 }
 
 type SelectOption = {
@@ -10,7 +11,9 @@ type SelectOption = {
   visible?: boolean;
   disabled?: boolean;
   nestedValues?: string[];
+  nestedValueIds?: number[];
   parentsValues?: string[];
+  parentsValueIds?: number[];
 };
 
 type SelectTemplatesOptions = Array<{
@@ -26,7 +29,12 @@ type SelectTemplatesProps = {
 type SelectStringOptions = Array<SelectOption>;
 
 type SelectStringProps = {
-  type: SELECT_TYPE.STRING;
+  type: SELECT_TYPE.STRING | SELECT_TYPE.STRING_WITH_PARENTS;
+  options: SelectStringOptions;
+};
+
+type SelectStringWithParentsProps = {
+  type: SELECT_TYPE.STRING_WITH_PARENTS;
   options: SelectStringOptions;
 };
 
@@ -37,7 +45,11 @@ type SelectTagsProps = {
   options: SelectTagsOptions;
 };
 
-type OptionsFactoryProps = SelectTemplatesProps | SelectStringProps | SelectTagsProps;
+type OptionsFactoryProps =
+  | SelectTemplatesProps
+  | SelectStringProps
+  | SelectTagsProps
+  | SelectStringWithParentsProps;
 
 export {
   SELECT_TYPE,
@@ -49,4 +61,6 @@ export {
   SelectStringProps,
   SelectTagsOptions,
   SelectTagsProps,
+  SelectStringWithParentsProps,
 };
+
