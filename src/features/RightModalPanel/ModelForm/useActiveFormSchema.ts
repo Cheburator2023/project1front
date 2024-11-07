@@ -159,15 +159,6 @@ const getAddSchema = (
         }
       }
     }
-
-    // Make not active model active only after state back to boolean false (undefined is initial state)
-    if (activeModelByDefault === false) {
-      formSchema = getUnionSchema(
-        formSchema,
-        markSchema(NOT_ACTIVE_MODEL_SCHEMA, SCHEMA_NAME_MAP.NOT_ACTIVE_MODEL_SCHEMA),
-      );
-    }
-
     return formSchema;
   }
 
