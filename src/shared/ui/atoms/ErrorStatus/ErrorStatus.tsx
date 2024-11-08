@@ -17,3 +17,4 @@ export const ErrorStatus = ({ text }: ErrorStatusProps) => (
     icon={<ErrorSolid />}
   />
 );
+

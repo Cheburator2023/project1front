@@ -26,6 +26,7 @@ type ArtificialRow = {
 };
 
 type Row = ArtificialRow & {
+  date_of_introduction_into_operation: string | null;
   system_model_id: string;
   id: string;
   model_source: string;
@@ -45,6 +46,7 @@ type Row = ArtificialRow & {
   allocation_rb_comment: string | null;
   allocation_kc_comment: string | null;
   allocation_other_comment: string | null;
+  artefacts_model_id: string | null;
   allocation_kib_usage: string | null;
   allocation_smb_usage: string | null;
   allocation_rb_usage: string | null;
@@ -150,6 +152,7 @@ type Row = ArtificialRow & {
   model_epic_05a: string | null;
   data_completion_of_stage_05a: string | null;
   solution_to_implement_model: string | null;
+  business_status: string | null;
   model_epic_07: string | null;
   model_epic_07_date: string | null;
   custom_model_id: string | null;

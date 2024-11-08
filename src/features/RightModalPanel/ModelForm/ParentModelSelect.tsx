@@ -2,9 +2,9 @@ import React, { useMemo } from 'react';
 
 import { SELECT_TYPE, SelectStringProps } from '@shared/ui/organisms';
 
+import { Row } from '@src/shared/types';
 import { getParentModelOptions } from './helpers';
 import { CustomSearchSelect } from './styles';
-import { Row } from '@src/shared/types';
 
 export interface ParentModelSelectProps {
   rows: Partial<Row>[];
@@ -34,3 +34,4 @@ export const ParentModelSelect = React.memo(
 );
 
 ParentModelSelect.displayName = 'ParentModelSelect';
+

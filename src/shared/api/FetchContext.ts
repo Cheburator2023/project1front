@@ -1,9 +1,9 @@
+/* eslint-disable no-use-before-define */
 import { createContext } from 'react';
 import { ErrorResponse, SuccessResponse } from './types';
 
 export const FetchContext = createContext<{
-  // eslint-disable-next-line no-use-before-define
-  protectedFetch?: <N, T = void>(
+  protectedFetch?: <T, N = void>(
     routeUrl: string,
     params?: Record<string, string>,
     body?: N,

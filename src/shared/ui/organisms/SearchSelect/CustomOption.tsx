@@ -38,13 +38,14 @@ interface OptionProps {
   text: string;
   checked: boolean;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  style?: React.CSSProperties;
 }
 
-export const CustomOption = ({ text, checked, onChange }: OptionProps) => {
+export const CustomOption = ({ text, checked, onChange, style }: OptionProps) => {
   const textRef = useRef(null);
 
   return (
-    <Container key={text}>
+    <Container key={text} style={style}>
       <Checkbox dimension="s" onChange={onChange} checked={checked} />
 
       <Label ref={textRef} font="Body/Body 2 Long" as="div">
@@ -54,3 +55,4 @@ export const CustomOption = ({ text, checked, onChange }: OptionProps) => {
     </Container>
   );
 };
+

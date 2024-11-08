@@ -3,21 +3,27 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@entities": ["src/entities/*", "src/entities/"],
-      "@pages": ["src/pages/*", "src/pages/"],
-      "@src/*": ["src/*"],
-      "@app/*": ["src/app/*"],
-      "@widgets": ["src/widgets/*", "src/widgets/"],
-      "@features": ["src/features/*", "src/features/"],
-      "@shared/*": ["src/shared/*"],
-      "*": ["./src/*"],
+      "@entities": ["./src/entities"],
+      "@entities/*": ["./src/entities/*"],
+      "@pages": ["./src/pages/"],
+      "@pages/*": ["./src/pages/*"],
+      "@src/*": ["./src/*"],
+      "@src": ["./src"],
+      "@app": ["./src/app"],
+      "@app/*": ["./src/app/*"],
+      "@widgets": ["./src/widgets/"],
+      "@widgets/*": ["./src/widgets/*"],
+      "@features": ["./src/features/"],
+      "@features/*": ["./src/features/*"],
+      "@shared/*": ["./src/shared/*"],
+      "@shared": ["./src/shared"]
     },
     "target": "esnext",
     "module": "esnext",
     "lib": ["dom", "es2017"],
     "allowJs": true,
     "sourceMap": true,
-    "jsx": "react",
+    "jsx": "react-jsx",
     "strict": true,
     "moduleResolution": "node",
     "esModuleInterop": true,
@@ -28,3 +34,4 @@
   },
   "exclude": ["node_modules", "dist"]
 }
+

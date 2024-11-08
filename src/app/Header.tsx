@@ -11,10 +11,10 @@ import { ReactComponent as PersonSolid } from '@admiral-ds/icons/build/system/Pe
 
 import { Loading, Tooltip } from '@shared/ui/atoms';
 import { IconButton } from '@shared/ui/molecules';
-import { ColumnsFilter } from 'shared/types';
 import { API_ROUTES, useFetch, ReportApi } from '@shared/api';
 
 import { ReactComponent as LogoIcon } from './logo.svg';
+import { ColumnsFilter } from '../shared/types';
 
 const Container = styled.div`
   width: 100%;
@@ -69,7 +69,14 @@ const ActionsGroup = styled.div`
 interface HeaderProps {
   columnsFilters?: Partial<ColumnsFilter>;
   downloadReportStatus: boolean;
-  user?: Keycloak.KeycloakTokenParsed & { family_name: string; given_name: string };
+  user?: Keycloak.KeycloakTokenParsed & {
+    family_name: string;
+    given_name: string;
+    realm_access: {
+      roles: string[];
+    };
+    roles: string[];
+  };
   updateColumnsFilters: (newColumnsFilters?: Partial<ColumnsFilter>) => void;
   updateDownloadReportStatus: React.Dispatch<React.SetStateAction<boolean>>;
   onLogout?: () => void;
@@ -86,7 +93,6 @@ const Header = ({
   goToSum,
 }: HeaderProps) => {
   const sumBtnRef = useRef(null);
-
   const { mutationProtectedFetch } = useFetch({});
 
   useEffect(() => {
@@ -112,7 +118,7 @@ const Header = ({
 
   return (
     <Container>
-      <Link to={'/sum-rm'}>
+      <Link to="/sum-rm">
         <Logo>
           <LogoIcon />
           <CustomLabel font="Caption/Caption 1">Реестр моделей</CustomLabel>

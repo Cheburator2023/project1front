@@ -23,10 +23,19 @@ enum INPUT_TYPE {
 
 type SelectInputValue = {
   type: INPUT_TYPE.SELECT;
-  value?: {
+  value?:
+    | {
+        id: string;
+        text: string;
+      }
+    | {
+        id: string;
+        text: string;
+      }[];
+  values?: {
     id: string;
     text: string;
-  };
+  }[];
 };
 
 type MultiSelectInputValue = {
@@ -116,12 +125,14 @@ type CommonInputProps<T extends string> = {
   label: string;
   name: T;
   required: boolean;
-  requireConditions?: FormFieldConditions; //TODO: fix imports (not allow FSD import rules)
-  valueConditions?: FormFieldValueConditions; //TODO: fix imports (not allow FSD import rules)
+  requireConditions?: FormFieldConditions; // TODO: fix imports (not allow FSD import rules)
+  valueConditions?: FormFieldValueConditions; // TODO: fix imports (not allow FSD import rules)
   placeholder?: string;
   disabled?: boolean;
   maxLength?: number;
   group?: string;
+  schemaKey?: string;
+  schemaOrder?: number;
 };
 
 type StringInput<T extends string> = CommonInputProps<T> & {
@@ -206,16 +217,6 @@ type MultiSelectInput<T extends string> = CommonInputProps<T> & {
   multiple: true;
 };
 
-// TODO: refactor
-type GroupFieldProps<T extends string> = {
-  id: `${T}_group`;
-  name: `${T}_group`;
-  required: boolean;
-  label: string;
-  type: INPUT_TYPE;
-  fields: InputFactoryProps<T>[];
-};
-
 type InputFactoryProps<T extends string> =
   | StringInput<T>
   | DateInput<T>
@@ -231,6 +232,16 @@ type InputFactoryProps<T extends string> =
   | TextAreaInput<T>
   | SelectInput<T>
   | MultiSelectInput<T>;
+
+// TODO: refactor
+type GroupFieldProps<T extends string> = {
+  id: `${T}_group`;
+  name: `${T}_group`;
+  required: boolean;
+  label: string;
+  type: INPUT_TYPE;
+  fields: InputFactoryProps<T>[];
+};
 
 export {
   INPUT_TYPE,

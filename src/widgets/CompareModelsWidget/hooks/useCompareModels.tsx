@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React, { ReactNode, useEffect, useRef, useState } from 'react';
 import { T } from '@admiral-ds/react-ui';
 
@@ -11,7 +12,9 @@ import {
 import { filterColumnsByColumnsFilters } from '@shared/helpers';
 import { CellWrapper, CellContentFactory } from '@entities';
 
+import { initialColumns } from '@src/shared/constants';
 import { compareValues, prepareFetchParams, processFetchData } from '../helpers';
+import { TableRow } from '../../../shared/ui';
 
 export const useCompareModels = (columnsFilters: Partial<ColumnsFilter>) => {
   const cellRef = useRef(null);
@@ -21,7 +24,7 @@ export const useCompareModels = (columnsFilters: Partial<ColumnsFilter>) => {
   const [resData, setResData] = useState<CompareModelsResponseType | undefined>(undefined);
   const [rowList, setRowList] = useState<Array<Partial<Row> & { comparisonKey: string }>>([]);
   const [columnList, setColumnList] = useState<Column[]>(
-    filterColumnsByColumnsFilters(columnsFilters),
+    filterColumnsByColumnsFilters(columnsFilters, initialColumns),
   );
 
   const [searchString, setSearchString] = useState<string>('');
@@ -50,7 +53,7 @@ export const useCompareModels = (columnsFilters: Partial<ColumnsFilter>) => {
       >({
         fetchApiRoute: API_ROUTES.COMPARE_MODELS,
         fetchMethod: 'GET',
-        // mockedResponse: mockedModelsCompareResponse,
+        mockedResponse: mockedModelsCompareResponse,
         newParams: prepareFetchParams(firstDate, secondDate),
       });
 
@@ -74,12 +77,40 @@ export const useCompareModels = (columnsFilters: Partial<ColumnsFilter>) => {
     }
   };
 
+  const cellRender = (
+    value: string,
+    record: TableRow & { comparisonKey: number },
+    field: keyof Row,
+    column: Column,
+  ): ReactNode => {
+    const { comparisonKey } = record;
+
+    const rowsToCompare = resData?.data?.cards[comparisonKey];
+
+    const backgroundColor = record?.id
+      ? // @ts-ignore
+        record.id[`${record.id}`.length - 1] === '1'
+        ? undefined
+        : compareValues(rowsToCompare?.[0][field], rowsToCompare?.[1][field])
+      : undefined;
+
+    return (
+      <CellWrapper type={COLUMN_TYPE.STRING}>
+        <div ref={cellRef}>
+          <T font="Body/Body 2 Short" style={{ backgroundColor }}>
+            {CellContentFactory({ value, column, row: record, isCompare: true })}
+          </T>
+        </div>
+      </CellWrapper>
+    );
+  };
+
   const updateColumnList = () => {
-    const newColumnList = filterColumnsByColumnsFilters(columnsFilters);
+    const newColumnList = filterColumnsByColumnsFilters(columnsFilters, initialColumns);
     const renderedColumnList = newColumnList.map((column) => {
       return {
         ...column,
-        renderCell: (data: any, row: Partial<Row> & { comparisonKey: number }) =>
+        renderCell: (data: any, row: TableRow & { comparisonKey: number }) =>
           cellRender(data, row, column.name as keyof Row, column),
       };
     });
@@ -107,33 +138,6 @@ export const useCompareModels = (columnsFilters: Partial<ColumnsFilter>) => {
     }
 
     setSearchString(newSearchString);
-  };
-
-  const cellRender = (
-    value: string,
-    record: Partial<Row> & { comparisonKey: number },
-    field: keyof Row,
-    column: Column,
-  ): ReactNode => {
-    const { comparisonKey } = record;
-
-    const rowsToCompare = resData?.data?.cards[comparisonKey];
-
-    const backgroundColor = record?.id
-      ? record.id[record.id?.length - 1] === '1'
-        ? undefined
-        : compareValues(rowsToCompare?.[0][field], rowsToCompare?.[1][field])
-      : undefined;
-
-    return (
-      <CellWrapper type={COLUMN_TYPE.STRING}>
-        <div ref={cellRef}>
-          <T font="Body/Body 2 Short" style={{ backgroundColor }}>
-            {CellContentFactory({ value, column, row: record, isCompare: true })}
-          </T>
-        </div>
-      </CellWrapper>
-    );
   };
 
   return {

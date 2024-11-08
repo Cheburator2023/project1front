@@ -1,10 +1,15 @@
+/* eslint-disable no-use-before-define */
 import { useContext, useEffect, useState } from 'react';
 
 import { FetchContext } from './FetchContext';
 import { API_ROUTES } from './constants';
 
+const MOCKED_REQUESTS = process.env.MOCKED_REQUESTS;
+console.log('🐸 Pepe said ~ MOCKED_REQUESTS:', MOCKED_REQUESTS);
+
 export interface MutationProtectedFetchProps<T, N> {
-  body?: T;
+  // TODO: check this types
+  body?: T extends N ? T : any;
   fetchApiRoute: API_ROUTES;
   fetchMethod: 'POST' | 'PUT' | 'DELETE' | 'GET';
   routeParam?: string | number;
@@ -28,10 +33,12 @@ const asyncFunc = (delay: number) =>
 export const useFetch = <T>({
   apiRoute,
   params,
-  mockedResponse,
+  mockedResponse: _mockedResponse,
   method = 'GET',
   delay = 200,
 }: FetchProps<T>) => {
+  const mockedResponse = MOCKED_REQUESTS ? _mockedResponse : undefined;
+
   const [responseData, setResponseData] = useState<T | undefined>(mockedResponse);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -62,7 +69,7 @@ export const useFetch = <T>({
         const response = await protectedFetch?.<void, T>(apiRoute, params);
 
         if (response && !response.error) {
-          setResponseData(response.data);
+          setResponseData(response.data as T);
           setError('');
         } else {
           setError('Ошибка загрузки');
@@ -82,6 +89,7 @@ export const useFetch = <T>({
 
   return {
     // fetch for CREATE, UPDATE, DELETE operations
+    // TODO: check this types
     mutationProtectedFetch: async <N, M>({
       body,
       fetchApiRoute,
@@ -89,8 +97,10 @@ export const useFetch = <T>({
       routeParam,
       fileName,
       newParams = {},
-      mockedResponse = undefined,
+      mockedResponse: __mockedResponseProtected = undefined,
     }: MutationProtectedFetchProps<N, M>) => {
+      const mockedResponseProtected = MOCKED_REQUESTS ? __mockedResponseProtected : undefined;
+
       const getRoute = () => {
         if (routeParam && fetchApiRoute) {
           return `${fetchApiRoute}/${routeParam}`;
@@ -101,9 +111,9 @@ export const useFetch = <T>({
 
       const route = getRoute();
 
-      if (mockedResponse) {
+      if (mockedResponseProtected) {
         await asyncFunc(1000);
-        return Promise.resolve({ data: mockedResponse, error: undefined });
+        return Promise.resolve({ data: mockedResponseProtected, error: undefined });
       }
 
       if (route) {

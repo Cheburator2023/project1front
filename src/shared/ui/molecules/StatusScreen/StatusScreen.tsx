@@ -87,7 +87,7 @@ export const StatusScreen = ({
             <StatusIndicator
               cssMixin={error ? ErrorColor : SuccessColor}
               dimension="m"
-              text={error ? error : successLabel}
+              text={error || successLabel}
               displayRight={false}
               icon={error ? <ErrorSolid /> : <CheckSolid />}
             />
@@ -99,3 +99,4 @@ export const StatusScreen = ({
     </>
   );
 };
+

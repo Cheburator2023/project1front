@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { Checkbox, CheckboxDimension } from '@admiral-ds/react-ui';
-import type { TableRow, RowId, Column, Dimension } from '../';
+import type { TableRow, RowId, Column, Dimension } from '..';
 
 import {
   CheckboxCell,
@@ -115,3 +115,4 @@ export const RegularRow = ({
     </>
   );
 };
+
