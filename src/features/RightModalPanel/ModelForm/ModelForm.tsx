@@ -156,7 +156,10 @@ export const ModelForm = ({
     async ({ checkOnly = false }: SubmitType) => {
       const valuesWithAddedOutsideControls: FormValues = {
         ...values,
-        active_model: { type: INPUT_TYPE.FLAG, value: activeModelByDefault || false },
+        active_model: {
+          type: INPUT_TYPE.FLAG,
+          value: activeModelByDefault || false,
+        },
       };
       const newInvalidFields = getInvalidFields(formSchema, valuesWithAddedOutsideControls);
 
@@ -167,10 +170,6 @@ export const ModelForm = ({
       setInvalidFields(isAllocationFieldsChanged ? [] : newInvalidFields);
 
       if (newInvalidFields.length && !isAllocationFieldsChanged) {
-        return;
-      }
-
-      if (newInvalidFields.length) {
         return;
       }
 
