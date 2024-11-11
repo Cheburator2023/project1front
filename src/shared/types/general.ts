@@ -26,7 +26,6 @@ type ArtificialRow = {
 };
 
 type Row = ArtificialRow & {
-  date_of_introduction_into_operation: string | null;
   system_model_id: string;
   id: string;
   model_source: string;
