@@ -15,7 +15,7 @@ module.exports = merge(common, {
   },
   plugins: [
     new DefinePlugin({
-      'process.env.MOCKED_REQUESTS': JSON.stringify(process.env.MOCKED_REQUESTS),
+      'process.env.MOCKED_REQUESTS': JSON.stringify(process.env.MOCKED_REQUESTS || ''),
     }),
   ],
   devServer: {
