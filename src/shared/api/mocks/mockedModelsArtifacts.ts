@@ -37,7 +37,6 @@ const mockedArtifacts: Artifact[] = [
     artefact_type_desc: 'text',
     values: [],
   },
-
   {
     artefact_id: 2110,
     artefact_tech_label: 'rating_model',

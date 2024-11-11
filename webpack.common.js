@@ -1,11 +1,13 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ModuleFederationPlugin = require('webpack').container.ModuleFederationPlugin;
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 const federationConfig = require('./federation.config.json');
 const deps = require('./package.json').dependencies;
 
 const SRC_DIR = path.join(__dirname, './src');
+const TS_CONFIG_PATH = path.resolve(__dirname, './tsconfig.json');
 
 const ALIAS = {
   '@src': `${SRC_DIR}`,
