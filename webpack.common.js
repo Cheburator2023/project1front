@@ -64,6 +64,16 @@ module.exports = {
           eager: true,
           requiredVersion: deps['styled-components'],
         },
+        zustand: {
+          singleton: true,
+          eager: true,
+          requiredVersion: deps['zustand'],
+        },
+        'use-sync-external-store': {
+          singleton: true,
+          eager: true,
+          requiredVersion: deps['use-sync-external-store'],
+        },
       },
     }),
     new HtmlWebpackPlugin({
