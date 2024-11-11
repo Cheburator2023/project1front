@@ -4,8 +4,8 @@
   "description": "",
   "private": true,
   "scripts": {
-    "build": "cross-env NODE_ENV=production MOCKED_REQUESTS=false webpack --mode production --config webpack.prod.js",
-    "serve": "cd dist && cross-env PORT=8001 NODE_ENV=production npx serve",
+    "build": "NODE_ENV=production MOCKED_REQUESTS=false webpack --mode production --config webpack.prod.js",
+    "serve": "cd dist && PORT=8001 NODE_ENV=production npx serve",
     "start": "webpack-dev-server --mode development --live-reload --config webpack.dev.js",
     "dev:mocked": "cross-env MOCKED_REQUESTS=true webpack-dev-server --mode development --live-reload --config webpack.dev.js",
     "clean": "rm -rf dist",
