@@ -408,6 +408,7 @@ const mapArtifactToField = (
     required: !!fieldSchema?.required,
     maxLength: fieldSchema?.maxLength,
     requireConditions: fieldSchema?.requireConditions,
+    optionConditions: fieldSchema?.optionConditions,
     valueConditions: fieldSchema?.valueConditions,
     disabled: artifact.is_edit_flg === '0',
     placeholder: artifact.artefact_desc ? artifact.artefact_desc : undefined,

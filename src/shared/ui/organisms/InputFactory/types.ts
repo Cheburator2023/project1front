@@ -2,6 +2,7 @@ import { SELECT_TYPE, SelectOption, SelectStringProps } from '@shared/ui/organis
 import {
   FormFieldConditions,
   FormFieldValueConditions,
+  OptionConditionsType,
 } from '@src/features/RightModalPanel/ModelForm';
 
 enum INPUT_TYPE {
@@ -127,6 +128,7 @@ type CommonInputProps<T extends string> = {
   required: boolean;
   requireConditions?: FormFieldConditions | string[]; // TODO: fix imports (not allow FSD import rules)
   valueConditions?: FormFieldValueConditions; // TODO: fix imports (not allow FSD import rules)
+  optionConditions?: OptionConditionsType[];
   placeholder?: string;
   disabled?: boolean;
   maxLength?: number;

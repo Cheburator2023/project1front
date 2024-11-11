@@ -392,6 +392,13 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
         rating_model: 'Да',
       },
     ],
+    optionConditions: [
+      {
+        connected_field: 'significance_validity',
+        value: 'Высокая',
+        options: ['Высокая', 'Средняя'],
+      },
+    ],
     valueConditions: [
       {
         value: 'Высокая',
