@@ -1,7 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ModuleFederationPlugin = require('webpack').container.ModuleFederationPlugin;
-const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 const federationConfig = require('./federation.config.json');
 const deps = require('./package.json').dependencies;
@@ -82,11 +81,6 @@ module.exports = {
   },
   resolve: {
     alias: ALIAS,
-    // plugins: [
-    //   new TsconfigPathsPlugin({
-    //     configFile: TS_CONFIG_PATH,
-    //   }),
-    // ],
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
     fallback: {
       url: false,
