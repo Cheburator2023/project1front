@@ -1,5 +1,5 @@
 /* eslint-disable no-unneeded-ternary */
-import React, { ChangeEvent, useCallback, useRef, useState } from 'react';
+import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { Button, CheckboxField, T } from '@admiral-ds/react-ui';
 
 import { Row } from '@shared/types';
@@ -15,7 +15,6 @@ import { Artifact, CustomError } from '@shared/api/types';
 import { useAppInjectStore } from '@shared/stores/appInjectStore';
 import { CUSTOMER_MAP } from '@shared/constants/customers';
 import { useScrollTo } from '@src/shared/hooks/useScrollTo';
-import { useDeepEffect } from '@src/shared/hooks/useDeepEffect';
 import { FormValues } from './types';
 import {
   getFormMode,
@@ -289,20 +288,20 @@ export const ModelForm = ({
     await handleSubmit({ checkOnly: true });
   };
 
-  useDeepEffect(() => {
+  useEffect(() => {
     const initialValues = getInputValuesFromRow(artifacts, initialRow);
 
     setValues(initialValues);
   }, [initialRow, artifacts]);
 
-  useDeepEffect(() => {
+  useEffect(() => {
     if (activeRow?.active_model === '1') {
       setActiveModelByDefault(true);
     }
   }, [activeRow?.active_model]);
 
   // Scroll to edit input field
-  useDeepEffect(() => {
+  useEffect(() => {
     if (formRef.current?.children && editCellName) {
       const editedFieldIndex = fields.findIndex((field) => field.name === editCellName);
 
@@ -316,7 +315,7 @@ export const ModelForm = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editCellName, formRef.current]);
 
-  useDeepEffect(() => {
+  useEffect(() => {
     if (dirtyFields.length) {
       const newInvalidFields = getInvalidFields(formSchema, values, wasPreviouslyActiveModel);
       setInvalidFields(newInvalidFields);
