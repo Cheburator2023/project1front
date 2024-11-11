@@ -1,6 +1,6 @@
-import { Template } from '@shared/api/types';
 import { Column, Row } from '@shared/types';
 import { RIGHT_PANEL_TYPE } from '@shared/constants';
+import { Template } from '@shared/api/types';
 
 export interface TableModelsProps {
   rowList: Array<Partial<Row>>;

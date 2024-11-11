@@ -34,8 +34,7 @@ import { ButtonContainer, FormContainer } from './styles';
 import { ParentModelSelect } from './ParentModelSelect';
 import { useActiveFormSchema } from './useActiveFormSchema';
 import { useFormFields } from './useFormFields';
-import { ALLOCATION_FIELDS_NAMES } from './constants';
-import { SCHEMA_NAME_MAP } from './constants';
+import { ALLOCATION_FIELDS_NAMES, SCHEMA_NAME_MAP } from './constants';
 import { ModelFormDotMenu } from './ModelFormDotMenu';
 
 type SubmitType = { checkOnly?: boolean };
@@ -150,6 +149,7 @@ export const ModelForm = ({
           return initialValue !== formattedValue.artefact_string_value;
         }
       }
+      return null;
     });
 
   const handleSubmit = useCallback(

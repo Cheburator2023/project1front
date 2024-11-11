@@ -1333,7 +1333,7 @@ const mockedModels: Array<Partial<Row>> = [
     allocation_rb_comment: null,
     allocation_kc_comment: null,
     allocation_other_comment: null,
-    date_of_introduction_into_operation: "2022-01-27 10:55:17"
+    date_of_introduction_into_operation: '2022-01-27 10:55:17',
   },
   {
     system_model_id: '0c093b7d-359a-11ec-80d2-0242ac11000d',
@@ -1474,7 +1474,7 @@ const mockedModels: Array<Partial<Row>> = [
     allocation_rb_comment: null,
     allocation_kc_comment: null,
     allocation_other_comment: null,
-    date_of_introduction_into_operation: "2022-01-27 10:55:17"
+    date_of_introduction_into_operation: '2022-01-27 10:55:17',
   },
   {
     system_model_id: '0fe12ac1-d82f-11ec-aca9-0a58010006b2',
