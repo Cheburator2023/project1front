@@ -1,27 +1,21 @@
 /* eslint-disable no-unneeded-ternary */
-import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
-import { Button, CheckboxField, Flex, Option, Select, T } from '@admiral-ds/react-ui';
-import { useKeycloak } from '@react-keycloak/web';
+import React, { ChangeEvent, useCallback, useRef, useState } from 'react';
+import { Button, CheckboxField, T } from '@admiral-ds/react-ui';
 
 import { Row } from '@shared/types';
 import { StatusScreen } from '@shared/ui/molecules';
 import { RIGHT_PANEL_TYPE, MODEL_FORM_MODE } from '@shared/constants';
-import {
-  INPUT_TYPE,
-  InputFactory,
-  InputValue,
-  RightPanel,
-  SELECT_TYPE,
-} from '@shared/ui/organisms';
+import { INPUT_TYPE, InputFactory, InputValue, RightPanel } from '@shared/ui/organisms';
 import { API_ROUTES, useFetch, ArtifactApi, ModelEditApi } from '@shared/api';
 
-import { groupBy } from 'lodash';
+import { filter, groupBy, omit, pick } from 'lodash';
 import { Flexbox, Spacer } from '@shared/ui/atoms';
 import { Artifact, CustomError } from '@shared/api/types';
 
 import { useAppInjectStore } from '@shared/stores/appInjectStore';
 import { CUSTOMER_MAP } from '@shared/constants/customers';
 import { useScrollTo } from '@src/shared/hooks/useScrollTo';
+import { useDeepEffect } from '@src/shared/hooks/useDeepEffect';
 import { FormValues } from './types';
 import {
   getFormMode,
@@ -34,7 +28,13 @@ import { ButtonContainer, FormContainer } from './styles';
 import { ParentModelSelect } from './ParentModelSelect';
 import { useActiveFormSchema } from './useActiveFormSchema';
 import { useFormFields } from './useFormFields';
-import { ALLOCATION_FIELDS_NAMES, SCHEMA_NAME_MAP } from './constants';
+import {
+  ACTIVE_MODEL_SCHEMA,
+  ALLOCATION_FIELDS_NAMES,
+  BASE_MODEL_SCHEMA,
+  NOT_ACTIVE_MODEL_SCHEMA,
+  SCHEMA_NAME_MAP,
+} from './constants';
 import { ModelFormDotMenu } from './ModelFormDotMenu';
 
 type SubmitType = { checkOnly?: boolean };
@@ -64,6 +64,7 @@ export const ModelForm = ({
   const { setCurrentCustomer, currentCustomer } = useAppInjectStore();
 
   const [values, setValues] = useState<FormValues | undefined>();
+  const [cachedValues, setCachedValues] = useState<FormValues | undefined>();
   const [invalidFields, setInvalidFields] = useState<Array<keyof Row>>([]);
   const [dirtyFields, setDirtyFields] = useState<Array<keyof Row>>([]);
   const [parentModelId, setParentModelId] = useState<string>();
@@ -80,6 +81,8 @@ export const ModelForm = ({
 
   const scrollToActiveError = useScrollTo(errorElemRef, formRef);
 
+  const wasPreviouslyActiveModel = activeRow?.active_model === '1';
+
   const { formSchema } = useActiveFormSchema({
     values,
     initialRow,
@@ -95,6 +98,7 @@ export const ModelForm = ({
     showAllFields,
     currentCustomer,
     activeModelByDefault,
+    wasPreviouslyActiveModel,
   });
 
   const IS_FORM_MODE_ADD = formMode === MODEL_FORM_MODE.ADD;
@@ -161,15 +165,21 @@ export const ModelForm = ({
           value: activeModelByDefault || false,
         },
       };
-      const newInvalidFields = getInvalidFields(formSchema, valuesWithAddedOutsideControls);
-
-      scrollToActiveError();
-
+      const newInvalidFields = getInvalidFields(
+        formSchema,
+        valuesWithAddedOutsideControls,
+        wasPreviouslyActiveModel,
+      );
       const isAllocationFieldsChanged = checkForAllocationFieldsChanged();
-
       setInvalidFields(isAllocationFieldsChanged ? [] : newInvalidFields);
+      scrollToActiveError();
+      setDirtyFields((prevDirtyFields) => [...prevDirtyFields, fields[0].name]);
 
       if (newInvalidFields.length && !isAllocationFieldsChanged) {
+        return;
+      }
+
+      if (newInvalidFields.length) {
         return;
       }
 
@@ -263,27 +273,36 @@ export const ModelForm = ({
     const isChecked = e?.target?.checked;
     setActiveModelByDefault(e?.target?.checked);
     setCurrentCustomer(CUSTOMER_MAP.UMRV);
-    if (!isChecked) {
-      setValues({});
+
+    setCachedValues(values);
+
+    if (isChecked) {
+      const fieldKeysToFilter = [...ACTIVE_MODEL_SCHEMA, ...NOT_ACTIVE_MODEL_SCHEMA].map(
+        (field) => field.name,
+      );
+
+      setValues(omit(values, fieldKeysToFilter));
+    } else {
+      setValues({ ...cachedValues, ...values });
     }
-    // setDirtyFields((prevDirtyFields) => [...prevDirtyFields, fields[0].name]);
+
     await handleSubmit({ checkOnly: true });
   };
 
-  useEffect(() => {
+  useDeepEffect(() => {
     const initialValues = getInputValuesFromRow(artifacts, initialRow);
 
     setValues(initialValues);
   }, [initialRow, artifacts]);
 
-  useEffect(() => {
-    if (values?.active_model?.value) {
+  useDeepEffect(() => {
+    if (activeRow?.active_model === '1') {
       setActiveModelByDefault(true);
     }
-  }, [values?.active_model?.value]);
+  }, [activeRow?.active_model]);
 
   // Scroll to edit input field
-  useEffect(() => {
+  useDeepEffect(() => {
     if (formRef.current?.children && editCellName) {
       const editedFieldIndex = fields.findIndex((field) => field.name === editCellName);
 
@@ -297,12 +316,12 @@ export const ModelForm = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editCellName, formRef.current]);
 
-  useEffect(() => {
+  useDeepEffect(() => {
     if (dirtyFields.length) {
-      const newInvalidFields = getInvalidFields(formSchema, values);
+      const newInvalidFields = getInvalidFields(formSchema, values, wasPreviouslyActiveModel);
       setInvalidFields(newInvalidFields);
     }
-  }, [values, dirtyFields, formSchema]);
+  }, [values, dirtyFields, formSchema, wasPreviouslyActiveModel]);
 
   return (
     <RightPanel

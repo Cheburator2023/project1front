@@ -2,6 +2,7 @@ import { Row } from '@src/shared/types';
 
 const mockedModels: Array<Partial<Row>> = [
   {
+    active_model: '0',
     system_model_id: '000f3c2a-7cc3-11ef-b049-8215a604741b',
     model_source: 'sum',
     model_version_id: '000f3c2a-7cc3-11ef-b049-8215a604741b',
@@ -72,6 +73,7 @@ const mockedModels: Array<Partial<Row>> = [
     allocation_other_comment: 'test',
   },
   {
+    active_model: '1',
     system_model_id: '0013539e-d9d5-11eb-8c85-0242ac11000d',
     model_source: 'sum',
     model_version_id: '0013539e-d9d5-11eb-8c85-0242ac11000d',
@@ -143,6 +145,7 @@ const mockedModels: Array<Partial<Row>> = [
     allocation_other_comment: 'test',
   },
   {
+    active_model: null,
     system_model_id: '01010055-6152-11ef-b31b-32eed338898a',
     model_source: 'sum',
     model_version_id: '01010055-6152-11ef-b31b-32eed338898a',
@@ -1333,7 +1336,6 @@ const mockedModels: Array<Partial<Row>> = [
     allocation_rb_comment: null,
     allocation_kc_comment: null,
     allocation_other_comment: null,
-    date_of_introduction_into_operation: '2022-01-27 10:55:17',
   },
   {
     system_model_id: '0c093b7d-359a-11ec-80d2-0242ac11000d',
@@ -1474,7 +1476,6 @@ const mockedModels: Array<Partial<Row>> = [
     allocation_rb_comment: null,
     allocation_kc_comment: null,
     allocation_other_comment: null,
-    date_of_introduction_into_operation: '2022-01-27 10:55:17',
   },
   {
     system_model_id: '0fe12ac1-d82f-11ec-aca9-0a58010006b2',

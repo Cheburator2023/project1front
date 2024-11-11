@@ -287,12 +287,12 @@ export const ACTIVE_MODEL_SCHEMA: FormFieldsSchema = [
 export const NOT_ACTIVE_MODEL_SCHEMA: FormFieldsSchema = [
   {
     name: 'remove_date',
-    required: true,
+    requireConditions: ['wasPreviouslyActiveModel'],
     customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
   },
   {
     name: 'remove_decision',
-    required: true,
+    requireConditions: ['wasPreviouslyActiveModel'],
     maxLength: 250,
     customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
   },

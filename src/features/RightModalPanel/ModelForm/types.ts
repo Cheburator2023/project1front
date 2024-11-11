@@ -17,7 +17,7 @@ type FormFieldsSchema = Array<{
   maxLength?: number;
   customers?: CUSTOMER_TYPE[];
   order?: number;
-  requireConditions?: FormFieldConditions;
+  requireConditions?: FormFieldConditions | string[];
   valueConditions?: FormFieldValueConditions;
   schemaKey?: string;
   schemaOrder?: number;

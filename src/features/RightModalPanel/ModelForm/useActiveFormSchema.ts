@@ -100,7 +100,7 @@ const getEditSchema = (
       activeModelByDefault === false
     ) {
       formSchema = getUnionSchema(
-        formSchema,
+        markSchema(BASE_MODEL_SCHEMA, SCHEMA_NAME_MAP.BASE_MODEL_SCHEMA),
         markSchema(NOT_ACTIVE_MODEL_SCHEMA, SCHEMA_NAME_MAP.NOT_ACTIVE_MODEL_SCHEMA),
       );
     }

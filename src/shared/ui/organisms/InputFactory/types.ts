@@ -125,7 +125,7 @@ type CommonInputProps<T extends string> = {
   label: string;
   name: T;
   required: boolean;
-  requireConditions?: FormFieldConditions; // TODO: fix imports (not allow FSD import rules)
+  requireConditions?: FormFieldConditions | string[]; // TODO: fix imports (not allow FSD import rules)
   valueConditions?: FormFieldValueConditions; // TODO: fix imports (not allow FSD import rules)
   placeholder?: string;
   disabled?: boolean;

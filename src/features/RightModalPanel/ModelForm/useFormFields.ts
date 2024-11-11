@@ -16,6 +16,7 @@ interface UseFormFieldsProps {
   showAllFields?: boolean;
   currentCustomer: CUSTOMER_TYPE;
   activeModelByDefault?: boolean;
+  wasPreviouslyActiveModel?: boolean;
 }
 
 export const useFormFields = ({
@@ -25,7 +26,6 @@ export const useFormFields = ({
   artifacts,
   showAllFields,
   currentCustomer,
-  activeModelByDefault,
 }: UseFormFieldsProps) => {
   const [fields, setFields] = useState<FormFields>([]);
 
@@ -37,7 +37,6 @@ export const useFormFields = ({
       currentFormSchema: formSchema,
       showAllFields,
       currentCustomer,
-      activeModelByDefault,
     });
 
     setFields(newFields);
