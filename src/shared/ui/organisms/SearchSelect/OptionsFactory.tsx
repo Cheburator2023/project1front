@@ -9,6 +9,7 @@ import { ReactComponent as PeopleSolid } from '@admiral-ds/icons/build/system/Pe
 import { SELECT_TYPE, OptionsFactoryProps, SelectOption } from './types';
 import { CustomOption } from './CustomOption';
 import { NOT_NULL_OPTION, EMPTY_OPTION } from './constants';
+import { Flexbox } from '../../atoms';
 
 // const Chevron = styled(ChevronRightOutline)<{ $isOpened?: boolean; dimension?: Dimension }>`
 //   transition: all 0.3s;
@@ -102,7 +103,7 @@ export const OptionsFactory = ({
       const { options } = optionsProps;
 
       return (
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <Flexbox flexDirection="column">
           {selectNotNullEnabled && (
             <Option
               value={NOT_NULL_OPTION.value}
@@ -137,7 +138,9 @@ export const OptionsFactory = ({
                   disabled={disabled}
                   value={value}
                   renderOption={(p) => {
-                    const padding = 20 * (Number(parentsValueIds?.length) + 1 || 1);
+                    const padding = parentsValueIds?.length
+                      ? 20 * (Number(parentsValueIds?.length) + 1 || 1)
+                      : 0;
 
                     return (
                       <CustomOption
@@ -154,7 +157,7 @@ export const OptionsFactory = ({
                 />
               );
             })}
-        </div>
+        </Flexbox>
       );
     }
   }
