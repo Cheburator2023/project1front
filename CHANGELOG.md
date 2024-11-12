@@ -1,5 +1,33 @@
 # Semantic Versioning Changelog
 
+# [1.25.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.24.0...v1.25.0) (2024-11-12)
+
+
+### Bug Fixes
+
+* deps fixed for sfera registry ([75e9bc5](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/75e9bc52c78d988e2f70a0ceda7d82f0072280c4))
+* deps realocation and prod fix ([c23094f](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/c23094f71bad1cfd3941b345f73ddb9c66831b2b))
+* deps realocation and prod fix ([7d9144b](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/7d9144b8e1eb34dc061e2e50fcc4e0d98fa8f618))
+* deps realocation and prod fix ([e894684](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/e8946844722175c0be3d81f61b31d894b4ed924a))
+* fixes after dev testing ([b08f08f](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/b08f08f5452146f208778bf75df7721574a16e94))
+* option factory css fixes ([083b6bc](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/083b6bc02e341a9a1d57143f5c762b65517f13c8))
+* **template:** add new field ([b94e05f](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/b94e05f3e7a10a50ab77b219a83cfde07c33443b))
+* Фикс бага - разработанные модели ([d5041d7](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/d5041d7f362ea68c8454c8a70dd31aa0a054b3ad))
+
+
+### Features
+
+* active model add form non active remove fix ([79789cc](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/79789cc75a2698adc9286e17d38253aa88719c74))
+* delete tsconfig ([04723e2](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/04723e2fdc11ccceb511fb68f4cc968f2815df98))
+* i,rv active model task done ([62c05ed](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/62c05edffd4fbe469bd316db715741120f35f3eb))
+* input select filtered conditional options added ([43b52db](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/43b52db83f4e98db439055188031876a47adeeca))
+* input select filtered conditional options added ([0270a4b](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/0270a4bb277e7e531157f5626fe8197cfd201fc3))
+* upd templates filters ([61e8994](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/61e8994cf2494d915022c670a4725cdbd408b917))
+* upd templates filters ([8877b7f](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/8877b7f97b358dea5167be6a30542b68dc69e067))
+* upd templates filters ([5eeffff](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/5eeffff08de35694051d17603feb6ea119d4fd79))
+* upd templates, fix allocations ([50e826c](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/50e826ccd469efbecae46c815e8d7f40e8f5a7ab))
+* Дашборды. Новое поле date_of_introduction_into_operation. Fix ([fabb1f2](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/fabb1f23e73683aff2d9bd642084e2c6a0fd3837))
+
 # [1.24.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.23.0...v1.24.0) (2024-11-06)
 
 
