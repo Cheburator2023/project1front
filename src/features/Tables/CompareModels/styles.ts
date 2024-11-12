@@ -47,3 +47,4 @@ export const CompareTable = styled(Table)`
     height: 100%;
   }
 `;
+

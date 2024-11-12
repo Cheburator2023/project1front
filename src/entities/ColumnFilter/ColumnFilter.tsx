@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import React, { useEffect, useState } from 'react';
 import { Button } from '@admiral-ds/react-ui';
 
@@ -5,10 +7,11 @@ import { COLUMN_TYPE, Column, ColumnsFilter, Row, TopFilters } from '@shared/typ
 import { SELECT_TYPE } from '@shared/ui/organisms';
 import { getColumnFilterOptions, getFilteredRowsByColumnsFilter } from '@shared/helpers';
 
-import { CustomDateField, CustomSearchSelect } from './styles';
-import { getDateRange, getFormattedDateValue } from './helpers';
 import { useTemplateFilters } from '@src/shared/hooks';
 import { Template } from '@src/shared/api/types';
+import { CustomDateField, CustomSearchSelect } from './styles';
+import { getDateRange, getFormattedDateValue } from './helpers';
+import { initialColumns } from '../../shared/constants';
 
 export interface ColumnFilterProps {
   column: Column;
@@ -104,16 +107,17 @@ export const ColumnFilter = React.memo(
           return null;
         }
 
-        const filteredRowsIds = getFilteredRowsByColumnsFilter(rowList, columnsFilters).reduce(
-          (filteredRowsIds, filteredRow) => {
-            if (filteredRow && filteredRow?.id) {
-              return [...filteredRowsIds, filteredRow.id];
-            }
+        const filteredRowsIds = getFilteredRowsByColumnsFilter(
+          rowList,
+          columnsFilters,
+          initialColumns,
+        ).reduce((filteredRowsIds, filteredRow) => {
+          if (filteredRow && filteredRow?.id) {
+            return [...filteredRowsIds, filteredRow.id];
+          }
 
-            return filteredRowsIds;
-          },
-          [] as string[],
-        );
+          return filteredRowsIds;
+        }, [] as string[]);
 
         const options = getColumnFilterOptions(
           rowList,

@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unstable-nested-components */
 import * as React from 'react';
 import ReactDOM from 'react-dom';
 import { CSSProperties, useEffect, useRef, useState } from 'react';
@@ -46,6 +47,9 @@ const COLUMN_MIN_WIDTH_L = 33;
 
 export type Dimension = 'xl' | 'l' | 'm' | 's';
 
+export type RowId = string | number;
+type IdSelectionStatusMap = Record<RowId, boolean>;
+
 type FilterProps = {
   /** Функция закрытия меню фильтра */
   closeMenu: () => void;
@@ -55,6 +59,58 @@ type FilterProps = {
    */
   setFilterActive?: (isActive: boolean) => void;
 };
+
+export interface TableRow {
+  id: RowId;
+  className?: string;
+  /** Строка в состоянии selected */
+  selected?: boolean;
+  /** Строка в состоянии disabled  */
+  disabled?: boolean;
+  /** Чекбокс строки в состоянии disabled */
+  checkboxDisabled?: boolean;
+  /** Строка в состоянии error */
+  error?: boolean;
+  /** Строка в состоянии success */
+  success?: boolean;
+  /** Строка в раскрытом состоянии */
+  expanded?: boolean;
+  /** Окраска строки по Hover. Данная окраска должна применяться, если строка кликабельна и ведет к каким-либо действиям */
+  hover?: boolean;
+  /** Название группы */
+  groupTitle?: string;
+  /** Строки таблицы, находящиеся в группе */
+  groupRows?: Array<string>;
+  /** Функция рендера содержимого раскрытой части строки (детализации строки) */
+  expandedRowRender?: (row: any) => React.ReactNode;
+  /** Функция рендера OverflowMenu для строки.
+   * Входные параметры: сама строка, колбек onVisibilityChange.
+   * Колбек необходимо вызывать при открытии/закрытии меню для того, чтобы таблица могла управлять видимостью OverflowMenu.
+   * OverflowMenu отображается при ховере на строку или при открытом меню
+   * и располагается по правому краю строки в видимой области таблицы.
+   *
+   * В качестве результата функция должна возвращать OverflowMenu.
+   * Для таблицы с dimension='s' или dimension='m' используется OverflowMenu c dimension='m'.
+   * Для таблицы с dimension='l' или dimension='xl' используется OverflowMenu c dimension='l'.
+   */
+  overflowMenuRender?: (
+    row: any,
+    onVisibilityChange?: (isVisible: boolean) => void,
+  ) => React.ReactNode;
+  /** Функция рендера одиночного действия над строкой.
+   * Одиночное действие отображается в виде иконки при ховере на строку
+   * и располагается по правому краю строки в видимой области таблицы.
+   *
+   * В качестве результата функция должна возвращать компонент RowAction,
+   * внутрь которого нужно передать произвольную иконку для отображения действия.
+   */
+  actionRender?: (row: any) => React.ReactNode;
+  /**
+   * Метод для переопределения стандартного вида заголовка группы
+   * @param row - объект строки
+   */
+  renderGroupTitle?(row: TableRow): React.ReactNode;
+}
 
 export type Column = {
   /** Уникальное название столбца */
@@ -118,61 +174,6 @@ export type Column = {
    */
   renderCell?(data: any, row: TableRow, rowIdx: number): React.ReactNode;
 };
-
-export type RowId = string | number;
-type IdSelectionStatusMap = Record<RowId, boolean>;
-
-export interface TableRow {
-  id: RowId;
-  className?: string;
-  /** Строка в состоянии selected */
-  selected?: boolean;
-  /** Строка в состоянии disabled  */
-  disabled?: boolean;
-  /** Чекбокс строки в состоянии disabled */
-  checkboxDisabled?: boolean;
-  /** Строка в состоянии error */
-  error?: boolean;
-  /** Строка в состоянии success */
-  success?: boolean;
-  /** Строка в раскрытом состоянии */
-  expanded?: boolean;
-  /** Окраска строки по Hover. Данная окраска должна применяться, если строка кликабельна и ведет к каким-либо действиям */
-  hover?: boolean;
-  /** Название группы */
-  groupTitle?: string;
-  /** Строки таблицы, находящиеся в группе */
-  groupRows?: Array<string>;
-  /** Функция рендера содержимого раскрытой части строки (детализации строки) */
-  expandedRowRender?: (row: any) => React.ReactNode;
-  /** Функция рендера OverflowMenu для строки.
-   * Входные параметры: сама строка, колбек onVisibilityChange.
-   * Колбек необходимо вызывать при открытии/закрытии меню для того, чтобы таблица могла управлять видимостью OverflowMenu.
-   * OverflowMenu отображается при ховере на строку или при открытом меню
-   * и располагается по правому краю строки в видимой области таблицы.
-   *
-   * В качестве результата функция должна возвращать OverflowMenu.
-   * Для таблицы с dimension='s' или dimension='m' используется OverflowMenu c dimension='m'.
-   * Для таблицы с dimension='l' или dimension='xl' используется OverflowMenu c dimension='l'.
-   */
-  overflowMenuRender?: (
-    row: any,
-    onVisibilityChange?: (isVisible: boolean) => void,
-  ) => React.ReactNode;
-  /** Функция рендера одиночного действия над строкой.
-   * Одиночное действие отображается в виде иконки при ховере на строку
-   * и располагается по правому краю строки в видимой области таблицы.
-   *
-   * В качестве результата функция должна возвращать компонент RowAction,
-   * внутрь которого нужно передать произвольную иконку для отображения действия.
-   */
-  actionRender?: (row: any) => React.ReactNode;
-  /**
-   * Метод для переопределения стандартного вида заголовка группы
-   * @param row - объект строки
-   */
-  renderGroupTitle?(row: TableRow): React.ReactNode;
-}
 
 export interface TableProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Массив столбцов */
@@ -270,7 +271,7 @@ export interface TableProps extends React.HTMLAttributes<HTMLDivElement> {
   };
   /** Объект локализации - позволяет перезадать текстовые константы используемые в компоненте,
    * по умолчанию значения констант берутся из темы в соответствии с параметром currentLocale, заданном в теме
-   **/
+   * */
   locale?: {
     /** Сообщение, отображаемое при отсутствии совпадений в строках после применения фильтра */
     emptyMessage?: React.ReactNode;
@@ -480,7 +481,7 @@ export const Table: React.FC<TableProps> = ({
             `[data-column="${(entry.target as HTMLElement).dataset.thColumn}"]`,
           );
           bodyCells?.forEach((cell) => {
-            cell.style.width = entry.borderBoxSize[0].inlineSize + 'px';
+            cell.style.width = `${entry.borderBoxSize[0].inlineSize}px`;
           });
 
           // find all header cells in the same column as entry column
@@ -488,8 +489,8 @@ export const Table: React.FC<TableProps> = ({
             `[data-th-column="${(entry.target as HTMLElement).dataset.thColumn}"]`,
           );
           headerCells?.forEach((cell) => {
-            cell.style.width = entry.borderBoxSize[0].inlineSize + 'px';
-            cell.style.minWidth = entry.borderBoxSize[0].inlineSize + 'px';
+            cell.style.width = `${entry.borderBoxSize[0].inlineSize}px`;
+            cell.style.minWidth = `${entry.borderBoxSize[0].inlineSize}px`;
           });
         });
       });
@@ -542,13 +543,13 @@ export const Table: React.FC<TableProps> = ({
 
     function handleScroll(e: any) {
       if (e.target === scrollBodyRef.current) {
-        requestAnimationFrame(function () {
+        requestAnimationFrame(() => {
           scrollHeader(e.target.scrollLeft);
           moveOverflowMenu(e.target.scrollLeft);
         });
       }
       if (stickyColumns.length > 0 || displayRowSelectionColumn || displayRowExpansionColumn) {
-        requestAnimationFrame(function () {
+        requestAnimationFrame(() => {
           setShadow(e.target.scrollLeft);
         });
       }
@@ -681,7 +682,7 @@ export const Table: React.FC<TableProps> = ({
           dimension,
           direction: 'horizontal',
           invalid: (el: HTMLElement) => {
-            return el.dataset.draggable == 'false';
+            return el.dataset.draggable === 'false';
           },
           accepts: (
             _,
@@ -692,7 +693,7 @@ export const Table: React.FC<TableProps> = ({
             // column can be dragged only inside parent container
             if (target !== source) return false;
             // can not place column before CheckboxCell or ExnandCell
-            if (sibling?.dataset.droppable == 'false') return false;
+            if (sibling?.dataset.droppable === 'false') return false;
             return true;
           },
         },
@@ -729,59 +730,71 @@ export const Table: React.FC<TableProps> = ({
     return { groupId, value };
   };
 
-  function handleCheckboxChange(id: RowId) {
-    const groupInfo = groupToRowsMap[id];
-    const rowHasGroup = rowToGroupMap[id];
+  const handleCheckboxChange = React.useCallback(
+    (id: RowId) => {
+      const groupInfo = groupToRowsMap[id];
+      const rowHasGroup = rowToGroupMap[id];
 
-    const groupCheckStatus = groupInfo && calcGroupCheckStatus(groupInfo);
-    const parentGroupNewValue = rowHasGroup && parentGroupWillBeChecked(id);
+      const groupCheckStatus = groupInfo && calcGroupCheckStatus(groupInfo);
+      const parentGroupNewValue = rowHasGroup && parentGroupWillBeChecked(id);
 
-    const idsMap = rowList.reduce((ids: IdSelectionStatusMap, row) => {
-      if (groupInfo) {
-        const rowInCurrentGroup = groupInfo.rows.includes(row.id.toString());
+      const idsMap = rowList.reduce((ids: IdSelectionStatusMap, row) => {
+        if (groupInfo) {
+          const rowInCurrentGroup = groupInfo.rows.includes(row.id.toString());
 
-        if (row.id === id || rowInCurrentGroup) {
-          ids[row.id] = !(groupCheckStatus?.indeterminate || groupCheckStatus?.checked);
+          if (row.id === id || rowInCurrentGroup) {
+            ids[row.id] = !(groupCheckStatus?.indeterminate || groupCheckStatus?.checked);
+          } else {
+            ids[row.id] = row.id === id ? !row.selected : !!row.selected;
+          }
         } else {
           ids[row.id] = row.id === id ? !row.selected : !!row.selected;
+          if (rowHasGroup && row.id === parentGroupNewValue?.groupId) {
+            ids[row.id] = parentGroupNewValue?.value;
+          }
         }
-      } else {
-        ids[row.id] = row.id === id ? !row.selected : !!row.selected;
-        if (rowHasGroup && row.id === parentGroupNewValue?.groupId) {
-          ids[row.id] = parentGroupNewValue?.value;
-        }
-      }
-      return ids;
-    }, {});
-    onRowSelectionChange?.(idsMap, id);
-  }
+        return ids;
+      }, {});
+      onRowSelectionChange?.(idsMap, id);
+    },
+    [rowList, onRowSelectionChange, groupToRowsMap, rowToGroupMap],
+  );
 
-  function handleExpansionChange(id: RowId) {
-    const idsMap = rowList.reduce((ids: IdSelectionStatusMap, row) => {
-      const value = row.id === id ? !row.expanded : !!row.expanded;
-      ids[row.id] = value;
-      return ids;
-    }, {});
-    onRowExpansionChange?.(idsMap);
-  }
+  const handleExpansionChange = React.useCallback(
+    (id: RowId) => {
+      const idsMap = rowList.reduce((ids: IdSelectionStatusMap, row) => {
+        const value = row.id === id ? !row.expanded : !!row.expanded;
+        ids[row.id] = value;
+        return ids;
+      }, {});
+      onRowExpansionChange?.(idsMap);
+    },
+    [onRowExpansionChange, rowList],
+  );
 
   const isSelected = (row: { selected?: boolean }) => row.selected;
   // When invoked on an empty array, every() always returns true. So we need to check rowList.length.
   const allRowsChecked = rowList.length > 0 && rowList.every(isSelected);
   const someRowsChecked = rowList.some(isSelected);
 
-  function handleHeaderCheckboxChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const toRemove = rowList.reduce((ids: IdSelectionStatusMap, row) => {
-      ids[row.id] = row.checkboxDisabled ? !!row.selected : !someRowsChecked;
-      return ids;
-    }, {});
-    onRowSelectionChange?.(toRemove);
-    onHeaderSelectionChange?.(e.target.checked);
-  }
+  const handleHeaderCheckboxChange = React.useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const toRemove = rowList.reduce((ids: IdSelectionStatusMap, row) => {
+        ids[row.id] = row.checkboxDisabled ? !!row.selected : !someRowsChecked;
+        return ids;
+      }, {});
+      onRowSelectionChange?.(toRemove);
+      onHeaderSelectionChange?.(e.target.checked);
+    },
+    [rowList, onRowSelectionChange, onHeaderSelectionChange, someRowsChecked],
+  );
 
-  function handleResizeChange({ name, width }: { name: string; width: number }) {
-    onColumnResize?.({ name, width: width + 'px' });
-  }
+  const handleResizeChange = React.useCallback(
+    ({ name, width }: { name: string; width: number }) => {
+      onColumnResize?.({ name, width: `${width}px` });
+    },
+    [onColumnResize],
+  );
 
   const handleSort = (name: string, colSort: 'asc' | 'desc' | 'initial') => {
     let newSort: 'asc' | 'desc' | 'initial' = 'initial';
@@ -815,35 +828,39 @@ export const Table: React.FC<TableProps> = ({
     />
   );
 
-  const renderBodyCell = (idx: number) => (row: TableRow, col: Column) => {
-    const headerCellWidth = hiddenHeaderRef.current
-      ?.querySelector<HTMLElement>(`[data-th-column="${col.name}"]`)
-      ?.getBoundingClientRect().width;
+  // TODO: refactor
+  const renderBodyCell = (idx: number) =>
+    function (row: TableRow, col: Column) {
+      const headerCellWidth = hiddenHeaderRef.current
+        ?.querySelector<HTMLElement>(`[data-th-column="${col.name}"]`)
+        ?.getBoundingClientRect().width;
 
-    const render = () => {
-      if (col.renderCell) {
-        return col.renderCell((row as any)[col.name], row, idx);
-      }
-      if (renderCell) {
-        return renderCell(row, col.name);
-      }
+      const render = () => {
+        if (col.renderCell) {
+          return col.renderCell((row as any)[col.name], row, idx);
+        }
+        if (renderCell) {
+          return renderCell(row, col.name);
+        }
 
-      return <CellTextContent cellAlign={col.cellAlign}>{(row as any)[col.name]}</CellTextContent>;
+        return (
+          <CellTextContent cellAlign={col.cellAlign}>{(row as any)[col.name]}</CellTextContent>
+        );
+      };
+
+      return (
+        <Cell
+          key={`${row.id}_${col.name}`}
+          dimension={dimension}
+          style={{ width: headerCellWidth || '100px' }}
+          className="td"
+          data-column={col.name}
+          data-row={row.id}
+        >
+          {render()}
+        </Cell>
+      );
     };
-
-    return (
-      <Cell
-        key={`${row.id}_${col.name}`}
-        dimension={dimension}
-        style={{ width: headerCellWidth || '100px' }}
-        className="td"
-        data-column={col.name}
-        data-row={row.id}
-      >
-        {render()}
-      </Cell>
-    );
-  };
 
   const renderGroupRow = (row: TableRow) => {
     const indeterminate =
@@ -934,7 +951,9 @@ export const Table: React.FC<TableProps> = ({
 
   const renderBody = () => {
     const emptyMessage = !(
-      !locale?.emptyMessage && !theme.locales[theme.currentLocale].table.emptyMessage
+      !locale?.emptyMessage &&
+      // @ts-expect-error TODO: fix types
+      !theme.locales[theme.currentLocale].table.emptyMessage
     );
     if (tableRows.length === 0) {
       return (
@@ -1074,3 +1093,4 @@ export const Table: React.FC<TableProps> = ({
 };
 
 Table.displayName = 'Table';
+

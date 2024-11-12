@@ -40,3 +40,4 @@ export const TemplatesGroupLabel = styled(T)`
   box-sizing: border-box;
   padding: 16px 24px;
 `;
+

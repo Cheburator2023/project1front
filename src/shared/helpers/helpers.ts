@@ -1,8 +1,9 @@
+/* eslint-disable no-restricted-syntax */
 import { EMPTY_OPTION, NOT_NULL_OPTION } from '@shared/ui/organisms';
 import { format, isValid, isWithinInterval, parse } from 'date-fns';
 
 import { COLUMN_TYPE, Column, ColumnsFilter, Row } from '@shared/types';
-import { DATE_FORMATS, initialColumns } from '@shared/constants';
+import { DATE_FORMATS } from '@shared/constants';
 
 const getISODateFormat = (dateString: string) => {
   for (const dateFormat of DATE_FORMATS) {
@@ -204,6 +205,7 @@ const getValuesColumnsFilterOptions = (
 const getFilteredRowsByColumnsFilter = (
   tableRows: Array<Partial<Row>>,
   columnsFilter: Partial<ColumnsFilter>,
+  initialColumns: Column[],
 ) => {
   const rowFields = Object.keys(columnsFilter) as Array<keyof Row>;
 
@@ -296,7 +298,10 @@ const checkColumnsFiltersForEqual = (
 
   return columnsFiltersStr === newColumnsFiltersStr;
 };
-const filterColumnsByColumnsFilters = (columnsFilters: Partial<ColumnsFilter>) => {
+const filterColumnsByColumnsFilters = (
+  columnsFilters: Partial<ColumnsFilter>,
+  initialColumns: Column[],
+) => {
   const columnsFiltersNames = Object.keys(columnsFilters);
 
   return columnsFiltersNames.reduce((acc, name) => {

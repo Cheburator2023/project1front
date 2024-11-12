@@ -22,6 +22,10 @@ const FormContainer = styled.form`
   > * {
     margin-bottom: 20px;
   }
+
+  .searchSelect {
+    padding: 4px 12px;
+  }
 `;
 
 const ButtonContainer = styled.div`
@@ -36,3 +40,4 @@ const ButtonContainer = styled.div`
 `;
 
 export { CustomSearchSelect, FormContainer, ButtonContainer };
+

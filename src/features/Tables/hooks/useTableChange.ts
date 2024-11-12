@@ -11,6 +11,7 @@ import {
   filterColumnsFiltersByColumns,
 } from '@shared/helpers';
 
+import { initialColumns } from '@src/shared/constants';
 import { TableChangeProps } from '../types';
 
 export const useTableChange = ({
@@ -116,7 +117,11 @@ export const useTableChange = ({
       }
 
       if (columnsFilters) {
-        newFilteredRows = getFilteredRowsByColumnsFilter(newFilteredRows, columnsFilters);
+        newFilteredRows = getFilteredRowsByColumnsFilter(
+          newFilteredRows,
+          columnsFilters,
+          initialColumns,
+        );
       }
 
       const sortedColumn = cols.find((col) => col.sort);

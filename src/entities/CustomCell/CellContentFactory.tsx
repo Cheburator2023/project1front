@@ -4,11 +4,12 @@ import { format } from 'date-fns';
 import { COLUMN_TYPE, Column, Row } from '@shared/types';
 
 import { getLink } from './helpers';
+import { TableRow } from '../../shared/ui';
 
 interface CellContentFactoryProps {
   column: Column;
   value: string;
-  row: Row;
+  row: TableRow;
   isCompare?: boolean;
 }
 

@@ -64,7 +64,7 @@ export const HeaderCellComponent = ({
   const defaultSpacer = dimension === 'l' || dimension === 'xl' ? '16px' : '12px';
   const spacer = spacingBetweenItems || defaultSpacer;
   const cellRef = React.createRef<HTMLDivElement>();
-  const colWidth = typeof width === 'number' ? width + 'px' : width;
+  const colWidth = typeof width === 'number' ? `${width}px` : width;
 
   return (
     <HeaderCell

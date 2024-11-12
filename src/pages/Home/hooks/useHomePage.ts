@@ -20,7 +20,7 @@ export const useHomePage = () => {
 
   const { responseData: templateData } = useFetch<Template[]>({
     apiRoute: API_ROUTES.TEMPLATES,
-    // mockedResponse: mockedTemplatesResponse,
+    mockedResponse: mockedTemplatesResponse,
   });
 
   const [activeScreen, setActiveScreen] = useState(ACTIVE_SCREEN.TABLE);
@@ -50,7 +50,11 @@ export const useHomePage = () => {
   }, [columnsFilters, downloadReportStatus]);
 
   const handleChangeCompare = (checked: boolean) => {
-    checked ? setActiveScreen(ACTIVE_SCREEN.COMPARE) : setActiveScreen(ACTIVE_SCREEN.TABLE);
+    if (checked) {
+      setActiveScreen(ACTIVE_SCREEN.COMPARE);
+    } else {
+      setActiveScreen(ACTIVE_SCREEN.TABLE);
+    }
     setCompareMode(checked);
   };
 

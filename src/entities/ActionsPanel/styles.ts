@@ -27,3 +27,4 @@ const CustomSearchInput = styled(SearchInput)`
 `;
 
 export { Container, CustomSearchInput };
+

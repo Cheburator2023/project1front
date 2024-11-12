@@ -806,4 +806,6 @@ export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
   provides_piloting: [],
   operational_monitoring: [],
   analytical_monitoring: [],
+  artefacts_model_id: [],
+  business_status: [],
 };

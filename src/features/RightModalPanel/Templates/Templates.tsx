@@ -101,7 +101,8 @@ export const Templates = ({ templates, onClose, updateTemplates }: TemplatesProp
     setError('');
 
     try {
-      const res = await mutationProtectedFetch<T, Template>(fetchParams);
+      // @ts-ignore TODO: fix types
+      const res: any = await mutationProtectedFetch<T, Template>(fetchParams);
 
       if (!res || res.error) {
         const errorMessage = res?.data?.message || 'Ошибка';
@@ -311,3 +312,4 @@ export const Templates = ({ templates, onClose, updateTemplates }: TemplatesProp
     />
   );
 };
+

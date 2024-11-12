@@ -6,6 +6,8 @@ const federationConfig = require('./federation.config.json');
 const deps = require('./package.json').dependencies;
 
 const SRC_DIR = path.join(__dirname, './src');
+const EXTERANL_MODULES = path.join(__dirname, './external_modules');
+const TS_CONFIG_PATH = path.resolve(__dirname, './tsconfig.json');
 
 const ALIAS = {
   '@src': `${SRC_DIR}`,
@@ -15,6 +17,8 @@ const ALIAS = {
   '@pages': `${SRC_DIR}/pages`,
   '@features': `${SRC_DIR}/features`,
   '@widgets': `${SRC_DIR}/widgets`,
+  zustand: `${EXTERANL_MODULES}/zustand/src`,
+  'use-sync-external-store': `${EXTERANL_MODULES}/use-sync-external-store`,
 };
 
 module.exports = {
@@ -113,3 +117,4 @@ module.exports = {
     ],
   },
 };
+
