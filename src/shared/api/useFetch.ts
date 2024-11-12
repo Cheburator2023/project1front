@@ -6,7 +6,6 @@ import { API_ROUTES } from './constants';
 import { stringToBoolean } from '../helpers/typeops';
 
 const MOCKED_REQUESTS = stringToBoolean(process.env.MOCKED_REQUESTS);
-console.log('🐸 Pepe said ~ MOCKED_REQUESTS:', MOCKED_REQUESTS);
 
 export interface MutationProtectedFetchProps<T, N> {
   // TODO: check this types

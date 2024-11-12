@@ -94,7 +94,7 @@ export const getFilteredOptionsBySearch = (
 
 export const getPlaceholder = (loading?: boolean, error?: boolean) => {
   if (error) {
-    return 'Ошибка загрузки';
+    return 'Не выбрано';
   }
 
   if (loading) {

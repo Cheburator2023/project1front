@@ -408,6 +408,7 @@ const mapArtifactToField = (
     required: !!fieldSchema?.required,
     maxLength: fieldSchema?.maxLength,
     requireConditions: fieldSchema?.requireConditions,
+    optionConditions: fieldSchema?.optionConditions,
     valueConditions: fieldSchema?.valueConditions,
     disabled: artifact.is_edit_flg === '0',
     placeholder: artifact.artefact_desc ? artifact.artefact_desc : undefined,
@@ -629,7 +630,6 @@ const getFormFields = ({
   currentFormSchema,
   showAllFields = false,
   currentCustomer = CUSTOMER_MAP.EVERY_CUSTOMER,
-  activeModelByDefault,
 }: {
   artifacts: Artifact[];
   currentFormSchema: FormFieldsSchema;
@@ -637,7 +637,6 @@ const getFormFields = ({
   initialRow?: Partial<Row>;
   showAllFields?: boolean;
   currentCustomer: CUSTOMER_TYPE;
-  activeModelByDefault?: boolean;
 }) => {
   const isActive = currentFormSchema.some(
     ({ schemaKey }) => schemaKey === SCHEMA_NAME_MAP.ACTIVE_MODEL_SCHEMA.key,
@@ -767,13 +766,16 @@ const checkForSatisfyConditions = (conditionsList: FormFieldConditions, values?:
 const checkRequireStatus = (
   values?: FormValues,
   required?: boolean,
-  requireConditions?: FormFieldConditions,
+  requireConditions?: FormFieldConditions | string[],
 ) => {
   if (required) {
     return true;
   }
 
   if (requireConditions) {
+    if (requireConditions.every((i) => typeof i === 'string')) {
+      return false;
+    }
     return checkForSatisfyConditions(requireConditions, values);
   }
 
@@ -796,10 +798,27 @@ const checkRequireValueStatus = (
   }
 };
 
-const getInvalidFields = (activeFormSchema: FormFieldsSchema, values?: FormValues) =>
-  activeFormSchema
-    .filter(({ name, required, requireConditions, valueConditions }) => {
+const getInvalidFields = (
+  activeFormSchema: FormFieldsSchema,
+  values?: FormValues,
+  wasPreviouslyActiveModel?: boolean,
+) => {
+  return activeFormSchema
+    .filter((field) => {
+      const { name, required, requireConditions, valueConditions, schemaKey } = field;
       const formValue = getFormValue(values?.[name]);
+
+      if (
+        schemaKey === SCHEMA_NAME_MAP.NOT_ACTIVE_MODEL_SCHEMA.key &&
+        requireConditions?.toString().includes('wasPreviouslyActiveModel')
+      ) {
+        if (wasPreviouslyActiveModel) {
+          if (!formValue) {
+            return true;
+          }
+        }
+        return false;
+      }
 
       const requiredField = checkRequireStatus(values, required, requireConditions);
 
@@ -818,6 +837,7 @@ const getInvalidFields = (activeFormSchema: FormFieldsSchema, values?: FormValue
       return false;
     })
     .map(({ name }) => name);
+};
 
 const getProperFormatValueForSubmit = (inputValue: InputValue) => {
   const { type, value } = inputValue;

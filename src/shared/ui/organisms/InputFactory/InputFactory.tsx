@@ -203,6 +203,28 @@ function InputFactorySwitcher<T extends string>({
         return '';
       };
 
+      let allowedOptions: string[] = [];
+
+      inputFactory?.optionConditions?.map((optionCondition) => {
+        const connectedFieldValue =
+          values?.[optionCondition?.connected_field as keyof typeof values];
+
+        if ((connectedFieldValue?.value as { text: string })?.text === optionCondition.value) {
+          allowedOptions = [...allowedOptions, ...optionCondition.options];
+        }
+
+        return null;
+      });
+
+      const _options = allowedOptions.length
+        ? {
+            ...options,
+            options: options.options.filter((option) =>
+              allowedOptions.toString().includes(option.text),
+            ),
+          }
+        : options;
+
       return (
         <SearchSelect
           key={name}
@@ -215,7 +237,7 @@ function InputFactorySwitcher<T extends string>({
           displayClearIcon
           required={required}
           label={label}
-          options={options}
+          options={_options}
           selectAllEnabled={!isTree}
           selectType={type}
           selectedValues={formattedValue}
@@ -223,8 +245,8 @@ function InputFactorySwitcher<T extends string>({
             onChange?.(name, {
               type,
               value: isTree
-                ? getSelectValues(selectedValue, options.options)
-                : getSelectValues(selectedValue, options.options)[0],
+                ? getSelectValues(selectedValue, _options.options)
+                : getSelectValues(selectedValue, _options.options)[0],
             })
           }
         />
