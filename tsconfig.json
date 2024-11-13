@@ -16,11 +16,7 @@
       "@features": ["./src/features/"],
       "@features/*": ["./src/features/*"],
       "@shared/*": ["./src/shared/*"],
-      "@shared": ["./src/shared"],
-      "zustand": ["./external_modules/zustand/src/*"],
-      "zustand/*": ["./external_modules/zustand/src/*"],
-      "use-sync-external-store": ["./external_modules/use-sync-external-store"],
-      "use-sync-external-store/*": ["./external_modules/use-sync-external-store"]
+      "@shared": ["./src/shared"]
     },
     "target": "esnext",
     "module": "esnext",
@@ -38,4 +34,3 @@
   },
   "exclude": ["node_modules", "dist"]
 }
-

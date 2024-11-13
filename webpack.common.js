@@ -17,8 +17,6 @@ const ALIAS = {
   '@pages': `${SRC_DIR}/pages`,
   '@features': `${SRC_DIR}/features`,
   '@widgets': `${SRC_DIR}/widgets`,
-  zustand: `${EXTERANL_MODULES}/zustand/src`,
-  'use-sync-external-store': `${EXTERANL_MODULES}/use-sync-external-store`,
 };
 
 module.exports = {
