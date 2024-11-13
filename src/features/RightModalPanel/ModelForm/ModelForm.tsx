@@ -27,13 +27,7 @@ import { ButtonContainer, FormContainer } from './styles';
 import { ParentModelSelect } from './ParentModelSelect';
 import { useActiveFormSchema } from './useActiveFormSchema';
 import { useFormFields } from './useFormFields';
-import {
-  ACTIVE_MODEL_SCHEMA,
-  ALLOCATION_FIELDS_NAMES,
-  BASE_MODEL_SCHEMA,
-  NOT_ACTIVE_MODEL_SCHEMA,
-  SCHEMA_NAME_MAP,
-} from './constants';
+import { ACTIVE_MODEL_SCHEMA, ALLOCATION_FIELDS_NAMES, SCHEMA_NAME_MAP } from './constants';
 import { ModelFormDotMenu } from './ModelFormDotMenu';
 
 type SubmitType = { checkOnly?: boolean };
@@ -63,7 +57,6 @@ export const ModelForm = ({
   const { setCurrentCustomer, currentCustomer } = useAppInjectStore();
 
   const [values, setValues] = useState<FormValues | undefined>();
-  const [cachedValues, setCachedValues] = useState<FormValues | undefined>();
   const [invalidFields, setInvalidFields] = useState<Array<keyof Row>>([]);
   const [dirtyFields, setDirtyFields] = useState<Array<keyof Row>>([]);
   const [parentModelId, setParentModelId] = useState<string>();
@@ -269,17 +262,8 @@ export const ModelForm = ({
   }, [onClose]);
 
   const activeModelCheckboxHandler = async (e: any) => {
-    const isChecked = e?.target?.checked;
     setActiveModelByDefault(e?.target?.checked);
     setCurrentCustomer(CUSTOMER_MAP.UMRV);
-
-    if (isChecked) {
-      const fieldKeysToFilter = [...ACTIVE_MODEL_SCHEMA].map((field) => field.name);
-      const _cachedValues = pick(values, fieldKeysToFilter);
-      setCachedValues(_cachedValues);
-    } else {
-      setValues({ ...values, ...cachedValues });
-    }
 
     await handleSubmit({ checkOnly: true });
   };
