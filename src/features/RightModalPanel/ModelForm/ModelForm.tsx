@@ -273,16 +273,12 @@ export const ModelForm = ({
     setActiveModelByDefault(e?.target?.checked);
     setCurrentCustomer(CUSTOMER_MAP.UMRV);
 
-    setCachedValues(values);
-
     if (isChecked) {
-      const fieldKeysToFilter = [...ACTIVE_MODEL_SCHEMA, ...NOT_ACTIVE_MODEL_SCHEMA].map(
-        (field) => field.name,
-      );
-
-      setValues(omit(values, fieldKeysToFilter));
+      const fieldKeysToFilter = [...ACTIVE_MODEL_SCHEMA].map((field) => field.name);
+      const _cachedValues = pick(values, fieldKeysToFilter);
+      setCachedValues(_cachedValues);
     } else {
-      setValues({ ...cachedValues, ...values });
+      setValues({ ...values, ...cachedValues });
     }
 
     await handleSubmit({ checkOnly: true });
