@@ -105,15 +105,13 @@ const getFilteredRowsBySearch = (
   rows: Array<Partial<Row>>,
   colNames: Array<keyof Row>,
   searchString: string,
-) =>
-  rows.filter(
-    (row) =>
-      colNames
-        .map((colName) => row[colName])
-        .join(' ')
-        .toLowerCase()
-        .split(searchString.toLowerCase()).length > 1,
+) => {
+  return rows.filter((row) =>
+    colNames.some((colName) =>
+      String(row[colName]).toLowerCase().includes(searchString.toLowerCase()),
+    ),
   );
+};
 
 const getColumnFilterOptionVisibilityStatus = (
   columnValue: string,
@@ -208,6 +206,7 @@ const getFilteredRowsByColumnsFilter = (
   initialColumns: Column[],
 ) => {
   const rowFields = Object.keys(columnsFilter) as Array<keyof Row>;
+  console.log('🐸 Pepe said ~ rowFields:', rowFields);
 
   return tableRows.filter((row) => {
     // Check each row field for passing filters
