@@ -3,6 +3,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
+      "react": ["./node_modules/@types/react"],
       "@entities": ["./src/entities"],
       "@entities/*": ["./src/entities/*"],
       "@pages": ["./src/pages/"],

@@ -4,11 +4,13 @@ import { ReactComponent as BrokerOutlineIcon } from '@admiral-ds/icons/build/fin
 import { ReactComponent as MenuOutline } from '@admiral-ds/icons/build/service/MenuOutline.svg';
 import { ReactComponent as PlusCircleSolid } from '@admiral-ds/icons/build/service/PlusCircleSolid.svg';
 import { ReactComponent as SettingsOutline } from '@admiral-ds/icons/build/system/SettingsOutline.svg';
+import { ReactComponent as DeleteSolid } from '@admiral-ds/icons/build/system/DeleteSolid.svg';
 
 import { IconButton } from '@shared/ui/molecules';
 import { RIGHT_PANEL_TYPE } from '@shared/constants';
 
 import { CustomSearchInput, Container } from './styles';
+import { useRightPanelStore } from '@src/shared/stores';
 
 export interface ActionsPanelProps {
   handleSearch: (newSearchString: string) => void;
@@ -17,6 +19,7 @@ export interface ActionsPanelProps {
 
 export const ActionsPanel = ({ updateRightPanelType, handleSearch }: ActionsPanelProps) => {
   const [searchValue, setSearchValue] = useState('');
+  const { isDeleteModelEnabled } = useRightPanelStore();
 
   const navigate = useNavigate();
 
@@ -47,6 +50,13 @@ export const ActionsPanel = ({ updateRightPanelType, handleSearch }: ActionsPane
           tooltip="Добавить модель"
           color="#0062FF"
           onClick={() => updateRightPanelType(RIGHT_PANEL_TYPE.ADD_MODEL)}
+        />
+        <IconButton
+          icon={<DeleteSolid />}
+          tooltip="Удалить модель"
+          color="#0062FF"
+          onClick={() => updateRightPanelType(RIGHT_PANEL_TYPE.DELETE_MODEL)}
+          disabled={!isDeleteModelEnabled}
         />
         <IconButton
           icon={<BrokerOutlineIcon />}

@@ -8,7 +8,7 @@ import { ColumnsFilter } from '@shared/types';
 
 import { Header } from './Header';
 import { themes } from './theme/theme';
-import { useAppInjectStore } from '../shared/stores/appInjectStore';
+import { useAppInjectStore } from '../shared/stores';
 import { CUSTOMER_MAP } from '../shared/constants/customers';
 
 interface LayoutProps {

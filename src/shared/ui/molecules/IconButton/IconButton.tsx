@@ -10,6 +10,7 @@ export interface IconButtonProps {
   dimension?: IconPlacementDimension;
   className?: string;
   onClick?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  disabled?: boolean;
 }
 
 export const IconButton = ({
@@ -20,6 +21,7 @@ export const IconButton = ({
   dimension = 'mBig',
   color = '#717681',
   onClick,
+  disabled,
 }: IconButtonProps) => {
   const iconRef = useRef(null);
 
@@ -32,6 +34,7 @@ export const IconButton = ({
         onClick={onClick}
         dimension={dimension}
         appearance={{ iconColor: color }}
+        disabled={disabled}
       >
         {icon}
       </IconPlacement>

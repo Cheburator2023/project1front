@@ -109,6 +109,22 @@ export const RightModalPanel = React.memo(
       );
     }
 
+    if (activeStatus === RIGHT_PANEL_TYPE.DELETE_MODEL) {
+      return artifactsData?.data ? (
+        <ModelForm
+          rows={rows}
+          mode={activeStatus}
+          artifacts={artifactsData.data}
+          activeRow={activeRow}
+          editCellName={activeCellName}
+          onClose={onClose}
+          onSubmit={onSubmit}
+        />
+      ) : (
+        <Spinner />
+      );
+    }
+
     return null;
   },
 );

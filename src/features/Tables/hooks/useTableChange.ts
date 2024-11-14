@@ -13,6 +13,7 @@ import {
 
 import { initialColumns } from '@src/shared/constants';
 import { TableChangeProps } from '../types';
+import { useRightPanelStore } from '@src/shared/stores';
 
 export const useTableChange = ({
   rowList,
@@ -29,6 +30,8 @@ export const useTableChange = ({
   // Table data
   const [rows, setRows] = useState(rowList);
   const [cols, setCols] = useState<(AdmiralColumn & Column)[]>([]);
+
+  const { setRightPanelState } = useRightPanelStore();
 
   const handleSort = ({ name, sort }: { name: string; sort: 'asc' | 'desc' | 'initial' }) => {
     setCurrentPage(1);
@@ -70,6 +73,14 @@ export const useTableChange = ({
       ...row,
       selected: row.id && Boolean(ids[row.id]),
     }));
+
+    const selectedRows = rowsWithUpdatedSelectedStatus.filter((row) => row.selected);
+
+    if (selectedRows.length === 1 && selectedRows[0].model_source === 'sum-rm') {
+      setRightPanelState(true);
+    } else {
+      setRightPanelState(false);
+    }
 
     setRows(rowsWithUpdatedSelectedStatus);
   };
