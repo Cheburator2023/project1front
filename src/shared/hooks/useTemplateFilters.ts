@@ -33,7 +33,7 @@ export const useTemplateFilters = (
   }, [columnsFilters, activeTemplate]);
 
   const isTemplateFilter = (filterId: string): boolean => {
-    return activeTemplate ? filterId in activeTemplate.template_value : false;
+    return activeTemplate?.template_value ? filterId in activeTemplate.template_value : false;
   };
 
   const getFilteredColumns = (initialColumns: Column[], showFilterTemplate: boolean): Column[] => {

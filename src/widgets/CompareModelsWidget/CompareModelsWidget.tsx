@@ -70,6 +70,7 @@ const CompareModelsWidget = React.memo(
           onChangePage={compareModelsTable.handleChangePage}
           handleSearch={compareModelsTable.handleSearch}
           updateRightPanelType={setRightPanelType}
+          templates={templates}
         />
       </>
     );

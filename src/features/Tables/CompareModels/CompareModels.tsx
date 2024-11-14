@@ -7,6 +7,7 @@ import { ErrorStatus, Loading, Pagination } from '@shared/ui/atoms';
 import { RIGHT_PANEL_TYPE } from '@shared/constants';
 import { ActionsPanel, ColumnFilter } from '@entities';
 
+import { Template } from '@src/shared/api';
 import { CompareTable } from './styles';
 import { useTableChange } from '../hooks';
 
@@ -26,6 +27,7 @@ interface TableModelsProps {
   onChangePage: (result: { page: number; pageSize: number }) => void;
   handleSearch: (newSearchString: string) => void;
   updateRightPanelType: (value: React.SetStateAction<RIGHT_PANEL_TYPE | null>) => void;
+  templates: Template[];
 }
 
 const StatusWrapper = styled.div`
@@ -52,6 +54,7 @@ export const TableCompareModels = React.memo(
     updateRightPanelType,
     firstDate,
     secondDate,
+    templates,
   }: TableModelsProps) => {
     const {
       cols,
@@ -65,6 +68,8 @@ export const TableCompareModels = React.memo(
       handleColumnDragEnd,
       columnsFilters,
       onChangeColumnsFilters,
+      onChangeTopFilters,
+      topFilters,
     } = useTableChange({
       rowList,
       setCurrentPage,
@@ -73,6 +78,7 @@ export const TableCompareModels = React.memo(
       pageSize,
       searchString,
       columnList,
+      templates,
     });
 
     useEffect(() => {
@@ -92,6 +98,9 @@ export const TableCompareModels = React.memo(
               rowList={rowList}
               columnsFilters={columnsFilters}
               onChangeColumnsFilter={handleChangeColumnsFilter}
+              onChangeTopFilters={onChangeTopFilters}
+              topFilters={topFilters}
+              templates={templates}
             />
           ),
         }));

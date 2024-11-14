@@ -1,9 +1,8 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 
 import RoutesComponent from './Routes';
 import Layout from './Layout';
-import { GlobalsProvider } from '../shared/providers/GlobalsProvider';
 
 export const App = () => {
   return (

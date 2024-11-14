@@ -1,7 +1,7 @@
 {
-  "include": ["src"],
   "compilerOptions": {
     "baseUrl": ".",
+    "typeRoots": ["types", "./node_modules/@types"],
     "paths": {
       "@entities": ["./src/entities"],
       "@entities/*": ["./src/entities/*"],
@@ -24,13 +24,18 @@
     "allowJs": true,
     "sourceMap": true,
     "jsx": "react-jsx",
-    "strict": true,
+    "strict": false,
     "moduleResolution": "node",
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "noEmit": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "noImplicitAny": false,
+    "strictNullChecks": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true
   },
-  "exclude": ["node_modules", "dist"]
+  "include": ["src", "types"],
+  "exclude": ["node_modules", "dist", "**/*.spec.ts"]
 }

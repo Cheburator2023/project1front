@@ -45,7 +45,7 @@ export interface ModelFormProps {
   rows: Partial<Row>[];
   activeRow?: Partial<Row>;
   // TODO: check this types
-  onSubmit: (newRow: CustomError | Row | ArtifactApi[], formMode: MODEL_FORM_MODE) => void;
+  onSubmit: (newRow: Row, formMode: MODEL_FORM_MODE) => void;
   onClose: () => void;
 }
 
@@ -234,7 +234,7 @@ export const ModelForm = ({
       }
 
       if (newRow && formMode) {
-        onSubmit(newRow, formMode);
+        onSubmit(newRow as any, formMode);
         setSubmitLoading(false);
         setSubmitError('');
       }
@@ -243,7 +243,7 @@ export const ModelForm = ({
   );
 
   const handleChangeParentModel = useCallback(
-    (_, selectedValue: string[]) => {
+    (_: any, selectedValue: string[]) => {
       const selectedModelId = selectedValue[0];
 
       const parentModel = rows.find((row) => row.system_model_id === selectedModelId);

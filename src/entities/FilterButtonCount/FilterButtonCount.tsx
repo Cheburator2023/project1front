@@ -2,8 +2,8 @@ import React, { FC, useMemo } from 'react';
 import { ACTIVE_SCREEN } from '@src/shared/constants';
 import { ColumnsFilter, TopFilters } from '@src/shared/types';
 import { Template } from '@src/shared/api/types';
-import { BadgeCount, ButtonCustom, CheckSolidCustom, FilterOutlineCustom } from './style';
 import { getActiveFiltersCount } from '@src/shared/helpers';
+import { BadgeCount, ButtonCustom, CheckSolidCustom, FilterOutlineCustom } from './style';
 
 const getButtonApperance = (hasTemplates: boolean) => {
   return hasTemplates ? 'primary' : 'white';
