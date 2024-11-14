@@ -1,6 +1,7 @@
 /* eslint-disable no-unneeded-ternary */
 import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { Button, CheckboxField, T } from '@admiral-ds/react-ui';
+import { format } from 'date-fns';
 
 import { Row } from '@shared/types';
 import { StatusScreen } from '@shared/ui/molecules';
@@ -133,19 +134,39 @@ export const ModelForm = ({
   }, []);
 
   // TODO: Temporary solution to solve the problem of editing allocations in models that do not have all required fields. This is a technical debt that needs to be fixed.
+  /**
+   * Check if any of the allocation fields have been changed.
+   * @returns {boolean} true if any allocation field has been changed, false otherwise.
+   */
   const checkForAllocationFieldsChanged = () =>
-    ALLOCATION_FIELDS_NAMES.some((allocationFieldName) => {
-      const initialValue = initialRow?.[allocationFieldName] || '';
-      const newValue = values?.[allocationFieldName];
+    ALLOCATION_FIELDS_NAMES.some((fieldName) => {
+      const initialValue = initialRow?.[fieldName] ?? '';
+      const newInputValue = values?.[fieldName];
 
-      if (newValue) {
-        const formattedValue = getProperFormatValueForSubmit(newValue);
+      if (!newInputValue) {
+        return false;
+      }
 
-        if (!Array.isArray(formattedValue)) {
-          return initialValue !== formattedValue.artefact_string_value;
+      let newStringValue = '';
+
+      if (
+        newInputValue.type === INPUT_TYPE.DATE ||
+        newInputValue.type === INPUT_TYPE.QUARTERLY_DATE
+      ) {
+        if (!newInputValue.value) {
+          return false;
+        }
+
+        newStringValue = format(newInputValue.value, 'yyyy-MM-dd');
+      } else {
+        const formattedValue = getProperFormatValueForSubmit(newInputValue);
+
+        if (!Array.isArray(formattedValue) && formattedValue.artefact_string_value) {
+          newStringValue = formattedValue.artefact_string_value;
         }
       }
-      return null;
+
+      return initialValue !== newStringValue;
     });
 
   const handleSubmit = useCallback(
@@ -168,10 +189,6 @@ export const ModelForm = ({
       setDirtyFields((prevDirtyFields) => [...prevDirtyFields, fields[0].name]);
 
       if (newInvalidFields.length && !isAllocationFieldsChanged) {
-        return;
-      }
-
-      if (newInvalidFields.length) {
         return;
       }
 
@@ -424,4 +441,3 @@ export const ModelForm = ({
     />
   );
 };
-
