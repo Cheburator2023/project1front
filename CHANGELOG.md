@@ -1,5 +1,14 @@
 # Semantic Versioning Changelog
 
+## [1.25.1](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.25.0...v1.25.1) (2024-11-14)
+
+
+### Bug Fixes
+
+* active model form values reset undo ([0bc4d93](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/0bc4d938fcc3e9c2555fbd1f86e62732570ebcb9))
+* active model toggle values reset fixed ([421daff](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/421daff4c4580a4d69f9c733ec4e25718ea95909))
+* table perf increase / search field perf fix ([24019d3](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/24019d32159ed23d2fc06abb0891a94003513261))
+
 # [1.25.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.24.0...v1.25.0) (2024-11-12)
 
 
