@@ -84,6 +84,7 @@ export const ModelForm = ({
 
   const { fields } = useFormFields({
     formSchema,
+    values,
     mode: formMode,
     initialRow,
     artifacts,
