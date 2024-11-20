@@ -1,3 +1,4 @@
+/* eslint-disable array-callback-return */
 /* eslint-disable no-unneeded-ternary */
 import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { Button, CheckboxField, T } from '@admiral-ds/react-ui';
@@ -8,20 +9,21 @@ import { RIGHT_PANEL_TYPE, MODEL_FORM_MODE } from '@shared/constants';
 import { INPUT_TYPE, InputFactory, InputValue, RightPanel } from '@shared/ui/organisms';
 import { API_ROUTES, useFetch, ArtifactApi, ModelEditApi } from '@shared/api';
 
-import { filter, groupBy, omit, pick } from 'lodash';
+import { filter, groupBy, isEqual, omit, pick } from 'lodash';
 import { Flexbox, Spacer } from '@shared/ui/atoms';
 import { Artifact, CustomError } from '@shared/api/types';
 
 import { useAppInjectStore } from '@shared/stores/appInjectStore';
 import { CUSTOMER_MAP } from '@shared/constants/customers';
 import { useScrollTo } from '@src/shared/hooks/useScrollTo';
-import { FormValues } from './types';
+import { FormFieldConditions, FormValues } from './types';
 import {
   getFormMode,
   getArtifactApiItems,
   getInvalidFields,
   getInputValuesFromRow,
   getProperFormatValueForSubmit,
+  checkRequireValueStatus,
 } from './helpers';
 import { ButtonContainer, FormContainer } from './styles';
 import { ParentModelSelect } from './ParentModelSelect';
@@ -98,7 +100,7 @@ export const ModelForm = ({
   const title = IS_FORM_MODE_ADD ? 'Новая модель' : 'Редактирование модели';
   const groupedBySchemaName = groupBy(fields, 'schemaKey');
 
-  const handleChange = useCallback((name: keyof Row, value: InputValue) => {
+  const handleChange = (name: keyof Row, value: InputValue) => {
     let newValues = { [name]: value };
     // TODO: move this logic to artifact
     if (name === 'model_type' && value.type === INPUT_TYPE.SELECT) {
@@ -128,10 +130,64 @@ export const ModelForm = ({
       }
     }
 
+    const connectedValues: any = {};
+    const connectedValuesToContitions: any = {};
+    let autoCompletedField: any = {};
+
+    formSchema.map(({ valueConditions, name: connectedName }) => {
+      if (valueConditions?.length === 1) {
+        const conditions = valueConditions[0].conditions;
+        const connectedValue = valueConditions[0].value;
+        conditions?.map((condition) => {
+          Object.keys(condition).map((fieldName) => {
+            // @ts-ignore
+            const formFieldValue = values?.[fieldName as any]?.value?.text;
+
+            if (fieldName === name || formFieldValue) {
+              // @ts-ignore
+              connectedValues[fieldName] =
+                // @ts-ignore
+                fieldName === name ? value : values?.[fieldName as any];
+
+              connectedValuesToContitions[fieldName] =
+                // @ts-ignore
+                fieldName === name ? value?.value?.text : formFieldValue;
+            }
+          });
+        });
+
+        const completesCondition = isEqual([connectedValuesToContitions], conditions);
+
+        if (completesCondition) {
+          const field = fields.find((_field) => {
+            return _field.name === connectedName;
+          });
+
+          const artifact = artifacts.find(
+            (_artifact) => _artifact.artefact_tech_label === connectedName,
+          );
+          const connectedArtifactOption = artifact?.values?.find(
+            (option) => option.artefact_value === connectedValue,
+          );
+
+          autoCompletedField = {
+            [connectedName]: {
+              type: field?.type,
+              value: {
+                id: `${connectedArtifactOption?.artefact_value_id}`,
+                text: connectedValue,
+              },
+            },
+          };
+        }
+      }
+      return false;
+    });
+
     setDirtyFields((prevDirtyFields) => [...prevDirtyFields, name]);
 
-    setValues((prevValues) => ({ ...prevValues, ...newValues }));
-  }, []);
+    setValues((prevValues) => ({ ...prevValues, ...newValues, ...autoCompletedField }));
+  };
 
   // TODO: Temporary solution to solve the problem of editing allocations in models that do not have all required fields. This is a technical debt that needs to be fixed.
   const checkForAllocationFieldsChanged = () =>
