@@ -7,8 +7,12 @@ export const CUSTOMER_MAP = {
     name: 'УМРВ',
     id: 1,
   },
+  DADM: {
+    name: 'DADM',
+    id: 2,
+  },
 };
 
-export const DEFAULT_CUSTOMER = CUSTOMER_MAP.UMRV;
-export type CUSTOMER_TYPE = typeof CUSTOMER_MAP.EVERY_CUSTOMER;
+export const DEFAULT_CUSTOMER = CUSTOMER_MAP.EVERY_CUSTOMER;
+export type CUSTOMER_TYPE = typeof CUSTOMER_MAP.DADM;
 

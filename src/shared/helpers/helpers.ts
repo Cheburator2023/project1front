@@ -206,7 +206,6 @@ const getFilteredRowsByColumnsFilter = (
   initialColumns: Column[],
 ) => {
   const rowFields = Object.keys(columnsFilter) as Array<keyof Row>;
-  console.log('🐸 Pepe said ~ rowFields:', rowFields);
 
   return tableRows.filter((row) => {
     // Check each row field for passing filters

@@ -6,10 +6,11 @@ import { sortBy } from 'lodash';
 import { useDeepEffect } from '@shared/hooks/useDeepEffect';
 import { CUSTOMER_TYPE } from '@shared/constants/customers';
 import { getFormFields } from './helpers';
-import { FormFields, FormFieldsSchema } from './types';
+import { FormFields, FormFieldsSchema, FormValues } from './types';
 
 interface UseFormFieldsProps {
   formSchema: FormFieldsSchema;
+  values?: FormValues;
   artifacts: Artifact[];
   mode: MODEL_FORM_MODE;
   initialRow?: Partial<Row>;
@@ -26,12 +27,14 @@ export const useFormFields = ({
   artifacts,
   showAllFields,
   currentCustomer,
+  values,
 }: UseFormFieldsProps) => {
   const [fields, setFields] = useState<FormFields>([]);
 
   useDeepEffect(() => {
     const newFields = getFormFields({
       artifacts,
+      values,
       initialRow,
       mode,
       currentFormSchema: formSchema,
@@ -40,9 +43,10 @@ export const useFormFields = ({
     });
 
     setFields(newFields);
-  }, [artifacts, formSchema, initialRow, mode, showAllFields, currentCustomer]);
+  }, [artifacts, formSchema, initialRow, mode, showAllFields, currentCustomer, values]);
 
   // order field by schema order prop
+  // and filterout active_model checkbox
   const orderedFields = sortBy(fields, 'schemaOrder').filter(({ name }) => name !== 'active_model');
 
   return {
