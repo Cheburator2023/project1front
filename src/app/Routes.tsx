@@ -2,6 +2,8 @@ import React from 'react';
 import { Navigate, useRoutes } from 'react-router-dom';
 
 import { Home, ChartsDashboardPage } from '@pages';
+import { Playground } from '@pages/Playground';
+import { FutureTableHomePage } from '@pages/Playground/FutureTableHomePage';
 
 const ROUTE_MAP = [
   {
@@ -10,8 +12,16 @@ const ROUTE_MAP = [
     element: <Home />,
   },
   {
+    path: '/future_table',
+    element: <FutureTableHomePage />,
+  },
+  {
     path: 'charts',
     element: <ChartsDashboardPage />,
+  },
+  {
+    path: '/playground',
+    element: <Playground />,
   },
   {
     path: '*',

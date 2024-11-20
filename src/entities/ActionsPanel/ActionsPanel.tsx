@@ -12,7 +12,7 @@ import { CustomSearchInput, Container } from './styles';
 
 export interface ActionsPanelProps {
   handleSearch: (newSearchString: string) => void;
-  updateRightPanelType: (value: React.SetStateAction<RIGHT_PANEL_TYPE | null>) => void;
+  updateRightPanelType: (newRightPanelType: RIGHT_PANEL_TYPE | null) => void;
 }
 
 export const ActionsPanel = ({ updateRightPanelType, handleSearch }: ActionsPanelProps) => {

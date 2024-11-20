@@ -14,8 +14,8 @@ interface CompareModelsWidgetProps {
   templates: Template[];
   compareMode: boolean;
   handleChangeCompare: (checked: boolean) => void;
-  updateActiveScreen: React.Dispatch<React.SetStateAction<ACTIVE_SCREEN>>;
-  setRightPanelType: React.Dispatch<React.SetStateAction<RIGHT_PANEL_TYPE | null>>;
+  updateActiveScreen: (newActiveScreen: ACTIVE_SCREEN) => void;
+  setRightPanelType: (newRightPanelType: RIGHT_PANEL_TYPE | null) => void;
 }
 
 const CompareModelsWidget = React.memo(
@@ -70,7 +70,6 @@ const CompareModelsWidget = React.memo(
           onChangePage={compareModelsTable.handleChangePage}
           handleSearch={compareModelsTable.handleSearch}
           updateRightPanelType={setRightPanelType}
-          templates={templates}
         />
       </>
     );

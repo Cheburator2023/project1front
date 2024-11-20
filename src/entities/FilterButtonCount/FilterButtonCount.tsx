@@ -15,7 +15,7 @@ const getBadgeApperance = (hasTemplates: boolean, hasActiveFilters: boolean) => 
 
 export interface FilterButtonCountProps {
   topFilters: TopFilters;
-  updateActiveScreen: React.Dispatch<React.SetStateAction<ACTIVE_SCREEN>>;
+  updateActiveScreen: (newActiveScreen: ACTIVE_SCREEN) => void;
   activeScreen: ACTIVE_SCREEN;
   columnsFilters: Partial<ColumnsFilter>;
   templates: Template[];

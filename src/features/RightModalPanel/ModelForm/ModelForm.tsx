@@ -184,7 +184,7 @@ export const ModelForm = ({
 
       const artifactApiItems = getArtifactApiItems(valuesWithAddedOutsideControls, parentModelId);
       // TODO: check this types
-      let newRow: CustomError | Row | ArtifactApi[] | undefined;
+      let newRow: Row | undefined;
 
       setSubmitLoading(checkOnly ? false : true);
 
@@ -230,11 +230,11 @@ export const ModelForm = ({
           return;
         }
 
-        newRow = res.data;
+        newRow = res.data as Row;
       }
 
       if (newRow && formMode) {
-        onSubmit(newRow as any, formMode);
+        onSubmit(newRow, formMode);
         setSubmitLoading(false);
         setSubmitError('');
       }
@@ -243,7 +243,7 @@ export const ModelForm = ({
   );
 
   const handleChangeParentModel = useCallback(
-    (_: any, selectedValue: string[]) => {
+    (_, selectedValue: string[]) => {
       const selectedModelId = selectedValue[0];
 
       const parentModel = rows.find((row) => row.system_model_id === selectedModelId);
@@ -273,12 +273,16 @@ export const ModelForm = ({
     setActiveModelByDefault(e?.target?.checked);
     setCurrentCustomer(CUSTOMER_MAP.UMRV);
 
+    setCachedValues(values);
+
     if (isChecked) {
-      const fieldKeysToFilter = [...ACTIVE_MODEL_SCHEMA].map((field) => field.name);
-      const _cachedValues = pick(values, fieldKeysToFilter);
-      setCachedValues(_cachedValues);
+      const fieldKeysToFilter = [...ACTIVE_MODEL_SCHEMA, ...NOT_ACTIVE_MODEL_SCHEMA].map(
+        (field) => field.name,
+      );
+
+      setValues(omit(values, fieldKeysToFilter));
     } else {
-      setValues({ ...values, ...cachedValues });
+      setValues({ ...cachedValues, ...values });
     }
 
     await handleSubmit({ checkOnly: true });

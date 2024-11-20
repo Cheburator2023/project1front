@@ -5,13 +5,13 @@ import { Template } from '@shared/api';
 
 export const useTemplateFilters = (
   columnsFilters: Partial<ColumnsFilter>,
-  templates: Template[],
-  topFilters: string[],
+  templates?: Template[],
+  topFilters?: string[],
 ) => {
   const [modifiedFilters, setModifiedFilters] = useState(new Set<string>());
 
   const activeTemplate = useMemo(
-    () => getActiveTemplate(templates, topFilters[0]),
+    () => getActiveTemplate(templates, topFilters?.[0]),
     [templates, topFilters],
   );
 

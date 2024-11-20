@@ -83,7 +83,7 @@ interface HeaderProps {
   goToSum?: () => void;
 }
 
-const Header: React.FC<any> = ({
+const Header = ({
   columnsFilters,
   user,
   downloadReportStatus,
