@@ -14,6 +14,7 @@ import {
   RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA,
   NOT_ACTIVE_MODEL_SCHEMA,
   SCHEMA_NAME_MAP,
+  DELETE_MODEL_SCHEMA,
 } from './constants';
 import { FormFieldsSchema, FormValues } from './types';
 import { markSchema } from './helpers';
@@ -165,6 +166,16 @@ const getAddSchema = (
   return formSchema;
 };
 
+const getDeleteSchema = (
+  activeRow?: Partial<Row>,
+  values?: FormValues,
+  activeModelByDefault?: boolean,
+) => {
+  let formSchema = markSchema(DELETE_MODEL_SCHEMA, SCHEMA_NAME_MAP.DELETE_MODEL_SCHEMA);
+
+  return formSchema;
+};
+
 export const useActiveFormSchema = ({
   initialRow,
   values,
@@ -188,6 +199,12 @@ export const useActiveFormSchema = ({
     }
     if (mode === MODEL_FORM_MODE.ADD) {
       const newFormSchema = getAddSchema(initialRow, values, activeModelByDefault);
+
+      setFormSchema(sortBy(newFormSchema, 'required'));
+    }
+
+    if (mode === MODEL_FORM_MODE.DELETE) {
+      const newFormSchema = getDeleteSchema(initialRow, values, activeModelByDefault);
 
       setFormSchema(sortBy(newFormSchema, 'required'));
     }

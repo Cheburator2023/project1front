@@ -32,6 +32,7 @@ type Row = ArtificialRow & {
   rating_model: string | null;
   create_date: string | null;
   date_of_introduction_into_operation: string | null;
+  reason_model_delete: string | null;
   usage_confirm_date_q1: string | null;
   usage_confirm_date_q2: string | null;
   usage_confirm_date_q3: string | null;

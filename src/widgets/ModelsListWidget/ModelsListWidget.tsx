@@ -86,6 +86,7 @@ export const ModelsListWidget = ({
         onActionCell={actions.handleClickOnActionCell}
         updateRowsCount={actions.setTotalRows}
         setCurrentPage={actions.setPage}
+        templates={templates}
       />
       <Pagination
         page={data.page}

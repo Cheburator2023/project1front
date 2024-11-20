@@ -2,6 +2,33 @@ import { Artifact, ArtifactResponse, ArtifactType, ArtifactGroup } from '../type
 
 const mockedArtifacts: Artifact[] = [
   {
+    artefact_id: 4004,
+    artefact_tech_label: 'reason_model_delete',
+    artefact_label: 'Причина удаления модели',
+    artefact_desc: 'Укажите причина удаления модели',
+    artefact_context: null,
+    is_main_info_flg: '0',
+    is_class_flg: '0',
+    is_edit_flg: '1',
+    artefact_type_id: 1,
+    artefact_business_group_id: 1,
+    is_multi_fill_flg: '0',
+    artefact_parent_id: null,
+    artefact_parent_value: null,
+    artefact_default_value: null,
+    is_default_value_flg: null,
+    artefact_hint: 'Укажите причина удаления модели',
+    artefact_regular_expression: null,
+    artefact_value_id: null,
+    artefact_value: null,
+    artefact_value_label: null,
+    is_active_flg: null,
+    artefact_parent_value_id: null,
+    artefact_type_desc: 'text',
+    values: [],
+  },
+
+  {
     artefact_id: 2112,
     artefact_tech_label: 'date_of_introduction_into_operation',
     artefact_label: 'Дата релиза',

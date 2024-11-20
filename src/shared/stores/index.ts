@@ -1,3 +1,3 @@
 export { useAppInjectStore } from './appInjectStore';
-export { useRightPanelStore } from './rightPanelStore';
+export { useDeleteRightModelPanelStore } from './deleteRightModelPanelStore';
 

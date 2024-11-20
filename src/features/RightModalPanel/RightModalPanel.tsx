@@ -14,6 +14,8 @@ import { Spinner } from '@admiral-ds/react-ui';
 import { ModelForm } from './ModelForm';
 import { HistoryChanges } from './HistoryChanges';
 import { Templates } from './Templates';
+import { DeleteModelForm } from './ModelForm/DeleteModelForm';
+import { useDeleteRightModelPanelStore } from '@src/shared/stores';
 
 export interface RightModalPanelProps {
   activeStatus: RIGHT_PANEL_TYPE | null;
@@ -42,10 +44,14 @@ export const RightModalPanel = React.memo(
       mockedResponse: mockedModelsArtifacts,
     });
 
-    const activeRow = useMemo(
-      () => activeStatus && rows.find((row) => row.system_model_id === activeRowId),
-      [rows, activeRowId, activeStatus],
-    );
+    const { activeRowId: activeRowIdDelete } = useDeleteRightModelPanelStore();
+
+    const activeRow = useMemo(() => {
+      if (activeStatus === RIGHT_PANEL_TYPE.DELETE_MODEL) {
+        return rows.find((row) => row.id === activeRowIdDelete);
+      }
+      return rows.find((row) => row.id === activeRowId);
+    }, [rows, activeRowId, activeStatus]);
 
     if (!activeStatus) {
       return null;
@@ -87,6 +93,8 @@ export const RightModalPanel = React.memo(
           return null;
         }
 
+        debugger;
+
         return artifactsData?.data ? (
           <ModelForm
             rows={rows}
@@ -110,8 +118,14 @@ export const RightModalPanel = React.memo(
     }
 
     if (activeStatus === RIGHT_PANEL_TYPE.DELETE_MODEL) {
+      if (!activeRow) {
+        return null;
+      }
+
+      debugger;
+
       return artifactsData?.data ? (
-        <ModelForm
+        <DeleteModelForm
           rows={rows}
           mode={activeStatus}
           artifacts={artifactsData.data}

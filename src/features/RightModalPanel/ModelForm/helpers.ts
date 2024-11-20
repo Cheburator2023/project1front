@@ -40,6 +40,7 @@ import {
 import {
   ACTIVE_MODEL_SCHEMA,
   BASE_MODEL_SCHEMA,
+  DELETE_MODEL_SCHEMA,
   NOT_ACTIVE_MODEL_SCHEMA,
   RATING_SYSTEM_MODEL_SCHEMA,
   RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA,
@@ -676,7 +677,9 @@ const getFormFields = ({
   ).filter(({ customers }) => customers?.find((customer) => customer === currentCustomer));
 
   const fieldsNamesToGenerate =
-    showAllFields && process.env.NODE_ENV === 'development'
+    mode === MODEL_FORM_MODE.DELETE
+      ? DELETE_MODEL_SCHEMA.map(({ name }) => name)
+      : showAllFields && process.env.NODE_ENV === 'development'
       ? mergedUniqueArrayOfAllAttrsForDebug.map(({ name }) => name)
       : currentCustomer === CUSTOMER_MAP.UMRV && mode === MODEL_FORM_MODE.ADD
       ? mergedModels.map(({ name }) => name)
@@ -946,6 +949,10 @@ const getParentModelOptions = (rows: Partial<Row>[]) =>
 const getFormMode = (activePanelType: RIGHT_PANEL_TYPE) => {
   if (activePanelType === RIGHT_PANEL_TYPE.EDIT_MODEL) {
     return MODEL_FORM_MODE.EDIT;
+  }
+
+  if (activePanelType === RIGHT_PANEL_TYPE.DELETE_MODEL) {
+    return MODEL_FORM_MODE.DELETE;
   }
 
   return MODEL_FORM_MODE.ADD;

@@ -10,7 +10,7 @@ import { IconButton } from '@shared/ui/molecules';
 import { RIGHT_PANEL_TYPE } from '@shared/constants';
 
 import { CustomSearchInput, Container } from './styles';
-import { useRightPanelStore } from '@src/shared/stores';
+import { useDeleteRightModelPanelStore } from '@src/shared/stores';
 
 export interface ActionsPanelProps {
   handleSearch: (newSearchString: string) => void;
@@ -19,7 +19,20 @@ export interface ActionsPanelProps {
 
 export const ActionsPanel = ({ updateRightPanelType, handleSearch }: ActionsPanelProps) => {
   const [searchValue, setSearchValue] = useState('');
-  const { isDeleteModelEnabled } = useRightPanelStore();
+  const { selectedModelsCount, selectedModelSource, isDeleteButtonEnabled } =
+    useDeleteRightModelPanelStore();
+
+  let deleteTooltipMessage = '';
+
+  if (selectedModelsCount === 0) {
+    deleteTooltipMessage = 'Выберите модель для удаления';
+  } else if (selectedModelsCount > 1) {
+    deleteTooltipMessage = 'Нельзя удалить несколько моделей';
+  } else if (selectedModelSource !== 'sum-rm') {
+    deleteTooltipMessage = 'Модель должна быть с исчтоником "sum-rm"';
+  } else {
+    deleteTooltipMessage = 'Удалить модель';
+  }
 
   const navigate = useNavigate();
 
@@ -53,11 +66,12 @@ export const ActionsPanel = ({ updateRightPanelType, handleSearch }: ActionsPane
         />
         <IconButton
           icon={<DeleteSolid />}
-          tooltip="Удалить модель"
+          tooltip={deleteTooltipMessage}
           color="#0062FF"
           onClick={() => updateRightPanelType(RIGHT_PANEL_TYPE.DELETE_MODEL)}
-          disabled={!isDeleteModelEnabled}
+          disabled={!isDeleteButtonEnabled}
         />
+
         <IconButton
           icon={<BrokerOutlineIcon />}
           tooltip="Графики"

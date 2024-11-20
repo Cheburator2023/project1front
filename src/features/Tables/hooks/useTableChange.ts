@@ -13,7 +13,7 @@ import {
 
 import { initialColumns } from '@src/shared/constants';
 import { TableChangeProps } from '../types';
-import { useRightPanelStore } from '@src/shared/stores';
+import { useDeleteRightModelPanelStore } from '@src/shared/stores';
 
 export const useTableChange = ({
   rowList,
@@ -31,7 +31,7 @@ export const useTableChange = ({
   const [rows, setRows] = useState(rowList);
   const [cols, setCols] = useState<(AdmiralColumn & Column)[]>([]);
 
-  const { setRightPanelState } = useRightPanelStore();
+  const { updateDeleteModelState } = useDeleteRightModelPanelStore();
 
   const handleSort = ({ name, sort }: { name: string; sort: 'asc' | 'desc' | 'initial' }) => {
     setCurrentPage(1);
@@ -76,10 +76,10 @@ export const useTableChange = ({
 
     const selectedRows = rowsWithUpdatedSelectedStatus.filter((row) => row.selected);
 
-    if (selectedRows.length === 1 && selectedRows[0].model_source === 'sum-rm') {
-      setRightPanelState(true);
+    if (selectedRows.length === 1) {
+      updateDeleteModelState(1, selectedRows[0].model_source, selectedRows[0].id);
     } else {
-      setRightPanelState(false);
+      updateDeleteModelState(selectedRows.length, null);
     }
 
     setRows(rowsWithUpdatedSelectedStatus);
