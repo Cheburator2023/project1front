@@ -399,9 +399,18 @@ const getDisabledStatus = (minDate: Date, maxDate: Date, quarter: number) => {
 // Main mapping function that combine object for proper input format
 const mapArtifactToField = (
   artifact: Artifact,
+  currentFormSchema: FormFieldsSchema,
   fieldSchema?: FormFieldsSchema[number],
   activeRow?: Partial<Row>,
+  values?: FormValues,
 ): InputFactoryProps<keyof Row> => {
+  const isDisabledByConditions = !checkDisabledStatusByConditions(
+    values,
+    fieldSchema?.disabledConditions,
+  );
+
+  const isDisabled = !checkRequireValueStatus(values, fieldSchema?.enabledByValueConditions);
+
   const commonAttributes: CommonInputProps<keyof Row> = {
     id: artifact.artefact_id.toString(),
     name: artifact.artefact_tech_label,
@@ -410,8 +419,12 @@ const mapArtifactToField = (
     maxLength: fieldSchema?.maxLength,
     requireConditions: fieldSchema?.requireConditions,
     optionConditions: fieldSchema?.optionConditions,
+    enabledByValueConditions: fieldSchema?.enabledByValueConditions,
+    disabledConditions: fieldSchema?.disabledConditions,
     valueConditions: fieldSchema?.valueConditions,
-    disabled: artifact.is_edit_flg === '0',
+    disabled:
+      artifact.is_edit_flg === '0' ||
+      (fieldSchema?.enabledByValueConditions && isDisabled && isDisabledByConditions),
     placeholder: artifact.artefact_desc ? artifact.artefact_desc : undefined,
     group: artifact.group,
     schemaKey: fieldSchema?.schemaKey || SCHEMA_NAME_MAP.REST_MODEL_SCHEMA.key,
@@ -626,6 +639,7 @@ const getGroupLabel = (field: InputFactoryProps<keyof Row>): string => {
 // Основная функция для генерации полей формы
 const getFormFields = ({
   artifacts,
+  values,
   initialRow,
   mode,
   currentFormSchema,
@@ -633,6 +647,7 @@ const getFormFields = ({
   currentCustomer = CUSTOMER_MAP.EVERY_CUSTOMER,
 }: {
   artifacts: Artifact[];
+  values?: FormValues;
   currentFormSchema: FormFieldsSchema;
   mode: MODEL_FORM_MODE;
   initialRow?: Partial<Row>;
@@ -665,7 +680,7 @@ const getFormFields = ({
     'name',
   );
 
-  const mergedModels = uniqBy(
+  let mergedModelsForUmrv = uniqBy(
     concat(
       BASE_MODEL_SCHEMA,
       isActive ? ACTIVE_MODEL_SCHEMA : [],
@@ -674,15 +689,32 @@ const getFormFields = ({
       isRatingSystemRegulatorApprove ? RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA : [],
     ),
     'name',
-  ).filter(({ customers }) => customers?.find((customer) => customer === currentCustomer));
+  ).filter(({ customers }) => customers?.find((customer) => customer.id === currentCustomer?.id));
+
+  if (currentCustomer.id === CUSTOMER_MAP.UMRV.id && mode === MODEL_FORM_MODE.EDIT) {
+    mergedModelsForUmrv = uniqBy(
+      concat(
+        BASE_MODEL_SCHEMA,
+        ACTIVE_MODEL_SCHEMA,
+        isNotActive ? NOT_ACTIVE_MODEL_SCHEMA : [],
+        RATING_SYSTEM_MODEL_SCHEMA,
+        RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA,
+        initialColumns,
+      ),
+      'name',
+    ).filter(
+      ({ customers }) =>
+        !customers || customers?.find((customer) => customer.id === currentCustomer?.id),
+    );
+  }
 
   const fieldsNamesToGenerate =
     mode === MODEL_FORM_MODE.DELETE
       ? DELETE_MODEL_SCHEMA.map(({ name }) => name)
-      : showAllFields && process.env.NODE_ENV === 'development'
+      : showAllFields
       ? mergedUniqueArrayOfAllAttrsForDebug.map(({ name }) => name)
-      : currentCustomer === CUSTOMER_MAP.UMRV && mode === MODEL_FORM_MODE.ADD
-      ? mergedModels.map(({ name }) => name)
+      : currentCustomer.id === CUSTOMER_MAP.UMRV.id
+      ? mergedModelsForUmrv.map(({ name }) => name)
       : mode === MODEL_FORM_MODE.ADD
       ? BASE_MODEL_SCHEMA.map(({ name }) => name)
       : initialColumns.map(({ name }) => name);
@@ -693,7 +725,13 @@ const getFormFields = ({
     const fieldSchema = currentFormSchema.find(({ name }) => name === fieldName);
 
     if (artifact) {
-      const field = mapArtifactToField(artifact, fieldSchema, initialRow);
+      const field = mapArtifactToField(
+        artifact,
+        currentFormSchema,
+        fieldSchema,
+        initialRow,
+        values,
+      );
       return [...fields, field];
     }
 
@@ -785,6 +823,20 @@ const checkRequireStatus = (
   return false;
 };
 
+const checkDisabledStatusByConditions = (
+  values?: FormValues,
+  disabledConditions?: FormFieldConditions | string[],
+) => {
+  if (disabledConditions) {
+    if (disabledConditions.every((i) => typeof i === 'string')) {
+      return false;
+    }
+    return checkForSatisfyConditions(disabledConditions, values);
+  }
+
+  return false;
+};
+
 // Check for require specific value
 const checkRequireValueStatus = (
   values?: FormValues,
@@ -799,6 +851,47 @@ const checkRequireValueStatus = (
       }
     }
   }
+};
+
+const getEnabledByConditionsFields = (
+  activeFormSchema: FormFieldsSchema,
+  values?: FormValues,
+  wasPreviouslyActiveModel?: boolean,
+) => {
+  return activeFormSchema
+    .filter((field) => {
+      const { name, required, disabledConditions, enabledByValueConditions, schemaKey } = field;
+      const formValue = getFormValue(values?.[name]);
+
+      if (
+        schemaKey === SCHEMA_NAME_MAP.NOT_ACTIVE_MODEL_SCHEMA.key &&
+        disabledConditions?.toString().includes('wasPreviouslyActiveModel')
+      ) {
+        if (wasPreviouslyActiveModel) {
+          if (!formValue) {
+            return true;
+          }
+        }
+        return false;
+      }
+
+      const requiredField = checkRequireStatus(values, false, disabledConditions);
+
+      if (requiredField) {
+        if (!formValue) {
+          return true;
+        }
+      }
+
+      const valueToCompare = checkRequireValueStatus(values, enabledByValueConditions);
+
+      if (valueToCompare !== undefined && !checkForEqualValues(formValue, valueToCompare)) {
+        return true;
+      }
+
+      return false;
+    })
+    .map(({ name }) => name);
 };
 
 const getInvalidFields = (

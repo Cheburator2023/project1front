@@ -1,5 +1,5 @@
 {
-  "include": ["src"],
+  "include": ["src", "external_modules"],
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
@@ -20,6 +20,7 @@
       "@shared": ["./src/shared"],
       "zustand": ["./external_modules/zustand/src/*"],
       "zustand/*": ["./external_modules/zustand/src/*"],
+
       "use-sync-external-store": ["./external_modules/use-sync-external-store"],
       "use-sync-external-store/*": ["./external_modules/use-sync-external-store"]
     },
@@ -35,7 +36,8 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "noEmit": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "preserveSymlinks": true
   },
   "exclude": ["node_modules", "dist"]
 }
