@@ -49,6 +49,10 @@ const dsStreamArtifactOptions = {
       value: 'Финансовое моделирование',
       text: 'Финансовое моделирование',
     },
+    {
+      value: 'Разработка моделей для КМБ и КСБ',
+      text: 'Разработка моделей для КМБ и КСБ',
+    },
   ],
 } as SelectStringProps;
 
