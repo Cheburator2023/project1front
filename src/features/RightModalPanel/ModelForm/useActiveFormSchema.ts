@@ -1,7 +1,7 @@
 /* eslint-disable no-sequences */
 /* eslint-disable no-return-assign */
 /* eslint-disable no-constant-condition */
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { MODEL_FORM_MODE } from '@shared/constants';
 import { Row } from '@shared/types';
 import { INPUT_TYPE } from '@shared/ui/organisms';
@@ -15,6 +15,7 @@ import {
   NOT_ACTIVE_MODEL_SCHEMA,
   SCHEMA_NAME_MAP,
   DELETE_MODEL_SCHEMA,
+  DELETE_CONFIRM_MODEL_SCHEMA,
 } from './constants';
 import { FormFieldsSchema, FormValues } from './types';
 import { markSchema } from './helpers';
@@ -166,12 +167,17 @@ const getAddSchema = (
   return formSchema;
 };
 
-const getDeleteSchema = (
-  activeRow?: Partial<Row>,
-  values?: FormValues,
-  activeModelByDefault?: boolean,
-) => {
+const getDeleteModelSchema = () => {
   let formSchema = markSchema(DELETE_MODEL_SCHEMA, SCHEMA_NAME_MAP.DELETE_MODEL_SCHEMA);
+
+  return formSchema;
+};
+
+const getDeleteConfirmModelSchema = () => {
+  let formSchema = markSchema(
+    DELETE_CONFIRM_MODEL_SCHEMA,
+    SCHEMA_NAME_MAP.DELETE_CONFIRM_MODEL_SCHEMA,
+  );
 
   return formSchema;
 };
@@ -204,7 +210,13 @@ export const useActiveFormSchema = ({
     }
 
     if (mode === MODEL_FORM_MODE.DELETE) {
-      const newFormSchema = getDeleteSchema(initialRow, values, activeModelByDefault);
+      const newFormSchema = getDeleteModelSchema();
+
+      setFormSchema(sortBy(newFormSchema, 'required'));
+    }
+
+    if (mode === MODEL_FORM_MODE.DELETE_CONFIRM) {
+      const newFormSchema = getDeleteConfirmModelSchema();
 
       setFormSchema(sortBy(newFormSchema, 'required'));
     }

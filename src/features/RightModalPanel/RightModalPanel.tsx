@@ -14,7 +14,7 @@ import { Spinner } from '@admiral-ds/react-ui';
 import { ModelForm } from './ModelForm';
 import { HistoryChanges } from './HistoryChanges';
 import { Templates } from './Templates';
-import { DeleteModelForm } from './ModelForm/DeleteModelForm';
+import { DeleteModelForm } from './DeleteModelForm/DeleteModelForm';
 import { useDeleteRightModelPanelStore } from '@src/shared/stores';
 
 export interface RightModalPanelProps {
@@ -93,8 +93,6 @@ export const RightModalPanel = React.memo(
           return null;
         }
 
-        debugger;
-
         return artifactsData?.data ? (
           <ModelForm
             rows={rows}
@@ -121,8 +119,6 @@ export const RightModalPanel = React.memo(
       if (!activeRow) {
         return null;
       }
-
-      debugger;
 
       return artifactsData?.data ? (
         <DeleteModelForm

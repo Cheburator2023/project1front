@@ -40,6 +40,7 @@ import {
 import {
   ACTIVE_MODEL_SCHEMA,
   BASE_MODEL_SCHEMA,
+  DELETE_CONFIRM_MODEL_SCHEMA,
   DELETE_MODEL_SCHEMA,
   NOT_ACTIVE_MODEL_SCHEMA,
   RATING_SYSTEM_MODEL_SCHEMA,
@@ -708,16 +709,29 @@ const getFormFields = ({
     );
   }
 
-  const fieldsNamesToGenerate =
-    mode === MODEL_FORM_MODE.DELETE
-      ? DELETE_MODEL_SCHEMA.map(({ name }) => name)
-      : showAllFields
-      ? mergedUniqueArrayOfAllAttrsForDebug.map(({ name }) => name)
-      : currentCustomer.id === CUSTOMER_MAP.UMRV.id
-      ? mergedModelsForUmrv.map(({ name }) => name)
-      : mode === MODEL_FORM_MODE.ADD
-      ? BASE_MODEL_SCHEMA.map(({ name }) => name)
-      : initialColumns.map(({ name }) => name);
+  const fieldsNamesToGenerate = (() => {
+    if (showAllFields) {
+      return mergedUniqueArrayOfAllAttrsForDebug.map(({ name }) => name);
+    }
+
+    if (mode === MODEL_FORM_MODE.DELETE) {
+      return DELETE_MODEL_SCHEMA.map(({ name }) => name);
+    }
+
+    if (mode === MODEL_FORM_MODE.DELETE_CONFIRM) {
+      return DELETE_CONFIRM_MODEL_SCHEMA.map(({ name }) => name);
+    }
+
+    if (currentCustomer.id === CUSTOMER_MAP.UMRV.id) {
+      return mergedModelsForUmrv.map(({ name }) => name);
+    }
+
+    if (mode === MODEL_FORM_MODE.ADD) {
+      return BASE_MODEL_SCHEMA.map(({ name }) => name);
+    }
+
+    return initialColumns.map(({ name }) => name);
+  })();
 
   // Генерация полей
   const formFields = fieldsNamesToGenerate.reduce((fields, fieldName) => {
@@ -1042,10 +1056,6 @@ const getParentModelOptions = (rows: Partial<Row>[]) =>
 const getFormMode = (activePanelType: RIGHT_PANEL_TYPE) => {
   if (activePanelType === RIGHT_PANEL_TYPE.EDIT_MODEL) {
     return MODEL_FORM_MODE.EDIT;
-  }
-
-  if (activePanelType === RIGHT_PANEL_TYPE.DELETE_MODEL) {
-    return MODEL_FORM_MODE.DELETE;
   }
 
   return MODEL_FORM_MODE.ADD;

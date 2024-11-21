@@ -55,12 +55,17 @@ export const SCHEMA_NAME_MAP: SchemaNameMap = {
     title: 'Атрибуты рейтинговой системы, подлежащей согласованию Регулятором',
     schemaOrder: 5,
   },
-  REST_MODEL_SCHEMA: { key: 'REST_MODEL_SCHEMA', title: 'Прочие атрибуты', schemaOrder: 6 },
   DELETE_MODEL_SCHEMA: {
     key: 'DELETE_MODEL_SCHEMA',
-    title: '',
+    title: 'Атрибуты удаления модели',
+    schemaOrder: 6,
+  },
+  DELETE_CONFIRM_MODEL_SCHEMA: {
+    key: 'DELETE_CONFIRM_MODEL_SCHEMA',
+    title: 'Атрибуты подверждения удаления модели',
     schemaOrder: 7,
   },
+  REST_MODEL_SCHEMA: { key: 'REST_MODEL_SCHEMA', title: 'Прочие атрибуты', schemaOrder: 8 },
 };
 
 export const BASE_MODEL_SCHEMA: FormFieldsSchema = [
@@ -717,6 +722,21 @@ export const DELETE_MODEL_SCHEMA: FormFieldsSchema = [
   },
   {
     name: 'reason_model_delete',
+    required: false,
+    maxLength: 250,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
+  },
+];
+
+export const DELETE_CONFIRM_MODEL_SCHEMA: FormFieldsSchema = [
+  {
+    name: 'business_customer',
+    required: true,
+    maxLength: 255,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
+  },
+  {
+    name: 'model_name_dadm',
     required: false,
     maxLength: 250,
     customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
