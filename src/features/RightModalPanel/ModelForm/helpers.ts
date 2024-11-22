@@ -40,13 +40,12 @@ import {
 import {
   ACTIVE_MODEL_SCHEMA,
   BASE_MODEL_SCHEMA,
-  DELETE_CONFIRM_MODEL_SCHEMA,
-  DELETE_MODEL_SCHEMA,
   NOT_ACTIVE_MODEL_SCHEMA,
   RATING_SYSTEM_MODEL_SCHEMA,
   RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA,
   SCHEMA_NAME_MAP,
 } from './constants';
+import { DELETE_CONFIRM_MODEL_SCHEMA, DELETE_MODEL_SCHEMA } from '../DeleteModelForm/constants';
 
 export const markSchema = (
   schema: FormFieldsSchema,

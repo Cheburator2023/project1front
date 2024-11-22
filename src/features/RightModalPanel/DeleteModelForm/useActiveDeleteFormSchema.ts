@@ -3,13 +3,9 @@ import { MODEL_FORM_MODE } from '@shared/constants';
 import { Row } from '@shared/types';
 import { sortBy } from 'lodash';
 import { useDeepEffect } from '@shared/hooks/useDeepEffect';
-import {
-  SCHEMA_NAME_MAP,
-  DELETE_MODEL_SCHEMA,
-  DELETE_CONFIRM_MODEL_SCHEMA,
-} from '../ModelForm/constants';
 import { FormFieldsSchema } from '../ModelForm/types';
 import { markSchema } from '../ModelForm/helpers';
+import { DELETE_CONFIRM_MODEL_SCHEMA, DELETE_MODEL_SCHEMA, SCHEMA_NAME_MAP } from './constants';
 
 interface UseActiveFormSchemaProps {
   initialRow?: Partial<Row>;

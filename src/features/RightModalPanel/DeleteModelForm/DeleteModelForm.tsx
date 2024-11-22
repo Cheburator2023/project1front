@@ -7,7 +7,7 @@ import styled from 'styled-components';
 import { Row } from '@shared/types';
 import { StatusScreen } from '@shared/ui/molecules';
 import { RIGHT_PANEL_TYPE, MODEL_FORM_MODE } from '@shared/constants';
-import { InputFactory, RightPanel } from '@shared/ui/organisms';
+import { InputFactory, InputValue, RightPanel } from '@shared/ui/organisms';
 import { ArtifactApi } from '@shared/api';
 import { groupBy } from 'lodash';
 import { Flexbox, Spacer } from '@shared/ui/atoms';
@@ -18,11 +18,7 @@ import { FormValues } from '../ModelForm/types';
 import { getInputValuesFromRow } from '../ModelForm/helpers';
 import { ButtonContainer, FormContainer } from '../ModelForm/styles';
 import { useFormFields } from '../ModelForm/useFormFields';
-import {
-  DELETE_CONFIRM_MODEL_SCHEMA,
-  DELETE_MODEL_SCHEMA,
-  SCHEMA_NAME_MAP,
-} from '../ModelForm/constants';
+import { DELETE_CONFIRM_MODEL_SCHEMA, DELETE_MODEL_SCHEMA, SCHEMA_NAME_MAP } from './constants';
 import { useDeleteRightModelPanelStore } from '@src/shared/stores';
 import { useActiveDeleteFormSchema } from './useActiveDeleteFormSchema';
 
@@ -56,7 +52,6 @@ export interface ModelFormProps {
   editCellName?: keyof Row;
   rows: Partial<Row>[];
   activeRow?: Partial<Row>;
-  // TODO: check this types
   onSubmit: (newRow: CustomError | Row | ArtifactApi[], formMode: MODEL_FORM_MODE) => void;
   onClose: () => void;
 }
@@ -119,7 +114,11 @@ export const DeleteModelForm = ({
 
   debugger;
 
-  const handleChange = useCallback(() => {}, []);
+  const handleChange = useCallback((name: keyof Row, value: InputValue) => {
+    let newValues = { [name]: value };
+
+    setValues((prevValues) => ({ ...prevValues, ...newValues }));
+  }, []);
 
   const handleSubmit = useCallback(async () => {}, [
     values,

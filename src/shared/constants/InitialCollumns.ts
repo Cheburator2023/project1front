@@ -12,6 +12,11 @@ export const initialColumns: Array<Column> = [
     type: COLUMN_TYPE.STRING,
   },
   {
+    name: 'status_model_delete',
+    title: 'Cтатус удаления модели',
+    type: COLUMN_TYPE.STRING,
+  },
+  {
     name: 'group_company',
     title: 'Компания группы',
     type: COLUMN_TYPE.STRING,
@@ -814,4 +819,7 @@ export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
   artefacts_model_id: [],
   business_status: [],
   reason_model_delete: [],
+  status_model_delete: [],
+  lead_validator_comment_model_delete: [],
+  lead_validator_resolution_model_delete: [],
 };

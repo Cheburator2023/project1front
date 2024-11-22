@@ -42,6 +42,8 @@ export const useFormFields = ({
       currentCustomer,
     });
 
+    debugger;
+
     setFields(newFields);
   }, [artifacts, formSchema, initialRow, mode, showAllFields, currentCustomer, values]);
 

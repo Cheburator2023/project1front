@@ -66,6 +66,8 @@ const Layout = ({ children, user, protectedFetch, goToSum, onLogout }: LayoutPro
     }
   }, [user?.roles, user?.realm_access, setCurrentCustomer]);
 
+  console.log('user', user);
+
   return (
     // eslint-disable-next-line react/jsx-no-constructed-context-values
     <FetchContext.Provider value={{ protectedFetch }}>
