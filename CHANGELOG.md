@@ -1,5 +1,14 @@
 # Semantic Versioning Changelog
 
+## [1.25.2](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.25.1...v1.25.2) (2024-11-22)
+
+
+### Bug Fixes
+
+* dashboards / add stream ([4febc02](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/4febc02bc3dabf2a30ff8870fc87465a6fd79ca6))
+* umrv form logic fixes ([234a8fc](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/234a8fc6bfebbc17c3ed6f9276772983348e6c42))
+* update allocations date fields ([1dfe124](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/1dfe1243e639d1be826a541513ca37eede040f93))
+
 ## [1.25.1](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.25.0...v1.25.1) (2024-11-14)
 
 
