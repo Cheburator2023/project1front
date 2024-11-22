@@ -16,6 +16,7 @@ import { Artifact, CustomError } from '@shared/api/types';
 import { useAppInjectStore } from '@shared/stores/appInjectStore';
 import { CUSTOMER_MAP } from '@shared/constants/customers';
 import { useScrollTo } from '@src/shared/hooks/useScrollTo';
+import { useDeepEffect } from '@src/shared/hooks/useDeepEffect';
 import { FormFieldConditions, FormValues } from './types';
 import {
   getFormMode,
@@ -69,6 +70,9 @@ export const ModelForm = ({
   const [expandedPanel, setExpandPanel] = useState(true);
   const [showAllFields, setShowAllFields] = useState(false);
   const [activeModelByDefault, setActiveModelByDefault] = useState<boolean | undefined>(undefined);
+  const [completesConditionField, setCompletesConditionField] = useState<
+    { connectedName: string; connectedValue: string } | undefined
+  >(undefined);
 
   const errorElemRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
@@ -101,38 +105,9 @@ export const ModelForm = ({
   const groupedBySchemaName = groupBy(fields, 'schemaKey');
 
   const handleChange = (name: keyof Row, value: InputValue) => {
-    let newValues = { [name]: value };
-    // TODO: move this logic to artifact
-    if (name === 'model_type' && value.type === INPUT_TYPE.SELECT) {
-      if (
-        Array.isArray(value.value)
-          ? value.value.some((item) => item.text === 'Бизнес-модели')
-          : value.value?.text === 'Бизнес-модели'
-      ) {
-        newValues = {
-          ...newValues,
-          model_risk_type: {
-            type: INPUT_TYPE.SELECT,
-            value: {
-              id: '479',
-              text: 'Бизнес',
-            },
-          },
-        };
-      } else {
-        newValues = {
-          ...newValues,
-          model_risk_type: {
-            type: INPUT_TYPE.SELECT,
-            value: undefined,
-          },
-        };
-      }
-    }
-
+    const newValues = { [name]: value };
     const connectedValues: any = {};
     const connectedValuesToContitions: any = {};
-    let autoCompletedField: any = {};
 
     formSchema.map(({ valueConditions, name: connectedName }) => {
       if (valueConditions?.length === 1) {
@@ -158,27 +133,18 @@ export const ModelForm = ({
 
         const completesCondition = isEqual([connectedValuesToContitions], conditions);
 
-        if (completesCondition) {
-          const field = fields.find((_field) => {
-            return _field.name === connectedName;
+        if (completesCondition && connectedName !== name) {
+          setCompletesConditionField({ connectedName, connectedValue });
+        } else {
+          const fieldToReset = formSchema.find((_field) => {
+            return JSON.stringify(_field.valueConditions?.[0].conditions)?.includes(name);
           });
 
-          const artifact = artifacts.find(
-            (_artifact) => _artifact.artefact_tech_label === connectedName,
-          );
-          const connectedArtifactOption = artifact?.values?.find(
-            (option) => option.artefact_value === connectedValue,
-          );
+          setValues((prevValues) => ({
+            ...omit(prevValues, fieldToReset?.name as any),
+          }));
 
-          autoCompletedField = {
-            [connectedName]: {
-              type: field?.type,
-              value: {
-                id: `${connectedArtifactOption?.artefact_value_id}`,
-                text: connectedValue,
-              },
-            },
-          };
+          setCompletesConditionField(undefined);
         }
       }
       return false;
@@ -186,8 +152,48 @@ export const ModelForm = ({
 
     setDirtyFields((prevDirtyFields) => [...prevDirtyFields, name]);
 
-    setValues((prevValues) => ({ ...prevValues, ...newValues, ...autoCompletedField }));
+    setValues((prevValues) => ({ ...prevValues, ...newValues }));
   };
+
+  useDeepEffect(() => {
+    setTimeout(() => {
+      if (completesConditionField?.connectedName) {
+        let autoCompletedField = {};
+
+        const connectedField = fields.find((_field) => {
+          return _field.name === completesConditionField?.connectedName;
+        });
+
+        const artifact = artifacts.find(
+          (_artifact) => _artifact.artefact_tech_label === completesConditionField?.connectedName,
+        );
+        const connectedArtifactOption = artifact?.values?.find(
+          (option) => option.artefact_value === completesConditionField?.connectedValue,
+        );
+
+        if (
+          !connectedField?.disabled &&
+          connectedArtifactOption?.artefact_value === completesConditionField?.connectedValue
+        ) {
+          autoCompletedField = {
+            [completesConditionField.connectedName]: {
+              type: connectedField?.type,
+              value: {
+                id: `${connectedArtifactOption?.artefact_value_id}`,
+                text: `${connectedArtifactOption?.artefact_value}`,
+              },
+            },
+          };
+          setValues((prevValues) => ({ ...prevValues, ...autoCompletedField }));
+        }
+        if (connectedField?.disabled) {
+          setValues((prevValues) => ({
+            ...omit(prevValues, completesConditionField?.connectedName),
+          }));
+        }
+      }
+    }, 300);
+  }, [completesConditionField, fields]);
 
   // TODO: Temporary solution to solve the problem of editing allocations in models that do not have all required fields. This is a technical debt that needs to be fixed.
   const checkForAllocationFieldsChanged = () =>
