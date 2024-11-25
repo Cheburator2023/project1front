@@ -81,7 +81,7 @@ export const PlaygroundTable = ({
         ? 'agNumberColumnFilter'
         : 'agMultiColumnFilter',
     filterParams: data.type === COLUMN_TYPE.DATE && dateFilterParams,
-    pinned: data.name === 'active_model' && currentCustomer === CUSTOMER_MAP.UMRV && 'left',
+    // pinned: data.name === 'active_model' && currentCustomer === CUSTOMER_MAP.UMRV && 'left',
   }));
 
   const defaultColDef = useMemo<ColDef>(() => {

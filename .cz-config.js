@@ -1,4 +1,5 @@
 module.exports = {
+  skipQuestions: ['scope'],
   types: [
     {
       value: 'refactor',
