@@ -14,6 +14,7 @@
     "start": "webpack-dev-server --mode development --live-reload --config webpack.dev.js",
     "dev:webpack": "cross-env MOCKED_REQUESTS=false webpack serve --mode development --config ./webpack.dev.js",
     "dev:webpack:mocked": "cross-env MOCKED_REQUESTS=true webpack serve --mode development --config ./webpack.dev.js",
+    "dev:webpack:mocked:prod": "cross-env MOCKED_REQUESTS=true NODE_ENV=production webpack serve --mode production --config ./webpack.prod.js",
     "dev:vite": "cross-env MOCKED_REQUESTS=false NODE_ENV=development vite serve",
     "dev:vite:mocked": "cross-env MOCKED_REQUESTS=true NODE_ENV=development vite serve",
     "clean": "rm -rf dist",

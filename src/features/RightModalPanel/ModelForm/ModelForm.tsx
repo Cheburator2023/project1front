@@ -1,3 +1,4 @@
+/* eslint-disable array-callback-return */
 /* eslint-disable no-unneeded-ternary */
 import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { Button, CheckboxField, T } from '@admiral-ds/react-ui';
@@ -8,32 +9,28 @@ import { RIGHT_PANEL_TYPE, MODEL_FORM_MODE } from '@shared/constants';
 import { INPUT_TYPE, InputFactory, InputValue, RightPanel } from '@shared/ui/organisms';
 import { API_ROUTES, useFetch, ArtifactApi, ModelEditApi } from '@shared/api';
 
-import { filter, groupBy, omit, pick } from 'lodash';
+import { filter, groupBy, isEqual, omit, pick } from 'lodash';
 import { Flexbox, Spacer } from '@shared/ui/atoms';
 import { Artifact, CustomError } from '@shared/api/types';
 
 import { useAppInjectStore } from '@shared/stores/appInjectStore';
 import { CUSTOMER_MAP } from '@shared/constants/customers';
 import { useScrollTo } from '@src/shared/hooks/useScrollTo';
-import { FormValues } from './types';
+import { useDeepEffect } from '@src/shared/hooks/useDeepEffect';
+import { FormFieldConditions, FormValues } from './types';
 import {
   getFormMode,
   getArtifactApiItems,
   getInvalidFields,
   getInputValuesFromRow,
   getProperFormatValueForSubmit,
+  checkRequireValueStatus,
 } from './helpers';
 import { ButtonContainer, FormContainer } from './styles';
 import { ParentModelSelect } from './ParentModelSelect';
 import { useActiveFormSchema } from './useActiveFormSchema';
 import { useFormFields } from './useFormFields';
-import {
-  ACTIVE_MODEL_SCHEMA,
-  ALLOCATION_FIELDS_NAMES,
-  BASE_MODEL_SCHEMA,
-  NOT_ACTIVE_MODEL_SCHEMA,
-  SCHEMA_NAME_MAP,
-} from './constants';
+import { ACTIVE_MODEL_SCHEMA, ALLOCATION_FIELDS_NAMES, SCHEMA_NAME_MAP } from './constants';
 import { ModelFormDotMenu } from './ModelFormDotMenu';
 
 type SubmitType = { checkOnly?: boolean };
@@ -63,7 +60,6 @@ export const ModelForm = ({
   const { setCurrentCustomer, currentCustomer } = useAppInjectStore();
 
   const [values, setValues] = useState<FormValues | undefined>();
-  const [cachedValues, setCachedValues] = useState<FormValues | undefined>();
   const [invalidFields, setInvalidFields] = useState<Array<keyof Row>>([]);
   const [dirtyFields, setDirtyFields] = useState<Array<keyof Row>>([]);
   const [parentModelId, setParentModelId] = useState<string>();
@@ -74,6 +70,9 @@ export const ModelForm = ({
   const [expandedPanel, setExpandPanel] = useState(true);
   const [showAllFields, setShowAllFields] = useState(false);
   const [activeModelByDefault, setActiveModelByDefault] = useState<boolean | undefined>(undefined);
+  const [completesConditionField, setCompletesConditionField] = useState<
+    { connectedName: string; connectedValue: string } | undefined
+  >(undefined);
 
   const errorElemRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
@@ -91,6 +90,7 @@ export const ModelForm = ({
 
   const { fields } = useFormFields({
     formSchema,
+    values,
     mode: formMode,
     initialRow,
     artifacts,
@@ -104,40 +104,96 @@ export const ModelForm = ({
   const title = IS_FORM_MODE_ADD ? 'Новая модель' : 'Редактирование модели';
   const groupedBySchemaName = groupBy(fields, 'schemaKey');
 
-  const handleChange = useCallback((name: keyof Row, value: InputValue) => {
-    let newValues = { [name]: value };
-    // TODO: move this logic to artifact
-    if (name === 'model_type' && value.type === INPUT_TYPE.SELECT) {
-      if (
-        Array.isArray(value.value)
-          ? value.value.some((item) => item.text === 'Бизнес-модели')
-          : value.value?.text === 'Бизнес-модели'
-      ) {
-        newValues = {
-          ...newValues,
-          model_risk_type: {
-            type: INPUT_TYPE.SELECT,
-            value: {
-              id: '479',
-              text: 'Бизнес',
-            },
-          },
-        };
-      } else {
-        newValues = {
-          ...newValues,
-          model_risk_type: {
-            type: INPUT_TYPE.SELECT,
-            value: undefined,
-          },
-        };
+  const handleChange = (name: keyof Row, value: InputValue) => {
+    const newValues = { [name]: value };
+    const connectedValues: any = {};
+    const connectedValuesToContitions: any = {};
+
+    formSchema.map(({ valueConditions, name: connectedName }) => {
+      if (valueConditions?.length === 1) {
+        const conditions = valueConditions[0].conditions;
+        const connectedValue = valueConditions[0].value;
+        conditions?.map((condition) => {
+          Object.keys(condition).map((fieldName) => {
+            // @ts-ignore
+            const formFieldValue = values?.[fieldName as any]?.value?.text;
+
+            if (fieldName === name || formFieldValue) {
+              // @ts-ignore
+              connectedValues[fieldName] =
+                // @ts-ignore
+                fieldName === name ? value : values?.[fieldName as any];
+
+              connectedValuesToContitions[fieldName] =
+                // @ts-ignore
+                fieldName === name ? value?.value?.text : formFieldValue;
+            }
+          });
+        });
+
+        const completesCondition = isEqual([connectedValuesToContitions], conditions);
+
+        if (completesCondition && connectedName !== name) {
+          setCompletesConditionField({ connectedName, connectedValue });
+        } else {
+          const fieldToReset = formSchema.find((_field) => {
+            return JSON.stringify(_field.valueConditions?.[0].conditions)?.includes(name);
+          });
+
+          setValues((prevValues) => ({
+            ...omit(prevValues, fieldToReset?.name as any),
+          }));
+
+          setCompletesConditionField(undefined);
+        }
       }
-    }
+      return false;
+    });
 
     setDirtyFields((prevDirtyFields) => [...prevDirtyFields, name]);
 
     setValues((prevValues) => ({ ...prevValues, ...newValues }));
-  }, []);
+  };
+
+  useDeepEffect(() => {
+    setTimeout(() => {
+      if (completesConditionField?.connectedName) {
+        let autoCompletedField = {};
+
+        const connectedField = fields.find((_field) => {
+          return _field.name === completesConditionField?.connectedName;
+        });
+
+        const artifact = artifacts.find(
+          (_artifact) => _artifact.artefact_tech_label === completesConditionField?.connectedName,
+        );
+        const connectedArtifactOption = artifact?.values?.find(
+          (option) => option.artefact_value === completesConditionField?.connectedValue,
+        );
+
+        if (
+          !connectedField?.disabled &&
+          connectedArtifactOption?.artefact_value === completesConditionField?.connectedValue
+        ) {
+          autoCompletedField = {
+            [completesConditionField.connectedName]: {
+              type: connectedField?.type,
+              value: {
+                id: `${connectedArtifactOption?.artefact_value_id}`,
+                text: `${connectedArtifactOption?.artefact_value}`,
+              },
+            },
+          };
+          setValues((prevValues) => ({ ...prevValues, ...autoCompletedField }));
+        }
+        if (connectedField?.disabled) {
+          setValues((prevValues) => ({
+            ...omit(prevValues, completesConditionField?.connectedName),
+          }));
+        }
+      }
+    }, 300);
+  }, [completesConditionField, fields]);
 
   // TODO: Temporary solution to solve the problem of editing allocations in models that do not have all required fields. This is a technical debt that needs to be fixed.
   const checkForAllocationFieldsChanged = () =>
@@ -269,21 +325,8 @@ export const ModelForm = ({
   }, [onClose]);
 
   const activeModelCheckboxHandler = async (e: any) => {
-    const isChecked = e?.target?.checked;
     setActiveModelByDefault(e?.target?.checked);
     setCurrentCustomer(CUSTOMER_MAP.UMRV);
-
-    setCachedValues(values);
-
-    if (isChecked) {
-      const fieldKeysToFilter = [...ACTIVE_MODEL_SCHEMA, ...NOT_ACTIVE_MODEL_SCHEMA].map(
-        (field) => field.name,
-      );
-
-      setValues(omit(values, fieldKeysToFilter));
-    } else {
-      setValues({ ...cachedValues, ...values });
-    }
 
     await handleSubmit({ checkOnly: true });
   };

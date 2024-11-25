@@ -11,15 +11,14 @@ type FormFieldValueConditions = Array<{
 type FormFieldsSchema = Array<{
   name: keyof Row;
   required?: boolean;
-  disabled?: {
-    forCustomer?: CUSTOMER_TYPE;
-  };
   maxLength?: number;
   customers?: CUSTOMER_TYPE[];
   order?: number;
   requireConditions?: FormFieldConditions | string[];
   optionConditions?: OptionConditionsType[];
   valueConditions?: FormFieldValueConditions;
+  disabledConditions?: FormFieldConditions | string[];
+  enabledByValueConditions?: FormFieldValueConditions;
   schemaKey?: string;
   schemaOrder?: number;
 }>;

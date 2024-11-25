@@ -8,6 +8,7 @@ import { ReactComponent as SettingsOutline } from '@admiral-ds/icons/build/syste
 import { IconButton } from '@shared/ui/molecules';
 import { RIGHT_PANEL_TYPE } from '@shared/constants';
 
+import { useDebouncedCallback } from '@src/shared/hooks/useDebouncedCallback';
 import { CustomSearchInput, Container } from './styles';
 
 export interface ActionsPanelProps {
@@ -17,28 +18,26 @@ export interface ActionsPanelProps {
 
 export const ActionsPanel = ({ updateRightPanelType, handleSearch }: ActionsPanelProps) => {
   const [searchValue, setSearchValue] = useState('');
+  const debouncedHandleChange = useDebouncedCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    handleChange(e);
+  }, 300);
 
   const navigate = useNavigate();
 
-  const handleChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newValue = e.currentTarget.value;
-
-      setSearchValue(newValue);
-
-      if (!(newValue.length || e.isTrusted)) {
-        handleSearch(newValue);
-      }
-    },
-    [handleSearch],
-  );
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    handleSearch(newValue);
+  };
 
   return (
     <Container>
       <CustomSearchInput
         placeholder="Поиск"
         onSearchClick={() => handleSearch(searchValue)}
-        onChange={handleChange}
+        onChange={(e) => {
+          setSearchValue(e.target.value);
+          debouncedHandleChange(e);
+        }}
         value={searchValue}
       />
       <div>
