@@ -4,12 +4,14 @@ import { ReactComponent as BrokerOutlineIcon } from '@admiral-ds/icons/build/fin
 import { ReactComponent as MenuOutline } from '@admiral-ds/icons/build/service/MenuOutline.svg';
 import { ReactComponent as PlusCircleSolid } from '@admiral-ds/icons/build/service/PlusCircleSolid.svg';
 import { ReactComponent as SettingsOutline } from '@admiral-ds/icons/build/system/SettingsOutline.svg';
+import { ReactComponent as ShowTableOutline } from '@admiral-ds/icons/build/category/ShowTableOutline.svg';
 
 import { IconButton } from '@shared/ui/molecules';
 import { RIGHT_PANEL_TYPE } from '@shared/constants';
 
 import { useDebouncedCallback } from '@src/shared/hooks/useDebouncedCallback';
 import { CustomSearchInput, Container } from './styles';
+import { ROUTES } from '../../app/Routes';
 
 export interface ActionsPanelProps {
   handleSearch: (newSearchString: string) => void;
@@ -51,6 +53,12 @@ export const ActionsPanel = ({ updateRightPanelType, handleSearch }: ActionsPane
           icon={<BrokerOutlineIcon />}
           tooltip="Графики"
           onClick={() => navigate('charts')}
+        />
+
+        <IconButton
+          icon={<ShowTableOutline />}
+          tooltip="Новый интерфейс таблиц"
+          onClick={() => navigate(ROUTES.FUTURE_TABLE)}
         />
         <IconButton icon={<MenuOutline />} tooltip="Меню" onClick={() => null} />
         <IconButton icon={<SettingsOutline />} tooltip="Настройки" onClick={() => null} />

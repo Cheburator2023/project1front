@@ -5,22 +5,29 @@ import { Home, ChartsDashboardPage } from '@pages';
 import { Playground } from '@pages/Playground';
 import { FutureTableHomePage } from '@pages/Playground/FutureTableHomePage';
 
+export const ROUTES = {
+  HOME: '/',
+  FUTURE_TABLE: '/future_table',
+  CHARTS: '/charts',
+  PLAYGROUND: '/playground',
+};
+
 const ROUTE_MAP = [
   {
-    path: '/',
+    path: ROUTES.HOME,
     index: true,
     element: <Home />,
   },
   {
-    path: '/future_table',
+    path: ROUTES.FUTURE_TABLE,
     element: <FutureTableHomePage />,
   },
   {
-    path: 'charts',
+    path: ROUTES.CHARTS,
     element: <ChartsDashboardPage />,
   },
   {
-    path: '/playground',
+    path: ROUTES.PLAYGROUND,
     element: <Playground />,
   },
   {

@@ -17,6 +17,7 @@ import { ReactComponent as MenuOutline } from '@admiral-ds/icons/build/service/M
 import { ReactComponent as PlusCircleSolid } from '@admiral-ds/icons/build/service/PlusCircleSolid.svg';
 import { ReactComponent as SettingsOutline } from '@admiral-ds/icons/build/system/SettingsOutline.svg';
 import { ReactComponent as SearchOutline } from '@admiral-ds/icons/build/system/SearchOutline.svg';
+import { ReactComponent as ShowTableOutline } from '@admiral-ds/icons/build/category/ShowTableOutline.svg';
 
 import { Flexbox, Spacer } from '@src/shared/ui/atoms';
 import { TDisplayTableModels, TModelsTable } from '@pages/Home/hooks';
@@ -29,6 +30,7 @@ import { useAppInjectStore } from '@src/shared/stores/appInjectStore';
 import { CUSTOMER_MAP } from '@src/shared/constants/customers';
 import { PlaygroundCustomCell } from './PlaygroundCustomCell';
 import { AG_GRID_LOCALE_RU } from './locale/agGridLocale.ru';
+import { ROUTES } from '../../app/Routes';
 
 const toolTipValueGetter = (params: ITooltipParams) =>
   params.value == null || params.value === '' ? '- Отсутствует -' : params.value;
@@ -162,6 +164,11 @@ export const PlaygroundTable = ({
               icon={<BrokerOutlineIcon />}
               tooltip="Графики"
               onClick={() => navigate('charts')}
+            />
+            <IconButton
+              icon={<ShowTableOutline />}
+              tooltip="Текущий интерфейс таблиц"
+              onClick={() => navigate(ROUTES.HOME)}
             />
             <IconButton icon={<MenuOutline />} tooltip="Меню" onClick={() => null} />
             <IconButton icon={<SettingsOutline />} tooltip="Настройки" onClick={() => null} />
