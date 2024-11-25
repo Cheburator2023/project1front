@@ -834,7 +834,7 @@ const checkDisabledStatusByConditions = (
 };
 
 // Check for require specific value
-const checkRequireValueStatus = (
+export const checkRequireValueStatus = (
   values?: FormValues,
   valueConditions?: FormFieldValueConditions,
 ) => {
@@ -847,47 +847,6 @@ const checkRequireValueStatus = (
       }
     }
   }
-};
-
-const getEnabledByConditionsFields = (
-  activeFormSchema: FormFieldsSchema,
-  values?: FormValues,
-  wasPreviouslyActiveModel?: boolean,
-) => {
-  return activeFormSchema
-    .filter((field) => {
-      const { name, required, disabledConditions, enabledByValueConditions, schemaKey } = field;
-      const formValue = getFormValue(values?.[name]);
-
-      if (
-        schemaKey === SCHEMA_NAME_MAP.NOT_ACTIVE_MODEL_SCHEMA.key &&
-        disabledConditions?.toString().includes('wasPreviouslyActiveModel')
-      ) {
-        if (wasPreviouslyActiveModel) {
-          if (!formValue) {
-            return true;
-          }
-        }
-        return false;
-      }
-
-      const requiredField = checkRequireStatus(values, false, disabledConditions);
-
-      if (requiredField) {
-        if (!formValue) {
-          return true;
-        }
-      }
-
-      const valueToCompare = checkRequireValueStatus(values, enabledByValueConditions);
-
-      if (valueToCompare !== undefined && !checkForEqualValues(formValue, valueToCompare)) {
-        return true;
-      }
-
-      return false;
-    })
-    .map(({ name }) => name);
 };
 
 const getInvalidFields = (
