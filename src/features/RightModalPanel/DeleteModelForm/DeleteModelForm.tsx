@@ -135,6 +135,15 @@ export const DeleteModelForm = ({
         },
       };
 
+      // if (!valuesWithAddedOutsideControls['status']) {
+      //   valuesWithAddedOutsideControls['status'] = {
+      //     type: INPUT_TYPE.STRING,
+      //     value: 'Ожидает удаления',
+      //   };
+      // } else {
+      //   valuesWithAddedOutsideControls['status'].value = 'Ожидает удаления';
+      // }
+
       const newInvalidFields = getInvalidFields(deleteFormSchema, valuesWithAddedOutsideControls);
       setInvalidFields(newInvalidFields);
       scrollToActiveError();
@@ -149,6 +158,7 @@ export const DeleteModelForm = ({
       }
 
       const artifactApiItems = getArtifactApiItems(valuesWithAddedOutsideControls);
+
       // TODO: check this types
       let newRow: CustomError | Row | ArtifactApi[] | undefined;
 

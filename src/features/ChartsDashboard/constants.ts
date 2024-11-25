@@ -1,7 +1,6 @@
 import { SELECT_TYPE, SelectStringProps } from '@src/shared/ui/organisms';
 import * as Highcharts from 'highcharts';
 import { MetricsCaption } from './types';
-import { overflow } from 'html2canvas/dist/types/css/property-descriptors/overflow';
 
 const dsStreamArtifactOptions = {
   type: SELECT_TYPE.STRING,
@@ -49,6 +48,10 @@ const dsStreamArtifactOptions = {
     {
       value: 'Финансовое моделирование',
       text: 'Финансовое моделирование',
+    },
+    {
+      value: 'Разработка моделей для КМБ и КСБ',
+      text: 'Разработка моделей для КМБ и КСБ',
     },
   ],
 } as SelectStringProps;
