@@ -13,7 +13,7 @@ import {
 
 import { initialColumns } from '@src/shared/constants';
 import { TableChangeProps } from '../types';
-import { useDeleteRightModelPanelStore } from '@src/shared/stores';
+import { useDeleteRightModelPanelStore, useUserStore } from '@src/shared/stores';
 
 export const useTableChange = ({
   rowList,
@@ -26,6 +26,8 @@ export const useTableChange = ({
 }: TableChangeProps) => {
   const { columnsFilters, topFilters, onChangeColumnsFilters, onChangeTopFilters } =
     useContext(FiltersContext);
+
+  const { username } = useUserStore();
 
   // Table data
   const [rows, setRows] = useState(rowList);
@@ -77,9 +79,23 @@ export const useTableChange = ({
     const selectedRows = rowsWithUpdatedSelectedStatus.filter((row) => row.selected);
 
     if (selectedRows.length === 1) {
-      updateDeleteModelState(1, selectedRows[0].model_source, selectedRows[0].id);
+      const selectedRow = selectedRows[0];
+
+      const lowerUsername = username.toLowerCase();
+      const lowerModelCreator = selectedRow?.model_creator?.toLowerCase() || '';
+      const lowerBusinessCustomers =
+        selectedRow.business_customer
+          ?.toLowerCase()
+          .split(',')
+          .map((customer) => customer.trim()) || [];
+
+      const userMatches =
+        lowerUsername === lowerModelCreator ||
+        lowerBusinessCustomers.some((customer) => customer === lowerUsername);
+
+      updateDeleteModelState(1, selectedRow.model_source, userMatches, selectedRow.id);
     } else {
-      updateDeleteModelState(selectedRows.length, null);
+      updateDeleteModelState(selectedRows.length, null, false);
     }
 
     setRows(rowsWithUpdatedSelectedStatus);

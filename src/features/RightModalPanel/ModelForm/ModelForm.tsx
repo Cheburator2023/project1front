@@ -98,8 +98,6 @@ export const ModelForm = ({
   const title = IS_FORM_MODE_ADD ? 'Новая модель' : 'Редактирование модели';
   const groupedBySchemaName = groupBy(fields, 'schemaKey');
 
-  debugger;
-
   const handleChange = useCallback((name: keyof Row, value: InputValue) => {
     let newValues = { [name]: value };
     // TODO: move this logic to artifact

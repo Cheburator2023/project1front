@@ -20,7 +20,7 @@ export interface ActionsPanelProps {
 
 export const ActionsPanel = ({ updateRightPanelType, handleSearch }: ActionsPanelProps) => {
   const [searchValue, setSearchValue] = useState('');
-  const { selectedModelsCount, selectedModelSource, isDeleteButtonEnabled } =
+  const { selectedModelsCount, selectedModelSource, isDeleteButtonEnabled, userMatches } =
     useDeleteRightModelPanelStore();
 
   let deleteTooltipMessage = '';
@@ -31,6 +31,8 @@ export const ActionsPanel = ({ updateRightPanelType, handleSearch }: ActionsPane
     deleteTooltipMessage = 'Нельзя удалить несколько моделей';
   } else if (selectedModelSource !== 'sum-rm') {
     deleteTooltipMessage = 'Модель должна быть с исчтоником "sum-rm"';
+  } else if (!userMatches) {
+    deleteTooltipMessage = 'Модель может-быть удалена только создателем или владельцем модели';
   } else {
     deleteTooltipMessage = 'Удалить модель';
   }

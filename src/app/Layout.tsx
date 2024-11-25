@@ -10,6 +10,7 @@ import { Header } from './Header';
 import { themes } from './theme/theme';
 import { useAppInjectStore } from '../shared/stores';
 import { CUSTOMER_MAP } from '../shared/constants/customers';
+import { useUserStore } from '@src/shared/stores';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -20,6 +21,7 @@ interface LayoutProps {
       roles: string[];
     };
     roles: string[];
+    preferred_username: string;
   };
   protectedFetch?: <T, N>(
     routeUrl: string,
@@ -45,6 +47,7 @@ const Layout = ({ children, user, protectedFetch, goToSum, onLogout }: LayoutPro
   const [downloadReportStatus, setDownloadReportStatus] = useState(false);
   const [columnsFilters, setColumnsFilters] = useState<Partial<ColumnsFilter>>();
   const { setCurrentCustomer } = useAppInjectStore();
+  const { setUsername } = useUserStore();
 
   const updateColumnsFilters = useCallback((newColumnsFilters?: Partial<ColumnsFilter>) => {
     setColumnsFilters(newColumnsFilters);
@@ -64,9 +67,13 @@ const Layout = ({ children, user, protectedFetch, goToSum, onLogout }: LayoutPro
     } else if (currentCustomerLS) {
       setCurrentCustomer(JSON.parse(currentCustomerLS));
     }
+
+    if (user?.preferred_username) {
+      setUsername(user?.preferred_username);
+    }
   }, [user?.roles, user?.realm_access, setCurrentCustomer]);
 
-  console.log('user', user);
+  console.log(user);
 
   return (
     // eslint-disable-next-line react/jsx-no-constructed-context-values

@@ -7,20 +7,23 @@ import styled from 'styled-components';
 import { Row } from '@shared/types';
 import { StatusScreen } from '@shared/ui/molecules';
 import { RIGHT_PANEL_TYPE, MODEL_FORM_MODE } from '@shared/constants';
-import { InputFactory, InputValue, RightPanel } from '@shared/ui/organisms';
-import { ArtifactApi } from '@shared/api';
+import { INPUT_TYPE, InputFactory, InputValue, RightPanel } from '@shared/ui/organisms';
+import { API_ROUTES, ArtifactApi, useFetch } from '@shared/api';
 import { groupBy } from 'lodash';
 import { Flexbox, Spacer } from '@shared/ui/atoms';
-import { Artifact, CustomError } from '@shared/api/types';
+import { Artifact, CustomError, ModelEditApi } from '@shared/api/types';
 
 import { useAppInjectStore } from '@shared/stores/appInjectStore';
 import { FormValues } from '../ModelForm/types';
-import { getInputValuesFromRow } from '../ModelForm/helpers';
+import { getArtifactApiItems, getInputValuesFromRow, getInvalidFields } from '../ModelForm/helpers';
 import { ButtonContainer, FormContainer } from '../ModelForm/styles';
 import { useFormFields } from '../ModelForm/useFormFields';
 import { DELETE_CONFIRM_MODEL_SCHEMA, DELETE_MODEL_SCHEMA, SCHEMA_NAME_MAP } from './constants';
 import { useDeleteRightModelPanelStore } from '@src/shared/stores';
 import { useActiveDeleteFormSchema } from './useActiveDeleteFormSchema';
+import { useScrollTo } from '@src/shared/hooks/useScrollTo';
+
+type SubmitType = { checkOnly?: boolean };
 
 const StyledTabMenu = styled(TabMenu)`
   display: flex;
@@ -65,10 +68,12 @@ export const DeleteModelForm = ({
   onSubmit,
   onClose,
 }: ModelFormProps) => {
+  const { mutationProtectedFetch } = useFetch({});
   const { setCurrentCustomer, currentCustomer } = useAppInjectStore();
 
   const [values, setValues] = useState<FormValues | undefined>();
   const [invalidFields, setInvalidFields] = useState<Array<keyof Row>>([]);
+  const [dirtyFields, setDirtyFields] = useState<Array<keyof Row>>([]);
   const [selectedColSize, setSelectedColSize] = useState<string>('2');
   const [submitLoading, setSubmitLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string>();
@@ -81,6 +86,8 @@ export const DeleteModelForm = ({
 
   const errorElemRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
+
+  const scrollToActiveError = useScrollTo(errorElemRef, formRef);
 
   const { deleteFormSchema } = useActiveDeleteFormSchema({
     initialRow,
@@ -112,20 +119,79 @@ export const DeleteModelForm = ({
     }
   }, []);
 
-  debugger;
-
   const handleChange = useCallback((name: keyof Row, value: InputValue) => {
     let newValues = { [name]: value };
 
     setValues((prevValues) => ({ ...prevValues, ...newValues }));
   }, []);
 
-  const handleSubmit = useCallback(async () => {}, [
-    values,
-    deleteFormSchema,
-    formMode,
-    activeModelByDefault,
-  ]);
+  const handleSubmit = useCallback(
+    async ({ checkOnly = false }: SubmitType) => {
+      const valuesWithAddedOutsideControls: FormValues = {
+        ...values,
+        active_model: {
+          type: INPUT_TYPE.FLAG,
+          value: activeModelByDefault || false,
+        },
+      };
+
+      const newInvalidFields = getInvalidFields(deleteFormSchema, valuesWithAddedOutsideControls);
+      setInvalidFields(newInvalidFields);
+      scrollToActiveError();
+      setDirtyFields((prevDirtyFields) => [...prevDirtyFields, fields[0].name]);
+
+      if (newInvalidFields.length) {
+        return;
+      }
+
+      if (newInvalidFields.length) {
+        return;
+      }
+
+      const artifactApiItems = getArtifactApiItems(valuesWithAddedOutsideControls);
+      // TODO: check this types
+      let newRow: CustomError | Row | ArtifactApi[] | undefined;
+
+      setSubmitLoading(checkOnly ? false : true);
+
+      if (initialRow && !checkOnly) {
+        const { system_model_id, model_source } = initialRow;
+
+        if (system_model_id && model_source) {
+          // TODO: fix response type and structure and input type ModelEditApi[]
+          const res: any = await mutationProtectedFetch<ModelEditApi[], { data: { cards: Row[] } }>(
+            {
+              body: [
+                {
+                  model_id: system_model_id,
+                  artefacts: artifactApiItems,
+                  model_source,
+                },
+              ],
+              fetchApiRoute: API_ROUTES.MODELS_EDIT,
+              fetchMethod: 'PUT',
+            },
+          );
+
+          if (!res || res.error) {
+            setSubmitError('Произошла ошибка при обновлении модели');
+            return;
+          }
+
+          if (res?.data?.data?.cards && res.data.data.cards[0]) {
+            newRow = res.data.data.cards[0];
+          }
+        }
+      }
+
+      if (newRow && formMode) {
+        onSubmit(newRow, formMode);
+        setSubmitLoading(false);
+        setSubmitError('');
+      }
+    },
+    [values, deleteFormSchema, formMode, activeModelByDefault],
+  );
 
   const handleOnClose = useCallback(() => {
     onClose();
@@ -215,7 +281,12 @@ export const DeleteModelForm = ({
             <span style={{ color: '#D92020' }}>*</span> Поля обязательные для сохранения
           </T>
           <ButtonContainer>
-            <Button dimension="s" onClick={() => handleSubmit()} value="Submit" type="submit">
+            <Button
+              dimension="s"
+              onClick={() => handleSubmit({ checkOnly: false })}
+              value="Submit"
+              type="submit"
+            >
               Да
             </Button>
             <Button

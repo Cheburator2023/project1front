@@ -34,7 +34,8 @@ type Row = ArtificialRow & {
   date_of_introduction_into_operation: string | null;
   lead_validator_resolution_model_delete: string | null;
   lead_validator_comment_model_delete: string | null;
-  status_model_delete: string | null;
+  model_creator: string | null;
+  status: string | null;
   reason_model_delete: string | null;
   usage_confirm_date_q1: string | null;
   usage_confirm_date_q2: string | null;

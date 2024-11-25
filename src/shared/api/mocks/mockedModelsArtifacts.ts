@@ -70,8 +70,8 @@ const mockedArtifacts: Artifact[] = [
 
   {
     artefact_id: 4005,
-    artefact_tech_label: 'status_model_delete',
-    artefact_label: 'Статус удаления',
+    artefact_tech_label: 'status',
+    artefact_label: 'Статуc',
     artefact_desc: '',
     artefact_context: null,
     is_main_info_flg: '0',

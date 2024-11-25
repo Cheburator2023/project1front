@@ -7,8 +7,14 @@ export type DeleteRightModelPanelStoreState = {
   selectedModelSource: string | null;
   activeRowId: string | null;
   formMode: MODEL_FORM_MODE.DELETE | MODEL_FORM_MODE.DELETE_CONFIRM;
+  userMatches: boolean;
   setFormMode: (mode: MODEL_FORM_MODE.DELETE | MODEL_FORM_MODE.DELETE_CONFIRM) => void;
-  updateDeleteModelState: (count: number, source: string | null) => void;
+  updateDeleteModelState: (
+    count: number,
+    source: string | null,
+    userMatches: boolean,
+    rowId?: string | null,
+  ) => void;
 };
 
 export const useDeleteRightModelPanelStore = create<DeleteRightModelPanelStoreState>((set) => ({
@@ -19,12 +25,18 @@ export const useDeleteRightModelPanelStore = create<DeleteRightModelPanelStoreSt
   formMode: MODEL_FORM_MODE.DELETE,
   setFormMode: (mode: MODEL_FORM_MODE.DELETE | MODEL_FORM_MODE.DELETE_CONFIRM) =>
     set({ formMode: mode }),
-  updateDeleteModelState: (count: number, source: string | null, rowId = null) => {
+  updateDeleteModelState: (
+    count: number,
+    source: string | null,
+    userMatches: boolean,
+    rowId = null,
+  ) => {
     set({
       selectedModelsCount: count,
       selectedModelSource: source,
       activeRowId: rowId,
-      isDeleteButtonEnabled: count === 1 && source === 'sum-rm',
+      userMatches,
+      isDeleteButtonEnabled: count === 1 && source === 'sum-rm' && userMatches,
     });
   },
 }));
