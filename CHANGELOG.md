@@ -1,5 +1,18 @@
 # Semantic Versioning Changelog
 
+# [1.26.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.25.2...v1.26.0) (2024-11-25)
+
+
+### Bug Fixes
+
+* dashboards style ([0f975fc](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/0f975fc284f237a07bc75b08f84264d826e575d7))
+
+
+### Features
+
+* autocomplete added ([0a4b368](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/0a4b36810e4f060aa1868a0f7d1aa9e12257b844))
+* autocomplete added ([2a018dc](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/2a018dcd72cdc2ccd5cb9345b1021af8da0d6a9b))
+
 ## [1.25.2](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.25.1...v1.25.2) (2024-11-22)
 
 
