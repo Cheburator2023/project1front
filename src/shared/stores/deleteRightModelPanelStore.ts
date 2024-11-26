@@ -38,15 +38,14 @@ export const useDeleteRightModelPanelStore = create<DeleteRightModelPanelStoreSt
     const allowedRoles = ['admin_it', 'admin_it_lead'];
     const hasAccess = roles.some((role: string) => allowedRoles.includes(role));
 
-    const isDeleteButtonEnabled = count === 1 && source === 'sum-rm' && hasAccess;
+    const isDeleteButtonEnabled = count === 1 && source === 'sum-rm' && (hasAccess || userMatches);
 
     set({
       selectedModelsCount: count,
       selectedModelSource: source,
       activeRowId: rowId,
       userMatches,
-      isDeleteButtonEnabled:
-        isDeleteButtonEnabled || (count === 1 && source === 'sum-rm' && userMatches),
+      isDeleteButtonEnabled,
     });
   },
 }));

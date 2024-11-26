@@ -20,6 +20,7 @@ interface LayoutProps {
     realm_access: {
       roles: string[];
     };
+    groups: string[];
     roles: string[];
     preferred_username: string;
   };
@@ -72,8 +73,8 @@ const Layout = ({ children, user, protectedFetch, goToSum, onLogout }: LayoutPro
       setUsername(user?.preferred_username);
     }
 
-    if (user?.roles[1]) {
-      setRoles(user?.roles[1]);
+    if (user?.groups[1]) {
+      setRoles(user?.groups[1]);
     }
   }, [user?.roles, user?.realm_access, setCurrentCustomer]);
 
