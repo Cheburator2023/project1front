@@ -15,13 +15,24 @@ import { Artifact, CustomError, ModelEditApi } from '@shared/api/types';
 
 import { useAppInjectStore } from '@shared/stores/appInjectStore';
 import { FormValues } from '../ModelForm/types';
-import { getArtifactApiItems, getInputValuesFromRow, getInvalidFields } from '../ModelForm/helpers';
+import {
+  getArtifactApiItems,
+  getInputValuesFromRow,
+  getInvalidFields,
+  getProperFormatValueForSubmit,
+} from '../ModelForm/helpers';
 import { ButtonContainer, FormContainer } from '../ModelForm/styles';
 import { useFormFields } from '../ModelForm/useFormFields';
-import { DELETE_CONFIRM_MODEL_SCHEMA, DELETE_MODEL_SCHEMA, SCHEMA_NAME_MAP } from './constants';
+import {
+  DELETE_CONFIRM_MODEL_SCHEMA,
+  DELETE_MODEL_SCHEMA,
+  SCHEMA_NAME_MAP,
+} from '../ModelForm/constants';
 import { useDeleteRightModelPanelStore } from '@src/shared/stores';
 import { useActiveDeleteFormSchema } from './useActiveDeleteFormSchema';
 import { useScrollTo } from '@src/shared/hooks/useScrollTo';
+import { ALLOCATION_FIELDS_NAMES } from '../ModelForm/constants';
+import { useActiveFormSchema } from '../ModelForm/useActiveFormSchema';
 
 type SubmitType = { checkOnly?: boolean };
 
@@ -74,6 +85,7 @@ export const DeleteModelForm = ({
   const [values, setValues] = useState<FormValues | undefined>();
   const [invalidFields, setInvalidFields] = useState<Array<keyof Row>>([]);
   const [dirtyFields, setDirtyFields] = useState<Array<keyof Row>>([]);
+  const [parentModelId, setParentModelId] = useState<string>();
   const [selectedColSize, setSelectedColSize] = useState<string>('2');
   const [submitLoading, setSubmitLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string>();
@@ -84,23 +96,30 @@ export const DeleteModelForm = ({
   const [activeTab, setActiveTab] = useState<string>('1');
   const { formMode, setFormMode } = useDeleteRightModelPanelStore();
 
+  const wasPreviouslyActiveModel = activeRow?.active_model === '1';
+
   const errorElemRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
 
   const scrollToActiveError = useScrollTo(errorElemRef, formRef);
 
-  const { deleteFormSchema } = useActiveDeleteFormSchema({
+  const { formSchema } = useActiveFormSchema({
+    values,
     initialRow,
     mode: formMode,
+    activeModelByDefault,
   });
 
   const { fields } = useFormFields({
-    formSchema: deleteFormSchema,
+    formSchema,
+    values,
     mode: formMode,
     initialRow,
     artifacts,
     showAllFields,
     currentCustomer,
+    activeModelByDefault,
+    wasPreviouslyActiveModel,
   });
 
   const title = 'Удаление модели';
@@ -122,8 +141,53 @@ export const DeleteModelForm = ({
   const handleChange = useCallback((name: keyof Row, value: InputValue) => {
     let newValues = { [name]: value };
 
+    if (name === 'model_type' && value.type === INPUT_TYPE.SELECT) {
+      if (
+        Array.isArray(value.value)
+          ? value.value.some((item) => item.text === 'Бизнес-модели')
+          : value.value?.text === 'Бизнес-модели'
+      ) {
+        newValues = {
+          ...newValues,
+          model_risk_type: {
+            type: INPUT_TYPE.SELECT,
+            value: {
+              id: '479',
+              text: 'Бизнес',
+            },
+          },
+        };
+      } else {
+        newValues = {
+          ...newValues,
+          model_risk_type: {
+            type: INPUT_TYPE.SELECT,
+            value: undefined,
+          },
+        };
+      }
+    }
+
+    setDirtyFields((prevDirtyFields) => [...prevDirtyFields, name]);
+
     setValues((prevValues) => ({ ...prevValues, ...newValues }));
   }, []);
+
+  // TODO: Temporary solution to solve the problem of editing allocations in models that do not have all required fields. This is a technical debt that needs to be fixed.
+  const checkForAllocationFieldsChanged = () =>
+    ALLOCATION_FIELDS_NAMES.some((allocationFieldName) => {
+      const initialValue = initialRow?.[allocationFieldName] || '';
+      const newValue = values?.[allocationFieldName];
+
+      if (newValue) {
+        const formattedValue = getProperFormatValueForSubmit(newValue);
+
+        if (!Array.isArray(formattedValue)) {
+          return initialValue !== formattedValue.artefact_string_value;
+        }
+      }
+      return null;
+    });
 
   const handleSubmit = useCallback(
     async ({ checkOnly = false }: SubmitType) => {
@@ -144,12 +208,17 @@ export const DeleteModelForm = ({
       //   valuesWithAddedOutsideControls['status'].value = 'Ожидает удаления';
       // }
 
-      const newInvalidFields = getInvalidFields(deleteFormSchema, valuesWithAddedOutsideControls);
-      setInvalidFields(newInvalidFields);
+      const newInvalidFields = getInvalidFields(
+        formSchema,
+        valuesWithAddedOutsideControls,
+        wasPreviouslyActiveModel,
+      );
+      const isAllocationFieldsChanged = checkForAllocationFieldsChanged();
+      setInvalidFields(isAllocationFieldsChanged ? [] : newInvalidFields);
       scrollToActiveError();
       setDirtyFields((prevDirtyFields) => [...prevDirtyFields, fields[0].name]);
 
-      if (newInvalidFields.length) {
+      if (newInvalidFields.length && !isAllocationFieldsChanged) {
         return;
       }
 
@@ -157,7 +226,7 @@ export const DeleteModelForm = ({
         return;
       }
 
-      const artifactApiItems = getArtifactApiItems(valuesWithAddedOutsideControls);
+      const artifactApiItems = getArtifactApiItems(valuesWithAddedOutsideControls, parentModelId);
 
       // TODO: check this types
       let newRow: CustomError | Row | ArtifactApi[] | undefined;
@@ -200,10 +269,14 @@ export const DeleteModelForm = ({
         setSubmitError('');
       }
     },
-    [values, deleteFormSchema, formMode, activeModelByDefault],
+    [values, formSchema, formMode, activeModelByDefault],
   );
 
   const handleOnClose = useCallback(() => {
+    setValues({});
+    setInvalidFields([]);
+    setParentModelId(undefined);
+
     onClose();
   }, [onClose]);
 
@@ -211,6 +284,7 @@ export const DeleteModelForm = ({
     const initialValues = getInputValuesFromRow(artifacts, initialRow);
 
     setValues(initialValues);
+    debugger;
   }, [initialRow, artifacts]);
 
   useEffect(() => {
@@ -218,6 +292,28 @@ export const DeleteModelForm = ({
       setActiveModelByDefault(true);
     }
   }, [activeRow?.active_model]);
+
+  // Scroll to edit input field
+  useEffect(() => {
+    if (formRef.current?.children && editCellName) {
+      const editedFieldIndex = fields.findIndex((field) => field.name === editCellName);
+
+      if (editedFieldIndex !== -1) {
+        formRef.current.children[editedFieldIndex]?.scrollIntoView({
+          block: 'center',
+          behavior: 'smooth',
+        });
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editCellName, formRef.current]);
+
+  useEffect(() => {
+    if (dirtyFields.length) {
+      const newInvalidFields = getInvalidFields(formSchema, values, wasPreviouslyActiveModel);
+      setInvalidFields(newInvalidFields);
+    }
+  }, [values, dirtyFields, formSchema, wasPreviouslyActiveModel]);
 
   return (
     <RightPanel

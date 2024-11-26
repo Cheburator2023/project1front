@@ -14,6 +14,8 @@ import {
   RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA,
   NOT_ACTIVE_MODEL_SCHEMA,
   SCHEMA_NAME_MAP,
+  DELETE_CONFIRM_MODEL_SCHEMA,
+  DELETE_MODEL_SCHEMA,
 } from './constants';
 import { FormFieldsSchema, FormValues } from './types';
 import { markSchema } from './helpers';
@@ -165,6 +167,21 @@ const getAddSchema = (
   return formSchema;
 };
 
+const getDeleteModelSchema = () => {
+  let formSchema = markSchema(DELETE_MODEL_SCHEMA, SCHEMA_NAME_MAP.DELETE_MODEL_SCHEMA);
+
+  return formSchema;
+};
+
+const getDeleteConfirmModelSchema = () => {
+  let formSchema = markSchema(
+    DELETE_CONFIRM_MODEL_SCHEMA,
+    SCHEMA_NAME_MAP.DELETE_CONFIRM_MODEL_SCHEMA,
+  );
+
+  return formSchema;
+};
+
 export const useActiveFormSchema = ({
   initialRow,
   values,
@@ -188,6 +205,17 @@ export const useActiveFormSchema = ({
     }
     if (mode === MODEL_FORM_MODE.ADD) {
       const newFormSchema = getAddSchema(initialRow, values, activeModelByDefault);
+
+      setFormSchema(sortBy(newFormSchema, 'required'));
+    }
+    if (mode === MODEL_FORM_MODE.DELETE) {
+      const newFormSchema = getDeleteModelSchema();
+
+      setFormSchema(sortBy(newFormSchema, 'required'));
+    }
+
+    if (mode === MODEL_FORM_MODE.DELETE_CONFIRM) {
+      const newFormSchema = getDeleteConfirmModelSchema();
 
       setFormSchema(sortBy(newFormSchema, 'required'));
     }
