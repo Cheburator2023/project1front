@@ -3,7 +3,6 @@ import { BrowserRouter } from 'react-router-dom';
 
 import RoutesComponent from './Routes';
 import Layout from './Layout';
-import { GlobalsProvider } from '../shared/providers/GlobalsProvider';
 
 export const App = () => {
   return (

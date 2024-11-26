@@ -26,8 +26,8 @@ import {
 
 export interface TemplateFiltersProps {
   templates: Template[];
-  updateRightPanelType: (value: React.SetStateAction<RIGHT_PANEL_TYPE | null>) => void;
-  updateActiveScreen: React.Dispatch<React.SetStateAction<ACTIVE_SCREEN>>;
+  updateRightPanelType: (newRightPanelType: RIGHT_PANEL_TYPE | null) => void;
+  updateActiveScreen: (newActiveScreen: ACTIVE_SCREEN) => void;
 }
 
 export const TemplateFilters = ({
