@@ -7,9 +7,9 @@ import { FutureTableHomePage } from '@pages/Playground/FutureTableHomePage';
 
 export const ROUTES = {
   HOME: '/',
-  FUTURE_TABLE: '/future_table',
-  CHARTS: '/charts',
-  PLAYGROUND: '/playground',
+  FUTURE_TABLE: 'future_table',
+  CHARTS: 'charts',
+  PLAYGROUND: 'playground',
 };
 
 const ROUTE_MAP = [
