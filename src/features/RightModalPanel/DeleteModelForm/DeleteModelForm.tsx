@@ -23,16 +23,11 @@ import {
 } from '../ModelForm/helpers';
 import { ButtonContainer, FormContainer } from '../ModelForm/styles';
 import { useFormFields } from '../ModelForm/useFormFields';
-import {
-  DELETE_CONFIRM_MODEL_SCHEMA,
-  DELETE_MODEL_SCHEMA,
-  SCHEMA_NAME_MAP,
-} from '../ModelForm/constants';
+import { DELETE_CONFIRM_MODEL_SCHEMA, DELETE_MODEL_SCHEMA, SCHEMA_NAME_MAP } from './constants';
 import { useDeleteRightModelPanelStore } from '@src/shared/stores';
 import { useActiveDeleteFormSchema } from './useActiveDeleteFormSchema';
 import { useScrollTo } from '@src/shared/hooks/useScrollTo';
 import { ALLOCATION_FIELDS_NAMES } from '../ModelForm/constants';
-import { useActiveFormSchema } from '../ModelForm/useActiveFormSchema';
 
 type SubmitType = { checkOnly?: boolean };
 
@@ -103,15 +98,13 @@ export const DeleteModelForm = ({
 
   const scrollToActiveError = useScrollTo(errorElemRef, formRef);
 
-  const { formSchema } = useActiveFormSchema({
-    values,
+  const { deleteFormSchema } = useActiveDeleteFormSchema({
     initialRow,
     mode: formMode,
-    activeModelByDefault,
   });
 
   const { fields } = useFormFields({
-    formSchema,
+    formSchema: deleteFormSchema,
     values,
     mode: formMode,
     initialRow,
@@ -140,33 +133,6 @@ export const DeleteModelForm = ({
 
   const handleChange = useCallback((name: keyof Row, value: InputValue) => {
     let newValues = { [name]: value };
-
-    if (name === 'model_type' && value.type === INPUT_TYPE.SELECT) {
-      if (
-        Array.isArray(value.value)
-          ? value.value.some((item) => item.text === 'Бизнес-модели')
-          : value.value?.text === 'Бизнес-модели'
-      ) {
-        newValues = {
-          ...newValues,
-          model_risk_type: {
-            type: INPUT_TYPE.SELECT,
-            value: {
-              id: '479',
-              text: 'Бизнес',
-            },
-          },
-        };
-      } else {
-        newValues = {
-          ...newValues,
-          model_risk_type: {
-            type: INPUT_TYPE.SELECT,
-            value: undefined,
-          },
-        };
-      }
-    }
 
     setDirtyFields((prevDirtyFields) => [...prevDirtyFields, name]);
 
@@ -199,17 +165,17 @@ export const DeleteModelForm = ({
         },
       };
 
-      // if (!valuesWithAddedOutsideControls['status']) {
-      //   valuesWithAddedOutsideControls['status'] = {
-      //     type: INPUT_TYPE.STRING,
-      //     value: 'Ожидает удаления',
-      //   };
-      // } else {
-      //   valuesWithAddedOutsideControls['status'].value = 'Ожидает удаления';
-      // }
+      if (!valuesWithAddedOutsideControls['status']) {
+        valuesWithAddedOutsideControls['status'] = {
+          type: INPUT_TYPE.STRING,
+          value: 'Ожидает удаления',
+        };
+      } else {
+        valuesWithAddedOutsideControls['status'].value = 'Ожидает удаления';
+      }
 
       const newInvalidFields = getInvalidFields(
-        formSchema,
+        deleteFormSchema,
         valuesWithAddedOutsideControls,
         wasPreviouslyActiveModel,
       );
@@ -269,7 +235,7 @@ export const DeleteModelForm = ({
         setSubmitError('');
       }
     },
-    [values, formSchema, formMode, activeModelByDefault],
+    [values, deleteFormSchema, formMode, activeModelByDefault],
   );
 
   const handleOnClose = useCallback(() => {
@@ -282,6 +248,8 @@ export const DeleteModelForm = ({
 
   useEffect(() => {
     const initialValues = getInputValuesFromRow(artifacts, initialRow);
+
+    console.log(initialValues);
 
     setValues(initialValues);
     debugger;
@@ -310,10 +278,10 @@ export const DeleteModelForm = ({
 
   useEffect(() => {
     if (dirtyFields.length) {
-      const newInvalidFields = getInvalidFields(formSchema, values, wasPreviouslyActiveModel);
+      const newInvalidFields = getInvalidFields(deleteFormSchema, values, wasPreviouslyActiveModel);
       setInvalidFields(newInvalidFields);
     }
-  }, [values, dirtyFields, formSchema, wasPreviouslyActiveModel]);
+  }, [values, dirtyFields, deleteFormSchema, wasPreviouslyActiveModel]);
 
   return (
     <RightPanel

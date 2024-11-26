@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { MODEL_FORM_MODE } from '../constants';
+import { useUserStore } from './userStore';
 
 export type DeleteRightModelPanelStoreState = {
   isDeleteButtonEnabled: boolean;
@@ -31,12 +32,21 @@ export const useDeleteRightModelPanelStore = create<DeleteRightModelPanelStoreSt
     userMatches: boolean,
     rowId = null,
   ) => {
+    const { roles } = useUserStore.getState();
+
+    debugger;
+    const allowedRoles = ['admin_it', 'admin_it_lead'];
+    const hasAccess = roles.some((role: string) => allowedRoles.includes(role));
+
+    const isDeleteButtonEnabled = count === 1 && source === 'sum-rm' && hasAccess;
+
     set({
       selectedModelsCount: count,
       selectedModelSource: source,
       activeRowId: rowId,
       userMatches,
-      isDeleteButtonEnabled: count === 1 && source === 'sum-rm' && userMatches,
+      isDeleteButtonEnabled:
+        isDeleteButtonEnabled || (count === 1 && source === 'sum-rm' && userMatches),
     });
   },
 }));

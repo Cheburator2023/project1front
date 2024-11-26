@@ -203,7 +203,11 @@ export const useTableModels = () => {
 
   const handleSubmit = useCallback((newRow: Row, formMode: MODEL_FORM_MODE) => {
     const newRowWithId = { ...newRow, id: newRow.system_model_id, hover: true };
-    if (formMode === MODEL_FORM_MODE.EDIT) {
+    if (
+      formMode === MODEL_FORM_MODE.EDIT ||
+      MODEL_FORM_MODE.DELETE ||
+      MODEL_FORM_MODE.DELETE_CONFIRM
+    ) {
       setRowList((prevRows) =>
         prevRows.map((row) =>
           row?.system_model_id === newRowWithId.system_model_id ? newRowWithId : row,
@@ -212,6 +216,8 @@ export const useTableModels = () => {
     } else {
       setRowList((prevRows) => [newRowWithId, ...prevRows]);
     }
+
+    debugger;
   }, []);
 
   const handleOnClose = useCallback(() => {

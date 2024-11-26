@@ -47,7 +47,7 @@ const Layout = ({ children, user, protectedFetch, goToSum, onLogout }: LayoutPro
   const [downloadReportStatus, setDownloadReportStatus] = useState(false);
   const [columnsFilters, setColumnsFilters] = useState<Partial<ColumnsFilter>>();
   const { setCurrentCustomer } = useAppInjectStore();
-  const { setUsername } = useUserStore();
+  const { setUsername, setRoles } = useUserStore();
 
   const updateColumnsFilters = useCallback((newColumnsFilters?: Partial<ColumnsFilter>) => {
     setColumnsFilters(newColumnsFilters);
@@ -70,6 +70,10 @@ const Layout = ({ children, user, protectedFetch, goToSum, onLogout }: LayoutPro
 
     if (user?.preferred_username) {
       setUsername(user?.preferred_username);
+    }
+
+    if (user?.roles[1]) {
+      setRoles(user?.roles[1]);
     }
   }, [user?.roles, user?.realm_access, setCurrentCustomer]);
 
