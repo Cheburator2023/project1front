@@ -101,4 +101,5 @@ const Home = () => {
     </FiltersContext.Provider>
   );
 };
+
 export { Home };

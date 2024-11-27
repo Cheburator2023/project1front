@@ -25,7 +25,7 @@ interface TableModelsProps {
   setCurrentPage: (newPage: number) => void;
   onChangePage: (result: { page: number; pageSize: number }) => void;
   handleSearch: (newSearchString: string) => void;
-  updateRightPanelType: (value: React.SetStateAction<RIGHT_PANEL_TYPE | null>) => void;
+  updateRightPanelType: (newRightPanelType: RIGHT_PANEL_TYPE | null) => void;
 }
 
 const StatusWrapper = styled.div`

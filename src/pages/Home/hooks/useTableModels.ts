@@ -24,6 +24,84 @@ import {
   filterColumnsByColumnsFilters,
   getISODateFormat,
 } from '@shared/helpers';
+import { ArtifactApi, CustomError } from '@src/shared/api/types';
+
+export type TDisplayTableModels = {
+  activeScreen: ACTIVE_SCREEN;
+  setActiveScreen: (newActiveScreen: ACTIVE_SCREEN) => void;
+  compareMode: boolean;
+  setCompareMode: (newCompareMode: boolean) => void;
+  rightPanelType: RIGHT_PANEL_TYPE | null;
+  setRightPanelType: (newRightPanelType: RIGHT_PANEL_TYPE | null) => void;
+  handleChangeCompare: (checked: boolean) => void;
+  handleSearch: (newSearchString: string) => void;
+};
+
+export type TModelsTable = {
+  rowList: Partial<Row>[];
+  setRowList: (newRowList: Row[]) => void;
+  columnList: Column[];
+  setColumnList: (newColumnList: Column[]) => void;
+  handleClickOnActionCell: (
+    action: RIGHT_PANEL_TYPE.EDIT_MODEL | RIGHT_PANEL_TYPE.HISTORY_CHANGES,
+    rowId: string,
+    cellName: keyof Row,
+  ) => void;
+  updateColumnList: (newColumnFilters: Partial<ColumnsFilter>) => void;
+  handleSearch: (newSearchString: string) => void;
+  handleChangePage: (result: { page: number; pageSize: number }) => void;
+  loading: boolean;
+  error: string;
+  activeRowId: string | undefined;
+  activeCellName?: keyof Row;
+  searchString: string;
+  setTotalRows: React.Dispatch<React.SetStateAction<number>>;
+  pageSize: number;
+  setPageSize: React.Dispatch<React.SetStateAction<number>>;
+  page: number;
+  setPage: React.Dispatch<React.SetStateAction<number>>;
+  totalRows: number;
+};
+
+export type TFilters = {
+  templates: Template[];
+  setTemplates: React.Dispatch<React.SetStateAction<Template[]>>;
+  columnsFilters: Partial<ColumnsFilter>;
+  topFilters: TopFilters;
+  setTopFilters: React.Dispatch<React.SetStateAction<TopFilters>>;
+  setColumnsFilters: React.Dispatch<React.SetStateAction<Partial<ColumnsFilter>>>;
+  handleChangeColumnFilters: (newColumnFilters: Partial<ColumnsFilter>) => void;
+  firstDate: string | null;
+  secondDate: string | null;
+  setFirstDate: React.Dispatch<React.SetStateAction<string | null>>;
+  setSecondDate: React.Dispatch<React.SetStateAction<string | null>>;
+};
+
+export type TContext = {
+  updateColumnsFilters: (newColumnsFilters: Partial<ColumnsFilter>) => void;
+  downloadReportStatus: boolean;
+  handleSubmit: (newRow: Row | CustomError | ArtifactApi[], formMode: MODEL_FORM_MODE) => void;
+  handleOnClose: () => void;
+  contextValue: {
+    firstDate: string | null;
+    secondDate: string | null;
+    modelsDownloadingDate: string | undefined;
+    topFilters: TopFilters;
+    columnsFilters: Partial<ColumnsFilter>;
+    onChangeModelDownloadingDate: (date: string) => void;
+    onChangeColumnsFilters: (newColumnFilters: Partial<ColumnsFilter>) => void;
+    onChangeTopFilters: (newTopFilters: TopFilters) => void;
+    onChangeFirstDate: (newFirstDate: string | null) => void;
+    onChangeSecondDate: (newSecondDate: string | null) => void;
+  };
+};
+
+export interface IUseTableModels {
+  display: TDisplayTableModels;
+  modelsTable: TModelsTable;
+  filters: TFilters;
+  context: TContext;
+}
 
 export const useTableModels = () => {
   const { updateColumnsFilters, downloadReportStatus } = useContext(DownloadReportContext);
@@ -226,7 +304,7 @@ export const useTableModels = () => {
     setActiveRowId(undefined);
   }, []);
 
-  return {
+  const result: IUseTableModels = {
     display: {
       activeScreen,
       setActiveScreen,
@@ -279,5 +357,7 @@ export const useTableModels = () => {
       handleOnClose,
     },
   };
+
+  return result;
 };
 

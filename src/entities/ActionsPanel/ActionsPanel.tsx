@@ -1,27 +1,31 @@
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ReactComponent as BrokerOutlineIcon } from '@admiral-ds/icons/build/finance/BrokerOutline.svg';
 import { ReactComponent as MenuOutline } from '@admiral-ds/icons/build/service/MenuOutline.svg';
 import { ReactComponent as PlusCircleSolid } from '@admiral-ds/icons/build/service/PlusCircleSolid.svg';
 import { ReactComponent as SettingsOutline } from '@admiral-ds/icons/build/system/SettingsOutline.svg';
 import { ReactComponent as DeleteSolid } from '@admiral-ds/icons/build/system/DeleteSolid.svg';
+import { ReactComponent as ShowTableOutline } from '@admiral-ds/icons/build/category/ShowTableOutline.svg';
 
 import { IconButton } from '@shared/ui/molecules';
 import { RIGHT_PANEL_TYPE } from '@shared/constants';
-
 import { useDebouncedCallback } from '@src/shared/hooks/useDebouncedCallback';
-import { CustomSearchInput, Container } from './styles';
 import { useDeleteRightModelPanelStore } from '@src/shared/stores';
+import { useRoles } from '@src/shared/hooks';
+
+import { CustomSearchInput, Container } from './styles';
+import { ROUTES } from '../../app/Routes';
 
 export interface ActionsPanelProps {
   handleSearch: (newSearchString: string) => void;
-  updateRightPanelType: (value: React.SetStateAction<RIGHT_PANEL_TYPE | null>) => void;
+  updateRightPanelType: (newRightPanelType: RIGHT_PANEL_TYPE | null) => void;
 }
 
 export const ActionsPanel = ({ updateRightPanelType, handleSearch }: ActionsPanelProps) => {
   const [searchValue, setSearchValue] = useState('');
   const { selectedModelsCount, selectedModelSource, isDeleteButtonEnabled, userMatches } =
     useDeleteRightModelPanelStore();
+  const { isAdmin } = useRoles();
 
   let deleteTooltipMessage = '';
 
@@ -31,7 +35,7 @@ export const ActionsPanel = ({ updateRightPanelType, handleSearch }: ActionsPane
     deleteTooltipMessage = 'Нельзя удалить несколько моделей';
   } else if (selectedModelSource !== 'sum-rm') {
     deleteTooltipMessage = 'Модель должна быть с исчтоником "sum-rm"';
-  } else if (!userMatches) {
+  } else if (!userMatches && !isAdmin) {
     deleteTooltipMessage = 'Модель может-быть удалена только создателем или владельцем модели';
   } else {
     deleteTooltipMessage = 'Удалить модель';
@@ -78,6 +82,12 @@ export const ActionsPanel = ({ updateRightPanelType, handleSearch }: ActionsPane
           icon={<BrokerOutlineIcon />}
           tooltip="Графики"
           onClick={() => navigate('charts')}
+        />
+
+        <IconButton
+          icon={<ShowTableOutline />}
+          tooltip="Новый интерфейс таблиц"
+          onClick={() => navigate(ROUTES.FUTURE_TABLE)}
         />
         <IconButton icon={<MenuOutline />} tooltip="Меню" onClick={() => null} />
         <IconButton icon={<SettingsOutline />} tooltip="Настройки" onClick={() => null} />

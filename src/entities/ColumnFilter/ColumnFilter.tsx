@@ -18,9 +18,9 @@ export interface ColumnFilterProps {
   rowList: Partial<Row>[];
   columnsFilters: Partial<ColumnsFilter>;
   onChangeColumnsFilter: (rowFieldName: string, selectValue: string[]) => void;
-  onChangeTopFilters: (filters: any) => void;
-  topFilters: TopFilters;
-  templates: Template[];
+  onChangeTopFilters?: (filters: any) => void;
+  topFilters?: TopFilters;
+  templates?: Template[];
 }
 
 export const ColumnFilter = React.memo(
@@ -44,7 +44,7 @@ export const ColumnFilter = React.memo(
     const { shouldResetTemplateOnInitialValueChange } = useTemplateFilters(
       columnsFilters,
       templates,
-      topFilters.templates,
+      topFilters?.templates,
     );
 
     useEffect(() => {
@@ -59,7 +59,7 @@ export const ColumnFilter = React.memo(
         if (
           shouldResetTemplateOnInitialValueChange(arrayValue, initialTemplateValue, column.name)
         ) {
-          onChangeTopFilters({ ...topFilters, templates: [] });
+          onChangeTopFilters?.({ ...topFilters, templates: [] });
         }
       }
     };

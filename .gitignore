@@ -18,3 +18,7 @@
 .env.production.local
 
 .idea
+**/.util_cache
+.util_cache
+.env
+/.cache

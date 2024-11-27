@@ -28,6 +28,7 @@ import { useDeleteRightModelPanelStore } from '@src/shared/stores';
 import { useActiveDeleteFormSchema } from './useActiveDeleteFormSchema';
 import { useScrollTo } from '@src/shared/hooks/useScrollTo';
 import { ALLOCATION_FIELDS_NAMES } from '../ModelForm/constants';
+import { useRoles } from '@src/shared/hooks';
 
 type SubmitType = { checkOnly?: boolean };
 
@@ -51,6 +52,7 @@ const tabs = [
     id: '2',
     content: 'Подтверждение',
     schema: DELETE_CONFIRM_MODEL_SCHEMA,
+    disabled: true,
   },
 ];
 
@@ -90,6 +92,7 @@ export const DeleteModelForm = ({
   const [activeModelByDefault, setActiveModelByDefault] = useState<boolean | undefined>(undefined);
   const [activeTab, setActiveTab] = useState<string>('1');
   const { formMode, setFormMode } = useDeleteRightModelPanelStore();
+  const { isValidatorLead } = useRoles();
 
   const wasPreviouslyActiveModel = activeRow?.active_model === '1';
 

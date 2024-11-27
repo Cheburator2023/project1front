@@ -4,7 +4,7 @@ import { DropdownProvider } from '@admiral-ds/react-ui';
 import Keycloak from 'keycloak-js';
 
 import { FetchContext, DownloadReportContext } from '@shared/api';
-import { ColumnsFilter } from '@shared/types';
+import { ColumnsFilter, Role } from '@shared/types';
 
 import { Header } from './Header';
 import { themes } from './theme/theme';
@@ -48,7 +48,7 @@ const Layout = ({ children, user, protectedFetch, goToSum, onLogout }: LayoutPro
   const [downloadReportStatus, setDownloadReportStatus] = useState(false);
   const [columnsFilters, setColumnsFilters] = useState<Partial<ColumnsFilter>>();
   const { setCurrentCustomer } = useAppInjectStore();
-  const { setUsername, setRoles } = useUserStore();
+  const { setUsername, setGroups, setRoles } = useUserStore();
 
   const updateColumnsFilters = useCallback((newColumnsFilters?: Partial<ColumnsFilter>) => {
     setColumnsFilters(newColumnsFilters);
@@ -73,12 +73,24 @@ const Layout = ({ children, user, protectedFetch, goToSum, onLogout }: LayoutPro
       setUsername(user?.preferred_username);
     }
 
-    if (user?.groups[1]) {
-      setRoles(user?.groups[1]);
+    if (user?.groups) {
+      setGroups(user.groups);
+
+      const roles = user.groups.filter((group) =>
+        Object.values(Role).includes(group as Role),
+      ) as Role[];
+      setRoles(roles);
     }
   }, [user?.roles, user?.realm_access, setCurrentCustomer]);
 
   console.log(user);
+
+  const onLogoutHandler = () => {
+    if (onLogout) {
+      onLogout();
+    }
+    localStorage.removeItem('currentCustomer');
+  };
 
   return (
     // eslint-disable-next-line react/jsx-no-constructed-context-values
@@ -95,7 +107,7 @@ const Layout = ({ children, user, protectedFetch, goToSum, onLogout }: LayoutPro
                 updateColumnsFilters={updateColumnsFilters}
                 updateDownloadReportStatus={setDownloadReportStatus}
                 goToSum={goToSum}
-                onLogout={onLogout}
+                onLogout={onLogoutHandler}
               />
               {children}
             </Container>
