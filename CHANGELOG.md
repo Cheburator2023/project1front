@@ -1,5 +1,13 @@
 # Semantic Versioning Changelog
 
+## [1.27.1](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.27.0...v1.27.1) (2024-11-27)
+
+
+### Bug Fixes
+
+* client routing and waterm fixed ([e9e9e14](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/e9e9e14e8b64d8456f040b6d6d396e50ffb46010))
+* server side bundle name fix webpack fix ([7006ae8](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/7006ae8bd24a46a2659f68d0c997721deee8d560))
+
 # [1.27.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.26.0...v1.27.0) (2024-11-27)
 
 
