@@ -2,8 +2,8 @@ import { initialColumns, SYSTEM_SPECIFIC_FLAGS } from '@src/shared/constants';
 import { COLUMN_TYPE, ColumnsFilter } from '@src/shared/types';
 import { Template } from '@src/shared/api/types';
 
-const getActiveTemplate = (templates: Template[], activeTemplateId: string) => {
-  return templates.find((template) => String(template.template_id) === activeTemplateId);
+const getActiveTemplate = (templates?: Template[], activeTemplateId?: string) => {
+  return templates?.find((template) => String(template.template_id) === activeTemplateId);
 };
 
 const isSystemSpecificFilter = (filterId: string): boolean => {

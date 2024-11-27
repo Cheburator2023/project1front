@@ -5,13 +5,13 @@ import { Template } from '@shared/api';
 
 export const useTemplateFilters = (
   columnsFilters: Partial<ColumnsFilter>,
-  templates: Template[],
-  topFilters: string[],
+  templates?: Template[],
+  topFilters?: string[],
 ) => {
   const [modifiedFilters, setModifiedFilters] = useState(new Set<string>());
 
   const activeTemplate = useMemo(
-    () => getActiveTemplate(templates, topFilters[0]),
+    () => getActiveTemplate(templates, topFilters?.[0]),
     [templates, topFilters],
   );
 
@@ -33,7 +33,7 @@ export const useTemplateFilters = (
   }, [columnsFilters, activeTemplate]);
 
   const isTemplateFilter = (filterId: string): boolean => {
-    return activeTemplate ? filterId in activeTemplate.template_value : false;
+    return activeTemplate?.template_value ? filterId in activeTemplate.template_value : false;
   };
 
   const getFilteredColumns = (initialColumns: Column[], showFilterTemplate: boolean): Column[] => {

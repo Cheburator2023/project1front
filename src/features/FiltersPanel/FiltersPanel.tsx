@@ -21,8 +21,8 @@ export interface FiltersPanelProps {
   handleCompareOnlyChanged?: (checked: boolean) => void;
   handleUpdateCompareList?: () => void;
   templates: Template[];
-  updateActiveScreen: React.Dispatch<React.SetStateAction<ACTIVE_SCREEN>>;
-  updateRightPanelType: (value: React.SetStateAction<RIGHT_PANEL_TYPE | null>) => void;
+  updateActiveScreen: (newActiveScreen: ACTIVE_SCREEN) => void;
+  updateRightPanelType: (newRightPanelType: RIGHT_PANEL_TYPE | null) => void;
 }
 
 export const FiltersPanel = ({

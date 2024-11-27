@@ -1,9 +1,8 @@
 {
-  "include": ["src", "external_modules"],
   "compilerOptions": {
+    "typeRoots": ["node_modules/@types", "types"],
     "baseUrl": ".",
     "paths": {
-      "react": ["./node_modules/@types/react"],
       "@entities": ["./src/entities"],
       "@entities/*": ["./src/entities/*"],
       "@pages": ["./src/pages/"],
@@ -17,12 +16,7 @@
       "@features": ["./src/features/"],
       "@features/*": ["./src/features/*"],
       "@shared/*": ["./src/shared/*"],
-      "@shared": ["./src/shared"],
-      "zustand": ["./external_modules/zustand/src/*"],
-      "zustand/*": ["./external_modules/zustand/src/*"],
-
-      "use-sync-external-store": ["./external_modules/use-sync-external-store"],
-      "use-sync-external-store/*": ["./external_modules/use-sync-external-store"]
+      "@shared": ["./src/shared"]
     },
     "target": "esnext",
     "module": "esnext",
@@ -37,8 +31,11 @@
     "emitDecoratorMetadata": true,
     "noEmit": true,
     "skipLibCheck": true,
-    "preserveSymlinks": true
+    "noImplicitAny": false,
+    "strictNullChecks": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true
   },
+  "include": ["src", "types"],
   "exclude": ["node_modules", "dist"]
 }
-

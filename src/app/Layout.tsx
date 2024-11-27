@@ -66,6 +66,13 @@ const Layout = ({ children, user, protectedFetch, goToSum, onLogout }: LayoutPro
     }
   }, [user?.roles, user?.realm_access, setCurrentCustomer]);
 
+  const onLogoutHandler = () => {
+    if (onLogout) {
+      onLogout();
+    }
+    localStorage.removeItem('currentCustomer');
+  };
+
   return (
     // eslint-disable-next-line react/jsx-no-constructed-context-values
     <FetchContext.Provider value={{ protectedFetch }}>
@@ -81,7 +88,7 @@ const Layout = ({ children, user, protectedFetch, goToSum, onLogout }: LayoutPro
                 updateColumnsFilters={updateColumnsFilters}
                 updateDownloadReportStatus={setDownloadReportStatus}
                 goToSum={goToSum}
-                onLogout={onLogout}
+                onLogout={onLogoutHandler}
               />
               {children}
             </Container>

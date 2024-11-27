@@ -102,7 +102,7 @@ export const BASE_MODEL_SCHEMA: FormFieldsSchema = [
     name: 'ds_department',
     required: false,
     maxLength: 255,
-    customers: [CUSTOMER_MAP.DADM],
+    customers: [CUSTOMER_MAP.DADM, CUSTOMER_MAP.UMRV],
   },
   {
     name: 'ds_stream',

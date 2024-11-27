@@ -13,7 +13,7 @@ export interface TemplatesFilterProps {
   loading?: boolean;
   error?: string;
   showLabel?: boolean;
-  updateRightPanelType: (value: React.SetStateAction<RIGHT_PANEL_TYPE | null>) => void;
+  updateRightPanelType: (newRightPanelType: RIGHT_PANEL_TYPE | null) => void;
 }
 
 export const TemplatesFilter = ({

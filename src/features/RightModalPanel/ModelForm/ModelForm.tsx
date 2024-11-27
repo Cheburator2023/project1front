@@ -43,7 +43,7 @@ export interface ModelFormProps {
   rows: Partial<Row>[];
   activeRow?: Partial<Row>;
   // TODO: check this types
-  onSubmit: (newRow: CustomError | Row | ArtifactApi[], formMode: MODEL_FORM_MODE) => void;
+  onSubmit: (newRow: Row, formMode: MODEL_FORM_MODE) => void;
   onClose: () => void;
 }
 
@@ -257,7 +257,7 @@ export const ModelForm = ({
 
       const artifactApiItems = getArtifactApiItems(valuesWithAddedOutsideControls, parentModelId);
       // TODO: check this types
-      let newRow: CustomError | Row | ArtifactApi[] | undefined;
+      let newRow: Row | undefined;
 
       setSubmitLoading(checkOnly ? false : true);
 
@@ -303,7 +303,7 @@ export const ModelForm = ({
           return;
         }
 
-        newRow = res.data;
+        newRow = res.data as Row;
       }
 
       if (newRow && formMode) {
