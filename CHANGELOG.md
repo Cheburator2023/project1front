@@ -1,5 +1,22 @@
 # Semantic Versioning Changelog
 
+# [1.27.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.26.0...v1.27.0) (2024-11-27)
+
+
+### Bug Fixes
+
+* added new table icon shortcut ([b16e744](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/b16e744e2498fe33b725d168100f23c91925eb5f))
+* config fixes ([ac7c22a](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/ac7c22a4ea1c9eb84301281abc9b238a4e38bbcb))
+* ds_department field coustomers data fixed ([648a75e](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/648a75eeaedcfa0fbaa68219833ded29c12281a6))
+* ds_department field coustomers data fixed ([dae7e91](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/dae7e9169708b4db734755979f57b35e9364a3a1))
+* routes slash in paths fixed ([091759f](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/091759f71b0648c591b824476cf2a2f18e72a8ed))
+
+
+### Features
+
+* future table clone done ([14a05d1](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/14a05d104ea8f36584f3408c1a92df142fb90bd3))
+* new packages and cz menu added with commit linting ([b24a8c5](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/b24a8c55df1114e501840362f4041ab5d6ea158e))
+
 # [1.26.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.25.2...v1.26.0) (2024-11-25)
 
 
