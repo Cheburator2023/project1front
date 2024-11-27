@@ -168,7 +168,7 @@ export const PlaygroundTable = ({
             <IconButton
               icon={<ShowTableOutline />}
               tooltip="Текущий интерфейс таблиц"
-              onClick={() => navigate(ROUTES.HOME)}
+              onClick={() => navigate(ROUTES.MF_HOME_ROUTE)}
             />
             <IconButton icon={<MenuOutline />} tooltip="Меню" onClick={() => null} />
             <IconButton icon={<SettingsOutline />} tooltip="Настройки" onClick={() => null} />
