@@ -15,6 +15,7 @@ import { API_ROUTES, useFetch, ReportApi } from '@shared/api';
 
 import { ReactComponent as LogoIcon } from './logo.svg';
 import { ColumnsFilter } from '../shared/types';
+import { ROUTES } from './Routes';
 
 const Container = styled.div`
   width: 100%;
@@ -118,7 +119,7 @@ const Header = ({
 
   return (
     <Container>
-      <Link to="/sum-rm">
+      <Link to={ROUTES.MF_HOME_ROUTE}>
         <Logo>
           <LogoIcon />
           <CustomLabel font="Caption/Caption 1">Реестр моделей</CustomLabel>
