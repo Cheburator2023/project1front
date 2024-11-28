@@ -7,6 +7,7 @@ const deps = require('./package.json').dependencies;
 
 const SRC_DIR = path.join(__dirname, './src');
 const TS_CONFIG_PATH = path.resolve(__dirname, './tsconfig.json');
+const PUBLIC_PATH = process.env.PUBLIC_PATH || '/';
 
 const ALIAS = {
   '@src': `${SRC_DIR}`,
@@ -71,10 +72,9 @@ module.exports = {
     }),
   ],
   output: {
-    // filename: 'bundle.[name].[hash].js',
     filename: '[name].bundle.js',
     path: path.resolve(__dirname, 'dist'),
-    // publicPath: '/',
+    publicPath: PUBLIC_PATH,
     clean: true,
   },
   resolve: {
