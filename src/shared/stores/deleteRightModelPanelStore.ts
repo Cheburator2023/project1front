@@ -5,24 +5,27 @@ import { Role } from '../types';
 
 export type DeleteRightModelPanelStoreState = {
   isDeleteButtonEnabled: boolean;
-  selectedModelsCount: number;
-  selectedModelSource: string | null;
+  modelsCount: number;
+  modelSource: string | null;
+  modelStatus: string | null;
   activeRowId: string | null;
-  formMode: MODEL_FORM_MODE.DELETE | MODEL_FORM_MODE.DELETE_CONFIRM;
   userMatches: boolean;
+  formMode: MODEL_FORM_MODE.DELETE | MODEL_FORM_MODE.DELETE_CONFIRM;
   setFormMode: (mode: MODEL_FORM_MODE.DELETE | MODEL_FORM_MODE.DELETE_CONFIRM) => void;
   updateDeleteModelState: (
     count: number,
-    source: string | null,
-    userMatches: boolean,
+    source?: string | null,
+    status?: string | null,
     rowId?: string | null,
+    userMatches?: boolean,
   ) => void;
 };
 
 export const useDeleteRightModelPanelStore = create<DeleteRightModelPanelStoreState>((set) => ({
   isDeleteButtonEnabled: false,
-  selectedModelsCount: 0,
-  selectedModelSource: null,
+  modelsCount: 0,
+  modelSource: null,
+  modelStatus: null,
   activeRowId: null,
   userMatches: false,
   formMode: MODEL_FORM_MODE.DELETE,
@@ -30,18 +33,25 @@ export const useDeleteRightModelPanelStore = create<DeleteRightModelPanelStoreSt
     set({ formMode: mode }),
   updateDeleteModelState: (
     count: number,
-    source: string | null,
-    userMatches: boolean,
-    rowId = null,
+    source?: string | null,
+    status?: string | null,
+    rowId?: string | null,
+    userMatches?: boolean,
   ) => {
     const { hasRole } = useUserStore.getState();
     const isAdmin = hasRole(Role.ADMIN_IT) || hasRole(Role.ADMIN_IT_LEAD);
+    const isValidatorLead = hasRole(Role.VALIDATOR_LEAD);
 
-    const isDeleteButtonEnabled = count === 1 && source === 'sum-rm' && (isAdmin || userMatches);
+    const isDeleteButtonEnabled =
+      count === 1 &&
+      source === 'sum-rm' &&
+      status !== 'Ошибка заведения' &&
+      (isAdmin || userMatches || (isValidatorLead && status === 'Ожидает удаления'));
 
     set({
-      selectedModelsCount: count,
-      selectedModelSource: source,
+      modelsCount: count,
+      modelSource: source,
+      modelStatus: status,
       activeRowId: rowId,
       userMatches,
       isDeleteButtonEnabled,

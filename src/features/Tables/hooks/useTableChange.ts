@@ -14,6 +14,7 @@ import {
 import { initialColumns } from '@src/shared/constants';
 import { TableChangeProps } from '../types';
 import { useDeleteRightModelPanelStore, useUserStore } from '@src/shared/stores';
+import { useModelUserMatch } from '@src/shared/hooks';
 
 export const useTableChange = ({
   rowList,
@@ -27,13 +28,12 @@ export const useTableChange = ({
   const { columnsFilters, topFilters, onChangeColumnsFilters, onChangeTopFilters } =
     useContext(FiltersContext);
 
-  const { username } = useUserStore();
+  const { updateDeleteModelState } = useDeleteRightModelPanelStore();
+  const { isModelCreator, isInBusinessCustomers } = useModelUserMatch();
 
   // Table data
   const [rows, setRows] = useState(rowList);
   const [cols, setCols] = useState<(AdmiralColumn & Column)[]>([]);
-
-  const { updateDeleteModelState } = useDeleteRightModelPanelStore();
 
   const handleSort = ({ name, sort }: { name: string; sort: 'asc' | 'desc' | 'initial' }) => {
     setCurrentPage(1);
@@ -81,21 +81,13 @@ export const useTableChange = ({
     if (selectedRows.length === 1) {
       const selectedRow = selectedRows[0];
 
-      const lowerUsername = username.toLowerCase();
-      const lowerModelCreator = selectedRow?.model_creator?.toLowerCase() || '';
-      const lowerBusinessCustomers =
-        selectedRow.business_customer
-          ?.toLowerCase()
-          .split(',')
-          .map((customer) => customer.trim()) || [];
+      const { model_source, status, id } = selectedRow;
 
-      const userMatches =
-        lowerUsername === lowerModelCreator ||
-        lowerBusinessCustomers.some((customer) => customer === lowerUsername);
+      const userMatches = isModelCreator(selectedRow) || isInBusinessCustomers(selectedRow);
 
-      updateDeleteModelState(1, selectedRow.model_source, userMatches, selectedRow.id);
+      updateDeleteModelState(1, model_source, status, id, userMatches);
     } else {
-      updateDeleteModelState(selectedRows.length, null, false);
+      updateDeleteModelState(selectedRows.length);
     }
 
     setRows(rowsWithUpdatedSelectedStatus);

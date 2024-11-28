@@ -1,12 +1,12 @@
 /* eslint-disable no-unneeded-ternary */
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, T } from '@admiral-ds/react-ui';
 import { TabMenu } from '@admiral-ds/react-ui';
 import styled from 'styled-components';
 
 import { Row } from '@shared/types';
 import { StatusScreen } from '@shared/ui/molecules';
-import { RIGHT_PANEL_TYPE, MODEL_FORM_MODE } from '@shared/constants';
+import { MODEL_FORM_MODE } from '@shared/constants';
 import { INPUT_TYPE, InputFactory, InputValue, RightPanel } from '@shared/ui/organisms';
 import { API_ROUTES, ArtifactApi, useFetch } from '@shared/api';
 import { groupBy } from 'lodash';
@@ -15,19 +15,13 @@ import { Artifact, CustomError, ModelEditApi } from '@shared/api/types';
 
 import { useAppInjectStore } from '@shared/stores/appInjectStore';
 import { FormValues } from '../ModelForm/types';
-import {
-  getArtifactApiItems,
-  getInputValuesFromRow,
-  getInvalidFields,
-  getProperFormatValueForSubmit,
-} from '../ModelForm/helpers';
+import { getArtifactApiItems, getInputValuesFromRow, getInvalidFields } from '../ModelForm/helpers';
 import { ButtonContainer, FormContainer } from '../ModelForm/styles';
 import { useFormFields } from '../ModelForm/useFormFields';
 import { DELETE_CONFIRM_MODEL_SCHEMA, DELETE_MODEL_SCHEMA, SCHEMA_NAME_MAP } from './constants';
 import { useDeleteRightModelPanelStore } from '@src/shared/stores';
 import { useActiveDeleteFormSchema } from './useActiveDeleteFormSchema';
 import { useScrollTo } from '@src/shared/hooks/useScrollTo';
-import { ALLOCATION_FIELDS_NAMES } from '../ModelForm/constants';
 import { useRoles } from '@src/shared/hooks';
 
 type SubmitType = { checkOnly?: boolean };
@@ -42,40 +36,21 @@ const StyledTabMenu = styled(TabMenu)`
   }
 `;
 
-const tabs = [
-  {
-    id: '1',
-    content: 'Инициатор',
-    schema: DELETE_MODEL_SCHEMA,
-  },
-  {
-    id: '2',
-    content: 'Подтверждение',
-    schema: DELETE_CONFIRM_MODEL_SCHEMA,
-    disabled: true,
-  },
-];
-
-export interface ModelFormProps {
-  mode: RIGHT_PANEL_TYPE.ADD_MODEL | RIGHT_PANEL_TYPE.EDIT_MODEL | RIGHT_PANEL_TYPE.DELETE_MODEL;
-
+export interface DeleteModelFormProps {
   artifacts: Artifact[];
   editCellName?: keyof Row;
-  rows: Partial<Row>[];
   activeRow?: Partial<Row>;
   onSubmit: (newRow: CustomError | Row | ArtifactApi[], formMode: MODEL_FORM_MODE) => void;
   onClose: () => void;
 }
 
 export const DeleteModelForm = ({
-  mode,
-  rows,
   artifacts,
   editCellName,
   activeRow,
   onSubmit,
   onClose,
-}: ModelFormProps) => {
+}: DeleteModelFormProps) => {
   const { mutationProtectedFetch } = useFetch({});
   const { setCurrentCustomer, currentCustomer } = useAppInjectStore();
 
@@ -93,6 +68,11 @@ export const DeleteModelForm = ({
   const [activeTab, setActiveTab] = useState<string>('1');
   const { formMode, setFormMode } = useDeleteRightModelPanelStore();
   const { isValidatorLead } = useRoles();
+
+  const currentStatusModel = useMemo(
+    () => values?.status?.value || initialRow?.status,
+    [values?.status?.value, initialRow?.status],
+  );
 
   const wasPreviouslyActiveModel = activeRow?.active_model === '1';
 
@@ -121,6 +101,27 @@ export const DeleteModelForm = ({
   const title = 'Удаление модели';
   const groupedBySchemaName = groupBy(fields, 'schemaKey');
 
+  const tabs = useMemo(() => {
+    const confirmationTabDisabled =
+      !isValidatorLead && currentStatusModel === 'Ожидает удаления' ? false : !isValidatorLead;
+
+    debugger;
+
+    return [
+      {
+        id: '1',
+        content: 'Инициатор',
+        schema: DELETE_MODEL_SCHEMA,
+      },
+      {
+        id: '2',
+        content: 'Подтверждение',
+        schema: DELETE_CONFIRM_MODEL_SCHEMA,
+        disabled: confirmationTabDisabled,
+      },
+    ];
+  }, [isValidatorLead, currentStatusModel]);
+
   const handleTabChange = useCallback((tabId) => {
     setActiveTab(tabId);
     const selectedTab = tabs.find((tab) => tab.id === tabId);
@@ -142,22 +143,6 @@ export const DeleteModelForm = ({
     setValues((prevValues) => ({ ...prevValues, ...newValues }));
   }, []);
 
-  // TODO: Temporary solution to solve the problem of editing allocations in models that do not have all required fields. This is a technical debt that needs to be fixed.
-  const checkForAllocationFieldsChanged = () =>
-    ALLOCATION_FIELDS_NAMES.some((allocationFieldName) => {
-      const initialValue = initialRow?.[allocationFieldName] || '';
-      const newValue = values?.[allocationFieldName];
-
-      if (newValue) {
-        const formattedValue = getProperFormatValueForSubmit(newValue);
-
-        if (!Array.isArray(formattedValue)) {
-          return initialValue !== formattedValue.artefact_string_value;
-        }
-      }
-      return null;
-    });
-
   const handleSubmit = useCallback(
     async ({ checkOnly = false }: SubmitType) => {
       const valuesWithAddedOutsideControls: FormValues = {
@@ -168,13 +153,15 @@ export const DeleteModelForm = ({
         },
       };
 
+      const newStatusModel = isValidatorLead ? 'Ошибка заведения' : 'Ожидает удаления';
+
       if (!valuesWithAddedOutsideControls['status']) {
         valuesWithAddedOutsideControls['status'] = {
           type: INPUT_TYPE.STRING,
-          value: 'Ожидает удаления',
+          value: newStatusModel,
         };
       } else {
-        valuesWithAddedOutsideControls['status'].value = 'Ожидает удаления';
+        valuesWithAddedOutsideControls['status'].value = newStatusModel;
       }
 
       const newInvalidFields = getInvalidFields(
@@ -182,12 +169,11 @@ export const DeleteModelForm = ({
         valuesWithAddedOutsideControls,
         wasPreviouslyActiveModel,
       );
-      const isAllocationFieldsChanged = checkForAllocationFieldsChanged();
-      setInvalidFields(isAllocationFieldsChanged ? [] : newInvalidFields);
+      setInvalidFields(newInvalidFields);
       scrollToActiveError();
       setDirtyFields((prevDirtyFields) => [...prevDirtyFields, fields[0].name]);
 
-      if (newInvalidFields.length && !isAllocationFieldsChanged) {
+      if (newInvalidFields.length) {
         return;
       }
 
@@ -252,8 +238,6 @@ export const DeleteModelForm = ({
   useEffect(() => {
     const initialValues = getInputValuesFromRow(artifacts, initialRow);
 
-    console.log(initialValues);
-
     setValues(initialValues);
     debugger;
   }, [initialRow, artifacts]);
@@ -286,6 +270,50 @@ export const DeleteModelForm = ({
     }
   }, [values, dirtyFields, deleteFormSchema, wasPreviouslyActiveModel]);
 
+  const renderFooter = useCallback(() => {
+    const isSubmitButtonEnabled = useMemo(() => {
+      if (activeTab === '1' && isValidatorLead) {
+        return false;
+      }
+
+      if (activeTab === '2' && isValidatorLead) {
+        return true;
+      }
+
+      if (!isValidatorLead) {
+        return activeTab === '1';
+      }
+    }, [activeTab, isValidatorLead]);
+
+    return (
+      <>
+        <T font="Caption/Caption 1" color="Neutral/Neutral 50" as="div">
+          <span style={{ color: '#D92020' }}>*</span> Поля обязательные для сохранения
+        </T>
+        <ButtonContainer>
+          <Button
+            dimension="s"
+            onClick={() => handleSubmit({ checkOnly: false })}
+            value="Submit"
+            type="submit"
+            disabled={!isSubmitButtonEnabled}
+          >
+            Да
+          </Button>
+          <Button
+            dimension="s"
+            onClick={handleOnClose}
+            appearance="secondary"
+            value="Submit"
+            type="submit"
+          >
+            Нет
+          </Button>
+        </ButtonContainer>
+      </>
+    );
+  }, [activeTab, isValidatorLead]);
+
   return (
     <RightPanel
       title={title}
@@ -305,7 +333,7 @@ export const DeleteModelForm = ({
             dimension="l"
             activeTab={activeTab}
             onChange={handleTabChange}
-            tabs={tabs.map(({ id, content }) => ({ id, content }))}
+            tabs={tabs.map(({ id, content, disabled }) => ({ id, content, disabled }))}
           />
           <FormContainer ref={formRef}>
             {Object.keys(groupedBySchemaName).map((schemaKey) => {
@@ -352,32 +380,7 @@ export const DeleteModelForm = ({
           </FormContainer>
         </StatusScreen>
       }
-      footer={
-        <>
-          <T font="Caption/Caption 1" color="Neutral/Neutral 50" as="div">
-            <span style={{ color: '#D92020' }}>*</span> Поля обязательные для сохранения
-          </T>
-          <ButtonContainer>
-            <Button
-              dimension="s"
-              onClick={() => handleSubmit({ checkOnly: false })}
-              value="Submit"
-              type="submit"
-            >
-              Да
-            </Button>
-            <Button
-              dimension="s"
-              onClick={handleOnClose}
-              appearance="secondary"
-              value="Submit"
-              type="submit"
-            >
-              Нет
-            </Button>
-          </ButtonContainer>
-        </>
-      }
+      footer={renderFooter()}
     />
   );
 };

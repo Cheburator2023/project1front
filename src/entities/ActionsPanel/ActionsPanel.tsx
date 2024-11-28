@@ -23,18 +23,22 @@ export interface ActionsPanelProps {
 
 export const ActionsPanel = ({ updateRightPanelType, handleSearch }: ActionsPanelProps) => {
   const [searchValue, setSearchValue] = useState('');
-  const { selectedModelsCount, selectedModelSource, isDeleteButtonEnabled, userMatches } =
+  const { modelsCount, modelSource, isDeleteButtonEnabled, userMatches, modelStatus } =
     useDeleteRightModelPanelStore();
-  const { isAdmin } = useRoles();
+  const { isAdmin, isValidatorLead } = useRoles();
 
   let deleteTooltipMessage = '';
 
-  if (selectedModelsCount === 0) {
+  if (modelsCount === 0) {
     deleteTooltipMessage = 'Выберите модель для удаления';
-  } else if (selectedModelsCount > 1) {
+  } else if (modelsCount > 1) {
     deleteTooltipMessage = 'Нельзя удалить несколько моделей';
-  } else if (selectedModelSource !== 'sum-rm') {
+  } else if (modelSource !== 'sum-rm') {
     deleteTooltipMessage = 'Модель должна быть с исчтоником "sum-rm"';
+  } else if (modelStatus === 'Ошибка заведения') {
+    deleteTooltipMessage = 'Модель уже удалена и находится в статусе "Ошибка заведения"';
+  } else if (isValidatorLead && modelStatus !== 'Ожидает удаления') {
+    deleteTooltipMessage = 'Подтвердить удаление модели можно только в статусе "Ожидает удаления"';
   } else if (!userMatches && !isAdmin) {
     deleteTooltipMessage = 'Модель может-быть удалена только создателем или владельцем модели';
   } else {
