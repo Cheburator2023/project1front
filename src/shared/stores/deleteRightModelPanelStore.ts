@@ -45,8 +45,7 @@ export const useDeleteRightModelPanelStore = create<DeleteRightModelPanelStoreSt
     const isDeleteButtonEnabled =
       count === 1 &&
       source === 'sum-rm' &&
-      status !== 'Ошибка заведения' &&
-      (isAdmin || userMatches || (isValidatorLead && status === 'Ожидает удаления'));
+      (isAdmin || userMatches || (isValidatorLead && !!status));
 
     set({
       modelsCount: count,

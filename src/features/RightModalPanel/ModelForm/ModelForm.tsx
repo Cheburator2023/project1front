@@ -239,6 +239,9 @@ export const ModelForm = ({
       }
 
       const artifactApiItems = getArtifactApiItems(valuesWithAddedOutsideControls, parentModelId);
+
+      debugger;
+
       // TODO: check this types
       let newRow: Row | undefined;
 

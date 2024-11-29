@@ -294,8 +294,6 @@ export const useTableModels = () => {
     } else {
       setRowList((prevRows) => [newRowWithId, ...prevRows]);
     }
-
-    debugger;
   }, []);
 
   const handleOnClose = useCallback(() => {

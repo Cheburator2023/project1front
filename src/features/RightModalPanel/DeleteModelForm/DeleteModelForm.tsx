@@ -24,8 +24,6 @@ import { useActiveDeleteFormSchema } from './useActiveDeleteFormSchema';
 import { useScrollTo } from '@src/shared/hooks/useScrollTo';
 import { useRoles } from '@src/shared/hooks';
 
-type SubmitType = { checkOnly?: boolean };
-
 const StyledTabMenu = styled(TabMenu)`
   display: flex;
   justify-content: space-around;
@@ -36,6 +34,24 @@ const StyledTabMenu = styled(TabMenu)`
   }
 `;
 
+export enum ResolutionText {
+  APPROVE = 'Утвердительно',
+  REJECT = 'Отрицательно',
+}
+
+export enum ModelStatus {
+  ERROR_REGISTRATION = 'Ошибка заведения',
+  AWAITING_DELETION = 'Ожидает удаления',
+  EMPTY = '',
+}
+
+export type ResolutionValue = {
+  id: string;
+  text: ResolutionText;
+};
+
+export type SubmitType = { checkOnly?: boolean };
+
 export interface DeleteModelFormProps {
   artifacts: Artifact[];
   editCellName?: keyof Row;
@@ -43,6 +59,38 @@ export interface DeleteModelFormProps {
   onSubmit: (newRow: CustomError | Row | ArtifactApi[], formMode: MODEL_FORM_MODE) => void;
   onClose: () => void;
 }
+
+export const resolveModelStatusForDeletion = ({
+  isValidatorLead,
+  resolutionValue,
+  currentModelStatus,
+}) => {
+  if (isValidatorLead) {
+    const resolutionText = resolutionValue?.text;
+
+    if (resolutionText === ResolutionText.APPROVE) {
+      return ModelStatus.ERROR_REGISTRATION;
+    } else if (resolutionText === ResolutionText.REJECT) {
+      return ModelStatus.EMPTY;
+    }
+  }
+
+  return currentModelStatus || ModelStatus.AWAITING_DELETION;
+};
+
+const tabs = [
+  {
+    id: '1',
+    content: 'Инициатор',
+    schema: DELETE_MODEL_SCHEMA,
+  },
+  {
+    id: '2',
+    content: 'Подтверждение',
+    schema: DELETE_CONFIRM_MODEL_SCHEMA,
+    // disabled: confirmationTabDisabled,
+  },
+];
 
 export const DeleteModelForm = ({
   artifacts,
@@ -69,10 +117,10 @@ export const DeleteModelForm = ({
   const { formMode, setFormMode } = useDeleteRightModelPanelStore();
   const { isValidatorLead } = useRoles();
 
-  const currentStatusModel = useMemo(
-    () => values?.status?.value || initialRow?.status,
-    [values?.status?.value, initialRow?.status],
-  );
+  // const currentStatusModel = useMemo(
+  //   () => values?.status?.value || initialRow?.status,
+  //   [values?.status?.value, initialRow?.status],
+  // );
 
   const wasPreviouslyActiveModel = activeRow?.active_model === '1';
 
@@ -101,26 +149,8 @@ export const DeleteModelForm = ({
   const title = 'Удаление модели';
   const groupedBySchemaName = groupBy(fields, 'schemaKey');
 
-  const tabs = useMemo(() => {
-    const confirmationTabDisabled =
-      !isValidatorLead && currentStatusModel === 'Ожидает удаления' ? false : !isValidatorLead;
-
-    debugger;
-
-    return [
-      {
-        id: '1',
-        content: 'Инициатор',
-        schema: DELETE_MODEL_SCHEMA,
-      },
-      {
-        id: '2',
-        content: 'Подтверждение',
-        schema: DELETE_CONFIRM_MODEL_SCHEMA,
-        disabled: confirmationTabDisabled,
-      },
-    ];
-  }, [isValidatorLead, currentStatusModel]);
+  // const confirmationTabDisabled =
+  //   !isValidatorLead && currentStatusModel === 'Ожидает удаления' ? false : !isValidatorLead;
 
   const handleTabChange = useCallback((tabId) => {
     setActiveTab(tabId);
@@ -153,15 +183,22 @@ export const DeleteModelForm = ({
         },
       };
 
-      const newStatusModel = isValidatorLead ? 'Ошибка заведения' : 'Ожидает удаления';
+      const resolutionValue = values?.lead_validator_resolution_model_delete
+        ?.value as ResolutionValue;
+
+      const newModelStatus = resolveModelStatusForDeletion({
+        isValidatorLead,
+        resolutionValue,
+        currentModelStatus: valuesWithAddedOutsideControls['status']?.value as ModelStatus,
+      });
 
       if (!valuesWithAddedOutsideControls['status']) {
         valuesWithAddedOutsideControls['status'] = {
           type: INPUT_TYPE.STRING,
-          value: newStatusModel,
+          value: newModelStatus,
         };
       } else {
-        valuesWithAddedOutsideControls['status'].value = newStatusModel;
+        valuesWithAddedOutsideControls['status'].value = newModelStatus;
       }
 
       const newInvalidFields = getInvalidFields(
@@ -169,6 +206,7 @@ export const DeleteModelForm = ({
         valuesWithAddedOutsideControls,
         wasPreviouslyActiveModel,
       );
+
       setInvalidFields(newInvalidFields);
       scrollToActiveError();
       setDirtyFields((prevDirtyFields) => [...prevDirtyFields, fields[0].name]);
@@ -177,13 +215,10 @@ export const DeleteModelForm = ({
         return;
       }
 
-      if (newInvalidFields.length) {
-        return;
-      }
-
       const artifactApiItems = getArtifactApiItems(valuesWithAddedOutsideControls, parentModelId);
 
-      // TODO: check this types
+      debugger;
+
       let newRow: CustomError | Row | ArtifactApi[] | undefined;
 
       setSubmitLoading(checkOnly ? false : true);
@@ -192,7 +227,6 @@ export const DeleteModelForm = ({
         const { system_model_id, model_source } = initialRow;
 
         if (system_model_id && model_source) {
-          // TODO: fix response type and structure and input type ModelEditApi[]
           const res: any = await mutationProtectedFetch<ModelEditApi[], { data: { cards: Row[] } }>(
             {
               body: [
@@ -239,6 +273,7 @@ export const DeleteModelForm = ({
     const initialValues = getInputValuesFromRow(artifacts, initialRow);
 
     setValues(initialValues);
+
     debugger;
   }, [initialRow, artifacts]);
 
@@ -270,49 +305,17 @@ export const DeleteModelForm = ({
     }
   }, [values, dirtyFields, deleteFormSchema, wasPreviouslyActiveModel]);
 
-  const renderFooter = useCallback(() => {
-    const isSubmitButtonEnabled = useMemo(() => {
-      if (activeTab === '1' && isValidatorLead) {
-        return false;
-      }
+  // if (activeTab === '1' && isValidatorLead) {
+  //   return false;
+  // }
 
-      if (activeTab === '2' && isValidatorLead) {
-        return true;
-      }
+  // if (activeTab === '2' && isValidatorLead) {
+  //   return true;
+  // }
 
-      if (!isValidatorLead) {
-        return activeTab === '1';
-      }
-    }, [activeTab, isValidatorLead]);
-
-    return (
-      <>
-        <T font="Caption/Caption 1" color="Neutral/Neutral 50" as="div">
-          <span style={{ color: '#D92020' }}>*</span> Поля обязательные для сохранения
-        </T>
-        <ButtonContainer>
-          <Button
-            dimension="s"
-            onClick={() => handleSubmit({ checkOnly: false })}
-            value="Submit"
-            type="submit"
-            disabled={!isSubmitButtonEnabled}
-          >
-            Да
-          </Button>
-          <Button
-            dimension="s"
-            onClick={handleOnClose}
-            appearance="secondary"
-            value="Submit"
-            type="submit"
-          >
-            Нет
-          </Button>
-        </ButtonContainer>
-      </>
-    );
-  }, [activeTab, isValidatorLead]);
+  // if (!isValidatorLead) {
+  //   return activeTab === '1';
+  // }
 
   return (
     <RightPanel
@@ -333,7 +336,7 @@ export const DeleteModelForm = ({
             dimension="l"
             activeTab={activeTab}
             onChange={handleTabChange}
-            tabs={tabs.map(({ id, content, disabled }) => ({ id, content, disabled }))}
+            tabs={tabs.map(({ id, content }) => ({ id, content }))}
           />
           <FormContainer ref={formRef}>
             {Object.keys(groupedBySchemaName).map((schemaKey) => {
@@ -380,7 +383,33 @@ export const DeleteModelForm = ({
           </FormContainer>
         </StatusScreen>
       }
-      footer={renderFooter()}
+      footer={
+        <>
+          <T font="Caption/Caption 1" color="Neutral/Neutral 50" as="div">
+            <span style={{ color: '#D92020' }}>*</span> Поля обязательные для сохранения
+          </T>
+          <ButtonContainer>
+            <Button
+              dimension="s"
+              onClick={() => handleSubmit({ checkOnly: false })}
+              value="Submit"
+              type="submit"
+              // disabled={!isSubmitButtonEnabled}
+            >
+              Да
+            </Button>
+            <Button
+              dimension="s"
+              onClick={handleOnClose}
+              appearance="secondary"
+              value="Submit"
+              type="submit"
+            >
+              Нет
+            </Button>
+          </ButtonContainer>
+        </>
+      }
     />
   );
 };

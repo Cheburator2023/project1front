@@ -35,12 +35,9 @@ export const ActionsPanel = ({ updateRightPanelType, handleSearch }: ActionsPane
     deleteTooltipMessage = 'Нельзя удалить несколько моделей';
   } else if (modelSource !== 'sum-rm') {
     deleteTooltipMessage = 'Модель должна быть с исчтоником "sum-rm"';
-  } else if (modelStatus === 'Ошибка заведения') {
-    deleteTooltipMessage = 'Модель уже удалена и находится в статусе "Ошибка заведения"';
-  } else if (isValidatorLead && modelStatus !== 'Ожидает удаления') {
-    deleteTooltipMessage = 'Подтвердить удаление модели можно только в статусе "Ожидает удаления"';
-  } else if (!userMatches && !isAdmin) {
-    deleteTooltipMessage = 'Модель может-быть удалена только создателем или владельцем модели';
+  } else if (!userMatches && !isAdmin && !isValidatorLead) {
+    deleteTooltipMessage =
+      'Модель может-быть удалена только создателем, владельцем модели или администратором';
   } else {
     deleteTooltipMessage = 'Удалить модель';
   }
