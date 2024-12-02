@@ -7,6 +7,7 @@ import { FutureTableHomePage } from '@pages/Playground/FutureTableHomePage';
 
 export const ROUTES = {
   HOME: '/',
+  MF_HOME_ROUTE: '/sum-rm',
   FUTURE_TABLE: 'future_table',
   CHARTS: 'charts',
   PLAYGROUND: 'playground',
@@ -16,6 +17,10 @@ const ROUTE_MAP = [
   {
     path: ROUTES.HOME,
     index: true,
+    element: <Home />,
+  },
+  {
+    path: ROUTES.MF_HOME_ROUTE,
     element: <Home />,
   },
   {

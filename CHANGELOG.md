@@ -1,5 +1,61 @@
 # Semantic Versioning Changelog
 
+## [1.27.1](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.27.0...v1.27.1) (2024-11-27)
+
+
+### Bug Fixes
+
+* client routing and waterm fixed ([e9e9e14](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/e9e9e14e8b64d8456f040b6d6d396e50ffb46010))
+* server side bundle name fix webpack fix ([7006ae8](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/7006ae8bd24a46a2659f68d0c997721deee8d560))
+
+# [1.27.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.26.0...v1.27.0) (2024-11-27)
+
+
+### Bug Fixes
+
+* added new table icon shortcut ([b16e744](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/b16e744e2498fe33b725d168100f23c91925eb5f))
+* config fixes ([ac7c22a](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/ac7c22a4ea1c9eb84301281abc9b238a4e38bbcb))
+* ds_department field coustomers data fixed ([648a75e](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/648a75eeaedcfa0fbaa68219833ded29c12281a6))
+* ds_department field coustomers data fixed ([dae7e91](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/dae7e9169708b4db734755979f57b35e9364a3a1))
+* routes slash in paths fixed ([091759f](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/091759f71b0648c591b824476cf2a2f18e72a8ed))
+
+
+### Features
+
+* future table clone done ([14a05d1](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/14a05d104ea8f36584f3408c1a92df142fb90bd3))
+* new packages and cz menu added with commit linting ([b24a8c5](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/b24a8c55df1114e501840362f4041ab5d6ea158e))
+
+# [1.26.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.25.2...v1.26.0) (2024-11-25)
+
+
+### Bug Fixes
+
+* dashboards style ([0f975fc](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/0f975fc284f237a07bc75b08f84264d826e575d7))
+
+
+### Features
+
+* autocomplete added ([0a4b368](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/0a4b36810e4f060aa1868a0f7d1aa9e12257b844))
+* autocomplete added ([2a018dc](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/2a018dcd72cdc2ccd5cb9345b1021af8da0d6a9b))
+
+## [1.25.2](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.25.1...v1.25.2) (2024-11-22)
+
+
+### Bug Fixes
+
+* dashboards / add stream ([4febc02](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/4febc02bc3dabf2a30ff8870fc87465a6fd79ca6))
+* umrv form logic fixes ([234a8fc](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/234a8fc6bfebbc17c3ed6f9276772983348e6c42))
+* update allocations date fields ([1dfe124](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/1dfe1243e639d1be826a541513ca37eede040f93))
+
+## [1.25.1](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.25.0...v1.25.1) (2024-11-14)
+
+
+### Bug Fixes
+
+* active model form values reset undo ([0bc4d93](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/0bc4d938fcc3e9c2555fbd1f86e62732570ebcb9))
+* active model toggle values reset fixed ([421daff](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/421daff4c4580a4d69f9c733ec4e25718ea95909))
+* table perf increase / search field perf fix ([24019d3](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/24019d32159ed23d2fc06abb0891a94003513261))
+
 # [1.25.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.24.0...v1.25.0) (2024-11-12)
 
 
