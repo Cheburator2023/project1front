@@ -1,4 +1,4 @@
-import { Row } from '@shared/types';
+import { Row, UserRoles } from '@shared/types';
 import { InputFactoryProps, InputValue } from '@shared/ui/organisms';
 import { CUSTOMER_TYPE } from '@src/shared/constants/customers';
 
@@ -19,6 +19,10 @@ type FormFieldsSchema = Array<{
   valueConditions?: FormFieldValueConditions;
   disabledConditions?: FormFieldConditions | string[];
   enabledByValueConditions?: FormFieldValueConditions;
+  businessCustomerAllowed?: boolean;
+  modelCreatorAllowed?: boolean;
+  rolesAllowed?: UserRoles;
+  alwaysDisabled?: boolean;
   schemaKey?: string;
   schemaOrder?: number;
 }>;

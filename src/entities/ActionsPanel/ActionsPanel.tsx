@@ -1,15 +1,18 @@
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ReactComponent as BrokerOutlineIcon } from '@admiral-ds/icons/build/finance/BrokerOutline.svg';
 import { ReactComponent as MenuOutline } from '@admiral-ds/icons/build/service/MenuOutline.svg';
 import { ReactComponent as PlusCircleSolid } from '@admiral-ds/icons/build/service/PlusCircleSolid.svg';
 import { ReactComponent as SettingsOutline } from '@admiral-ds/icons/build/system/SettingsOutline.svg';
+import { ReactComponent as DeleteSolid } from '@admiral-ds/icons/build/system/DeleteSolid.svg';
 import { ReactComponent as ShowTableOutline } from '@admiral-ds/icons/build/category/ShowTableOutline.svg';
 
 import { IconButton } from '@shared/ui/molecules';
 import { RIGHT_PANEL_TYPE } from '@shared/constants';
-
 import { useDebouncedCallback } from '@src/shared/hooks/useDebouncedCallback';
+import { useDeleteRightModelPanelStore } from '@src/shared/stores';
+import { useRoles } from '@src/shared/hooks';
+
 import { CustomSearchInput, Container } from './styles';
 import { ROUTES } from '../../app/Routes';
 
@@ -20,6 +23,25 @@ export interface ActionsPanelProps {
 
 export const ActionsPanel = ({ updateRightPanelType, handleSearch }: ActionsPanelProps) => {
   const [searchValue, setSearchValue] = useState('');
+  const { modelsCount, modelSource, isDeleteButtonEnabled, userMatches, modelStatus } =
+    useDeleteRightModelPanelStore();
+  const { isAdmin, isValidatorLead } = useRoles();
+
+  let deleteTooltipMessage = '';
+
+  if (modelsCount === 0) {
+    deleteTooltipMessage = 'Выберите модель для удаления';
+  } else if (modelsCount > 1) {
+    deleteTooltipMessage = 'Нельзя удалить несколько моделей';
+  } else if (modelSource !== 'sum-rm') {
+    deleteTooltipMessage = 'Модель должна быть с исчтоником "sum-rm"';
+  } else if (!userMatches && !isAdmin && !isValidatorLead) {
+    deleteTooltipMessage =
+      'Модель может-быть удалена только создателем, владельцем модели или администратором';
+  } else {
+    deleteTooltipMessage = 'Удалить модель';
+  }
+
   const debouncedHandleChange = useDebouncedCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     handleChange(e);
   }, 300);
@@ -49,6 +71,14 @@ export const ActionsPanel = ({ updateRightPanelType, handleSearch }: ActionsPane
           color="#0062FF"
           onClick={() => updateRightPanelType(RIGHT_PANEL_TYPE.ADD_MODEL)}
         />
+        <IconButton
+          icon={<DeleteSolid />}
+          tooltip={deleteTooltipMessage}
+          color="#0062FF"
+          onClick={() => updateRightPanelType(RIGHT_PANEL_TYPE.DELETE_MODEL)}
+          disabled={!isDeleteButtonEnabled}
+        />
+
         <IconButton
           icon={<BrokerOutlineIcon />}
           tooltip="Графики"

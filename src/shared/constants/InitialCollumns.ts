@@ -664,6 +664,16 @@ export const initialColumns: Array<Column> = [
     sticky: true,
     type: COLUMN_TYPE.ACTION,
   },
+  {
+    name: 'reason_model_delete',
+    title: 'Причина удаления модели',
+    type: COLUMN_TYPE.STRING,
+  },
+  {
+    name: 'status',
+    title: 'Cтатус',
+    type: COLUMN_TYPE.STRING,
+  },
 ];
 
 export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
@@ -808,4 +818,9 @@ export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
   analytical_monitoring: [],
   artefacts_model_id: [],
   business_status: [],
+  lead_validator_comment_model_delete: [],
+  lead_validator_resolution_model_delete: [],
+  model_creator: [],
+  reason_model_delete: [],
+  status: [],
 };

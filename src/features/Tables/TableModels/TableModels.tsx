@@ -72,6 +72,7 @@ export const TableModels = React.memo(
               <CustomCell
                 column={column}
                 value={value}
+                editable={!(column.name === 'reason_model_delete' || column.name === 'status')}
                 row={row}
                 onAction={(action) => {
                   onActionCell(action, row.system_model_id, column.name);

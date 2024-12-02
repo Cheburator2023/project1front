@@ -1,0 +1,15 @@
+import { useUserStore } from '../stores';
+import { Role } from '../types';
+
+export const useRoles = () => {
+  const { roles } = useUserStore();
+  const { hasRole } = useUserStore();
+
+  return {
+    roles,
+    hasRole,
+    isAdmin: hasRole(Role.ADMIN_IT) || hasRole(Role.ADMIN_IT_LEAD),
+    isValidatorLead: hasRole(Role.VALIDATOR_LEAD),
+  };
+};
+

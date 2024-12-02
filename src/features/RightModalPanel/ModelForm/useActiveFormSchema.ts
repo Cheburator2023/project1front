@@ -1,7 +1,7 @@
 /* eslint-disable no-sequences */
 /* eslint-disable no-return-assign */
 /* eslint-disable no-constant-condition */
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { MODEL_FORM_MODE } from '@shared/constants';
 import { Row } from '@shared/types';
 import { INPUT_TYPE } from '@shared/ui/organisms';
@@ -15,8 +15,8 @@ import {
   NOT_ACTIVE_MODEL_SCHEMA,
   SCHEMA_NAME_MAP,
 } from './constants';
-import { FormFieldsSchema, FormValues } from './types';
-import { markSchema } from './helpers';
+import { FormFieldsSchema, FormValues } from '../types';
+import { markSchema } from '../helpers';
 
 interface UseActiveFormSchemaProps {
   values?: FormValues;

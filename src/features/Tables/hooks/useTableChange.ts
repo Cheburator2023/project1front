@@ -13,6 +13,8 @@ import {
 
 import { initialColumns } from '@src/shared/constants';
 import { TableChangeProps } from '../types';
+import { useDeleteRightModelPanelStore, useUserStore } from '@src/shared/stores';
+import { useModelUserMatch } from '@src/shared/hooks';
 
 export const useTableChange = ({
   rowList,
@@ -25,6 +27,9 @@ export const useTableChange = ({
 }: TableChangeProps) => {
   const { columnsFilters, topFilters, onChangeColumnsFilters, onChangeTopFilters } =
     useContext(FiltersContext);
+
+  const { updateDeleteModelState } = useDeleteRightModelPanelStore();
+  const { isModelCreator, isInBusinessCustomers } = useModelUserMatch();
 
   // Table data
   const [rows, setRows] = useState(rowList);
@@ -70,6 +75,20 @@ export const useTableChange = ({
       ...row,
       selected: row.id && Boolean(ids[row.id]),
     }));
+
+    const selectedRows = rowsWithUpdatedSelectedStatus.filter((row) => row.selected);
+
+    if (selectedRows.length === 1) {
+      const selectedRow = selectedRows[0];
+
+      const { model_source, status, id } = selectedRow;
+
+      const userMatches = isModelCreator(selectedRow) || isInBusinessCustomers(selectedRow);
+
+      updateDeleteModelState(1, model_source, status, id, userMatches);
+    } else {
+      updateDeleteModelState(selectedRows.length);
+    }
 
     setRows(rowsWithUpdatedSelectedStatus);
   };

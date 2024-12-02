@@ -10,28 +10,27 @@ import { RIGHT_PANEL_TYPE, MODEL_FORM_MODE } from '@shared/constants';
 import { INPUT_TYPE, InputFactory, InputValue, RightPanel } from '@shared/ui/organisms';
 import { API_ROUTES, useFetch, ArtifactApi, ModelEditApi } from '@shared/api';
 
-import { filter, groupBy, isEqual, omit, pick } from 'lodash';
+import { groupBy, isEqual, omit, pick } from 'lodash';
 import { Flexbox, Spacer } from '@shared/ui/atoms';
-import { Artifact, CustomError } from '@shared/api/types';
+import { Artifact } from '@shared/api/types';
 
 import { useAppInjectStore } from '@shared/stores/appInjectStore';
 import { CUSTOMER_MAP } from '@shared/constants/customers';
 import { useScrollTo } from '@src/shared/hooks/useScrollTo';
 import { useDeepEffect } from '@src/shared/hooks/useDeepEffect';
-import { FormFieldConditions, FormValues } from './types';
+import { FormValues } from '../types';
 import {
   getFormMode,
   getArtifactApiItems,
   getInvalidFields,
   getInputValuesFromRow,
   getProperFormatValueForSubmit,
-  checkRequireValueStatus,
-} from './helpers';
+} from '../helpers';
 import { ButtonContainer, FormContainer } from './styles';
 import { ParentModelSelect } from './ParentModelSelect';
 import { useActiveFormSchema } from './useActiveFormSchema';
 import { useFormFields } from './useFormFields';
-import { ACTIVE_MODEL_SCHEMA, ALLOCATION_FIELDS_NAMES, SCHEMA_NAME_MAP } from './constants';
+import { ALLOCATION_FIELDS_NAMES, SCHEMA_NAME_MAP } from './constants';
 import { ModelFormDotMenu } from './ModelFormDotMenu';
 
 type SubmitType = { checkOnly?: boolean };
@@ -256,6 +255,9 @@ export const ModelForm = ({
       }
 
       const artifactApiItems = getArtifactApiItems(valuesWithAddedOutsideControls, parentModelId);
+
+      debugger;
+
       // TODO: check this types
       let newRow: Row | undefined;
 
