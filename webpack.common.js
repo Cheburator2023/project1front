@@ -7,7 +7,7 @@ const deps = require('./package.json').dependencies;
 
 const SRC_DIR = path.join(__dirname, './src');
 const TS_CONFIG_PATH = path.resolve(__dirname, './tsconfig.json');
-const PUBLIC_PATH = process.env.PUBLIC_PATH || '/';
+const PUBLIC_PATH = process.env.PUBLIC_PATH || undefined;
 
 const ALIAS = {
   '@src': `${SRC_DIR}`,
