@@ -3,8 +3,8 @@ import { MODEL_FORM_MODE } from '@shared/constants';
 import { Row } from '@shared/types';
 import { sortBy } from 'lodash';
 import { useDeepEffect } from '@shared/hooks/useDeepEffect';
-import { FormFieldsSchema } from '../ModelForm/types';
-import { markSchema } from '../ModelForm/helpers';
+import { FormFieldsSchema } from '../types';
+import { markSchema } from '../helpers';
 import { DELETE_CONFIRM_MODEL_SCHEMA, DELETE_MODEL_SCHEMA, SCHEMA_NAME_MAP } from './constants';
 
 interface UseActiveFormSchemaProps {

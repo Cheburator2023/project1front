@@ -3,7 +3,7 @@ import React, { useMemo } from 'react';
 import { SELECT_TYPE, SelectStringProps } from '@shared/ui/organisms';
 
 import { Row } from '@src/shared/types';
-import { getParentModelOptions } from './helpers';
+import { getParentModelOptions } from '../helpers';
 import { CustomSearchSelect } from './styles';
 
 export interface ParentModelSelectProps {

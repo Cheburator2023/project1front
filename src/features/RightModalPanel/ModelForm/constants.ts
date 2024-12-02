@@ -1,6 +1,6 @@
 import { Row } from '@src/shared/types';
 import { CUSTOMER_MAP } from '@src/shared/constants/customers';
-import { FormFieldsSchema } from './types';
+import { FormFieldsSchema } from '../types';
 
 export const MONTHS_IN_QUARTER = 3;
 export const ADDITIONAL_DAYS_OUT_QUARTER = 10;

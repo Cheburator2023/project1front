@@ -8,7 +8,6 @@ export const useModelUserMatch = () => {
 
   const isModelCreator = (row: Partial<Row>): boolean => {
     const lowerModelCreator = row.model_creator?.toLowerCase();
-
     return lowerUsername === lowerModelCreator;
   };
 

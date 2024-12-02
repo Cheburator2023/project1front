@@ -12,7 +12,7 @@ import {
 } from 'date-fns';
 
 import { ArtifactType, type Artifact, type ArtifactApi, type ArtifactValue } from '@shared/api';
-import { Row } from '@shared/types';
+import { Role, Row } from '@shared/types';
 import { initialColumns, RIGHT_PANEL_TYPE, MODEL_FORM_MODE } from '@shared/constants';
 import {
   CommonInputProps,
@@ -27,7 +27,7 @@ import {
 } from '@shared/ui/organisms';
 
 import { ArtifactGroup } from '@src/shared/api/types';
-import { concat, pick, uniqBy } from 'lodash';
+import { concat, uniqBy } from 'lodash';
 import { CUSTOMER_MAP, CUSTOMER_TYPE } from '@src/shared/constants/customers';
 import {
   FormFieldConditions,
@@ -44,8 +44,10 @@ import {
   RATING_SYSTEM_MODEL_SCHEMA,
   RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA,
   SCHEMA_NAME_MAP,
-} from './constants';
-import { DELETE_CONFIRM_MODEL_SCHEMA, DELETE_MODEL_SCHEMA } from '../DeleteModelForm/constants';
+} from './ModelForm/constants';
+import { DELETE_CONFIRM_MODEL_SCHEMA, DELETE_MODEL_SCHEMA } from './DeleteModelForm/constants';
+import { useUserStore } from '@src/shared/stores';
+import { isInBusinessCustomers, isModelCreator } from '@src/shared/helpers';
 
 export const markSchema = (
   schema: FormFieldsSchema,
@@ -396,6 +398,60 @@ const getDisabledStatus = (minDate: Date, maxDate: Date, quarter: number) => {
   });
 };
 
+const isUserAllowedForField = (
+  fieldSchema?: FormFieldsSchema[number],
+  row?: Partial<Row> | undefined,
+): boolean | undefined => {
+  const { hasRole } = useUserStore.getState();
+
+  if (
+    !fieldSchema?.rolesAllowed &&
+    !fieldSchema?.businessCustomerAllowed &&
+    !fieldSchema?.modelCreatorAllowed
+  ) {
+    return true;
+  }
+
+  const rolesAllowed = fieldSchema?.rolesAllowed?.some((role: Role) => hasRole(role));
+  const businessCustomerAllowed =
+    fieldSchema?.businessCustomerAllowed && isInBusinessCustomers(row);
+  const modelCreatorAllowed = fieldSchema?.modelCreatorAllowed && isModelCreator(row);
+
+  return rolesAllowed || businessCustomerAllowed || modelCreatorAllowed;
+};
+
+const isFieldDisabled = (
+  values?: FormValues,
+  fieldSchema?: FormFieldsSchema[number],
+  artifact?: Artifact,
+  row?: Partial<Row> | undefined,
+): boolean | undefined => {
+  if (fieldSchema?.alwaysDisabled) {
+    return true;
+  }
+
+  if (!isUserAllowedForField(fieldSchema, row)) {
+    return true;
+  }
+
+  const isGloballyDisabled = artifact?.is_edit_flg === '0';
+
+  const isDisabledByConditions = !checkDisabledStatusByConditions(
+    values,
+    fieldSchema?.disabledConditions,
+  );
+
+  const isDisabledByValueConditions = !checkRequireValueStatus(
+    values,
+    fieldSchema?.enabledByValueConditions,
+  );
+
+  const isControlledByConditions =
+    fieldSchema?.enabledByValueConditions && isDisabledByValueConditions && isDisabledByConditions;
+
+  return isGloballyDisabled || isControlledByConditions;
+};
+
 // Main mapping function that combine object for proper input format
 const mapArtifactToField = (
   artifact: Artifact,
@@ -404,13 +460,6 @@ const mapArtifactToField = (
   activeRow?: Partial<Row>,
   values?: FormValues,
 ): InputFactoryProps<keyof Row> => {
-  const isDisabledByConditions = !checkDisabledStatusByConditions(
-    values,
-    fieldSchema?.disabledConditions,
-  );
-
-  const isDisabled = !checkRequireValueStatus(values, fieldSchema?.enabledByValueConditions);
-
   const commonAttributes: CommonInputProps<keyof Row> = {
     id: artifact.artefact_id.toString(),
     name: artifact.artefact_tech_label,
@@ -422,9 +471,7 @@ const mapArtifactToField = (
     enabledByValueConditions: fieldSchema?.enabledByValueConditions,
     disabledConditions: fieldSchema?.disabledConditions,
     valueConditions: fieldSchema?.valueConditions,
-    disabled:
-      artifact.is_edit_flg === '0' ||
-      (fieldSchema?.enabledByValueConditions && isDisabled && isDisabledByConditions),
+    disabled: isFieldDisabled(values, fieldSchema, artifact, activeRow),
     placeholder: artifact.artefact_desc ? artifact.artefact_desc : undefined,
     group: artifact.group,
     schemaKey: fieldSchema?.schemaKey || SCHEMA_NAME_MAP.REST_MODEL_SCHEMA.key,

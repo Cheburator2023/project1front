@@ -15,8 +15,8 @@ import {
   NOT_ACTIVE_MODEL_SCHEMA,
   SCHEMA_NAME_MAP,
 } from './constants';
-import { FormFieldsSchema, FormValues } from './types';
-import { markSchema } from './helpers';
+import { FormFieldsSchema, FormValues } from '../types';
+import { markSchema } from '../helpers';
 
 interface UseActiveFormSchemaProps {
   values?: FormValues;

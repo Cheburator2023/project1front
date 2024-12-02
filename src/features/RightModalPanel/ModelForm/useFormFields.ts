@@ -5,8 +5,8 @@ import { MODEL_FORM_MODE } from '@src/shared/constants';
 import { sortBy } from 'lodash';
 import { useDeepEffect } from '@shared/hooks/useDeepEffect';
 import { CUSTOMER_TYPE } from '@shared/constants/customers';
-import { getFormFields } from './helpers';
-import { FormFields, FormFieldsSchema, FormValues } from './types';
+import { getFormFields } from '../helpers';
+import { FormFields, FormFieldsSchema, FormValues } from '../types';
 
 interface UseFormFieldsProps {
   formSchema: FormFieldsSchema;
