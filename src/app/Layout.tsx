@@ -4,12 +4,13 @@ import { DropdownProvider } from '@admiral-ds/react-ui';
 import Keycloak from 'keycloak-js';
 
 import { FetchContext, DownloadReportContext } from '@shared/api';
-import { ColumnsFilter } from '@shared/types';
+import { ColumnsFilter, Role } from '@shared/types';
 
 import { Header } from './Header';
 import { themes } from './theme/theme';
-import { useAppInjectStore } from '../shared/stores/appInjectStore';
+import { useAppInjectStore } from '../shared/stores';
 import { CUSTOMER_MAP } from '../shared/constants/customers';
+import { useUserStore } from '@src/shared/stores';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -19,7 +20,9 @@ interface LayoutProps {
     realm_access: {
       roles: string[];
     };
+    groups: string[];
     roles: string[];
+    preferred_username: string;
   };
   protectedFetch?: <T, N>(
     routeUrl: string,
@@ -55,6 +58,7 @@ const Layout = ({ children, user, protectedFetch, goToSum, onLogout }: LayoutPro
   const [downloadReportStatus, setDownloadReportStatus] = useState(false);
   const [columnsFilters, setColumnsFilters] = useState<Partial<ColumnsFilter>>();
   const { setCurrentCustomer } = useAppInjectStore();
+  const { setUsername, setGroups, setRoles } = useUserStore();
 
   const updateColumnsFilters = useCallback((newColumnsFilters?: Partial<ColumnsFilter>) => {
     setColumnsFilters(newColumnsFilters);
@@ -74,7 +78,22 @@ const Layout = ({ children, user, protectedFetch, goToSum, onLogout }: LayoutPro
     } else if (currentCustomerLS) {
       setCurrentCustomer(JSON.parse(currentCustomerLS));
     }
+
+    if (user?.preferred_username) {
+      setUsername(user?.preferred_username);
+    }
+
+    if (user?.groups) {
+      setGroups(user.groups);
+
+      const roles = user.groups.filter((group) =>
+        Object.values(Role).includes(group as Role),
+      ) as Role[];
+      setRoles(roles);
+    }
   }, [user?.roles, user?.realm_access, setCurrentCustomer]);
+
+  console.log(user);
 
   const onLogoutHandler = () => {
     if (onLogout) {

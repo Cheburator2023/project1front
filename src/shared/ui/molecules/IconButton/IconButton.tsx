@@ -1,5 +1,5 @@
 import { IconPlacement, IconPlacementDimension } from '@admiral-ds/react-ui';
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Tooltip } from '@shared/ui/atoms';
 
 export interface IconButtonProps {
@@ -10,6 +10,7 @@ export interface IconButtonProps {
   dimension?: IconPlacementDimension;
   className?: string;
   onClick?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  disabled?: boolean;
 }
 
 export const IconButton = ({
@@ -20,23 +21,30 @@ export const IconButton = ({
   dimension = 'mBig',
   color = '#717681',
   onClick,
+  disabled,
 }: IconButtonProps) => {
-  const iconRef = useRef(null);
+  const iconRef = useRef<HTMLDivElement>(null);
+  const [isTooltipVisible, setTooltipVisible] = useState(false);
 
   return (
-    <>
+    <div
+      ref={iconRef}
+      onMouseEnter={() => setTooltipVisible(true)}
+      onMouseLeave={() => setTooltipVisible(false)}
+      style={{ display: 'inline-block' }}
+    >
       <IconPlacement
         name={name}
         className={className}
-        ref={iconRef}
         onClick={onClick}
         dimension={dimension}
         appearance={{ iconColor: color }}
+        disabled={disabled}
       >
         {icon}
       </IconPlacement>
-      {tooltip ? <Tooltip targetRef={iconRef} title={tooltip} /> : null}
-    </>
+      {tooltip && isTooltipVisible && <Tooltip targetRef={iconRef} title={tooltip} />}
+    </div>
   );
 };
 

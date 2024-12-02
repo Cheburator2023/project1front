@@ -1,3 +1,3 @@
 export * from './ModelForm';
-export * from './types';
+export * from '../types';
 

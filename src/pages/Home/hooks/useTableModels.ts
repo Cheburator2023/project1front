@@ -279,23 +279,22 @@ export const useTableModels = () => {
     [rowList],
   );
 
-  const handleSubmit = useCallback(
-    (newRow: Row | CustomError | ArtifactApi[], formMode: MODEL_FORM_MODE) => {
-      if ('system_model_id' in newRow) {
-        const newRowWithId = { ...newRow, id: newRow.system_model_id, hover: true };
-        if (formMode === MODEL_FORM_MODE.EDIT) {
-          setRowList((prevRows) =>
-            prevRows.map((row) =>
-              row?.system_model_id === newRowWithId.system_model_id ? newRowWithId : row,
-            ),
-          );
-        } else {
-          setRowList((prevRows) => [newRowWithId, ...prevRows]);
-        }
-      }
-    },
-    [],
-  );
+  const handleSubmit = useCallback((newRow: Row, formMode: MODEL_FORM_MODE) => {
+    const newRowWithId = { ...newRow, id: newRow.system_model_id, hover: true };
+    if (
+      formMode === MODEL_FORM_MODE.EDIT ||
+      MODEL_FORM_MODE.DELETE ||
+      MODEL_FORM_MODE.DELETE_CONFIRM
+    ) {
+      setRowList((prevRows) =>
+        prevRows.map((row) =>
+          row?.system_model_id === newRowWithId.system_model_id ? newRowWithId : row,
+        ),
+      );
+    } else {
+      setRowList((prevRows) => [newRowWithId, ...prevRows]);
+    }
+  }, []);
 
   const handleOnClose = useCallback(() => {
     setRightPanelType(null);

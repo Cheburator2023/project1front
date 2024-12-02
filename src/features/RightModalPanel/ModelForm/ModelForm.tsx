@@ -2,6 +2,7 @@
 /* eslint-disable no-unneeded-ternary */
 import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { Button, CheckboxField, T } from '@admiral-ds/react-ui';
+import { format } from 'date-fns';
 
 import { Row } from '@shared/types';
 import { StatusScreen } from '@shared/ui/molecules';
@@ -9,28 +10,27 @@ import { RIGHT_PANEL_TYPE, MODEL_FORM_MODE } from '@shared/constants';
 import { INPUT_TYPE, InputFactory, InputValue, RightPanel } from '@shared/ui/organisms';
 import { API_ROUTES, useFetch, ArtifactApi, ModelEditApi } from '@shared/api';
 
-import { filter, groupBy, isEqual, omit, pick } from 'lodash';
+import { groupBy, isEqual, omit, pick } from 'lodash';
 import { Flexbox, Spacer } from '@shared/ui/atoms';
-import { Artifact, CustomError } from '@shared/api/types';
+import { Artifact } from '@shared/api/types';
 
 import { useAppInjectStore } from '@shared/stores/appInjectStore';
 import { CUSTOMER_MAP } from '@shared/constants/customers';
 import { useScrollTo } from '@src/shared/hooks/useScrollTo';
 import { useDeepEffect } from '@src/shared/hooks/useDeepEffect';
-import { FormFieldConditions, FormValues } from './types';
+import { FormValues } from '../types';
 import {
   getFormMode,
   getArtifactApiItems,
   getInvalidFields,
   getInputValuesFromRow,
   getProperFormatValueForSubmit,
-  checkRequireValueStatus,
-} from './helpers';
+} from '../helpers';
 import { ButtonContainer, FormContainer } from './styles';
 import { ParentModelSelect } from './ParentModelSelect';
 import { useActiveFormSchema } from './useActiveFormSchema';
 import { useFormFields } from './useFormFields';
-import { ACTIVE_MODEL_SCHEMA, ALLOCATION_FIELDS_NAMES, SCHEMA_NAME_MAP } from './constants';
+import { ALLOCATION_FIELDS_NAMES, SCHEMA_NAME_MAP } from './constants';
 import { ModelFormDotMenu } from './ModelFormDotMenu';
 
 type SubmitType = { checkOnly?: boolean };
@@ -196,19 +196,39 @@ export const ModelForm = ({
   }, [completesConditionField, fields]);
 
   // TODO: Temporary solution to solve the problem of editing allocations in models that do not have all required fields. This is a technical debt that needs to be fixed.
+  /**
+   * Check if any of the allocation fields have been changed.
+   * @returns {boolean} true if any allocation field has been changed, false otherwise.
+   */
   const checkForAllocationFieldsChanged = () =>
-    ALLOCATION_FIELDS_NAMES.some((allocationFieldName) => {
-      const initialValue = initialRow?.[allocationFieldName] || '';
-      const newValue = values?.[allocationFieldName];
+    ALLOCATION_FIELDS_NAMES.some((fieldName) => {
+      const initialValue = initialRow?.[fieldName] ?? '';
+      const newInputValue = values?.[fieldName];
 
-      if (newValue) {
-        const formattedValue = getProperFormatValueForSubmit(newValue);
+      if (!newInputValue) {
+        return false;
+      }
 
-        if (!Array.isArray(formattedValue)) {
-          return initialValue !== formattedValue.artefact_string_value;
+      let newStringValue = '';
+
+      if (
+        newInputValue.type === INPUT_TYPE.DATE ||
+        newInputValue.type === INPUT_TYPE.QUARTERLY_DATE
+      ) {
+        if (!newInputValue.value) {
+          return false;
+        }
+
+        newStringValue = format(newInputValue.value, 'yyyy-MM-dd');
+      } else {
+        const formattedValue = getProperFormatValueForSubmit(newInputValue);
+
+        if (!Array.isArray(formattedValue) && formattedValue.artefact_string_value) {
+          newStringValue = formattedValue.artefact_string_value;
         }
       }
-      return null;
+
+      return initialValue !== newStringValue;
     });
 
   const handleSubmit = useCallback(
@@ -234,11 +254,10 @@ export const ModelForm = ({
         return;
       }
 
-      if (newInvalidFields.length) {
-        return;
-      }
-
       const artifactApiItems = getArtifactApiItems(valuesWithAddedOutsideControls, parentModelId);
+
+      debugger;
+
       // TODO: check this types
       let newRow: Row | undefined;
 
@@ -487,4 +506,3 @@ export const ModelForm = ({
     />
   );
 };
-
