@@ -9,7 +9,9 @@ import {
   ColDef,
   IDateFilterParams,
   ITooltipParams,
+  RowSelectedEvent,
   RowSelectionOptions,
+  SelectionChangedEvent,
   ValueGetterParams,
 } from 'ag-grid-community';
 import { ReactComponent as BrokerOutlineIcon } from '@admiral-ds/icons/build/finance/BrokerOutline.svg';
@@ -18,6 +20,7 @@ import { ReactComponent as PlusCircleSolid } from '@admiral-ds/icons/build/servi
 import { ReactComponent as SettingsOutline } from '@admiral-ds/icons/build/system/SettingsOutline.svg';
 import { ReactComponent as SearchOutline } from '@admiral-ds/icons/build/system/SearchOutline.svg';
 import { ReactComponent as ShowTableOutline } from '@admiral-ds/icons/build/category/ShowTableOutline.svg';
+import { ReactComponent as DeleteSolid } from '@admiral-ds/icons/build/system/DeleteSolid.svg';
 
 import { Flexbox, Spacer } from '@src/shared/ui/atoms';
 import { TDisplayTableModels, TModelsTable } from '@pages/Home/hooks';
@@ -31,6 +34,9 @@ import { CUSTOMER_MAP } from '@src/shared/constants/customers';
 import { PlaygroundCustomCell } from './PlaygroundCustomCell';
 import { AG_GRID_LOCALE_RU } from './locale/agGridLocale.ru';
 import { ROUTES } from '../../app/Routes';
+import { useDeleteRightModelPanelStore } from '../../shared/stores';
+import { useRoles } from '../../shared/hooks';
+import { isInBusinessCustomers, isModelCreator } from '../../shared/helpers';
 
 const toolTipValueGetter = (params: ITooltipParams) =>
   params.value == null || params.value === '' ? '- Отсутствует -' : params.value;
@@ -68,6 +74,10 @@ export const PlaygroundTable = ({
   modelsTable: TModelsTable;
 }) => {
   const { currentCustomer } = useAppInjectStore();
+  const { modelsCount, modelSource, isDeleteButtonEnabled, userMatches, updateDeleteModelState } =
+    useDeleteRightModelPanelStore();
+  const { isAdmin, isValidatorLead } = useRoles();
+
   const navigate = useNavigate();
   const gridRef = useRef<AgGridReact>(null);
   const rowData = modelsTable.rowList;
@@ -125,6 +135,7 @@ export const PlaygroundTable = ({
       mode: 'multiRow',
       headerCheckbox: true,
       selectAll: 'filtered',
+      rowSelected: (params) => {},
     };
   }, []);
 
@@ -140,6 +151,37 @@ export const PlaygroundTable = ({
   const paginationPageSizeSelector = useMemo<number[] | boolean>(() => {
     return [20, 100, 500, 1000];
   }, []);
+
+  let deleteTooltipMessage = '';
+
+  if (modelsCount === 0) {
+    deleteTooltipMessage = 'Выберите модель для удаления';
+  } else if (modelsCount > 1) {
+    deleteTooltipMessage = 'Нельзя удалить несколько моделей';
+  } else if (modelSource !== 'sum-rm') {
+    deleteTooltipMessage = 'Модель должна быть с исчтоником "sum-rm"';
+  } else if (!userMatches && !isAdmin && !isValidatorLead) {
+    deleteTooltipMessage =
+      'Модель может-быть удалена только создателем, владельцем модели или администратором';
+  } else {
+    deleteTooltipMessage = 'Удалить модель';
+  }
+
+  const handleSelectionChange = (event: SelectionChangedEvent): void => {
+    const selectedRows = event.api.getSelectedRows();
+
+    if (selectedRows.length === 1) {
+      const selectedRow = selectedRows[0];
+
+      const { model_source, status, id } = selectedRow;
+
+      const userMatches = isModelCreator(selectedRow) || isInBusinessCustomers(selectedRow);
+
+      updateDeleteModelState(1, model_source, status, id, userMatches);
+    } else {
+      updateDeleteModelState(selectedRows.length);
+    }
+  };
 
   return (
     <Flexbox height="calc(100vh - 230px)">
@@ -159,6 +201,13 @@ export const PlaygroundTable = ({
               tooltip="Добавить модель"
               color="#0062FF"
               onClick={() => display.setRightPanelType(RIGHT_PANEL_TYPE.ADD_MODEL)}
+            />
+            <IconButton
+              icon={<DeleteSolid />}
+              tooltip={deleteTooltipMessage}
+              color="#0062FF"
+              onClick={() => display.setRightPanelType(RIGHT_PANEL_TYPE.DELETE_MODEL)}
+              disabled={!isDeleteButtonEnabled}
             />
             <IconButton
               icon={<BrokerOutlineIcon />}
@@ -197,6 +246,7 @@ export const PlaygroundTable = ({
               lockPinned: true,
             }}
             sideBar
+            onSelectionChanged={handleSelectionChange}
             pagination
             paginationPageSize={100}
             paginationPageSizeSelector={paginationPageSizeSelector}

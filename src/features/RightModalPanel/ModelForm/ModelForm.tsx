@@ -192,7 +192,7 @@ export const ModelForm = ({
           }));
         }
       }
-    }, 300);
+    }, 100);
   }, [completesConditionField, fields]);
 
   // TODO: Temporary solution to solve the problem of editing allocations in models that do not have all required fields. This is a technical debt that needs to be fixed.
@@ -256,9 +256,7 @@ export const ModelForm = ({
 
       const artifactApiItems = getArtifactApiItems(valuesWithAddedOutsideControls, parentModelId);
 
-      debugger;
-
-      // TODO: check this types
+      // TODO: check this type
       let newRow: Row | undefined;
 
       setSubmitLoading(checkOnly ? false : true);
@@ -506,3 +504,4 @@ export const ModelForm = ({
     />
   );
 };
+

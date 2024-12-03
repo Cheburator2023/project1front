@@ -12,9 +12,9 @@ import {
 } from '@shared/helpers';
 
 import { initialColumns } from '@src/shared/constants';
-import { TableChangeProps } from '../types';
 import { useDeleteRightModelPanelStore, useUserStore } from '@src/shared/stores';
 import { useModelUserMatch } from '@src/shared/hooks';
+import { TableChangeProps } from '../types';
 
 export const useTableChange = ({
   rowList,
