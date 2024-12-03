@@ -12,7 +12,7 @@ import {
 } from 'date-fns';
 
 import { ArtifactType, type Artifact, type ArtifactApi, type ArtifactValue } from '@shared/api';
-import { Role, Row } from '@shared/types';
+import { Column, COLUMN_TYPE, Role, Row } from '@shared/types';
 import { initialColumns, RIGHT_PANEL_TYPE, MODEL_FORM_MODE } from '@shared/constants';
 import {
   CommonInputProps,
@@ -755,6 +755,17 @@ const getFormFields = ({
     );
   }
 
+  const EXCLUDED_FIELDS_BY_MODE: Record<string, string[]> = {
+    [MODEL_FORM_MODE.EDIT]: ['reason_model_delete', 'status'],
+  };
+
+  const filterColumnsByMode = (mode: MODEL_FORM_MODE, columns: Array<Column>): Array<Column> => {
+    const excludedFields = EXCLUDED_FIELDS_BY_MODE[mode] || [];
+    const filteredColumns = columns.filter((column) => !excludedFields.includes(column.name));
+
+    return filteredColumns;
+  };
+
   const fieldsNamesToGenerate = (() => {
     if (showAllFields) {
       return mergedUniqueArrayOfAllAttrsForDebug.map(({ name }) => name);
@@ -769,14 +780,21 @@ const getFormFields = ({
     }
 
     if (currentCustomer.id === CUSTOMER_MAP.UMRV.id) {
-      return mergedModelsForUmrv.map(({ name }) => name);
+      const columnsForUmrv: Column[] = mergedModelsForUmrv.map((model) => ({
+        name: model.name,
+        type: COLUMN_TYPE.STRING,
+        title: model.name,
+        required: model.required,
+      }));
+
+      return filterColumnsByMode(mode, columnsForUmrv).map(({ name }) => name);
     }
 
     if (mode === MODEL_FORM_MODE.ADD) {
       return BASE_MODEL_SCHEMA.map(({ name }) => name);
     }
 
-    return initialColumns.map(({ name }) => name);
+    return filterColumnsByMode(mode, initialColumns).map(({ name }) => name);
   })();
 
   // Генерация полей
