@@ -121,9 +121,7 @@ const mockedArtifacts: Artifact[] = [
     artefact_type_desc: 'text',
     values: [],
   },
-
-  ///////
-
+  ///
   {
     artefact_id: 2112,
     artefact_tech_label: 'date_of_introduction_into_operation',

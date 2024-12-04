@@ -1,7 +1,7 @@
 import { SELECT_TYPE, SelectStringProps } from '@src/shared/ui/organisms';
 import * as Highcharts from 'highcharts';
-import { MetricsCaption } from './types';
 import { overflow } from 'html2canvas/dist/types/css/property-descriptors/overflow';
+import { MetricsCaption } from './types';
 
 const dsStreamArtifactOptions = {
   type: SELECT_TYPE.STRING,
@@ -464,7 +464,9 @@ const initialChartPilots = () => ({
   ] as Highcharts.SeriesBarOptions[],
 });
 
-const initialChartDistributionByLifecycleStageModels = () => ({
+const initialChartDistributionByLifecycleStageModels = (): Highcharts.Options & {
+  chart: { plotBorderRadius: number };
+} => ({
   chart: {
     height: 185,
     marginTop: 20,
@@ -487,7 +489,7 @@ const initialChartDistributionByLifecycleStageModels = () => ({
     verticalAlign: 'top' as Highcharts.VerticalAlignValue,
     layout: 'vertical' as Highcharts.OptionsLayoutValue,
     itemStyle: {
-      width: '100px',
+      width: 100,
       overflow: 'hidden',
       textOverflow: 'ellipsis',
       whiteSpace: 'nowrap',

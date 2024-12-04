@@ -245,7 +245,26 @@ export const PlaygroundTable = ({
               pinned: 'left',
               lockPinned: true,
             }}
-            sideBar
+            sideBar={{
+              toolPanels: [
+                {
+                  id: 'columns',
+                  labelDefault: 'Columns',
+                  labelKey: 'columns',
+                  iconKey: 'columns',
+                  toolPanel: 'agColumnsToolPanel',
+                },
+                {
+                  id: 'filters',
+                  labelDefault: 'Filters',
+                  labelKey: 'filters',
+                  iconKey: 'filter',
+                  toolPanel: 'agFiltersToolPanel',
+                },
+              ],
+              defaultToolPanel: undefined,
+              // hiddenByDefault: true,
+            }}
             onSelectionChanged={handleSelectionChange}
             pagination
             paginationPageSize={100}

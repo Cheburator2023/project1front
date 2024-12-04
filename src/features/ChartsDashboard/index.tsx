@@ -133,9 +133,8 @@ const ChartsDashboard = () => {
     initialChartStalledModelsByMonth(),
   );
   const [pilots, setPilots] = useState(initialChartPilots());
-  const [distributionByLifecycleStageModels, setDistributionByLifecycleStageModels] = useState(
-    initialChartDistributionByLifecycleStageModels(),
-  );
+  const [distributionByLifecycleStageModels, setDistributionByLifecycleStageModels] =
+    useState<Highcharts.Options>(initialChartDistributionByLifecycleStageModels());
 
   const [isExporting, setIsExporting] = useState(false);
 
@@ -235,11 +234,11 @@ const ChartsDashboard = () => {
       ...distributionByLifecycleStageModels,
       series: [
         {
-          ...distributionByLifecycleStageModels.series[0],
+          ...distributionByLifecycleStageModels?.series?.[0],
           data: metricsData?.distributionByLifecycleStageModels,
         },
       ],
-    });
+    } as any);
 
     setModelDynamicsByStreams({
       ...modelDynamicsByStreams,

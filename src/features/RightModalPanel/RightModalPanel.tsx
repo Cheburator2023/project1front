@@ -8,14 +8,16 @@ import {
   ArtifactResponse,
   Template,
   mockedModelsArtifacts,
+  ArtifactApi,
 } from '@shared/api';
 
 import { Spinner } from '@admiral-ds/react-ui';
+import { useDeleteRightModelPanelStore } from '@src/shared/stores';
+import { CustomError } from '@src/shared/api/types';
 import { ModelForm } from './ModelForm';
 import { HistoryChanges } from './HistoryChanges';
 import { Templates } from './Templates';
 import { DeleteModelForm } from './DeleteModelForm/DeleteModelForm';
-import { useDeleteRightModelPanelStore } from '@src/shared/stores';
 
 export interface RightModalPanelProps {
   activeStatus: RIGHT_PANEL_TYPE | null;
@@ -24,7 +26,7 @@ export interface RightModalPanelProps {
   activeRowId?: string;
   activeCellName?: keyof Row;
   updateTemplates: React.Dispatch<React.SetStateAction<Template[]>>;
-  onSubmit: (newRow: Row, formMode: MODEL_FORM_MODE) => void;
+  onSubmit: (newRow: CustomError | Row | ArtifactApi[], formMode: MODEL_FORM_MODE) => void;
   onClose: () => void;
 }
 
@@ -122,8 +124,6 @@ export const RightModalPanel = React.memo(
 
       return artifactsData?.data ? (
         <DeleteModelForm
-          rows={rows}
-          mode={activeStatus}
           artifacts={artifactsData.data}
           activeRow={activeRow}
           editCellName={activeCellName}

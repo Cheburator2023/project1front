@@ -6,11 +6,11 @@ import Keycloak from 'keycloak-js';
 import { FetchContext, DownloadReportContext } from '@shared/api';
 import { ColumnsFilter, Role } from '@shared/types';
 
+import { useUserStore, useAppInjectStore } from '@src/shared/stores';
 import { Header } from './Header';
 import { themes } from './theme/theme';
-import { useAppInjectStore } from '../shared/stores';
+
 import { CUSTOMER_MAP } from '../shared/constants/customers';
-import { useUserStore } from '@src/shared/stores';
 
 interface LayoutProps {
   children: React.ReactNode;
