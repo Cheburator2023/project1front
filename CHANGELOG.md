@@ -1,5 +1,31 @@
 # Semantic Versioning Changelog
 
+# [1.28.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.27.1...v1.28.0) (2024-12-05)
+
+
+### Bug Fixes
+
+* fix build ([2f06a2e](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/2f06a2e3c5c0d634153f62db768515ceebad50df))
+* public path fixed ([cb78ff3](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/cb78ff31c5aecf31bed5088ca8066d282d7970af))
+
+
+### Features
+
+* delete model ([7d85329](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/7d85329e6e21616d6a7031b9007ceb29bb369dbb))
+* delete model ([f31b2da](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/f31b2dabcbf1e5e47cef60857e2928497ab11f62))
+* delete model ([2456826](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/2456826783d856f49c68e82a6e35fbff44033599))
+* delete model ([ca88d0c](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/ca88d0cfca8510235c9bfd99ce655de322851de9))
+* delete model ([6c9b309](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/6c9b309b3453bd756040add84ba12617b6b15b6e))
+* delete model / add columns ([fa2be6e](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/fa2be6eedad43b5774ebebde2044f79fec1a21c7))
+* delete model / delete icon ([e2f2534](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/e2f253407695a3692b6c98ccbf5dcc4d529664d3))
+* delete model / merge  and roles ([a3a249f](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/a3a249f53d7b9a040ce6fb65301db38cc33775b5))
+* delete model / model status ([51de1ba](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/51de1baf9a57e7f69dbfdc671b786f4d5f72baf4))
+* delete model / right modal panel ([ca965f3](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/ca965f348a41b61653a92ae4b82bd61a7ca9399b))
+* delete model / status ([439338b](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/439338b8755d47e3987ddc89e7e93788325ab491))
+* delete model / tabs ([317b8fb](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/317b8fb87efee7e8594ba32a5cb5fcfe468ccff0))
+* delete model / tabs 2.0 ([d9478df](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/d9478df7260f72cd81296969d02a4e72fa62862f))
+* delete_model ([b5b38d1](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/b5b38d1f1f0a3467f47af667b954ff755da7b5e6))
+
 ## [1.27.1](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.27.0...v1.27.1) (2024-11-27)
 
 
