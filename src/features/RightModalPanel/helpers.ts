@@ -468,6 +468,7 @@ const mapArtifactToField = (
     maxLength: fieldSchema?.maxLength,
     requireConditions: fieldSchema?.requireConditions,
     optionConditions: fieldSchema?.optionConditions,
+    autoCompleteConditions: fieldSchema?.autoCompleteConditions,
     enabledByValueConditions: fieldSchema?.enabledByValueConditions,
     disabledConditions: fieldSchema?.disabledConditions,
     valueConditions: fieldSchema?.valueConditions,

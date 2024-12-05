@@ -249,6 +249,7 @@ export const ACTIVE_MODEL_SCHEMA: FormFieldsSchema = [
     required: true,
     maxLength: 250,
   },
+  ///
   {
     name: 'rating_model',
     customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
@@ -309,6 +310,7 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
     ],
   },
   {
+    // уровень значимости
     name: 'significance_validity',
     required: true,
     customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
@@ -376,6 +378,7 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
       },
     ],
   },
+  /// Степень регуляторного надзора
   {
     name: 'degree_of_regulatory_supervision',
     maxLength: 250,
@@ -390,9 +393,20 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
     ],
     optionConditions: [
       {
+        // Уровень значимости Модели
         connected_field: 'significance_validity',
         value: 'Высокая',
         options: ['Высокая', 'Средняя'],
+      },
+    ],
+    autoCompleteConditions: [
+      {
+        value: 'Высокая',
+        conditions: [
+          {
+            significance_validity: 'Высокая',
+          },
+        ],
       },
     ],
     valueConditions: [
@@ -411,6 +425,9 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
             rating_model: 'Да',
             classification_of_rs_by_order_of_application_within_pvr:
               'Рейтинговые системы, подлежащие согласованию Регулятором',
+          },
+          {
+            significance_validity: 'Высокая',
           },
         ],
       },

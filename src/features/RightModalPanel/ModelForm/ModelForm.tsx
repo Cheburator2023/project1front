@@ -10,7 +10,7 @@ import { RIGHT_PANEL_TYPE, MODEL_FORM_MODE } from '@shared/constants';
 import { INPUT_TYPE, InputFactory, InputValue, RightPanel } from '@shared/ui/organisms';
 import { API_ROUTES, useFetch, ArtifactApi, ModelEditApi } from '@shared/api';
 
-import { groupBy, isEqual, omit, pick } from 'lodash';
+import { groupBy, isEqual, omit, pick, uniqBy } from 'lodash';
 import { Flexbox, Spacer } from '@shared/ui/atoms';
 import { Artifact } from '@shared/api/types';
 
@@ -70,8 +70,8 @@ export const ModelForm = ({
   const [expandedPanel, setExpandPanel] = useState(true);
   const [showAllFields, setShowAllFields] = useState(false);
   const [activeModelByDefault, setActiveModelByDefault] = useState<boolean | undefined>(undefined);
-  const [completesConditionField, setCompletesConditionField] = useState<
-    { connectedName: string; connectedValue: string } | undefined
+  const [completesConditionFields, setCompletesConditionField] = useState<
+    { connectedName: string; connectedValue: string }[] | undefined
   >(undefined);
 
   const errorElemRef = useRef<HTMLDivElement>(null);
@@ -109,10 +109,12 @@ export const ModelForm = ({
     const connectedValues: any = {};
     const connectedValuesToContitions: any = {};
 
+    // TODO: refactor this
     formSchema.map(({ valueConditions, name: connectedName }) => {
-      if (valueConditions?.length === 1) {
-        const conditions = valueConditions[0].conditions;
-        const connectedValue = valueConditions[0].value;
+      valueConditions?.map((valueCondition) => {
+        const conditions = valueCondition.conditions;
+        const connectedValue = valueCondition.value;
+
         conditions?.map((condition) => {
           Object.keys(condition).map((fieldName) => {
             // @ts-ignore
@@ -134,20 +136,58 @@ export const ModelForm = ({
         const completesCondition = isEqual([connectedValuesToContitions], conditions);
 
         if (completesCondition && connectedName !== name) {
-          setCompletesConditionField({ connectedName, connectedValue });
+          setCompletesConditionField(
+            uniqBy(
+              [...(completesConditionFields || []), { connectedName, connectedValue }],
+              'connectedName',
+            ),
+          );
         } else {
-          const fieldToReset = formSchema.find((_field) => {
-            return JSON.stringify(_field.valueConditions?.[0].conditions)?.includes(name);
-          });
+          formSchema.find((_field) => {
+            _field.valueConditions?.map((_valueCondition) => {
+              const isFieldResetable = JSON.stringify(_valueCondition.conditions)?.includes(name);
 
-          setValues((prevValues) => ({
-            ...omit(prevValues, fieldToReset?.name as any),
-          }));
+              if (isFieldResetable) {
+                setValues((prevValues) => ({
+                  ...omit(prevValues, _field?.name as any),
+                }));
+              }
+            });
+          });
 
           setCompletesConditionField(undefined);
         }
-      }
+      });
+
       return false;
+    });
+
+    // TODO: refactor this
+    formSchema.find((_field) => {
+      if (_field.name === name) {
+        const autoCompleteConditions = _field.autoCompleteConditions;
+
+        autoCompleteConditions?.map((autoCompleteCondition) => {
+          // @ts-ignore
+          if (value?.value?.text === autoCompleteCondition.value) {
+            autoCompleteCondition.conditions?.map((condition) => {
+              Object.keys(condition).map((fieldName) => {
+                // setValues((prevValues) => ({ ...prevValues, ...newValues }));
+
+                setCompletesConditionField(
+                  uniqBy(
+                    [
+                      ...(completesConditionFields || []),
+                      { connectedName: fieldName, connectedValue: condition[fieldName] },
+                    ],
+                    'connectedName',
+                  ),
+                );
+              });
+            });
+          }
+        });
+      }
     });
 
     setDirtyFields((prevDirtyFields) => [...prevDirtyFields, name]);
@@ -157,43 +197,46 @@ export const ModelForm = ({
 
   useDeepEffect(() => {
     setTimeout(() => {
-      if (completesConditionField?.connectedName) {
-        let autoCompletedField = {};
+      completesConditionFields?.map((completesConditionField) => {
+        if (completesConditionField?.connectedName) {
+          let autoCompletedField = {};
 
-        const connectedField = fields.find((_field) => {
-          return _field.name === completesConditionField?.connectedName;
-        });
+          const connectedField = fields.find((_field) => {
+            return _field.name === completesConditionField?.connectedName;
+          });
 
-        const artifact = artifacts.find(
-          (_artifact) => _artifact.artefact_tech_label === completesConditionField?.connectedName,
-        );
-        const connectedArtifactOption = artifact?.values?.find(
-          (option) => option.artefact_value === completesConditionField?.connectedValue,
-        );
+          const artifact = artifacts.find(
+            (_artifact) => _artifact.artefact_tech_label === completesConditionField?.connectedName,
+          );
+          const connectedArtifactOption = artifact?.values?.find(
+            (option) => option.artefact_value === completesConditionField?.connectedValue,
+          );
 
-        if (
-          !connectedField?.disabled &&
-          connectedArtifactOption?.artefact_value === completesConditionField?.connectedValue
-        ) {
-          autoCompletedField = {
-            [completesConditionField.connectedName]: {
-              type: connectedField?.type,
-              value: {
-                id: `${connectedArtifactOption?.artefact_value_id}`,
-                text: `${connectedArtifactOption?.artefact_value}`,
+          if (
+            !connectedField?.disabled &&
+            connectedArtifactOption?.artefact_value === completesConditionField?.connectedValue
+          ) {
+            autoCompletedField = {
+              [completesConditionField.connectedName]: {
+                type: connectedField?.type,
+                value: {
+                  id: `${connectedArtifactOption?.artefact_value_id}`,
+                  text: `${connectedArtifactOption?.artefact_value}`,
+                },
               },
-            },
-          };
-          setValues((prevValues) => ({ ...prevValues, ...autoCompletedField }));
+            };
+
+            setValues((prevValues) => ({ ...prevValues, ...autoCompletedField }));
+          }
+          if (connectedField?.disabled) {
+            setValues((prevValues) => ({
+              ...omit(prevValues, completesConditionField?.connectedName),
+            }));
+          }
         }
-        if (connectedField?.disabled) {
-          setValues((prevValues) => ({
-            ...omit(prevValues, completesConditionField?.connectedName),
-          }));
-        }
-      }
+      });
     }, 100);
-  }, [completesConditionField, fields]);
+  }, [completesConditionFields, fields]);
 
   // TODO: Temporary solution to solve the problem of editing allocations in models that do not have all required fields. This is a technical debt that needs to be fixed.
   /**
