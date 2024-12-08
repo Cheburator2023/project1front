@@ -93,7 +93,7 @@ export const BASE_MODEL_SCHEMA: FormFieldsSchema = [
     customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
   },
   {
-    name: 'model_name_validation',
+    name: 'model_name',
     required: false,
     maxLength: 250,
     customers: [CUSTOMER_MAP.DADM],
