@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { ErrorStatus, Loading, Pagination } from '@shared/ui/atoms';
 import { ACTIVE_SCREEN } from '@shared/constants';
@@ -7,6 +7,7 @@ import { ActionsPanel } from '@entities';
 import { FiltersPanel, RightModalPanel, TemplateFilters, TableModels } from '@features';
 import { useTableModels } from './hooks';
 import { CompareModelsWidget } from '../../widgets';
+import { Checkbox, T } from '@admiral-ds/react-ui';
 
 // TODO: вынести в atoms/styled
 const StatusWrapper = styled.div`
@@ -16,8 +17,21 @@ const StatusWrapper = styled.div`
   justify-content: center;
 `;
 
+const Row = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  > *:not(:last-child) {
+    margin-right: 66px;
+  }
+  > * {
+    flex: 0 0 auto;
+  }
+`;
+
 const Home = () => {
   const { display, modelsTable, filters, context } = useTableModels();
+  const [checked, setChecked] = useState<boolean>(false);
 
   if (modelsTable.error) {
     return (
@@ -84,6 +98,17 @@ const Home = () => {
             onChangePage={modelsTable.handleChangePage}
             totalElements={modelsTable.totalRows}
           />
+          <Row>
+            <Checkbox
+              dimension="s"
+              onChange={(e) => {
+                setChecked(e.target.checked);
+              }}
+            />
+            <T font="Body/Body 1 Long" as="div">
+              Default
+            </T>
+          </Row>
         </>
       )}
       {display.activeScreen === ACTIVE_SCREEN.COMPARE && (
