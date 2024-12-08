@@ -538,6 +538,11 @@ export const initialColumns: Array<Column> = [
     type: COLUMN_TYPE.STRING,
   },
   {
+    name: 'model_name',
+    title: 'Название модели в реестре ДАДМ',
+    type: COLUMN_TYPE.STRING,
+  },
+  {
     name: 'ds_stream',
     title: 'Стрим-исполнитель',
     type: COLUMN_TYPE.STRING,
@@ -678,7 +683,6 @@ export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
   model_alias: [],
   model_id: [],
   model_version: [],
-  model_name: [],
   model_name_validation: [],
   model_desc: [],
   model_type: [],
@@ -780,6 +784,7 @@ export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
   start_date_of_application_model_approved_regulator: [],
   model_crs_code: [],
   rfd: [],
+  model_name: [],
   ds_stream: [],
   model_epic_04: [],
   model_epic_04_date: [],
