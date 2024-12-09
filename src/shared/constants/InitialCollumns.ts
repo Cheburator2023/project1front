@@ -664,16 +664,16 @@ export const initialColumns: Array<Column> = [
     sticky: true,
     type: COLUMN_TYPE.ACTION,
   },
-  {
-    name: 'reason_model_delete',
-    title: 'Причина удаления модели',
-    type: COLUMN_TYPE.STRING,
-  },
-  {
-    name: 'status',
-    title: 'Cтатус',
-    type: COLUMN_TYPE.STRING,
-  },
+  // {
+  //   name: 'reason_model_delete',
+  //   title: 'Причина удаления модели',
+  //   type: COLUMN_TYPE.STRING,
+  // },
+  // {
+  //   name: 'status',
+  //   title: 'Cтатус',
+  //   type: COLUMN_TYPE.STRING,
+  // },
 ];
 
 export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
