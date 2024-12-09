@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.29.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.28.0...v1.29.0) (2024-12-09)
+
+
+### Features
+
+* rename artefacts ([4796134](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/47961344a9eb696195af245c193304c14e7154df))
+
 # [1.28.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.27.1...v1.28.0) (2024-12-05)
 
 
