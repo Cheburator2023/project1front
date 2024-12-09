@@ -60,7 +60,7 @@ export const SCHEMA_NAME_MAP: SchemaNameMap = {
 
 export const BASE_MODEL_SCHEMA: FormFieldsSchema = [
   {
-    name: 'model_name',
+    name: 'model_name_validation',
     required: true,
     maxLength: 250,
     customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
@@ -93,7 +93,7 @@ export const BASE_MODEL_SCHEMA: FormFieldsSchema = [
     customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
   },
   {
-    name: 'model_name_dadm',
+    name: 'model_name',
     required: false,
     maxLength: 250,
     customers: [CUSTOMER_MAP.DADM],
@@ -120,7 +120,7 @@ export const BASE_MODEL_SCHEMA: FormFieldsSchema = [
     required: false,
   },
   {
-    name: 'custom_model_type',
+    name: 'model_algorithm',
     customers: [CUSTOMER_MAP.DADM],
     required: false,
   },
@@ -161,7 +161,7 @@ export const BASE_MODEL_SCHEMA: FormFieldsSchema = [
 
 export const ACTIVE_MODEL_SCHEMA: FormFieldsSchema = [
   {
-    name: 'model_name',
+    name: 'model_name_validation',
     required: true,
     maxLength: 250,
     customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
@@ -282,7 +282,7 @@ export const ACTIVE_MODEL_SCHEMA: FormFieldsSchema = [
 
 export const NOT_ACTIVE_MODEL_SCHEMA: FormFieldsSchema = [
   {
-    name: 'remove_date',
+    name: 'rs_model_decommiss_date',
     requireConditions: ['wasPreviouslyActiveModel'],
     customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
   },
