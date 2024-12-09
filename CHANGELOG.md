@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.30.1](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.30.0...v1.30.1) (2024-12-09)
+
+
+### Bug Fixes
+
+* rename artefact ([fca7500](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/fca75003bd4b4cabfceafd1554bde347e5da4c1f))
+
 # [1.30.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.29.0...v1.30.0) (2024-12-09)
 
 
