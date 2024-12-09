@@ -19,10 +19,11 @@ const StatusWrapper = styled.div`
 
 const Row = styled.div`
   display: flex;
+  background: var(--neutral-neutral-05, #f3f4f6);
   flex-direction: row;
   align-items: center;
   > *:not(:last-child) {
-    margin-right: 66px;
+    margin-right: 6px;
   }
   > * {
     flex: 0 0 auto;
@@ -98,17 +99,17 @@ const Home = () => {
             onChangePage={modelsTable.handleChangePage}
             totalElements={modelsTable.totalRows}
           />
-          <Row>
+          {/* <Row>
             <Checkbox
               dimension="s"
               onChange={(e) => {
                 setChecked(e.target.checked);
               }}
             />
-            <T font="Body/Body 1 Long" as="div">
-              Default
+            <T font="Caption/Caption 1" as="div">
+              Не включать модели со статусом ошибка заведения
             </T>
-          </Row>
+          </Row> */}
         </>
       )}
       {display.activeScreen === ACTIVE_SCREEN.COMPARE && (
