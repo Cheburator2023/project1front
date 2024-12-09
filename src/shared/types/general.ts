@@ -154,7 +154,7 @@ type Row = ArtificialRow & {
   model_epic_04_date: string | null;
   model_epic_05: string | null;
   model_epic_05a: string | null;
-  model_epic_05_date: string | null;
+  data_completion_of_stage_05a: string | null;
   solution_to_implement_model: string | null;
   business_status: string | null;
   model_epic_07: string | null;

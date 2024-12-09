@@ -4038,7 +4038,7 @@ const mockedArtifacts: Artifact[] = [
   },
   {
     artefact_id: 2080,
-    artefact_tech_label: 'model_epic_05_date',
+    artefact_tech_label: 'data_completion_of_stage_05a',
     artefact_label: 'Дата завершения разработки пилота',
     artefact_desc: 'Укажите дату завершения разработки пилота',
     artefact_context: null,
