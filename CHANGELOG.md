@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.30.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.29.0...v1.30.0) (2024-12-09)
+
+
+### Features
+
+* delete_model ([95ceec1](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/95ceec13879c44835b97669780865c56772ccb5a))
+
 # [1.29.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.28.0...v1.29.0) (2024-12-09)
 
 
