@@ -7,6 +7,8 @@ import 'ag-grid-enterprise';
 
 import {
   ColDef,
+  FilterChangedEvent,
+  FilterModifiedEvent,
   IDateFilterParams,
   ITooltipParams,
   RowSelectedEvent,
@@ -23,7 +25,7 @@ import { ReactComponent as ShowTableOutline } from '@admiral-ds/icons/build/cate
 import { ReactComponent as DeleteSolid } from '@admiral-ds/icons/build/system/DeleteSolid.svg';
 
 import { Flexbox, Spacer } from '@src/shared/ui/atoms';
-import { TDisplayTableModels, TModelsTable } from '@pages/Home/hooks';
+import { TDisplayTableModels, TFilters, TModelsTable } from '@pages/Home/hooks';
 import { IconButton } from '@shared/ui/molecules';
 import { RIGHT_PANEL_TYPE } from '@shared/constants';
 import { useNavigate } from 'react-router-dom';
@@ -31,11 +33,13 @@ import { InputField } from '@admiral-ds/react-ui';
 import { COLUMN_TYPE } from '@src/shared/types';
 import { useAppInjectStore } from '@src/shared/stores/appInjectStore';
 import { CUSTOMER_MAP } from '@src/shared/constants/customers';
+import { useTableChange } from '@src/features/Tables/hooks';
+import { format } from 'date-fns';
 import { PlaygroundCustomCell } from './PlaygroundCustomCell';
 import { AG_GRID_LOCALE_RU } from './locale/agGridLocale.ru';
 import { ROUTES } from '../../app/Routes';
 import { useDeleteRightModelPanelStore } from '../../shared/stores';
-import { useRoles } from '../../shared/hooks';
+import { useRoles, useTemplateFilters } from '../../shared/hooks';
 import { isInBusinessCustomers, isModelCreator } from '../../shared/helpers';
 
 const toolTipValueGetter = (params: ITooltipParams) =>
@@ -69,13 +73,46 @@ const dateFilterParams: IDateFilterParams = {
 export const PlaygroundTable = ({
   display,
   modelsTable,
+  filters,
 }: {
   display: TDisplayTableModels;
   modelsTable: TModelsTable;
+  filters: TFilters;
 }) => {
+  const { rowList, setPage, page, setTotalRows, pageSize, searchString, columnList } = modelsTable;
+  const {
+    cols,
+    rows,
+    setCols,
+    setRows,
+    // handleSelectionChange,
+    handleResize,
+    handleSort,
+    handleChangeColumnsFilter,
+    handleColumnDragEnd,
+    columnsFilters,
+    onChangeColumnsFilters,
+    onChangeTopFilters,
+    topFilters,
+  } = useTableChange({
+    rowList,
+    setCurrentPage: setPage,
+    page,
+    updateRowsCount: setTotalRows,
+    pageSize,
+    searchString,
+    columnList,
+    templates: filters.templates,
+  });
   const { currentCustomer } = useAppInjectStore();
   const { modelsCount, modelSource, isDeleteButtonEnabled, userMatches, updateDeleteModelState } =
     useDeleteRightModelPanelStore();
+
+  const { shouldResetTemplateOnInitialValueChange } = useTemplateFilters(
+    columnsFilters,
+    filters.templates,
+    topFilters?.templates,
+  );
   const { isAdmin, isValidatorLead } = useRoles();
 
   const navigate = useNavigate();
@@ -183,6 +220,42 @@ export const PlaygroundTable = ({
     }
   };
 
+  const handleFilterChange = (event: FilterChangedEvent): void => {
+    // @ts-ignore
+    const colDef: any = event.api.getColumnFilterModel(event?.columns[0]?.getColDef());
+    // @ts-ignore
+    const isDate = event?.columns[0]?.colDef?.filterType === 'date';
+    // @ts-ignore
+    const colName: string = event?.columns[0]?.colId;
+
+    if (isDate) {
+      const dateFrom = new Date(colDef.dateFrom);
+      const dateTo = new Date(colDef.dateTo || colDef.dateFrom);
+      const toReverse = dateFrom > dateTo;
+
+      if (toReverse) {
+        const dateRange = [format(dateTo, 'yyyy-MM-dd'), format(dateFrom, 'yyyy-MM-dd')];
+        handleChangeColumnsFilter(colName, dateRange);
+      } else {
+        const dateRange = [format(dateFrom, 'yyyy-MM-dd'), format(dateTo, 'yyyy-MM-dd')];
+        handleChangeColumnsFilter(colName, dateRange);
+      }
+    } else {
+      // @ts-ignore
+      const value = colDef?.filterModels[1]?.values;
+      const initialTemplateValue = columnsFilters?.[colName] || [];
+
+      if (value) {
+        const arrayValue = Array.isArray(value) ? value : [value];
+        handleChangeColumnsFilter(colName, arrayValue);
+
+        if (shouldResetTemplateOnInitialValueChange(arrayValue, initialTemplateValue, colName)) {
+          onChangeTopFilters?.({ ...topFilters, templates: [] });
+        }
+      }
+    }
+  };
+
   return (
     <Flexbox height="calc(100vh - 230px)">
       <div style={containerStyle}>
@@ -266,6 +339,7 @@ export const PlaygroundTable = ({
               // hiddenByDefault: true,
             }}
             onSelectionChanged={handleSelectionChange}
+            onFilterChanged={handleFilterChange}
             pagination
             paginationPageSize={100}
             paginationPageSizeSelector={paginationPageSizeSelector}
