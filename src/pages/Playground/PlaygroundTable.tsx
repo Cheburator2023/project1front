@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, { useCallback, useMemo, useRef, useState, StrictMode } from 'react';
+import React, { useCallback, useMemo, useRef, useState, StrictMode, useEffect } from 'react';
 import { AgGridReact, CustomCellRendererProps } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
@@ -41,6 +41,7 @@ import { ROUTES } from '../../app/Routes';
 import { useDeleteRightModelPanelStore } from '../../shared/stores';
 import { useRoles, useTemplateFilters } from '../../shared/hooks';
 import { isInBusinessCustomers, isModelCreator } from '../../shared/helpers';
+import { useDeepEffect } from '../../shared/hooks/useDeepEffect';
 
 const toolTipValueGetter = (params: ITooltipParams) =>
   params.value == null || params.value === '' ? '- Отсутствует -' : params.value;
@@ -117,7 +118,7 @@ export const PlaygroundTable = ({
 
   const navigate = useNavigate();
   const gridRef = useRef<AgGridReact>(null);
-  const rowData = modelsTable.rowList;
+  const rowData = rows;
   const columnDefs = modelsTable.columnList.map((data) => ({
     ...data,
     headerName: data.title,
@@ -255,6 +256,13 @@ export const PlaygroundTable = ({
       }
     }
   };
+
+  useDeepEffect(() => {
+    if (rowList.length) {
+      setRows(rowList);
+      modelsTable.setTotalRows(rowList.length);
+    }
+  }, [rowList, modelsTable.setTotalRows]);
 
   return (
     <Flexbox height="calc(100vh - 230px)">
