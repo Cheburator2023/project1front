@@ -32,7 +32,7 @@ export const DELETE_MODEL_SCHEMA: FormFieldsSchema = [
     alwaysDisabled: true,
   },
   {
-    name: 'model_name',
+    name: 'model_name_validation',
     required: false,
     maxLength: 250,
     customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],

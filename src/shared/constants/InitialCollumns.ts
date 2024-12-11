@@ -32,7 +32,7 @@ export const initialColumns: Array<Column> = [
     type: COLUMN_TYPE.STRING,
   },
   {
-    name: 'model_name',
+    name: 'model_name_validation',
     title: 'Название модели',
     type: COLUMN_TYPE.STRING,
   },
@@ -332,7 +332,7 @@ export const initialColumns: Array<Column> = [
     type: COLUMN_TYPE.STRING,
   },
   {
-    name: 'remove_date',
+    name: 'rs_model_decommiss_date',
     title: 'Дата выведения РС / Модели из эксплуатации',
     type: COLUMN_TYPE.DATE,
   },
@@ -538,7 +538,7 @@ export const initialColumns: Array<Column> = [
     type: COLUMN_TYPE.STRING,
   },
   {
-    name: 'model_name_dadm',
+    name: 'model_name',
     title: 'Название модели в реестре ДАДМ',
     type: COLUMN_TYPE.STRING,
   },
@@ -588,12 +588,12 @@ export const initialColumns: Array<Column> = [
     type: COLUMN_TYPE.DATE,
   },
   {
-    name: 'custom_model_id',
+    name: 'customer_model_id',
     title: 'CustomModelId',
     type: COLUMN_TYPE.STRING,
   },
   {
-    name: 'custom_model_type',
+    name: 'model_algorithm',
     title: 'ModelType',
     type: COLUMN_TYPE.STRING,
   },
@@ -664,16 +664,16 @@ export const initialColumns: Array<Column> = [
     sticky: true,
     type: COLUMN_TYPE.ACTION,
   },
-  {
-    name: 'reason_model_delete',
-    title: 'Причина удаления модели',
-    type: COLUMN_TYPE.STRING,
-  },
-  {
-    name: 'status',
-    title: 'Cтатус',
-    type: COLUMN_TYPE.STRING,
-  },
+  // {
+  //   name: 'reason_model_delete',
+  //   title: 'Причина удаления модели',
+  //   type: COLUMN_TYPE.STRING,
+  // },
+  // {
+  //   name: 'status',
+  //   title: 'Cтатус',
+  //   type: COLUMN_TYPE.STRING,
+  // },
 ];
 
 export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
@@ -683,7 +683,7 @@ export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
   model_alias: [],
   model_id: [],
   model_version: [],
-  model_name: [],
+  model_name_validation: [],
   model_desc: [],
   model_type: [],
   model_risk_type: [],
@@ -744,7 +744,7 @@ export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
   validity_approve: [],
   validity_approve_date: [],
   bank_document: [],
-  remove_date: [],
+  rs_model_decommiss_date: [],
   remove_decision: [],
   assignment_contractor: [],
   developing_start_date: [],
@@ -784,7 +784,7 @@ export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
   start_date_of_application_model_approved_regulator: [],
   model_crs_code: [],
   rfd: [],
-  model_name_dadm: [],
+  model_name: [],
   ds_stream: [],
   model_epic_04: [],
   model_epic_04_date: [],
@@ -794,8 +794,8 @@ export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
   solution_to_implement_model: [],
   model_epic_07: [],
   model_epic_07_date: [],
-  custom_model_id: [],
-  custom_model_type: [],
+  customer_model_id: [],
+  model_algorithm: [],
   release: [],
   model_epic_09: [],
   model_epic_11: [],
