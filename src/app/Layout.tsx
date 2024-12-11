@@ -70,8 +70,10 @@ const Layout = ({ children, user, protectedFetch, goToSum, onLogout }: LayoutPro
 
     if (user && (Array.isArray(user?.roles) || Array.isArray(user?.realm_access?.roles))) {
       if (
-        user?.roles?.toString().includes('validat') ||
-        user?.realm_access.roles?.toString().includes('validat')
+        user?.groups?.toString().includes('validator') ||
+        user?.groups?.toString().includes('ds_validator') ||
+        user?.groups?.toString().includes('validator_lead') ||
+        user?.groups?.toString().includes('Validator_lead')
       ) {
         setCurrentCustomer(CUSTOMER_MAP.UMRV);
       }
