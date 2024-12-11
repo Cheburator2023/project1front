@@ -129,6 +129,7 @@ type CommonInputProps<T extends string> = {
   requireConditions?: FormFieldConditions | string[]; // TODO: fix imports (not allow FSD import rules)
   valueConditions?: FormFieldValueConditions; // TODO: fix imports (not allow FSD import rules)
   optionConditions?: OptionConditionsType[];
+  addNewOptionEnabled?: boolean;
   autoCompleteConditions?: FormFieldValueConditions;
   disabledConditions?: FormFieldConditions | string[];
   enabledByValueConditions?: FormFieldValueConditions;
