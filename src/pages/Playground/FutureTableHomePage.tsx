@@ -65,7 +65,7 @@ export const FutureTableHomePage = () => {
             updateActiveScreen={display.setActiveScreen}
             updateRightPanelType={display.setRightPanelType}
           />
-          <PlaygroundTable display={display} modelsTable={modelsTable} />
+          <PlaygroundTable display={display} modelsTable={modelsTable} filters={filters} />
         </>
       )}
       {display.activeScreen === ACTIVE_SCREEN.COMPARE && (

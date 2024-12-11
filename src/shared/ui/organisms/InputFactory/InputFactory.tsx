@@ -50,6 +50,7 @@ function InputFactorySwitcher<T extends string>({
     type,
     name,
     label,
+    addNewOptionEnabled,
     placeholder = 'Введите значение',
     id,
     requireConditions,
@@ -59,6 +60,7 @@ function InputFactorySwitcher<T extends string>({
   } = inputFactory;
 
   const value = values?.[name];
+
   const autoFocus = editFieldName === name;
 
   const valueConditionsText = valueConditions
@@ -237,18 +239,24 @@ function InputFactorySwitcher<T extends string>({
           displayClearIcon
           required={required}
           label={label}
+          addNewOptionEnabled={addNewOptionEnabled}
           options={_options}
           selectAllEnabled={!isTree}
           selectType={type}
           selectedValues={formattedValue}
-          onChange={(_, selectedValue) =>
-            onChange?.(name, {
+          onChange={(_, selectedValue) => {
+            const _value = isTree
+              ? getSelectValues(selectedValue, _options.options)
+              : getSelectValues(selectedValue, _options.options)[0] || {
+                  id: selectedValue[0],
+                  text: selectedValue[0],
+                };
+
+            return onChange?.(name, {
               type,
-              value: isTree
-                ? getSelectValues(selectedValue, _options.options)
-                : getSelectValues(selectedValue, _options.options)[0],
-            })
-          }
+              value: selectedValue === undefined ? undefined : _value,
+            });
+          }}
         />
       );
     }

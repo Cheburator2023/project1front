@@ -13,13 +13,13 @@ interface UseActiveFormSchemaProps {
 }
 
 const getDeleteModelSchema = () => {
-  let formSchema = markSchema(DELETE_MODEL_SCHEMA, SCHEMA_NAME_MAP.DELETE_MODEL_SCHEMA);
+  const formSchema = markSchema(DELETE_MODEL_SCHEMA, SCHEMA_NAME_MAP.DELETE_MODEL_SCHEMA);
 
   return formSchema;
 };
 
 const getDeleteConfirmModelSchema = () => {
-  let formSchema = markSchema(
+  const formSchema = markSchema(
     DELETE_CONFIRM_MODEL_SCHEMA,
     SCHEMA_NAME_MAP.DELETE_CONFIRM_MODEL_SCHEMA,
   );

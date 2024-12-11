@@ -30,6 +30,14 @@ module.exports = merge(common, {
     historyApiFallback: { disableDotRule: true },
     hot: true,
     allowedHosts: ['all'],
+    client: {
+      overlay: {
+        runtimeErrors: (error) => {
+          const ignoreErrors = ['ResizeObserver loop completed with undelivered notifications.'];
+          return !ignoreErrors.includes(error.message);
+        },
+      },
+    },
   },
 });
 

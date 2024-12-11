@@ -279,7 +279,7 @@ export const useTableModels = () => {
     [rowList],
   );
 
-  const handleSubmit = useCallback((newRow: Row, formMode: MODEL_FORM_MODE) => {
+  const handleSubmit = useCallback((newRow: any, formMode: MODEL_FORM_MODE) => {
     const newRowWithId = { ...newRow, id: newRow.system_model_id, hover: true };
     if (
       formMode === MODEL_FORM_MODE.EDIT ||

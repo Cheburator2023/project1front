@@ -6,11 +6,11 @@ import Keycloak from 'keycloak-js';
 import { FetchContext, DownloadReportContext } from '@shared/api';
 import { ColumnsFilter, Role } from '@shared/types';
 
+import { useUserStore, useAppInjectStore } from '@src/shared/stores';
 import { Header } from './Header';
 import { themes } from './theme/theme';
-import { useAppInjectStore } from '../shared/stores';
+
 import { CUSTOMER_MAP } from '../shared/constants/customers';
-import { useUserStore } from '@src/shared/stores';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -70,8 +70,10 @@ const Layout = ({ children, user, protectedFetch, goToSum, onLogout }: LayoutPro
 
     if (user && (Array.isArray(user?.roles) || Array.isArray(user?.realm_access?.roles))) {
       if (
-        user?.roles?.toString().includes('validat') ||
-        user?.realm_access.roles?.toString().includes('validat')
+        user?.groups?.toString().includes('validator') ||
+        user?.groups?.toString().includes('ds_validator') ||
+        user?.groups?.toString().includes('validator_lead') ||
+        user?.groups?.toString().includes('Validator_lead')
       ) {
         setCurrentCustomer(CUSTOMER_MAP.UMRV);
       }

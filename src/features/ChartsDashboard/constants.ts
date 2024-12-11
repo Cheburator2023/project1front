@@ -435,7 +435,9 @@ const initialChartPilots = () => ({
   ] as Highcharts.SeriesBarOptions[],
 });
 
-const initialChartDistributionByLifecycleStageModels = () => ({
+const initialChartDistributionByLifecycleStageModels = (): Highcharts.Options & {
+  chart: { plotBorderRadius: number };
+} => ({
   chart: {
     height: 185,
     marginTop: 20,
@@ -458,7 +460,7 @@ const initialChartDistributionByLifecycleStageModels = () => ({
     verticalAlign: 'top' as Highcharts.VerticalAlignValue,
     layout: 'vertical' as Highcharts.OptionsLayoutValue,
     itemStyle: {
-      width: '100px',
+      width: 100,
       overflow: 'hidden',
       textOverflow: 'ellipsis',
       whiteSpace: 'nowrap',

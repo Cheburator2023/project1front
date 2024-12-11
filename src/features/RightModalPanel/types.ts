@@ -16,6 +16,7 @@ type FormFieldsSchema = Array<{
   order?: number;
   requireConditions?: FormFieldConditions | string[];
   optionConditions?: OptionConditionsType[];
+  autoCompleteConditions?: FormFieldValueConditions;
   valueConditions?: FormFieldValueConditions;
   disabledConditions?: FormFieldConditions | string[];
   enabledByValueConditions?: FormFieldValueConditions;

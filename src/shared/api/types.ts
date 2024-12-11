@@ -184,6 +184,7 @@ export type Artifact = {
   is_main_info_flg?: ArtifactFlag;
   is_multi_fill_flg?: ArtifactFlag;
   artefact_type_desc: ArtifactTypeUnion;
+  can_add_new_option?: ArtifactFlag;
   values: Array<ArtifactValue>;
   start_date_depend_artefact?: keyof Row;
   group?: ArtifactGroupUnion;

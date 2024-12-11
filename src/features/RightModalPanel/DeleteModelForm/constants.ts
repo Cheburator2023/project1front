@@ -1,6 +1,6 @@
 import { CUSTOMER_MAP } from '@src/shared/constants/customers';
-import { FormFieldsSchema } from '../types';
 import { Role } from '@src/shared/types';
+import { FormFieldsSchema } from '../types';
 
 type SchemaNameMap = {
   [key: string]: {

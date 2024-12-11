@@ -121,9 +121,7 @@ const mockedArtifacts: Artifact[] = [
     artefact_type_desc: 'text',
     values: [],
   },
-
-  ///////
-
+  ///
   {
     artefact_id: 2112,
     artefact_tech_label: 'date_of_introduction_into_operation',
@@ -2088,6 +2086,7 @@ const mockedArtifacts: Artifact[] = [
     is_active_flg: '1',
     artefact_parent_value_id: null,
     artefact_type_desc: 'dropdown',
+    can_add_new_option: '1',
     values: [
       {
         artefact_id: 2032,
