@@ -1,5 +1,23 @@
 # Semantic Versioning Changelog
 
+# [1.31.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.30.1...v1.31.0) (2024-12-12)
+
+
+### Bug Fixes
+
+* addNewOptionEnabled logic added to search select, new artifact prop can_add_new_option ([105d816](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/105d816d214b82e00176ca26867d6bab7a3ea14d))
+* autocomplete fixes ([440a8b5](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/440a8b5865780a75e14ab60e869942c66f8d226e))
+* rows fix for new table ([3c95e60](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/3c95e6067a56a1e78a333c0ccc48669c5ad5a6f5))
+* streams dashboards ([cd1d7af](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/cd1d7aff520ce61e90bad833766cee6e6fc89e83))
+* validator umrv groups user detect fix ([c798fbf](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/c798fbfc77b0fddf7e2bdc1fe5d7c89ee5f92be5))
+
+
+### Features
+
+* new table delete model form feat added / removed unnecessary field from rest section ([3c29f42](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/3c29f42ed722a09ef9e3c2a4da18628c98fc9c70))
+* up proj version ([732e5af](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/732e5af1bc2216b41f40773ce41e6609a7f5fd7f))
+* useTemplateFilters connected to new table filters ([c9e7ef1](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/c9e7ef1b79ba2e33ccfe7d3331cc1dca4e9900fb))
+
 ## [1.30.1](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.30.0...v1.30.1) (2024-12-09)
 
 
