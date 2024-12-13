@@ -653,6 +653,11 @@ export const initialColumns: Array<Column> = [
     type: COLUMN_TYPE.STRING,
   },
   {
+    name: 'create_date',
+    title: 'Дата создания',
+    type: COLUMN_TYPE.DATE,
+  },
+  {
     name: 'model_source',
     title: 'Система источник данных',
     type: COLUMN_TYPE.STRING,
