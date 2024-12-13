@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.32.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.31.0...v1.32.0) (2024-12-13)
+
+
+### Features
+
+* add create_date ([425d4cf](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/425d4cf265ac9eefc55a7dc3277462e9c4d3f766))
+
 # [1.31.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.30.1...v1.31.0) (2024-12-12)
 
 
