@@ -71,13 +71,13 @@ export const ActionsPanel = ({ updateRightPanelType, handleSearch }: ActionsPane
           color="#0062FF"
           onClick={() => updateRightPanelType(RIGHT_PANEL_TYPE.ADD_MODEL)}
         />
-        {/* <IconButton
+        <IconButton
           icon={<DeleteSolid />}
           tooltip={deleteTooltipMessage}
           color="#0062FF"
           onClick={() => updateRightPanelType(RIGHT_PANEL_TYPE.DELETE_MODEL)}
           disabled={!isDeleteButtonEnabled}
-        /> */}
+        />
 
         <IconButton
           icon={<BrokerOutlineIcon />}

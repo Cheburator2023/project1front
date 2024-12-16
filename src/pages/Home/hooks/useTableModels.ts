@@ -25,6 +25,7 @@ import {
   getISODateFormat,
 } from '@shared/helpers';
 import { ArtifactApi, CustomError } from '@src/shared/api/types';
+import { useDeleteRightModelPanelStore } from '@src/shared/stores';
 
 export type TDisplayTableModels = {
   activeScreen: ACTIVE_SCREEN;
@@ -153,15 +154,23 @@ export const useTableModels = () => {
   };
 
   const fetchModels = useCallback(async (date?: string) => {
+    const { excludeError } = useDeleteRightModelPanelStore();
     setLoadingModels(true);
 
     try {
-      // TODO: fix types
+      const params: Record<string, any> = {};
+
+      if (date) {
+        params.date = getISODateFormat(date);
+      }
+
+      params.excludeError = excludeError.toString();
+
       const res: any = await mutationProtectedFetch<ModelsResponseType, ModelsResponseType>({
         fetchApiRoute: API_ROUTES.MODELS,
         fetchMethod: 'GET',
         mockedResponse: mockedModelsResponse,
-        newParams: date ? { date: getISODateFormat(date) } : {},
+        newParams: params,
       });
 
       if (res && !res?.error) {
@@ -174,6 +183,7 @@ export const useTableModels = () => {
       setLoadingModels(false);
     } catch {
       setErrorModels('Ошибка загрузки моделей');
+      setLoadingModels(false);
     }
   }, []);
 
