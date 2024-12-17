@@ -1,8 +1,8 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import { useDeleteRightModelPanelStore } from '@src/shared/stores';
 import { Checkbox, PaginationOne, T } from '@admiral-ds/react-ui';
+import { useExcludeErrorStore } from '@src/shared/stores/excludeErrorStore';
 
 export interface PaginationProps {
   page: number;
@@ -43,7 +43,7 @@ export const Pagination = ({
   pageSizes = [10, 20, 50, 100, 200],
   onChangePage,
 }: PaginationProps) => {
-  const { excludeError, updateExcludeError } = useDeleteRightModelPanelStore();
+  const { excludeError, updateExcludeError } = useExcludeErrorStore();
 
   return (
     <Container>

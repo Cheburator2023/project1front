@@ -11,9 +11,7 @@ export type DeleteRightModelPanelStoreState = {
   activeRowId: string | null;
   userMatches: boolean;
   formMode: MODEL_FORM_MODE.DELETE | MODEL_FORM_MODE.DELETE_CONFIRM;
-  excludeError: boolean;
   setFormMode: (mode: MODEL_FORM_MODE.DELETE | MODEL_FORM_MODE.DELETE_CONFIRM) => void;
-  updateExcludeError: (value: boolean) => void;
   updateDeleteModelState: (
     count: number,
     source?: string | null,
@@ -31,10 +29,8 @@ export const useDeleteRightModelPanelStore = create<DeleteRightModelPanelStoreSt
   activeRowId: null,
   userMatches: false,
   formMode: MODEL_FORM_MODE.DELETE,
-  excludeError: false,
   setFormMode: (mode: MODEL_FORM_MODE.DELETE | MODEL_FORM_MODE.DELETE_CONFIRM) =>
     set({ formMode: mode }),
-  updateExcludeError: (value: boolean) => set({ excludeError: value }),
   updateDeleteModelState: (
     count: number,
     source?: string | null,

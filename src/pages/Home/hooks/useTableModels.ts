@@ -25,7 +25,7 @@ import {
   getISODateFormat,
 } from '@shared/helpers';
 import { ArtifactApi, CustomError } from '@src/shared/api/types';
-import { useDeleteRightModelPanelStore } from '@src/shared/stores';
+import { useExcludeErrorStore } from '@src/shared/stores/excludeErrorStore';
 
 export type TDisplayTableModels = {
   activeScreen: ACTIVE_SCREEN;
@@ -137,6 +137,8 @@ export const useTableModels = () => {
   const [loadingModels, setLoadingModels] = useState(true);
   const [errorModels, setErrorModels] = useState<string>('');
 
+  const { excludeError } = useExcludeErrorStore();
+
   const { responseData: templateData, mutationProtectedFetch } = useFetch<Template[]>({
     apiRoute: API_ROUTES.TEMPLATES,
     mockedResponse: mockedTemplatesResponse,
@@ -153,39 +155,41 @@ export const useTableModels = () => {
     setTotalRows(formattedRows.length);
   };
 
-  const fetchModels = useCallback(async (date?: string) => {
-    const { excludeError } = useDeleteRightModelPanelStore();
-    setLoadingModels(true);
+  const fetchModels = useCallback(
+    async (date?: string) => {
+      setLoadingModels(true);
 
-    try {
-      const params: Record<string, any> = {};
+      try {
+        const params: Record<string, any> = {};
 
-      if (date) {
-        params.date = getISODateFormat(date);
+        if (date) {
+          params.date = getISODateFormat(date);
+        }
+
+        params.excludeError = excludeError.toString();
+
+        const res: any = await mutationProtectedFetch<ModelsResponseType, ModelsResponseType>({
+          fetchApiRoute: API_ROUTES.MODELS,
+          fetchMethod: 'GET',
+          mockedResponse: mockedModelsResponse,
+          newParams: params,
+        });
+
+        if (res && !res?.error) {
+          updateRows(res.data);
+          setErrorModels('');
+        } else if (res) {
+          setErrorModels(res.data.message);
+        }
+
+        setLoadingModels(false);
+      } catch {
+        setErrorModels('Ошибка загрузки моделей');
+        setLoadingModels(false);
       }
-
-      params.excludeError = excludeError.toString();
-
-      const res: any = await mutationProtectedFetch<ModelsResponseType, ModelsResponseType>({
-        fetchApiRoute: API_ROUTES.MODELS,
-        fetchMethod: 'GET',
-        mockedResponse: mockedModelsResponse,
-        newParams: params,
-      });
-
-      if (res && !res?.error) {
-        updateRows(res.data);
-        setErrorModels('');
-      } else if (res) {
-        setErrorModels(res.data.message);
-      }
-
-      setLoadingModels(false);
-    } catch {
-      setErrorModels('Ошибка загрузки моделей');
-      setLoadingModels(false);
-    }
-  }, []);
+    },
+    [excludeError],
+  );
 
   // Initial models loading
   useEffect(() => {

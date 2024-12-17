@@ -115,18 +115,18 @@ export const DeleteModelForm = ({
   onClose,
 }: DeleteModelFormProps) => {
   const { mutationProtectedFetch } = useFetch({});
-  const { setCurrentCustomer, currentCustomer } = useAppInjectStore();
+  const { currentCustomer } = useAppInjectStore();
 
   const [values, setValues] = useState<FormValues | undefined>();
   const [invalidFields, setInvalidFields] = useState<Array<keyof Row>>([]);
   const [dirtyFields, setDirtyFields] = useState<Array<keyof Row>>([]);
   const [parentModelId, setParentModelId] = useState<string>();
-  const [selectedColSize, setSelectedColSize] = useState<string>('2');
+  const [selectedColSize] = useState<string>('2');
   const [submitLoading, setSubmitLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string>();
-  const [initialRow, setInitialRow] = useState(activeRow);
+  const [initialRow] = useState(activeRow);
   const [expandedPanel, setExpandPanel] = useState(false);
-  const [showAllFields, setShowAllFields] = useState(false);
+  const [showAllFields] = useState(false);
   const [activeModelByDefault, setActiveModelByDefault] = useState<boolean | undefined>(undefined);
   const [activeTab, setActiveTab] = useState<string>('1');
   const { formMode, setFormMode } = useDeleteRightModelPanelStore();
