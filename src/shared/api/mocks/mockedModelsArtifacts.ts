@@ -2974,7 +2974,7 @@ const mockedArtifacts: Artifact[] = [
   },
   {
     artefact_id: 2045,
-    artefact_tech_label: 'analize_text_about_developing',
+    artefact_tech_label: 'developing_report',
     artefact_label: 'Отчет по разработке',
     artefact_desc:
       'Шаблоны <a href=""/template/Шаблон_Отчет_о_разработке_модели.docx"" target=""_blank"">Шаблон_Отчет о разработке модели.docx</a> <a href=""/template/Шаблон_Аналитическая_записка_о_разработке_модели.docx"" target=""_blank"">Шаблон_Аналитическая записка о разработке модели.docx</a>',

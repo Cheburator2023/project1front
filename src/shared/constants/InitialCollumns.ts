@@ -367,7 +367,7 @@ export const initialColumns: Array<Column> = [
     type: COLUMN_TYPE.STRING,
   },
   {
-    name: 'analize_text_about_developing',
+    name: 'developing_report',
     title: 'Отчет по разработке',
     type: COLUMN_TYPE.STRING,
   },
@@ -756,7 +756,7 @@ export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
   data_source_description: [],
   target: [],
   calibration_method: [],
-  analize_text_about_developing: [],
+  developing_report: [],
   name_and_version_rating_system: [],
   version_it_implementation: [],
   responsible_subdivision_and_project_lead_for_it_implementation: [],

@@ -117,7 +117,7 @@ type Row = ArtificialRow & {
   data_source_description: string | null;
   target: string | null;
   calibration_method: string | null;
-  analize_text_about_developing: string | null;
+  developing_report: string | null;
   name_and_version_rating_system: string | null;
   version_it_implementation: string | null;
   responsible_subdivision_and_project_lead_for_it_implementation: string | null;
