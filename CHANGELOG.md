@@ -1,5 +1,18 @@
 # Semantic Versioning Changelog
 
+# [1.33.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.32.0...v1.33.0) (2024-12-24)
+
+
+### Bug Fixes
+
+* rename artefact analize_text_about_developing ([24a94c5](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/24a94c59b648beeaaf8f2ae6b72d500f638161f0))
+
+
+### Features
+
+* delete model ([afbdbfa](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/afbdbfac5d5218ce708f9f298a76bb9b27c12503))
+* delete model ([bf43012](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/bf430125af033335c94f0b0e279e142a4bebf743))
+
 # [1.32.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.31.0...v1.32.0) (2024-12-13)
 
 
