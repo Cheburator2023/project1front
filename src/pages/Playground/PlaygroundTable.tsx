@@ -80,7 +80,9 @@ export const PlaygroundTable = ({
   modelsTable: TModelsTable;
   filters: TFilters;
 }) => {
-  const { rowList, setPage, page, setTotalRows, pageSize, searchString, columnList } = modelsTable;
+  const { rowList, setPage, page, setTotalRows, pageSize, searchString, columnList } =
+    modelsTable;
+
   const {
     cols,
     rows,
@@ -349,7 +351,7 @@ export const PlaygroundTable = ({
             onSelectionChanged={handleSelectionChange}
             onFilterChanged={handleFilterChange}
             pagination
-            paginationPageSize={100}
+            paginationPageSize={pageSize}
             paginationPageSizeSelector={paginationPageSizeSelector}
             singleClickEdit
             localeText={AG_GRID_LOCALE_RU}
@@ -360,4 +362,3 @@ export const PlaygroundTable = ({
     </Flexbox>
   );
 };
-

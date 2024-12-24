@@ -24,7 +24,7 @@ export const TableModels = React.memo(
   }: TableModelsProps) => {
     const {
       cols,
-      rows,
+      pageRows,
       setCols,
       setRows,
       handleSelectionChange,
@@ -112,7 +112,7 @@ export const TableModels = React.memo(
         displayRowSelectionColumn
         greyHeader
         headerLineClamp={1}
-        rowList={rows as Array<Partial<Row> & { id: string }>} // fix types
+        rowList={pageRows as Array<Partial<Row> & { id: string }>} // fix types
         columnList={cols}
         virtualScroll={{ fixedRowHeight: 40 }}
         style={{ height: 'calc(100vh - 245px)' }}
