@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.33.1](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.33.0...v1.33.1) (2024-12-24)
+
+
+### Bug Fixes
+
+* rows new table ([5469a57](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/5469a57beb7154e53026ecdfef9e6fd54631224f))
+
 # [1.33.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.32.0...v1.33.0) (2024-12-24)
 
 
