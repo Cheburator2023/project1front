@@ -42,6 +42,7 @@ import { useDeleteRightModelPanelStore } from '../../shared/stores';
 import { useRoles, useTemplateFilters } from '../../shared/hooks';
 import { isInBusinessCustomers, isModelCreator } from '../../shared/helpers';
 import { useDeepEffect } from '../../shared/hooks/useDeepEffect';
+import { Template } from '@src/shared/api/types';
 
 const toolTipValueGetter = (params: ITooltipParams) =>
   params.value == null || params.value === '' ? '- Отсутствует -' : params.value;
@@ -75,10 +76,12 @@ export const PlaygroundTable = ({
   display,
   modelsTable,
   filters,
+  templates,
 }: {
   display: TDisplayTableModels;
   modelsTable: TModelsTable;
   filters: TFilters;
+  templates: Template[];
 }) => {
   const { rowList, setPage, page, setTotalRows, pageSize, searchString, columnList } =
     modelsTable;
@@ -264,7 +267,7 @@ export const PlaygroundTable = ({
       setRows(rowList);
       modelsTable.setTotalRows(rowList.length);
     }
-  }, [rowList, modelsTable.setTotalRows]);
+  }, [rowList, modelsTable.setTotalRows, templates]);
 
   return (
     <Flexbox height="calc(100vh - 230px)">
