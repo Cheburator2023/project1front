@@ -141,20 +141,20 @@ const getColumnFilterOptions = (
   rowList.reduce(
     (columnValues, row) => {
       const columnValue = row[columnName];
-      const activeColumnFilters = columnsFilters?.[columnName];
+      // const activeColumnFilters = columnsFilters?.[columnName];
 
       if (columnValue) {
         // Check for unique value
         const isUniqueValue = !columnValues.find((item) => item.value === columnValue);
 
-        const isVisibleValue = getColumnFilterOptionVisibilityStatus(
-          columnValue,
-          row.id,
-          filteredRowsIds,
-          activeColumnFilters,
-        );
+        // const isVisibleValue = getColumnFilterOptionVisibilityStatus(
+        //   columnValue,
+        //   row.id,
+        //   filteredRowsIds,
+        //   activeColumnFilters,
+        // );
 
-        if (!isUniqueValue || !isVisibleValue) {
+        if (!isUniqueValue) {
           return columnValues;
         }
 
