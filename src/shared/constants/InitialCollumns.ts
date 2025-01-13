@@ -828,4 +828,9 @@ export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
   model_creator: [],
   reason_model_delete: [],
   status: [],
+  remove_date: [],
+  analize_text_about_developing: [],
+  model_name_dadm: [],
+  custom_model_id: [],
+  custom_model_type: [],
 };
