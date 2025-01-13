@@ -685,6 +685,16 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
     required: false,
     maxLength: 250,
   },
+  {
+    name: 'developing_start_date',
+    required: false,
+    maxLength: 250,
+  },
+  {
+    name: 'developing_end_date',
+    required: false,
+    maxLength: 250,
+  },
 ];
 
 export const RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA: FormFieldsSchema = [
