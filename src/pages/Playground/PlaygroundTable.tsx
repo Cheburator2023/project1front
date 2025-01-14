@@ -35,6 +35,7 @@ import { useAppInjectStore } from '@src/shared/stores/appInjectStore';
 import { CUSTOMER_MAP } from '@src/shared/constants/customers';
 import { useTableChange } from '@src/features/Tables/hooks';
 import { format } from 'date-fns';
+import { Template } from '@src/shared/api/types';
 import { PlaygroundCustomCell } from './PlaygroundCustomCell';
 import { AG_GRID_LOCALE_RU } from './locale/agGridLocale.ru';
 import { ROUTES } from '../../app/Routes';
@@ -42,7 +43,6 @@ import { useDeleteRightModelPanelStore } from '../../shared/stores';
 import { useRoles, useTemplateFilters } from '../../shared/hooks';
 import { isInBusinessCustomers, isModelCreator } from '../../shared/helpers';
 import { useDeepEffect } from '../../shared/hooks/useDeepEffect';
-import { Template } from '@src/shared/api/types';
 
 const toolTipValueGetter = (params: ITooltipParams) =>
   params.value == null || params.value === '' ? '- Отсутствует -' : params.value;
@@ -83,8 +83,7 @@ export const PlaygroundTable = ({
   filters: TFilters;
   templates: Template[];
 }) => {
-  const { rowList, setPage, page, setTotalRows, pageSize, searchString, columnList } =
-    modelsTable;
+  const { rowList, setPage, page, setTotalRows, pageSize, searchString, columnList } = modelsTable;
 
   const {
     cols,
@@ -128,6 +127,7 @@ export const PlaygroundTable = ({
     ...data,
     headerName: data.title,
     field: data.name,
+    headerTooltip: data.title,
     // https://www.ag-grid.com/react-data-grid/filter-date/#custom-selection-component
     filter:
       data.type === COLUMN_TYPE.DATE
@@ -144,7 +144,7 @@ export const PlaygroundTable = ({
       filter: 'agMultiColumnFilter',
       floatingFilter: true,
       initialWidth: 400,
-      minWidth: 200,
+      minWidth: 250,
       maxWidth: 1350,
       suppressHeaderMenuButton: false,
       suppressHeaderContextMenu: false,
@@ -157,8 +157,8 @@ export const PlaygroundTable = ({
       flex: 2,
       sortable: true,
       resizable: true,
-      wrapHeaderText: true,
-      autoHeaderHeight: true,
+      wrapHeaderText: false,
+      autoHeaderHeight: false,
       // valueGetter: (params: ValueGetterParams) => {
       //   return `(${params.getValue})`;
       // },
@@ -359,9 +359,11 @@ export const PlaygroundTable = ({
             singleClickEdit
             localeText={AG_GRID_LOCALE_RU}
             alwaysShowHorizontalScroll
+            tooltipShowDelay={500}
           />
         </div>
       </div>
     </Flexbox>
   );
 };
+

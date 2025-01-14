@@ -115,22 +115,24 @@ export const PlaygroundCustomCell = (params: PlaygroundCustomCellParams) => {
       <Wrapper ref={wrapperRef}>
         {value}
         <div className="actionButtons">
-          <ActionBtn
-            name="historyChanges"
-            dimension="s"
-            color="#0062FF"
-            icon={<CalendarUpdateOutline />}
-            tooltip="История изменений"
-            onClick={handleActionClick}
-          />
-          <ActionBtn
-            name="edit"
-            dimension="s"
-            color="#0062FF"
-            icon={<EditOutline />}
-            tooltip="Редактировать"
-            onClick={handleActionClick}
-          />
+          <div>
+            <ActionBtn
+              name="historyChanges"
+              dimension="s"
+              color="#0062FF"
+              icon={<CalendarUpdateOutline />}
+              tooltip="История изменений"
+              onClick={handleActionClick}
+            />
+            <ActionBtn
+              name="edit"
+              dimension="s"
+              color="#0062FF"
+              icon={<EditOutline />}
+              tooltip="Редактировать"
+              onClick={handleActionClick}
+            />
+          </div>
         </div>
       </Wrapper>
       <Tooltip targetRef={wrapperRef} title={params.value} />
@@ -162,9 +164,5 @@ const ActionBtn = styled(IconButton)`
   border-radius: 100%;
 
   cursor: pointer;
-
-  &:hover > div {
-    width: 16px;
-  }
 `;
 

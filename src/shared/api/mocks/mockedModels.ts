@@ -26487,7 +26487,7 @@ const mockedModels: Array<Partial<Row>> = [
     model_source: 'sum-rm',
     model_status: 'Разработана, не внедрена',
     business_status: 'Модель внедряется вне ПИМ;Разработана, не внедрена',
-    reason_model_delete: 'Модель заведена ошибочно'
+    reason_model_delete: 'Модель заведена ошибочно',
   },
   {
     system_model_id: '000e48cb-d1ce-4f46-a6a5-82443c91b7a8',
