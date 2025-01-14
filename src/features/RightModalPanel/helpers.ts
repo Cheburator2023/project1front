@@ -361,7 +361,7 @@ export const getStartDateInCurrentYear = (startDate: Date) => {
 const ENABLE_FEBRUARY_EXTENSION = true; // Можно переключать на false при необходимости
 
 const getDateLimits = (quarter: number) => {
-  const currentDate = new Date('2025-02-01');
+  const currentDate = new Date();
   const currentYear = currentDate.getFullYear();
 
   // Если запрашиваемый квартал — 4 и текущий квартал — 1, использовать прошлый год
@@ -385,7 +385,7 @@ const getDateLimits = (quarter: number) => {
 };
 
 const getDisabledStatus = (minDate: Date, maxDate: Date, quarter: number) => {
-  const currentDate = new Date('2025-02-01');
+  const currentDate = new Date();
   const currentQuarter = Math.floor((currentDate.getMonth() + 3) / 3);
 
   const startOfCurrentQuarter = new Date(currentDate.getFullYear(), (currentQuarter - 1) * 3, 1);
