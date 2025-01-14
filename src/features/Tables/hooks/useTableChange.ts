@@ -91,7 +91,7 @@ export const useTableChange = ({
       updateDeleteModelState(selectedRows.length);
     }
 
-    setRows(rowsWithUpdatedSelectedStatus);
+    setPageRows(rowsWithUpdatedSelectedStatus);
   };
 
   const handleChangeColumnsFilter = useCallback(

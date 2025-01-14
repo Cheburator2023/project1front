@@ -93,7 +93,14 @@ export const SearchSelect = ({
       : initialOptions;
   }, [initialOptions, addedOptions]);
 
-  const optionsValues = useMemo(() => getOptionsValues(options), [options]);
+  const baseOptionsValues = useMemo(() => getOptionsValues(options), [options]);
+  const unionOptionsValues = useMemo(() => {
+    const all = new Set(baseOptionsValues);
+    all.add(NOT_NULL_OPTION.value);
+    all.add(EMPTY_OPTION.value);
+    return Array.from(all);
+  }, [baseOptionsValues]);
+
   const { options: _options }: { options: SelectOption[] } = options as any;
   const isTree = _options?.some((option) => option.nestedValues || option.parentsValues);
 
@@ -115,15 +122,12 @@ export const SearchSelect = ({
   }, [options]);
 
   useEffect(() => {
-    if (selectedValues && selectedValues.length) {
-      // Except additional options, like "not-null"
-      const selectedMainOptions = selectedValues.filter(byMainOptions);
-
-      const isSelectAll = optionsValues.length === selectedMainOptions.length;
+    if (selectedValues?.length) {
+      const isSelectAll = unionOptionsValues.length === selectedValues.length;
 
       setSelectedAllValues(isSelectAll);
     }
-  }, [optionsValues, selectedValues]);
+  }, [unionOptionsValues, selectedValues]);
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const currentId = e.target.value;
@@ -133,9 +137,9 @@ export const SearchSelect = ({
     const { options: _options }: { options: SelectOption[] } = options as any;
 
     if (!isTree) {
-      if (selectedAllValues && newSelectedValues.length !== optionsValues?.length) {
+      if (selectedAllValues && newSelectedValues.length !== baseOptionsValues?.length) {
         setSelectedAllValues(false);
-      } else if (!selectedAllValues && newSelectedValues.length === optionsValues?.length) {
+      } else if (!selectedAllValues && newSelectedValues.length === baseOptionsValues?.length) {
         setSelectedAllValues(true);
       }
 
@@ -164,7 +168,7 @@ export const SearchSelect = ({
     let newSelectedValues: string[] = [];
 
     if (e.target.checked && options.type === SELECT_TYPE.STRING) {
-      newSelectedValues = [...optionsValues, NOT_NULL_OPTION.value, EMPTY_OPTION.value];
+      newSelectedValues = [...baseOptionsValues, NOT_NULL_OPTION.value, EMPTY_OPTION.value];
 
       setSelectedAllValues(true);
     } else {
