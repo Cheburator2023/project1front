@@ -9,6 +9,7 @@ import {
   ColDef,
   FilterChangedEvent,
   FilterModifiedEvent,
+  GetMainMenuItemsParams,
   IDateFilterParams,
   ITooltipParams,
   RowSelectedEvent,
@@ -51,6 +52,7 @@ const containerStyle = { width: '100%', height: '100%', padding: '10px' };
 const gridStyle = { height: '100%', width: '100%' };
 
 const dateFilterParams: IDateFilterParams = {
+  buttons: ['clear'],
   inRangeInclusive: true,
   comparator: (filterLocalDateAtMidnight: Date, cellValue: string) => {
     if (cellValue == null) return -1;
@@ -134,14 +136,21 @@ export const PlaygroundTable = ({
         ? 'agDateColumnFilter'
         : data.type === COLUMN_TYPE.NUMBER
         ? 'agNumberColumnFilter'
-        : 'agMultiColumnFilter',
-    filterParams: data.type === COLUMN_TYPE.DATE && dateFilterParams,
+        : 'agTextColumnFilter',
+    filterParams: data.type === COLUMN_TYPE.DATE ? dateFilterParams : { buttons: ['clear'] },
     // pinned: data.name === 'active_model' && currentCustomer === CUSTOMER_MAP.UMRV && 'left',
   }));
 
   const defaultColDef = useMemo<ColDef>(() => {
     return {
-      filter: 'agMultiColumnFilter',
+      filter: 'agTextColumnFilter',
+      mainMenuItems: (params: GetMainMenuItemsParams) => {
+        console.log('🐸 Pepe said ~ params:', params);
+        return params.defaultItems.filter(
+          (item) => item !== 'columnChooser' && item !== 'rowGroup',
+        );
+      },
+      filterParams: { buttons: ['clear'] },
       floatingFilter: true,
       initialWidth: 400,
       minWidth: 250,

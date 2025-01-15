@@ -48,6 +48,16 @@ const GlobalStyle = createGlobalStyle`
     opacity: 0 !important;
     visibility: hidden !important;
   }
+
+  
+  .ag-filter-apply-panel {
+    gap: 8px;
+  }
+
+  .ag-ltr .ag-filter-apply-panel-button {
+    margin-left: 0;
+    width: 100%;
+  }
 `;
 
 const Container = styled.div`
