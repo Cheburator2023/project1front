@@ -6,9 +6,8 @@ import { FiltersContext } from '@shared/api';
 import { FiltersPanel, RightModalPanel, TemplateFilters } from '@features';
 import { useTableModels } from '@pages/Home/hooks';
 
-import { CompareModelsWidget } from '../../widgets';
-
 import { PlaygroundTable } from './PlaygroundTable';
+import { CompareModelsWidgetNewTable } from '../../widgets/CompareModelsWidget/CompareModelsWidgetNewTable';
 
 // TODO: вынести в atoms/styled
 const StatusWrapper = styled.div`
@@ -65,11 +64,16 @@ export const FutureTableHomePage = () => {
             updateActiveScreen={display.setActiveScreen}
             updateRightPanelType={display.setRightPanelType}
           />
-          <PlaygroundTable display={display} modelsTable={modelsTable} filters={filters} templates={filters.templates} />
+          <PlaygroundTable
+            display={display}
+            modelsTable={modelsTable}
+            filters={filters}
+            templates={filters.templates}
+          />
         </>
       )}
       {display.activeScreen === ACTIVE_SCREEN.COMPARE && (
-        <CompareModelsWidget
+        <CompareModelsWidgetNewTable
           columnsFilters={filters.columnsFilters}
           firstDate={filters.firstDate}
           secondDate={filters.secondDate}
