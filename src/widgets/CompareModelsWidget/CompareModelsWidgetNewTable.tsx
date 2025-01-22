@@ -2,10 +2,11 @@ import React from 'react';
 
 import { ACTIVE_SCREEN, RIGHT_PANEL_TYPE } from '@shared/constants';
 import { ColumnsFilter } from '@src/shared/types';
-import { FiltersPanel, TableCompareModels } from '@features';
+import { FiltersPanel } from '@features';
 
 import { useCompareModels } from './hooks';
 import { Template } from '../../shared/api';
+import { CompareModelsNewTable } from '../../features/Tables/CompareModels/CompareModelsNewTable';
 
 interface CompareModelsWidgetProps {
   columnsFilters: Partial<ColumnsFilter>;
@@ -55,7 +56,7 @@ const CompareModelsWidgetNewTable = React.memo(
           }}
         />
 
-        <TableCompareModels
+        <CompareModelsNewTable
           firstDate={firstDate}
           secondDate={secondDate}
           error={compareModelsTable.error}
