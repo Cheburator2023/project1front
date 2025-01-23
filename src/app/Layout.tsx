@@ -71,8 +71,7 @@ const GlobalStyle = createGlobalStyle`
     height: 4px;
     border-radius: 50%;
     background: #00bb2f;
-    display: inline-block;
-    margin: 6px 0;
+    margin: 18px -10px;
     position: absolute;
   }
   & .ag-custom-cell-value-changed {

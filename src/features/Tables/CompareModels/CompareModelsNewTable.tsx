@@ -9,7 +9,7 @@ import { ActionsPanel, ColumnFilter } from '@entities';
 
 import { CompareTable } from './styles';
 import { useTableChange } from '../hooks';
-import { PlaygroundTable } from '../../../pages/Playground/PlaygroundTable';
+import { AgGridTable } from '../../NewTables/AgGridTable';
 import { useTableModels } from '../../../pages/Home/hooks';
 
 interface TableModelsProps {
@@ -130,7 +130,7 @@ export const CompareModelsNewTable = React.memo(
       <>
         {totalRows > 0 && firstDate && secondDate && !loading ? (
           <>
-            <PlaygroundTable
+            <AgGridTable
               display={display}
               modelsTable={modelsTable}
               filters={filters}

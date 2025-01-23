@@ -11,7 +11,7 @@ import { getLink } from '@entities/CustomCell/helpers';
 import { COLUMN_TYPE } from '@src/shared/types';
 import { Tooltip } from '@src/shared/ui/atoms';
 
-interface PlaygroundCustomCellParams extends CustomCellRendererProps {
+interface AgGridTableCustomCellParams extends CustomCellRendererProps {
   onAction: (action: any, row_system_model_id: any, columnName: any) => any;
   isCompare?: boolean;
 }
@@ -56,7 +56,7 @@ const valueFactory = ({
   }
 };
 
-export const PlaygroundCustomCell = (params: PlaygroundCustomCellParams) => {
+export const AgGridTableCustomCell = (params: AgGridTableCustomCellParams) => {
   const wrapperRef = useRef<any>(null);
   const [visible, setVisible] = React.useState(false);
 

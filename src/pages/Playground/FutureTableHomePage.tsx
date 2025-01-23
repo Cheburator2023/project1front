@@ -1,12 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
-import { ErrorStatus, Loading } from '@shared/ui/atoms';
+import { ErrorStatus, Flexbox, Loading, Spacer } from '@shared/ui/atoms';
 import { ACTIVE_SCREEN } from '@shared/constants';
 import { FiltersContext } from '@shared/api';
 import { FiltersPanel, RightModalPanel, TemplateFilters } from '@features';
 import { useTableModels } from '@pages/Home/hooks';
 
-import { PlaygroundTable } from './PlaygroundTable';
+import { AgGridTable } from '../../features/NewTables/AgGridTable';
 import { CompareModelsWidgetNewTable } from '../../widgets/CompareModelsWidget/CompareModelsWidgetNewTable';
 
 // TODO: вынести в atoms/styled
@@ -22,17 +22,19 @@ export const FutureTableHomePage = () => {
 
   if (modelsTable.error) {
     return (
-      <StatusWrapper>
+      <Flexbox flexDirection="column" alignItems="center" justifyContent="center" width="100%">
+        <Spacer />
         <ErrorStatus text={modelsTable.error} />
-      </StatusWrapper>
+      </Flexbox>
     );
   }
 
   if (modelsTable.loading) {
     return (
-      <StatusWrapper>
+      <Flexbox flexDirection="column" alignItems="center" justifyContent="center" width="100%">
+        <Spacer />
         <Loading text="Загрузка данных ..." />
-      </StatusWrapper>
+      </Flexbox>
     );
   }
 
@@ -64,7 +66,7 @@ export const FutureTableHomePage = () => {
             updateActiveScreen={display.setActiveScreen}
             updateRightPanelType={display.setRightPanelType}
           />
-          <PlaygroundTable
+          <AgGridTable
             display={display}
             modelsTable={modelsTable}
             filters={filters}

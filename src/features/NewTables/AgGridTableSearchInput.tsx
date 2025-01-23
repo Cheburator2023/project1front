@@ -17,7 +17,7 @@ const initOptions = (rowData: Partial<Row>[]) => {
   return Array.from(set);
 };
 
-export const PlaygroundSearchInput = React.memo(
+export const AgGridTableSearchInput = React.memo(
   ({
     placeholder = 'Поиск',
     rowData,

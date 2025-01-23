@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
-import React, { useCallback, useMemo, useRef, useState, StrictMode, useEffect } from 'react';
-import { AgGridReact, CustomCellRendererProps } from 'ag-grid-react';
+import { useCallback, useMemo, useRef } from 'react';
+import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 import 'ag-grid-enterprise';
@@ -8,15 +8,13 @@ import 'ag-grid-enterprise';
 import {
   ColDef,
   FilterChangedEvent,
-  FilterModifiedEvent,
   GetMainMenuItemsParams,
   IDateFilterParams,
   ITooltipParams,
   RowClassRules,
-  RowSelectedEvent,
   RowSelectionOptions,
   SelectionChangedEvent,
-  ValueGetterParams,
+  themeQuartz,
 } from 'ag-grid-community';
 import { ReactComponent as BrokerOutlineIcon } from '@admiral-ds/icons/build/finance/BrokerOutline.svg';
 import { ReactComponent as MenuOutline } from '@admiral-ds/icons/build/service/MenuOutline.svg';
@@ -24,8 +22,7 @@ import { ReactComponent as PlusCircleSolid } from '@admiral-ds/icons/build/servi
 import { ReactComponent as SettingsOutline } from '@admiral-ds/icons/build/system/SettingsOutline.svg';
 import { ReactComponent as SearchOutline } from '@admiral-ds/icons/build/system/SearchOutline.svg';
 import { ReactComponent as ShowTableOutline } from '@admiral-ds/icons/build/category/ShowTableOutline.svg';
-import { ReactComponent as DeleteSolid } from '@admiral-ds/icons/build/system/DeleteSolid.svg';
-import { Checkbox, PaginationOne, T, InputField } from '@admiral-ds/react-ui';
+import { Checkbox, T, InputField } from '@admiral-ds/react-ui';
 
 import { Flexbox, Spacer } from '@src/shared/ui/atoms';
 import { TDisplayTableModels, TFilters, TModelsTable } from '@pages/Home/hooks';
@@ -34,13 +31,12 @@ import { RIGHT_PANEL_TYPE } from '@shared/constants';
 import { useNavigate } from 'react-router-dom';
 import { Column, COLUMN_TYPE, Row } from '@src/shared/types';
 import { useAppInjectStore } from '@src/shared/stores/appInjectStore';
-import { CUSTOMER_MAP } from '@src/shared/constants/customers';
 import { useTableChange } from '@src/features/Tables/hooks';
 import { format } from 'date-fns';
 import { Template } from '@src/shared/api/types';
 import { useExcludeErrorStore } from '@src/shared/stores/excludeErrorStore';
-import { PlaygroundCustomCell } from './PlaygroundCustomCell';
-import { AG_GRID_LOCALE_RU } from './locale/agGridLocale.ru';
+import { AgGridTableCustomCell } from './AgGridTableCustomCell';
+import { AG_GRID_LOCALE_RU } from '../../pages/Playground/locale/agGridLocale.ru';
 import { ROUTES } from '../../app/Routes';
 import { useDeleteRightModelPanelStore } from '../../shared/stores';
 import { useRoles, useTemplateFilters } from '../../shared/hooks';
@@ -76,7 +72,7 @@ const dateFilterParams: IDateFilterParams = {
   inRangeFloatingFilterDateFormat: ' YYYY-MM-DD ',
 };
 
-export const PlaygroundTable = ({
+export const AgGridTable = ({
   display,
   modelsTable,
   filters,
@@ -206,7 +202,7 @@ export const PlaygroundTable = ({
       // },
       editable: false,
       toolTipValueGetter,
-      cellRenderer: PlaygroundCustomCell,
+      cellRenderer: AgGridTableCustomCell,
       cellRendererParams: {
         onAction: (action: any, row_system_model_id: any, columnName: any): any => {
           modelsTable.handleClickOnActionCell(action, row_system_model_id, columnName);
@@ -373,7 +369,7 @@ export const PlaygroundTable = ({
           </div>
         </Flexbox>
 
-        <Spacer />
+        <Spacer space={10} />
 
         <div style={gridStyle} className="ag-theme-quartz">
           <AgGridReact
@@ -385,7 +381,7 @@ export const PlaygroundTable = ({
             animateRows
             cellSelection
             onGridReady={onGridReadyGetData}
-            rowClassRules={rowClassRules}
+            rowClassRules={isCompared ? rowClassRules : undefined}
             selectionColumnDef={{
               pinned: 'left',
               lockPinned: true,
