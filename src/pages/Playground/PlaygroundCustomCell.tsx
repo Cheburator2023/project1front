@@ -113,7 +113,7 @@ export const PlaygroundCustomCell = (params: PlaygroundCustomCellParams) => {
   return (
     <div>
       <Wrapper ref={wrapperRef}>
-        {value}
+        <div className="ag-custom-cell-value">{value || 'Отсутствуют данные'}</div>
         <div className="actionButtons">
           <div>
             <ActionBtn

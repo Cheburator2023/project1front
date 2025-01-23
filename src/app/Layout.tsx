@@ -58,6 +58,26 @@ const GlobalStyle = createGlobalStyle`
     margin-left: 0;
     width: 100%;
   }
+  .ag-row-is-odd {
+    background-color: aliceblue ;
+  }
+
+  & .ag-custom-cell-value {
+    position: relative;
+  }
+  & .ag-custom-cell-value-changed .ag-custom-cell-value:before {
+    content: '';
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #00bb2f;
+    display: inline-block;
+    margin: 6px 0;
+    position: absolute;
+  }
+  & .ag-custom-cell-value-changed {
+    background-color: #15bf3b14;
+  }
 `;
 
 const Container = styled.div`

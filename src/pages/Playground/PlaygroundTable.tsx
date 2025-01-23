@@ -12,6 +12,7 @@ import {
   GetMainMenuItemsParams,
   IDateFilterParams,
   ITooltipParams,
+  RowClassRules,
   RowSelectedEvent,
   RowSelectionOptions,
   SelectionChangedEvent,
@@ -24,19 +25,20 @@ import { ReactComponent as SettingsOutline } from '@admiral-ds/icons/build/syste
 import { ReactComponent as SearchOutline } from '@admiral-ds/icons/build/system/SearchOutline.svg';
 import { ReactComponent as ShowTableOutline } from '@admiral-ds/icons/build/category/ShowTableOutline.svg';
 import { ReactComponent as DeleteSolid } from '@admiral-ds/icons/build/system/DeleteSolid.svg';
+import { Checkbox, PaginationOne, T, InputField } from '@admiral-ds/react-ui';
 
 import { Flexbox, Spacer } from '@src/shared/ui/atoms';
 import { TDisplayTableModels, TFilters, TModelsTable } from '@pages/Home/hooks';
 import { IconButton } from '@shared/ui/molecules';
 import { RIGHT_PANEL_TYPE } from '@shared/constants';
 import { useNavigate } from 'react-router-dom';
-import { InputField } from '@admiral-ds/react-ui';
-import { COLUMN_TYPE } from '@src/shared/types';
+import { Column, COLUMN_TYPE, Row } from '@src/shared/types';
 import { useAppInjectStore } from '@src/shared/stores/appInjectStore';
 import { CUSTOMER_MAP } from '@src/shared/constants/customers';
 import { useTableChange } from '@src/features/Tables/hooks';
 import { format } from 'date-fns';
 import { Template } from '@src/shared/api/types';
+import { useExcludeErrorStore } from '@src/shared/stores/excludeErrorStore';
 import { PlaygroundCustomCell } from './PlaygroundCustomCell';
 import { AG_GRID_LOCALE_RU } from './locale/agGridLocale.ru';
 import { ROUTES } from '../../app/Routes';
@@ -79,13 +81,30 @@ export const PlaygroundTable = ({
   modelsTable,
   filters,
   templates,
+  isCompared = false,
+  columnList: columnListOuter,
+  rowList: rowsOuter,
 }: {
   display: TDisplayTableModels;
   modelsTable: TModelsTable;
   filters: TFilters;
   templates: Template[];
+  isCompared?: boolean;
+  columnList?: Column[];
+  rowList?: Partial<Row>[];
 }) => {
-  const { rowList, setPage, page, setTotalRows, pageSize, searchString, columnList } = modelsTable;
+  const {
+    rowList: rowListInner,
+    setPage,
+    page,
+    setTotalRows,
+    pageSize,
+    searchString,
+    columnList: columnListInner,
+  } = modelsTable;
+
+  const rowList = rowsOuter || rowListInner;
+  const columnList = columnListOuter || columnListInner;
 
   const {
     cols,
@@ -114,6 +133,7 @@ export const PlaygroundTable = ({
   const { currentCustomer } = useAppInjectStore();
   const { modelsCount, modelSource, isDeleteButtonEnabled, userMatches, updateDeleteModelState } =
     useDeleteRightModelPanelStore();
+  const { excludeError, updateExcludeError } = useExcludeErrorStore();
 
   const { shouldResetTemplateOnInitialValueChange } = useTemplateFilters(
     columnsFilters,
@@ -125,7 +145,7 @@ export const PlaygroundTable = ({
   const navigate = useNavigate();
   const gridRef = useRef<AgGridReact>(null);
   const rowData = rows;
-  const columnDefs = modelsTable.columnList.map((data) => ({
+  const columnDefs = columnList.map((data) => ({
     ...data,
     headerName: data.title,
     field: data.name,
@@ -138,6 +158,20 @@ export const PlaygroundTable = ({
         ? 'agNumberColumnFilter'
         : 'agTextColumnFilter',
     filterParams: data.type === COLUMN_TYPE.DATE ? dateFilterParams : { buttons: ['clear'] },
+    cellClass: (params) => {
+      if (isCompared) {
+        const rowIndex = params.node.rowIndex;
+        const prevRow = params.api.getDisplayedRowAtIndex(rowIndex - 1);
+        const colId = params.column.colId;
+        const cellValue = params.data[colId];
+        const prevRowSameCellValue = prevRow?.data[colId];
+        const sameId = params?.data?.id?.split(':')[0] === prevRow?.data?.id?.split(':')[0];
+
+        if (prevRow && sameId && prevRowSameCellValue !== cellValue) {
+          return 'ag-custom-cell-value-changed';
+        }
+      }
+    },
     // pinned: data.name === 'active_model' && currentCustomer === CUSTOMER_MAP.UMRV && 'left',
   }));
 
@@ -145,7 +179,6 @@ export const PlaygroundTable = ({
     return {
       filter: 'agTextColumnFilter',
       mainMenuItems: (params: GetMainMenuItemsParams) => {
-        console.log('🐸 Pepe said ~ params:', params);
         return params.defaultItems.filter(
           (item) => item !== 'columnChooser' && item !== 'rowGroup',
         );
@@ -278,18 +311,39 @@ export const PlaygroundTable = ({
     }
   }, [rowList, modelsTable.setTotalRows, templates]);
 
+  const rowClassRules = useMemo<RowClassRules>(() => {
+    return {
+      // row style function
+      'ag-row-is-odd': (params) => {
+        return params?.rowIndex % 2 === 0;
+      },
+    };
+  }, []);
+
   return (
     <Flexbox height="calc(100vh - 230px)">
       <div style={containerStyle}>
         <Flexbox alignItems="center" justifyContent="space-between">
-          <Flexbox width="500px" fillChild>
+          <Flexbox width="1500px" fillChild alignItems="center" gap={20}>
             <InputField
               id="filter-text-box"
               onChange={onFilterTextBoxChanged}
               placeholder="Поиск"
               icons={<SearchOutline />}
             />
+
+            <Flexbox gap={6}>
+              <Checkbox
+                dimension="s"
+                checked={excludeError}
+                onChange={(e) => updateExcludeError(e.target.checked)}
+              />
+              <T font="Body/Body 2 Short" as="div">
+                Не включать модели со статусом ошибка заведения
+              </T>
+            </Flexbox>
           </Flexbox>
+
           <div>
             <IconButton
               icon={<PlusCircleSolid />}
@@ -331,6 +385,7 @@ export const PlaygroundTable = ({
             animateRows
             cellSelection
             onGridReady={onGridReadyGetData}
+            rowClassRules={rowClassRules}
             selectionColumnDef={{
               pinned: 'left',
               lockPinned: true,

@@ -130,32 +130,14 @@ export const CompareModelsNewTable = React.memo(
       <>
         {totalRows > 0 && firstDate && secondDate && !loading ? (
           <>
-            <ActionsPanel handleSearch={handleSearch} updateRightPanelType={updateRightPanelType} />
-            test
             <PlaygroundTable
               display={display}
               modelsTable={modelsTable}
               filters={filters}
               templates={filters.templates}
-            />
-            <CompareTable
-              // displayRowSelectionColumn
-              // greyHeader
-              headerLineClamp={1}
-              rowList={rows as Array<Partial<Row> & { id: string }>} // fix types
-              columnList={cols}
-              // virtualScroll={{ fixedRowHeight: 40 }}
-              // style={{ height: 'calc(100vh - 245px)' }}
-              onSortChange={handleSort}
-              onColumnResize={handleResize}
-              onRowSelectionChange={handleSelectionChange}
-              onColumnDragEnd={handleColumnDragEnd}
-            />
-            <Pagination
-              page={page}
-              pageSize={pageSize}
-              onChangePage={onChangePage}
-              totalElements={totalRows}
+              isCompared
+              columnList={columnList}
+              rowList={rows}
             />
           </>
         ) : (
