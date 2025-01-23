@@ -12,7 +12,7 @@ import {
 } from 'date-fns';
 
 import { ArtifactType, type Artifact, type ArtifactApi, type ArtifactValue } from '@shared/api';
-import { Column, COLUMN_TYPE, Role, Row } from '@shared/types';
+import { Column, COLUMN_TYPE, ModelSource, Role, Row } from '@shared/types';
 import { initialColumns, RIGHT_PANEL_TYPE, MODEL_FORM_MODE } from '@shared/constants';
 import {
   CommonInputProps,
@@ -435,6 +435,31 @@ const isUserAllowedForField = (
   return rolesAllowed || businessCustomerAllowed || modelCreatorAllowed;
 };
 
+const canEditArtefact = (artifact?: Artifact, row?: Partial<Row> | undefined): boolean => {
+  if (!artifact || !row) {
+    return false;
+  }
+
+  const isSumEditBlocked = artifact.is_edit_sum_flg === '0';
+
+  if (row.model_source === ModelSource.SUM && isSumEditBlocked) {
+    return false;
+  }
+
+  const isOwnerModel = isInBusinessCustomers(row);
+  const isEditableByRole = artifact.is_editable_by_role === '1';
+  const canBusinessCreatorEdit =
+    artifact.is_edit_for_business_creator_flg === '1' && isOwnerModel;
+
+  if (row.model_source === ModelSource.SUM_RM) {
+    return isEditableByRole || canBusinessCreatorEdit;
+  } else if (row.model_source === ModelSource.SUM) {
+    return isEditableByRole || canBusinessCreatorEdit;
+  }
+
+  return false;
+};
+
 const isFieldDisabled = (
   values?: FormValues,
   fieldSchema?: FormFieldsSchema[number],
@@ -464,7 +489,10 @@ const isFieldDisabled = (
   const isControlledByConditions =
     fieldSchema?.enabledByValueConditions && isDisabledByValueConditions && isDisabledByConditions;
 
-  return isGloballyDisabled || isControlledByConditions;
+
+  const isDisabledArtifactBySource = !canEditArtefact(artifact, row)
+
+  return isGloballyDisabled || isControlledByConditions || isDisabledArtifactBySource;
 };
 
 // Main mapping function that combine object for proper input format

@@ -203,6 +203,7 @@ enum ModelStatus {
 
 enum ModelSource {
   SUM_RM = 'sum-rm',
+  SUM = 'sum'
 }
 
 export {
