@@ -308,6 +308,7 @@ export const useTableModels = () => {
     } else {
       setRowList((prevRows) => [newRowWithId, ...prevRows]);
     }
+    fetchModels();
   }, []);
 
   const handleOnClose = useCallback(() => {

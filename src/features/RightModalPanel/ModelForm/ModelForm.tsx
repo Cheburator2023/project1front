@@ -386,7 +386,6 @@ export const ModelForm = ({
 
   const activeModelCheckboxHandler = async (e: any) => {
     setActiveModelByDefault(e?.target?.checked);
-    setCurrentCustomer(CUSTOMER_MAP.UMRV);
 
     await handleSubmit({ checkOnly: true });
   };
@@ -407,6 +406,13 @@ export const ModelForm = ({
   useEffect(() => {
     if (formRef.current?.children && editCellName) {
       const editedFieldIndex = fields.findIndex((field) => field.name === editCellName);
+      console.log('🐸 Pepe said ~ useEffect ~ editCellName:', editCellName);
+      console.log('🐸 Pepe said ~ useEffect ~ fields:', fields);
+      console.log(
+        '🐸 Pepe said ~ useEffect ~ editedFieldIndex:',
+        editedFieldIndex,
+        formRef.current.children,
+      );
 
       if (editedFieldIndex !== -1) {
         formRef.current.children[editedFieldIndex]?.scrollIntoView({
