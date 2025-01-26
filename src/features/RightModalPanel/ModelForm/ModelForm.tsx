@@ -9,8 +9,9 @@ import { StatusScreen } from '@shared/ui/molecules';
 import { RIGHT_PANEL_TYPE, MODEL_FORM_MODE } from '@shared/constants';
 import { INPUT_TYPE, InputFactory, InputValue, RightPanel } from '@shared/ui/organisms';
 import { API_ROUTES, useFetch, ArtifactApi, ModelEditApi } from '@shared/api';
+import { useModelUserMatch, useRoles } from '@src/shared/hooks';
 
-import { groupBy, isEqual, omit, pick, uniqBy } from 'lodash';
+import { groupBy, isEqual, omit, uniqBy } from 'lodash';
 import { Flexbox, Spacer } from '@shared/ui/atoms';
 import { Artifact } from '@shared/api/types';
 
@@ -73,6 +74,11 @@ export const ModelForm = ({
   const [completesConditionFields, setCompletesConditionField] = useState<
     { connectedName: string; connectedValue: string }[] | undefined
   >(undefined);
+
+  const { isValidator, isValidatorLead } = useRoles();
+  const { isInBusinessCustomers } = useModelUserMatch();
+
+  const isEditByRatingModel = isValidator || isValidatorLead || isInBusinessCustomers(activeRow!);
 
   const errorElemRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
@@ -398,10 +404,15 @@ export const ModelForm = ({
   }, [initialRow, artifacts]);
 
   useEffect(() => {
+    if (!isEditByRatingModel) {
+      setActiveModelByDefault(false);
+      return;
+    }
+
     if (activeRow?.active_model === '1') {
       setActiveModelByDefault(true);
     }
-  }, [activeRow?.active_model]);
+  }, [activeRow?.active_model, isEditByRatingModel]);
 
   // Scroll to edit input field
   useEffect(() => {
@@ -459,6 +470,7 @@ export const ModelForm = ({
               dimension="s"
               checked={activeModelByDefault}
               onChange={activeModelCheckboxHandler}
+              disabled={!isEditByRatingModel}
             >
               Действующая Модель/Модуль
             </CheckboxField>
