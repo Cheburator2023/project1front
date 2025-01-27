@@ -10,6 +10,7 @@ import { ReactComponent as CalendarUpdateOutline } from '@admiral-ds/icons/build
 import { getLink } from '@entities/CustomCell/helpers';
 import { COLUMN_TYPE } from '@src/shared/types';
 import { Tooltip } from '@src/shared/ui/atoms';
+import { usePermissions } from '@src/shared/hooks';
 
 interface PlaygroundCustomCellParams extends CustomCellRendererProps {
   onAction: (action: any, row_system_model_id: any, columnName: any) => any;
@@ -59,6 +60,8 @@ const valueFactory = ({
 export const PlaygroundCustomCell = (params: PlaygroundCustomCellParams) => {
   const wrapperRef = useRef<any>(null);
   const [visible, setVisible] = React.useState(false);
+
+  const { isEditModelEnabled } = usePermissions();
 
   const handleActionClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     const { name } = e.target as HTMLButtonElement;
@@ -115,15 +118,15 @@ export const PlaygroundCustomCell = (params: PlaygroundCustomCellParams) => {
       <Wrapper ref={wrapperRef}>
         {value}
         <div className="actionButtons">
-          <div>
-            <ActionBtn
-              name="historyChanges"
-              dimension="s"
-              color="#0062FF"
-              icon={<CalendarUpdateOutline />}
-              tooltip="История изменений"
-              onClick={handleActionClick}
-            />
+          <ActionBtn
+            name="historyChanges"
+            dimension="s"
+            color="#0062FF"
+            icon={<CalendarUpdateOutline />}
+            tooltip="История изменений"
+            onClick={handleActionClick}
+          />
+          {isEditModelEnabled && (
             <ActionBtn
               name="edit"
               dimension="s"
@@ -132,7 +135,7 @@ export const PlaygroundCustomCell = (params: PlaygroundCustomCellParams) => {
               tooltip="Редактировать"
               onClick={handleActionClick}
             />
-          </div>
+          )}
         </div>
       </Wrapper>
       <Tooltip targetRef={wrapperRef} title={params.value} />
@@ -165,4 +168,3 @@ const ActionBtn = styled(IconButton)`
 
   cursor: pointer;
 `;
-

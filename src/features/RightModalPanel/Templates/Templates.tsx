@@ -34,6 +34,7 @@ import {
   TemplatesGroupLabel,
   TemplatesGroupWrapper,
 } from './styles';
+import { usePermissions } from '@src/shared/hooks';
 
 const options = [
   {
@@ -56,6 +57,8 @@ export interface TemplatesProps {
 
 export const Templates = ({ templates, onClose, updateTemplates }: TemplatesProps) => {
   const { columnsFilters } = useContext(FiltersContext);
+
+  const { isAddPublicTemplateEnabled } = usePermissions();
 
   const { mutationProtectedFetch } = useFetch({});
 
@@ -188,15 +191,23 @@ export const Templates = ({ templates, onClose, updateTemplates }: TemplatesProp
 
   const model = useMemo(
     () =>
-      options.map(({ id, label, icon }) => ({
-        id,
-        render: (options: RenderOptionProps) => (
-          <StyledMenuItem key={id} dimension="s" data-dimension="s" {...options}>
-            <IconWrapper>{icon}</IconWrapper>
-            {label}
-          </StyledMenuItem>
-        ),
-      })),
+      options
+        .filter((option) => {
+          if (option.id === 'public' && !isAddPublicTemplateEnabled) {
+            return false;
+          }
+
+          return true;
+        })
+        .map(({ id, label, icon }) => ({
+          id,
+          render: (options: RenderOptionProps) => (
+            <StyledMenuItem key={ id } dimension="s" data-dimension="s" { ...options }>
+              <IconWrapper>{ icon }</IconWrapper>
+              { label }
+            </StyledMenuItem>
+          )
+        })),
     [],
   );
 

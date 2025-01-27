@@ -40,7 +40,7 @@ import { PlaygroundCustomCell } from './PlaygroundCustomCell';
 import { AG_GRID_LOCALE_RU } from './locale/agGridLocale.ru';
 import { ROUTES } from '../../app/Routes';
 import { useDeleteRightModelPanelStore } from '../../shared/stores';
-import { useRoles, useTemplateFilters } from '../../shared/hooks';
+import { usePermissions, useRoles, useTemplateFilters } from '../../shared/hooks';
 import { isInBusinessCustomers, isModelCreator } from '../../shared/helpers';
 import { useDeepEffect } from '../../shared/hooks/useDeepEffect';
 
@@ -119,6 +119,7 @@ export const PlaygroundTable = ({
     topFilters?.templates,
   );
   const { isAdmin, isValidatorLead } = useRoles();
+  const { isAddModelEnabled } = usePermissions();
 
   const navigate = useNavigate();
   const gridRef = useRef<AgGridReact>(null);
@@ -282,12 +283,14 @@ export const PlaygroundTable = ({
             />
           </Flexbox>
           <div>
-            <IconButton
-              icon={<PlusCircleSolid />}
-              tooltip="Добавить модель"
-              color="#0062FF"
-              onClick={() => display.setRightPanelType(RIGHT_PANEL_TYPE.ADD_MODEL)}
-            />
+            {isAddModelEnabled && (
+              <IconButton
+                icon={<PlusCircleSolid />}
+                tooltip="Добавить модель"
+                color="#0062FF"
+                onClick={() => display.setRightPanelType(RIGHT_PANEL_TYPE.ADD_MODEL)}
+              />
+            )}
             {/* <IconButton
               icon={<DeleteSolid />}
               tooltip={deleteTooltipMessage}

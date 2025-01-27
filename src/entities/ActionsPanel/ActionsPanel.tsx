@@ -11,7 +11,7 @@ import { IconButton } from '@shared/ui/molecules';
 import { RIGHT_PANEL_TYPE } from '@shared/constants';
 import { useDebouncedCallback } from '@src/shared/hooks/useDebouncedCallback';
 import { useDeleteRightModelPanelStore } from '@src/shared/stores';
-import { useRoles } from '@src/shared/hooks';
+import { usePermissions, useRoles } from '@src/shared/hooks';
 
 import { CustomSearchInput, Container } from './styles';
 import { ROUTES } from '../../app/Routes';
@@ -35,6 +35,7 @@ export const ActionsPanel = ({ updateRightPanelType, handleSearch }: ActionsPane
   const { modelsCount, modelSource, isDeleteButtonEnabled, userMatches } =
     useDeleteRightModelPanelStore();
   const { isAdmin, isValidatorLead } = useRoles();
+  const { isAddModelEnabled } = usePermissions();
 
   const deleteTooltipMessage = (() => {
     if (modelsCount === 0) return DELETE_TOOLTIP_MESSAGES.NO_MODEL_SELECTED;
@@ -67,12 +68,14 @@ export const ActionsPanel = ({ updateRightPanelType, handleSearch }: ActionsPane
         value={searchValue}
       />
       <div>
-        <IconButton
-          icon={<PlusCircleSolid />}
-          tooltip="Добавить модель"
-          color="#0062FF"
-          onClick={() => updateRightPanelType(RIGHT_PANEL_TYPE.ADD_MODEL)}
-        />
+        {isAddModelEnabled && (
+          <IconButton
+            icon={<PlusCircleSolid />}
+            tooltip="Добавить модель"
+            color="#0062FF"
+            onClick={() => updateRightPanelType(RIGHT_PANEL_TYPE.ADD_MODEL)}
+          />
+        )}
         <IconButton
           icon={<DeleteSolid />}
           tooltip={deleteTooltipMessage}
