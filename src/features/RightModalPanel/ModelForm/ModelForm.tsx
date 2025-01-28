@@ -293,6 +293,7 @@ export const ModelForm = ({
         formSchema,
         valuesWithAddedOutsideControls,
         wasPreviouslyActiveModel,
+        fields,
       );
       const isAllocationFieldsChanged = checkForAllocationFieldsChanged();
       setInvalidFields(isAllocationFieldsChanged ? [] : newInvalidFields);
@@ -361,7 +362,7 @@ export const ModelForm = ({
         setSubmitError('');
       }
     },
-    [values, formSchema, formMode, activeModelByDefault],
+    [values, formSchema, formMode, activeModelByDefault, fields],
   );
 
   const handleChangeParentModel = useCallback(
@@ -431,10 +432,15 @@ export const ModelForm = ({
 
   useEffect(() => {
     if (dirtyFields.length) {
-      const newInvalidFields = getInvalidFields(formSchema, values, wasPreviouslyActiveModel);
+      const newInvalidFields = getInvalidFields(
+        formSchema,
+        values,
+        wasPreviouslyActiveModel,
+        fields,
+      );
       setInvalidFields(newInvalidFields);
     }
-  }, [values, dirtyFields, formSchema, wasPreviouslyActiveModel]);
+  }, [values, dirtyFields, formSchema, wasPreviouslyActiveModel, fields]);
 
   return (
     <RightPanel
