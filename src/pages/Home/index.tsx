@@ -5,9 +5,9 @@ import { ACTIVE_SCREEN } from '@shared/constants';
 import { FiltersContext } from '@shared/api';
 import { ActionsPanel } from '@entities';
 import { FiltersPanel, RightModalPanel, TemplateFilters, TableModels } from '@features';
+
 import { useTableModels } from './hooks';
 import { CompareModelsWidget } from '../../widgets';
-import { Checkbox, T } from '@admiral-ds/react-ui';
 
 // TODO: вынести в atoms/styled
 const StatusWrapper = styled.div`

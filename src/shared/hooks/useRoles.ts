@@ -10,6 +10,7 @@ export const useRoles = () => {
     hasRole,
     isAdmin: hasRole(Role.ADMIN_IT) || hasRole(Role.ADMIN_IT_LEAD),
     isValidatorLead: hasRole(Role.VALIDATOR_LEAD),
+    isValidator: hasRole(Role.VALIDATOR)
   };
 };
 
