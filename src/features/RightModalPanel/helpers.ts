@@ -29,6 +29,8 @@ import {
 import { ArtifactGroup } from '@src/shared/api/types';
 import { concat, uniqBy } from 'lodash';
 import { CUSTOMER_MAP, CUSTOMER_TYPE } from '@src/shared/constants/customers';
+import { useUserStore } from '@src/shared/stores';
+import { isInBusinessCustomers, isModelCreator } from '@src/shared/helpers';
 import {
   FormFieldConditions,
   FormFieldValueConditions,
@@ -46,8 +48,6 @@ import {
   SCHEMA_NAME_MAP,
 } from './ModelForm/constants';
 import { DELETE_CONFIRM_MODEL_SCHEMA, DELETE_MODEL_SCHEMA } from './DeleteModelForm/constants';
-import { useUserStore } from '@src/shared/stores';
-import { isInBusinessCustomers, isModelCreator } from '@src/shared/helpers';
 
 export const markSchema = (
   schema: FormFieldsSchema,
@@ -358,24 +358,42 @@ export const getStartDateInCurrentYear = (startDate: Date) => {
   return startDate;
 };
 
+const ENABLE_FEBRUARY_EXTENSION = true; // Можно переключать на false при необходимости
+
 const getDateLimits = (quarter: number) => {
-  const currentYear = new Date().getFullYear();
-  const firstDateOfCurrentYear = startOfYear(new Date(currentYear, 0, 1));
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
 
-  const minDate = addMonths(firstDateOfCurrentYear, (quarter - 1) * 3);
+  // Если запрашиваемый квартал — 4 и текущий квартал — 1, использовать прошлый год
+  const effectiveYear = quarter === 4 && currentDate.getMonth() < 3 ? currentYear - 1 : currentYear;
 
-  const lastDayOfQuarter = endOfQuarter(minDate);
+  const firstDateOfEffectiveYear = startOfYear(new Date(effectiveYear, 0, 1));
+  const minDate = addMonths(firstDateOfEffectiveYear, (quarter - 1) * 3);
+  let maxDate = endOfQuarter(minDate);
+
+  // Продление максимальной даты для 4-го квартала до конца февраля
+  if (quarter === 4) {
+    maxDate = ENABLE_FEBRUARY_EXTENSION
+      ? new Date(effectiveYear + 1, 1, 28, 23, 59, 59) // Включаем февраль
+      : new Date(effectiveYear + 1, 0, 31, 23, 59, 59); // Только январь
+  }
 
   return {
     minDate,
-    maxDate: lastDayOfQuarter,
+    maxDate,
   };
 };
 
 const getDisabledStatus = (minDate: Date, maxDate: Date, quarter: number) => {
   const currentDate = new Date();
-
   const currentQuarter = Math.floor((currentDate.getMonth() + 3) / 3);
+
+  const startOfCurrentQuarter = new Date(currentDate.getFullYear(), (currentQuarter - 1) * 3, 1);
+  const monthAfterStartOfCurrentQuarter = addMonths(startOfCurrentQuarter, 1);
+
+  if (currentQuarter === 1 && quarter === 4) {
+    return !isWithinInterval(currentDate, { start: minDate, end: maxDate });
+  }
 
   if (quarter > currentQuarter) {
     return true;
@@ -384,9 +402,6 @@ const getDisabledStatus = (minDate: Date, maxDate: Date, quarter: number) => {
   if (quarter < currentQuarter - 1) {
     return true;
   }
-
-  const startOfCurrentQuarter = new Date(currentDate.getFullYear(), (currentQuarter - 1) * 3, 1);
-  const monthAfterStartOfCurrentQuarter = addMonths(startOfCurrentQuarter, 1);
 
   if (currentDate < monthAfterStartOfCurrentQuarter && quarter === currentQuarter - 1) {
     return false;
@@ -465,9 +480,11 @@ const mapArtifactToField = (
     name: artifact.artefact_tech_label,
     label: artifact.artefact_label,
     required: !!fieldSchema?.required,
+    addNewOptionEnabled: artifact.can_add_new_option === '1',
     maxLength: fieldSchema?.maxLength,
     requireConditions: fieldSchema?.requireConditions,
     optionConditions: fieldSchema?.optionConditions,
+    autoCompleteConditions: fieldSchema?.autoCompleteConditions,
     enabledByValueConditions: fieldSchema?.enabledByValueConditions,
     disabledConditions: fieldSchema?.disabledConditions,
     valueConditions: fieldSchema?.valueConditions,
@@ -727,32 +744,39 @@ const getFormFields = ({
     'name',
   );
 
-  let mergedModelsForUmrv = uniqBy(
-    concat(
-      BASE_MODEL_SCHEMA,
-      isActive ? ACTIVE_MODEL_SCHEMA : [],
-      isNotActive ? NOT_ACTIVE_MODEL_SCHEMA : [],
-      isRatingSystem ? RATING_SYSTEM_MODEL_SCHEMA : [],
-      isRatingSystemRegulatorApprove ? RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA : [],
-    ),
-    'name',
-  ).filter(({ customers }) => customers?.find((customer) => customer.id === currentCustomer?.id));
+  let mergedModelsForUmrv: any[] = [];
 
-  if (currentCustomer.id === CUSTOMER_MAP.UMRV.id && mode === MODEL_FORM_MODE.EDIT) {
+  if (currentCustomer.id === CUSTOMER_MAP.UMRV.id) {
     mergedModelsForUmrv = uniqBy(
       concat(
         BASE_MODEL_SCHEMA,
+        isActive ? ACTIVE_MODEL_SCHEMA : [],
+        isNotActive ? NOT_ACTIVE_MODEL_SCHEMA : [],
+        isRatingSystem ? RATING_SYSTEM_MODEL_SCHEMA : [],
+        isRatingSystemRegulatorApprove ? RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA : [],
+      ),
+      'name',
+    ).filter(({ customers }) => customers?.find((customer) => customer.id === currentCustomer?.id));
+
+    if (mode === MODEL_FORM_MODE.EDIT) {
+      const mergedModelSchemaForUmrv = concat(
         ACTIVE_MODEL_SCHEMA,
         isNotActive ? NOT_ACTIVE_MODEL_SCHEMA : [],
         RATING_SYSTEM_MODEL_SCHEMA,
         RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA,
-        initialColumns,
-      ),
-      'name',
-    ).filter(
-      ({ customers }) =>
-        !customers || customers?.find((customer) => customer.id === currentCustomer?.id),
-    );
+      );
+      const initialColumnsForUmrv = initialColumns.filter(
+        (col) => !mergedModelSchemaForUmrv.find(({ name }) => name === col.name)?.name,
+      );
+
+      mergedModelsForUmrv = uniqBy(
+        concat(BASE_MODEL_SCHEMA, mergedModelSchemaForUmrv, initialColumnsForUmrv),
+        'name',
+      ).filter(
+        ({ customers }) =>
+          !customers || customers?.find((customer) => customer.id === currentCustomer?.id),
+      );
+    }
   }
 
   const EXCLUDED_FIELDS_BY_MODE: Record<string, string[]> = {
@@ -820,7 +844,7 @@ const getFormFields = ({
   const createdGroups = new Set<string>();
 
   // Генерация финального списка полей с группами
-  const finalFormFields = formFields.reduce((fields, field) => {
+  let finalFormFields = formFields.reduce((fields, field) => {
     const groupLabel = getGroupLabel(field);
 
     // Если поле принадлежит группе и эта группа еще не создана
@@ -839,6 +863,21 @@ const getFormFields = ({
     // Добавляем поле, если оно не принадлежит группе
     return [...fields, field];
   }, [] as FormFields);
+
+  const umrvScmema = concat(
+    ACTIVE_MODEL_SCHEMA,
+    NOT_ACTIVE_MODEL_SCHEMA,
+    RATING_SYSTEM_MODEL_SCHEMA,
+    RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA,
+  );
+
+  finalFormFields = finalFormFields.filter(
+    (field) =>
+      !(
+        field.schemaKey === SCHEMA_NAME_MAP.REST_MODEL_SCHEMA.key &&
+        umrvScmema.find(({ name }) => name === field.name)
+      ),
+  );
 
   return finalFormFields;
 };

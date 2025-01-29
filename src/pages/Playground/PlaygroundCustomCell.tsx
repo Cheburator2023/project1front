@@ -10,6 +10,7 @@ import { ReactComponent as CalendarUpdateOutline } from '@admiral-ds/icons/build
 import { getLink } from '@entities/CustomCell/helpers';
 import { COLUMN_TYPE } from '@src/shared/types';
 import { Tooltip } from '@src/shared/ui/atoms';
+import { usePermissions } from '@src/shared/hooks';
 
 interface PlaygroundCustomCellParams extends CustomCellRendererProps {
   onAction: (action: any, row_system_model_id: any, columnName: any) => any;
@@ -59,6 +60,8 @@ const valueFactory = ({
 export const PlaygroundCustomCell = (params: PlaygroundCustomCellParams) => {
   const wrapperRef = useRef<any>(null);
   const [visible, setVisible] = React.useState(false);
+
+  const { isEditModelEnabled } = usePermissions();
 
   const handleActionClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     const { name } = e.target as HTMLButtonElement;
@@ -123,14 +126,16 @@ export const PlaygroundCustomCell = (params: PlaygroundCustomCellParams) => {
             tooltip="История изменений"
             onClick={handleActionClick}
           />
-          <ActionBtn
-            name="edit"
-            dimension="s"
-            color="#0062FF"
-            icon={<EditOutline />}
-            tooltip="Редактировать"
-            onClick={handleActionClick}
-          />
+          {isEditModelEnabled && (
+            <ActionBtn
+              name="edit"
+              dimension="s"
+              color="#0062FF"
+              icon={<EditOutline />}
+              tooltip="Редактировать"
+              onClick={handleActionClick}
+            />
+          )}
         </div>
       </Wrapper>
       <Tooltip targetRef={wrapperRef} title={params.value} />
@@ -162,9 +167,4 @@ const ActionBtn = styled(IconButton)`
   border-radius: 100%;
 
   cursor: pointer;
-
-  &:hover > div {
-    width: 16px;
-  }
 `;
-

@@ -1,7 +1,6 @@
 /* eslint-disable no-unneeded-ternary */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Button, T } from '@admiral-ds/react-ui';
-import { TabMenu } from '@admiral-ds/react-ui';
+import { Button, T, TabMenu } from '@admiral-ds/react-ui';
 import styled from 'styled-components';
 import { ReactComponent as ErrorTriangleSolid } from '@admiral-ds/icons/build/service/ErrorTriangleSolid.svg';
 import { ReactComponent as TimeSolid } from '@admiral-ds/icons/build/system/TimeSolid.svg';
@@ -16,15 +15,15 @@ import { Flexbox, Spacer } from '@shared/ui/atoms';
 import { Artifact, CustomError, ModelEditApi } from '@shared/api/types';
 
 import { useAppInjectStore } from '@shared/stores/appInjectStore';
+import { useDeleteRightModelPanelStore } from '@src/shared/stores';
+import { useScrollTo } from '@src/shared/hooks/useScrollTo';
+import { useRoles } from '@src/shared/hooks';
 import { FormValues } from '../types';
 import { getArtifactApiItems, getInputValuesFromRow, getInvalidFields } from '../helpers';
 import { ButtonContainer, FormContainer } from '../ModelForm/styles';
 import { useFormFields } from '../ModelForm/useFormFields';
 import { DELETE_CONFIRM_MODEL_SCHEMA, DELETE_MODEL_SCHEMA, SCHEMA_NAME_MAP } from './constants';
-import { useDeleteRightModelPanelStore } from '@src/shared/stores';
 import { useActiveDeleteFormSchema } from './useActiveDeleteFormSchema';
-import { useScrollTo } from '@src/shared/hooks/useScrollTo';
-import { useRoles } from '@src/shared/hooks';
 
 const StyledTabMenu = styled(TabMenu)`
   display: flex;
@@ -78,7 +77,8 @@ export const resolveModelStatusForDeletion = ({
 
     if (resolutionText === ResolutionText.APPROVE) {
       return ModelStatus.ERROR_REGISTRATION;
-    } else if (resolutionText === ResolutionText.REJECT) {
+    }
+    if (resolutionText === ResolutionText.REJECT) {
       return ModelStatus.EMPTY;
     }
   }
@@ -115,18 +115,18 @@ export const DeleteModelForm = ({
   onClose,
 }: DeleteModelFormProps) => {
   const { mutationProtectedFetch } = useFetch({});
-  const { setCurrentCustomer, currentCustomer } = useAppInjectStore();
+  const { currentCustomer } = useAppInjectStore();
 
   const [values, setValues] = useState<FormValues | undefined>();
   const [invalidFields, setInvalidFields] = useState<Array<keyof Row>>([]);
   const [dirtyFields, setDirtyFields] = useState<Array<keyof Row>>([]);
   const [parentModelId, setParentModelId] = useState<string>();
-  const [selectedColSize, setSelectedColSize] = useState<string>('2');
+  const [selectedColSize] = useState<string>('2');
   const [submitLoading, setSubmitLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string>();
-  const [initialRow, setInitialRow] = useState(activeRow);
+  const [initialRow] = useState(activeRow);
   const [expandedPanel, setExpandPanel] = useState(false);
-  const [showAllFields, setShowAllFields] = useState(false);
+  const [showAllFields] = useState(false);
   const [activeModelByDefault, setActiveModelByDefault] = useState<boolean | undefined>(undefined);
   const [activeTab, setActiveTab] = useState<string>('1');
   const { formMode, setFormMode } = useDeleteRightModelPanelStore();
@@ -207,7 +207,7 @@ export const DeleteModelForm = ({
   }, []);
 
   const handleChange = useCallback((name: keyof Row, value: InputValue) => {
-    let newValues = { [name]: value };
+    const newValues = { [name]: value };
 
     setDirtyFields((prevDirtyFields) => [...prevDirtyFields, name]);
 
@@ -227,16 +227,16 @@ export const DeleteModelForm = ({
       const newModelStatus = resolveModelStatusForDeletion({
         isValidatorLead,
         resolutionValue,
-        currentModelStatus: valuesWithAddedOutsideControls['status']?.value as ModelStatus,
+        currentModelStatus: valuesWithAddedOutsideControls.status?.value as ModelStatus,
       });
 
-      if (!valuesWithAddedOutsideControls['status']) {
-        valuesWithAddedOutsideControls['status'] = {
+      if (!valuesWithAddedOutsideControls.status) {
+        valuesWithAddedOutsideControls.status = {
           type: INPUT_TYPE.STRING,
           value: newModelStatus,
         };
       } else {
-        valuesWithAddedOutsideControls['status'].value = newModelStatus;
+        valuesWithAddedOutsideControls.status.value = newModelStatus;
       }
 
       const newInvalidFields = getInvalidFields(

@@ -56,7 +56,7 @@ export interface SearchSelectProps {
 export const SearchSelect = ({
   name,
   onChange,
-  options,
+  options: initialOptions,
   autoFocus,
   className,
   label,
@@ -81,7 +81,26 @@ export const SearchSelect = ({
   renderDropDownBottomPanel,
   onAddNewOption,
 }: SearchSelectProps) => {
-  const optionsValues = useMemo(() => getOptionsValues(options), [options]);
+  const [addedOptions, setAddedOptions] = useState<SelectOption[]>([]);
+
+  const options = useMemo(() => {
+    return initialOptions.type === SELECT_TYPE.STRING ||
+      initialOptions.type === SELECT_TYPE.STRING_WITH_PARENTS
+      ? {
+          ...initialOptions,
+          options: [...initialOptions.options, ...addedOptions],
+        }
+      : initialOptions;
+  }, [initialOptions, addedOptions]);
+
+  const baseOptionsValues = useMemo(() => getOptionsValues(options), [options]);
+  const unionOptionsValues = useMemo(() => {
+    const all = new Set(baseOptionsValues);
+    all.add(NOT_NULL_OPTION.value);
+    all.add(EMPTY_OPTION.value);
+    return Array.from(all);
+  }, [baseOptionsValues]);
+
   const { options: _options }: { options: SelectOption[] } = options as any;
   const isTree = _options?.some((option) => option.nestedValues || option.parentsValues);
 
@@ -103,26 +122,24 @@ export const SearchSelect = ({
   }, [options]);
 
   useEffect(() => {
-    if (selectedValues && selectedValues.length) {
-      // Except additional options, like "not-null"
-      const selectedMainOptions = selectedValues.filter(byMainOptions);
-
-      const isSelectAll = optionsValues.length === selectedMainOptions.length;
+    if (selectedValues?.length) {
+      const isSelectAll = unionOptionsValues.length === selectedValues.length;
 
       setSelectedAllValues(isSelectAll);
     }
-  }, [optionsValues, selectedValues]);
+  }, [unionOptionsValues, selectedValues]);
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const currentId = e.target.value;
     const selectedOptions = e.target.selectedOptions;
+
     let newSelectedValues = Array.from(selectedOptions).map((option) => option.value);
     const { options: _options }: { options: SelectOption[] } = options as any;
 
     if (!isTree) {
-      if (selectedAllValues && newSelectedValues.length !== optionsValues?.length) {
+      if (selectedAllValues && newSelectedValues.length !== baseOptionsValues?.length) {
         setSelectedAllValues(false);
-      } else if (!selectedAllValues && newSelectedValues.length === optionsValues?.length) {
+      } else if (!selectedAllValues && newSelectedValues.length === baseOptionsValues?.length) {
         setSelectedAllValues(true);
       }
 
@@ -151,7 +168,7 @@ export const SearchSelect = ({
     let newSelectedValues: string[] = [];
 
     if (e.target.checked && options.type === SELECT_TYPE.STRING) {
-      newSelectedValues = [...optionsValues, NOT_NULL_OPTION.value, EMPTY_OPTION.value];
+      newSelectedValues = [...baseOptionsValues, NOT_NULL_OPTION.value, EMPTY_OPTION.value];
 
       setSelectedAllValues(true);
     } else {
@@ -172,6 +189,31 @@ export const SearchSelect = ({
 
   const handleAddNewOption = () => {
     onAddNewOption?.(searchValue);
+
+    const addedOption = {
+      text: searchValue,
+      value: searchValue,
+      nestedValues: undefined,
+      nestedValueIds: undefined,
+      parentsValues: [],
+      parentsValueIds: [],
+    };
+
+    const newAddedOptions = [...addedOptions, addedOption];
+
+    if (options.type === SELECT_TYPE.STRING || options.type === SELECT_TYPE.STRING_WITH_PARENTS) {
+      const selectedOptions = [...options.options, newAddedOptions];
+
+      setSelectOptions({
+        type: options.type,
+        options: selectedOptions as any,
+      });
+      setAddedOptions(newAddedOptions);
+      onClickItemHandler(addedOption);
+      setSearchValue('');
+    }
+
+    setForcedOpen(false);
   };
 
   // This handle needed for preventing blob event
@@ -256,21 +298,27 @@ export const SearchSelect = ({
           showCheckbox={false}
           virtualScroll={virtualScrollEnabled ? { itemHeight: 'auto' } : undefined}
           // showCheckbox={options.type !== SELECT_TYPE.TAGS}
-          renderSelectValue={(value) =>
-            !loading && (
-              <SelectValue
-                options={options}
-                active={active}
-                selectedAllValues={selectedAllValues}
-                value={value}
-                modified={modified}
-              />
-            )
-          }
+          renderSelectValue={(value) => {
+            return (
+              !loading && (
+                <SelectValue
+                  options={options}
+                  active={active}
+                  selectedAllValues={selectedAllValues}
+                  value={value}
+                  modified={modified}
+                />
+              )
+            );
+          }}
           renderDropDownTopPanel={() => (
             // eslint-disable-next-line jsx-a11y/no-static-element-interactions
             <div onKeyDown={handlePreventEvent}>
-              <CustomSearchInput onChange={handleSearch} value={searchValue} placeholder="Поиск" />
+              <CustomSearchInput
+                onChange={handleSearch}
+                value={searchValue}
+                placeholder={addNewOptionEnabled ? 'Поиск/Добавить новое значение' : 'Поиск'}
+              />
               {multiple && selectAllEnabled && (
                 <CustomOption
                   text="Выбрать все"
@@ -289,7 +337,7 @@ export const SearchSelect = ({
                   dimension="s"
                   appearance="secondary"
                 >
-                  Добавить
+                  Добавить {searchValue}
                 </Button>
               )}
               {renderDropDownBottomPanel?.()}

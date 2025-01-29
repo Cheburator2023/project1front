@@ -25,6 +25,7 @@ import {
   getISODateFormat,
 } from '@shared/helpers';
 import { ArtifactApi, CustomError } from '@src/shared/api/types';
+import { useExcludeErrorStore } from '@src/shared/stores/excludeErrorStore';
 
 export type TDisplayTableModels = {
   activeScreen: ACTIVE_SCREEN;
@@ -136,6 +137,8 @@ export const useTableModels = () => {
   const [loadingModels, setLoadingModels] = useState(true);
   const [errorModels, setErrorModels] = useState<string>('');
 
+  const { excludeError } = useExcludeErrorStore();
+
   const { responseData: templateData, mutationProtectedFetch } = useFetch<Template[]>({
     apiRoute: API_ROUTES.TEMPLATES,
     mockedResponse: mockedTemplatesResponse,
@@ -152,30 +155,41 @@ export const useTableModels = () => {
     setTotalRows(formattedRows.length);
   };
 
-  const fetchModels = useCallback(async (date?: string) => {
-    setLoadingModels(true);
+  const fetchModels = useCallback(
+    async (date?: string) => {
+      setLoadingModels(true);
 
-    try {
-      // TODO: fix types
-      const res: any = await mutationProtectedFetch<ModelsResponseType, ModelsResponseType>({
-        fetchApiRoute: API_ROUTES.MODELS,
-        fetchMethod: 'GET',
-        mockedResponse: mockedModelsResponse,
-        newParams: date ? { date: getISODateFormat(date) } : {},
-      });
+      try {
+        const params: Record<string, any> = {};
 
-      if (res && !res?.error) {
-        updateRows(res.data);
-        setErrorModels('');
-      } else if (res) {
-        setErrorModels(res.data.message);
+        if (date) {
+          params.date = getISODateFormat(date);
+        }
+
+        params.excludeError = excludeError.toString();
+
+        const res: any = await mutationProtectedFetch<ModelsResponseType, ModelsResponseType>({
+          fetchApiRoute: API_ROUTES.MODELS,
+          fetchMethod: 'GET',
+          mockedResponse: mockedModelsResponse,
+          newParams: params,
+        });
+
+        if (res && !res?.error) {
+          updateRows(res.data);
+          setErrorModels('');
+        } else if (res) {
+          setErrorModels(res.data.message);
+        }
+
+        setLoadingModels(false);
+      } catch {
+        setErrorModels('Ошибка загрузки моделей');
+        setLoadingModels(false);
       }
-
-      setLoadingModels(false);
-    } catch {
-      setErrorModels('Ошибка загрузки моделей');
-    }
-  }, []);
+    },
+    [excludeError],
+  );
 
   // Initial models loading
   useEffect(() => {
@@ -279,7 +293,7 @@ export const useTableModels = () => {
     [rowList],
   );
 
-  const handleSubmit = useCallback((newRow: Row, formMode: MODEL_FORM_MODE) => {
+  const handleSubmit = useCallback((newRow: any, formMode: MODEL_FORM_MODE) => {
     const newRowWithId = { ...newRow, id: newRow.system_model_id, hover: true };
     if (
       formMode === MODEL_FORM_MODE.EDIT ||

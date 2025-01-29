@@ -1,58 +1,29 @@
 import { SELECT_TYPE, SelectStringProps } from '@src/shared/ui/organisms';
 import * as Highcharts from 'highcharts';
 import { MetricsCaption } from './types';
-import { overflow } from 'html2canvas/dist/types/css/property-descriptors/overflow';
 
 const dsStreamArtifactOptions = {
   type: SELECT_TYPE.STRING,
   options: [
     {
-      value: 'Управление моделирования партнерств и ИТ-процессов',
-      text: 'Управление моделирования партнерств и ИТ-процессов',
+      value: 'Моделирование РБ',
+      text: 'Моделирование РБ',
+    },
+    {
+      value: 'Разработка моделей для КМБ и КСБ',
+      text: 'Разработка моделей для КМБ и КСБ',
     },
     {
       value: 'Моделирование RnD',
       text: 'Моделирование RnD',
     },
     {
-      value: 'Управление моделирования РБ',
-      text: 'Управление моделирования РБ',
-    },
-    {
-      value: 'Управление моделирования КИБ и СМБ',
-      text: 'Управление моделирования КИБ и СМБ',
-    },
-    {
-      value: 'Модели партнерств и платформы больших данных',
-      text: 'Модели партнерств и платформы больших данных',
-    },
-    {
-      value: 'Моделирование РБ',
-      text: 'Моделирование РБ',
-    },
-    {
-      value: 'Моделирование КИБ и СМБ',
-      text: 'Моделирование КИБ и СМБ',
-    },
-    {
-      value: 'Модель ЦРС',
-      text: 'Модель ЦРС',
-    },
-    {
-      value: 'Управление перспективных алгоритмов машинного обучения',
-      text: 'Управление перспективных алгоритмов машинного обучения',
-    },
-    {
-      value: 'Управление процессных и финансовых моделей',
-      text: 'Управление процессных и финансовых моделей',
-    },
-    {
       value: 'Финансовое моделирование',
       text: 'Финансовое моделирование',
     },
     {
-      value: 'Разработка моделей для КМБ и КСБ',
-      text: 'Разработка моделей для КМБ и КСБ',
+      value: 'Модели партнерств и платформы больших данных',
+      text: 'Модели партнерств и платформы больших данных',
     },
   ],
 } as SelectStringProps;
@@ -464,7 +435,9 @@ const initialChartPilots = () => ({
   ] as Highcharts.SeriesBarOptions[],
 });
 
-const initialChartDistributionByLifecycleStageModels = () => ({
+const initialChartDistributionByLifecycleStageModels = (): Highcharts.Options & {
+  chart: { plotBorderRadius: number };
+} => ({
   chart: {
     height: 185,
     marginTop: 20,
@@ -487,7 +460,7 @@ const initialChartDistributionByLifecycleStageModels = () => ({
     verticalAlign: 'top' as Highcharts.VerticalAlignValue,
     layout: 'vertical' as Highcharts.OptionsLayoutValue,
     itemStyle: {
-      width: '100px',
+      width: 100,
       overflow: 'hidden',
       textOverflow: 'ellipsis',
       whiteSpace: 'nowrap',

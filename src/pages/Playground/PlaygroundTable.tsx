@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, { useCallback, useMemo, useRef, useState, StrictMode } from 'react';
+import React, { useCallback, useMemo, useRef, useState, StrictMode, useEffect } from 'react';
 import { AgGridReact, CustomCellRendererProps } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
@@ -7,9 +7,13 @@ import 'ag-grid-enterprise';
 
 import {
   ColDef,
+  FilterChangedEvent,
+  FilterModifiedEvent,
   IDateFilterParams,
   ITooltipParams,
+  RowSelectedEvent,
   RowSelectionOptions,
+  SelectionChangedEvent,
   ValueGetterParams,
 } from 'ag-grid-community';
 import { ReactComponent as BrokerOutlineIcon } from '@admiral-ds/icons/build/finance/BrokerOutline.svg';
@@ -18,9 +22,10 @@ import { ReactComponent as PlusCircleSolid } from '@admiral-ds/icons/build/servi
 import { ReactComponent as SettingsOutline } from '@admiral-ds/icons/build/system/SettingsOutline.svg';
 import { ReactComponent as SearchOutline } from '@admiral-ds/icons/build/system/SearchOutline.svg';
 import { ReactComponent as ShowTableOutline } from '@admiral-ds/icons/build/category/ShowTableOutline.svg';
+import { ReactComponent as DeleteSolid } from '@admiral-ds/icons/build/system/DeleteSolid.svg';
 
 import { Flexbox, Spacer } from '@src/shared/ui/atoms';
-import { TDisplayTableModels, TModelsTable } from '@pages/Home/hooks';
+import { TDisplayTableModels, TFilters, TModelsTable } from '@pages/Home/hooks';
 import { IconButton } from '@shared/ui/molecules';
 import { RIGHT_PANEL_TYPE } from '@shared/constants';
 import { useNavigate } from 'react-router-dom';
@@ -28,9 +33,16 @@ import { InputField } from '@admiral-ds/react-ui';
 import { COLUMN_TYPE } from '@src/shared/types';
 import { useAppInjectStore } from '@src/shared/stores/appInjectStore';
 import { CUSTOMER_MAP } from '@src/shared/constants/customers';
+import { useTableChange } from '@src/features/Tables/hooks';
+import { format } from 'date-fns';
+import { Template } from '@src/shared/api/types';
 import { PlaygroundCustomCell } from './PlaygroundCustomCell';
 import { AG_GRID_LOCALE_RU } from './locale/agGridLocale.ru';
 import { ROUTES } from '../../app/Routes';
+import { useDeleteRightModelPanelStore } from '../../shared/stores';
+import { usePermissions, useRoles, useTemplateFilters } from '../../shared/hooks';
+import { isInBusinessCustomers, isModelCreator } from '../../shared/helpers';
+import { useDeepEffect } from '../../shared/hooks/useDeepEffect';
 
 const toolTipValueGetter = (params: ITooltipParams) =>
   params.value == null || params.value === '' ? '- Отсутствует -' : params.value;
@@ -63,18 +75,60 @@ const dateFilterParams: IDateFilterParams = {
 export const PlaygroundTable = ({
   display,
   modelsTable,
+  filters,
+  templates,
 }: {
   display: TDisplayTableModels;
   modelsTable: TModelsTable;
+  filters: TFilters;
+  templates: Template[];
 }) => {
+  const { rowList, setPage, page, setTotalRows, pageSize, searchString, columnList } = modelsTable;
+
+  const {
+    cols,
+    rows,
+    setCols,
+    setRows,
+    // handleSelectionChange,
+    handleResize,
+    handleSort,
+    handleChangeColumnsFilter,
+    handleColumnDragEnd,
+    columnsFilters,
+    onChangeColumnsFilters,
+    onChangeTopFilters,
+    topFilters,
+  } = useTableChange({
+    rowList,
+    setCurrentPage: setPage,
+    page,
+    updateRowsCount: setTotalRows,
+    pageSize,
+    searchString,
+    columnList,
+    templates: filters.templates,
+  });
   const { currentCustomer } = useAppInjectStore();
+  const { modelsCount, modelSource, isDeleteButtonEnabled, userMatches, updateDeleteModelState } =
+    useDeleteRightModelPanelStore();
+
+  const { shouldResetTemplateOnInitialValueChange } = useTemplateFilters(
+    columnsFilters,
+    filters.templates,
+    topFilters?.templates,
+  );
+  const { isAdmin, isValidatorLead } = useRoles();
+  const { isAddModelEnabled } = usePermissions();
+
   const navigate = useNavigate();
   const gridRef = useRef<AgGridReact>(null);
-  const rowData = modelsTable.rowList;
+  const rowData = rows;
   const columnDefs = modelsTable.columnList.map((data) => ({
     ...data,
     headerName: data.title,
     field: data.name,
+    headerTooltip: data.title,
     // https://www.ag-grid.com/react-data-grid/filter-date/#custom-selection-component
     filter:
       data.type === COLUMN_TYPE.DATE
@@ -91,7 +145,7 @@ export const PlaygroundTable = ({
       filter: 'agMultiColumnFilter',
       floatingFilter: true,
       initialWidth: 400,
-      minWidth: 200,
+      minWidth: 250,
       maxWidth: 1350,
       suppressHeaderMenuButton: false,
       suppressHeaderContextMenu: false,
@@ -104,8 +158,8 @@ export const PlaygroundTable = ({
       flex: 2,
       sortable: true,
       resizable: true,
-      wrapHeaderText: true,
-      autoHeaderHeight: true,
+      wrapHeaderText: false,
+      autoHeaderHeight: false,
       // valueGetter: (params: ValueGetterParams) => {
       //   return `(${params.getValue})`;
       // },
@@ -125,6 +179,7 @@ export const PlaygroundTable = ({
       mode: 'multiRow',
       headerCheckbox: true,
       selectAll: 'filtered',
+      rowSelected: (params) => {},
     };
   }, []);
 
@@ -141,6 +196,80 @@ export const PlaygroundTable = ({
     return [20, 100, 500, 1000];
   }, []);
 
+  let deleteTooltipMessage = '';
+
+  if (modelsCount === 0) {
+    deleteTooltipMessage = 'Выберите модель для удаления';
+  } else if (modelsCount > 1) {
+    deleteTooltipMessage = 'Нельзя удалить несколько моделей';
+  } else if (modelSource !== 'sum-rm') {
+    deleteTooltipMessage = 'Модель должна быть с исчтоником "sum-rm"';
+  } else if (!userMatches && !isAdmin && !isValidatorLead) {
+    deleteTooltipMessage =
+      'Модель может-быть удалена только создателем, владельцем модели или администратором';
+  } else {
+    deleteTooltipMessage = 'Удалить модель';
+  }
+
+  const handleSelectionChange = (event: SelectionChangedEvent): void => {
+    const selectedRows = event.api.getSelectedRows();
+
+    if (selectedRows.length === 1) {
+      const selectedRow = selectedRows[0];
+
+      const { model_source, status, id } = selectedRow;
+
+      const userMatches = isModelCreator(selectedRow) || isInBusinessCustomers(selectedRow);
+
+      updateDeleteModelState(1, model_source, status, id, userMatches);
+    } else {
+      updateDeleteModelState(selectedRows.length);
+    }
+  };
+
+  const handleFilterChange = (event: FilterChangedEvent): void => {
+    // @ts-ignore
+    const colDef: any = event.api.getColumnFilterModel(event?.columns[0]?.getColDef());
+    // @ts-ignore
+    const isDate = event?.columns[0]?.colDef?.filterType === 'date';
+    // @ts-ignore
+    const colName: string = event?.columns[0]?.colId;
+
+    if (isDate) {
+      const dateFrom = new Date(colDef.dateFrom);
+      const dateTo = new Date(colDef.dateTo || colDef.dateFrom);
+      const toReverse = dateFrom > dateTo;
+
+      if (toReverse) {
+        const dateRange = [format(dateTo, 'yyyy-MM-dd'), format(dateFrom, 'yyyy-MM-dd')];
+        handleChangeColumnsFilter(colName, dateRange);
+      } else {
+        const dateRange = [format(dateFrom, 'yyyy-MM-dd'), format(dateTo, 'yyyy-MM-dd')];
+        handleChangeColumnsFilter(colName, dateRange);
+      }
+    } else {
+      // @ts-ignore
+      const value = colDef?.filterModels[1]?.values;
+      const initialTemplateValue = columnsFilters?.[colName] || [];
+
+      if (value) {
+        const arrayValue = Array.isArray(value) ? value : [value];
+        handleChangeColumnsFilter(colName, arrayValue);
+
+        if (shouldResetTemplateOnInitialValueChange(arrayValue, initialTemplateValue, colName)) {
+          onChangeTopFilters?.({ ...topFilters, templates: [] });
+        }
+      }
+    }
+  };
+
+  useDeepEffect(() => {
+    if (rowList.length) {
+      setRows(rowList);
+      modelsTable.setTotalRows(rowList.length);
+    }
+  }, [rowList, modelsTable.setTotalRows, templates]);
+
   return (
     <Flexbox height="calc(100vh - 230px)">
       <div style={containerStyle}>
@@ -154,12 +283,21 @@ export const PlaygroundTable = ({
             />
           </Flexbox>
           <div>
-            <IconButton
-              icon={<PlusCircleSolid />}
-              tooltip="Добавить модель"
+            {isAddModelEnabled && (
+              <IconButton
+                icon={<PlusCircleSolid />}
+                tooltip="Добавить модель"
+                color="#0062FF"
+                onClick={() => display.setRightPanelType(RIGHT_PANEL_TYPE.ADD_MODEL)}
+              />
+            )}
+            {/* <IconButton
+              icon={<DeleteSolid />}
+              tooltip={deleteTooltipMessage}
               color="#0062FF"
-              onClick={() => display.setRightPanelType(RIGHT_PANEL_TYPE.ADD_MODEL)}
-            />
+              onClick={() => display.setRightPanelType(RIGHT_PANEL_TYPE.DELETE_MODEL)}
+              disabled={!isDeleteButtonEnabled}
+            /> */}
             <IconButton
               icon={<BrokerOutlineIcon />}
               tooltip="Графики"
@@ -196,13 +334,35 @@ export const PlaygroundTable = ({
               pinned: 'left',
               lockPinned: true,
             }}
-            sideBar
+            sideBar={{
+              toolPanels: [
+                {
+                  id: 'columns',
+                  labelDefault: 'Columns',
+                  labelKey: 'columns',
+                  iconKey: 'columns',
+                  toolPanel: 'agColumnsToolPanel',
+                },
+                {
+                  id: 'filters',
+                  labelDefault: 'Filters',
+                  labelKey: 'filters',
+                  iconKey: 'filter',
+                  toolPanel: 'agFiltersToolPanel',
+                },
+              ],
+              defaultToolPanel: undefined,
+              // hiddenByDefault: true,
+            }}
+            onSelectionChanged={handleSelectionChange}
+            onFilterChanged={handleFilterChange}
             pagination
-            paginationPageSize={100}
+            paginationPageSize={pageSize}
             paginationPageSizeSelector={paginationPageSizeSelector}
             singleClickEdit
             localeText={AG_GRID_LOCALE_RU}
             alwaysShowHorizontalScroll
+            tooltipShowDelay={500}
           />
         </div>
       </div>
