@@ -16,7 +16,6 @@ import { Flexbox, Spacer } from '@shared/ui/atoms';
 import { Artifact } from '@shared/api/types';
 
 import { useAppInjectStore } from '@shared/stores/appInjectStore';
-import { CUSTOMER_MAP } from '@shared/constants/customers';
 import { useScrollTo } from '@src/shared/hooks/useScrollTo';
 import { useDeepEffect } from '@src/shared/hooks/useDeepEffect';
 import { FormValues } from '../types';
@@ -108,7 +107,7 @@ export const ModelForm = ({
 
   const IS_FORM_MODE_ADD = formMode === MODEL_FORM_MODE.ADD;
   const title = IS_FORM_MODE_ADD ? 'Новая модель' : 'Редактирование модели';
-  const groupedBySchemaName = groupBy(fields, 'schemaKey');
+  const groupedFieldsBySchemaName = groupBy(fields, 'schemaKey');
 
   const handleChange = (name: keyof Row, value: InputValue) => {
     const newValues = { [name]: value };
@@ -393,7 +392,6 @@ export const ModelForm = ({
 
   const activeModelCheckboxHandler = async (e: any) => {
     setActiveModelByDefault(e?.target?.checked);
-    setCurrentCustomer(CUSTOMER_MAP.UMRV);
 
     await handleSubmit({ checkOnly: true });
   };
@@ -418,11 +416,17 @@ export const ModelForm = ({
   // Scroll to edit input field
   useEffect(() => {
     if (formRef.current?.children && editCellName) {
-      const editedFieldIndex = fields.findIndex((field) => field.name === editCellName);
+      const inputFieldsRefs = document.querySelectorAll(
+        '#model_form_parent_container [data-form-input]',
+      );
+
+      const editedFieldIndex = Array.from(inputFieldsRefs).findIndex(
+        (field) => field.getAttribute('data-form-input') === editCellName,
+      );
 
       if (editedFieldIndex !== -1) {
-        formRef.current.children[editedFieldIndex]?.scrollIntoView({
-          block: 'center',
+        Array.from(inputFieldsRefs)[editedFieldIndex]?.scrollIntoView({
+          block: 'start',
           behavior: 'smooth',
         });
       }
@@ -491,9 +495,9 @@ export const ModelForm = ({
           apiLoading={submitLoading}
           onFinished={handleOnClose}
         >
-          <FormContainer ref={formRef}>
-            {Object.keys(groupedBySchemaName).map((schemaKey) => {
-              const fieldsByGroup = groupedBySchemaName[schemaKey || 'Аллокация'];
+          <FormContainer ref={formRef} id="model_form_parent_container">
+            {Object.keys(groupedFieldsBySchemaName).map((schemaKey) => {
+              const fieldsByGroup = groupedFieldsBySchemaName[schemaKey || 'Аллокация'];
               const schemaTitle = SCHEMA_NAME_MAP[schemaKey]?.title;
 
               return (
@@ -517,6 +521,7 @@ export const ModelForm = ({
                           fillChild
                           key={field.name}
                           ref={errorElemRef}
+                          data-form-input={field.name}
                         >
                           <InputFactory<keyof Row>
                             values={values}

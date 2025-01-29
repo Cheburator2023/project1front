@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 
-import { Row } from '@shared/types';
+import { Column, Row } from '@shared/types';
 import { RIGHT_PANEL_TYPE, MODEL_FORM_MODE } from '@shared/constants';
 import {
   API_ROUTES,
