@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Column as AdmiralColumn } from '@admiral-ds/react-ui';
+import { usePermissions } from '@src/shared/hooks';
 
 import { Column, COLUMN_TYPE, Row } from '@shared/types';
 import { CellWrapper, ColumnFilter, CustomCell } from '@entities';
@@ -8,7 +9,6 @@ import { ModelRelationsModal } from '@features';
 import { CustomTable } from './styles';
 import { useTableChange } from '../hooks';
 import { TableModelsProps } from '../types';
-import { usePermissions } from '@src/shared/hooks';
 
 // TODO: передавать в хук (props)
 export const TableModels = React.memo(

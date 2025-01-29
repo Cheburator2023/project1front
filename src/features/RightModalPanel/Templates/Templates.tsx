@@ -7,6 +7,7 @@ import {
   RenderOptionProps,
   StyledDropdownContainer,
 } from '@admiral-ds/react-ui';
+import { usePermissions } from '@src/shared/hooks';
 
 import { ReactComponent as PlusCircleOutline } from '@admiral-ds/icons/build/service/PlusCircleOutline.svg';
 import { ReactComponent as LockOutline } from '@admiral-ds/icons/build/security/LockOutline.svg';
@@ -34,7 +35,7 @@ import {
   TemplatesGroupLabel,
   TemplatesGroupWrapper,
 } from './styles';
-import { usePermissions } from '@src/shared/hooks';
+
 
 const options = [
   {
