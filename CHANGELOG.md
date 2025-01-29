@@ -1,5 +1,22 @@
 # Semantic Versioning Changelog
 
+# [1.34.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.33.1...v1.34.0) (2025-01-24)
+
+
+### Bug Fixes
+
+* allocation q4 ([662e2ac](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/662e2acf2a483edc0fa679cddb19eac08518a587))
+* allocation q4 ([8c4e976](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/8c4e976a98b0d1fd58c1a53f824c7f322ad56aad))
+* filter in search select ([4a095ee](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/4a095eec2d27b05b6ce24a8cf6ef64f3739c5a9b))
+* handle_selection_change ([f84b943](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/f84b9434d5afe7f04a4bf04d4515255d40586bd7))
+* reset template filters ([1533607](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/1533607cab9229640f2e1eceb30eb19071ca7cba))
+
+
+### Features
+
+* new sections and fields added ([71ab7de](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/71ab7de5f30272f26da09020da14eed70cc5a66c))
+* new sections and fields added ([26f4961](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/26f496114bbb3910c225a42624621cdb2771ac41))
+
 ## [1.33.1](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.33.0...v1.33.1) (2024-12-24)
 
 

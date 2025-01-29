@@ -25,7 +25,7 @@ import {
   getISODateFormat,
 } from '@shared/helpers';
 import { ArtifactApi, CustomError } from '@src/shared/api/types';
-import { useExcludeErrorStore } from '@src/shared/stores/excludeErrorStore';
+import { useExcludeErrorStore } from '@src/shared/stores';
 
 export type TDisplayTableModels = {
   activeScreen: ACTIVE_SCREEN;

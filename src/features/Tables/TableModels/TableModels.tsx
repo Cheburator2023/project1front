@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Column as AdmiralColumn } from '@admiral-ds/react-ui';
+import { usePermissions } from '@src/shared/hooks';
 
 import { Column, COLUMN_TYPE, Row } from '@shared/types';
 import { CellWrapper, ColumnFilter, CustomCell } from '@entities';
@@ -47,6 +48,8 @@ export const TableModels = React.memo(
       templates,
     });
 
+    const { isEditModelEnabled } = usePermissions();
+
     useEffect(() => {
       if (rowList.length) {
         setRows(rowList);
@@ -59,26 +62,35 @@ export const TableModels = React.memo(
           sortable: column.type !== COLUMN_TYPE.ACTION,
           sticky: !!column.sticky,
           cellAlign: column.type === COLUMN_TYPE.NUMBER ? 'right' : 'left',
-          renderCell: (value: string, row: Row) =>
-            column.type === COLUMN_TYPE.ACTION ? ( // TODO: move this logic to custom cell component
-              <>
-                {value === '1' && row.system_model_id ? (
-                  <CellWrapper type={COLUMN_TYPE.STRING}>
-                    <ModelRelationsModal modelId={row.system_model_id} />
-                  </CellWrapper>
-                ) : null}
-              </>
-            ) : (
+          renderCell: (value: string, row: Row) => {
+            if (column.type === COLUMN_TYPE.ACTION) {
+              return (
+                <>
+                  {value === '1' && row.system_model_id ? (
+                    <CellWrapper type={COLUMN_TYPE.STRING}>
+                      <ModelRelationsModal modelId={row.system_model_id} />
+                    </CellWrapper>
+                  ) : null}
+                </>
+              );
+            }
+
+            const editable =
+              isEditModelEnabled &&
+              !(column.name === 'reason_model_delete' || column.name === 'status');
+
+            return (
               <CustomCell
                 column={column}
                 value={value}
-                editable={!(column.name === 'reason_model_delete' || column.name === 'status')}
+                editable={editable}
                 row={row}
                 onAction={(action) => {
                   onActionCell(action, row.system_model_id, column.name);
                 }}
               />
-            ),
+            );
+          },
           extraText:
             column.type !== COLUMN_TYPE.ACTION ? (
               <ColumnFilter
@@ -99,6 +111,7 @@ export const TableModels = React.memo(
       rowList,
       columnList,
       columnsFilters,
+      isEditModelEnabled,
       onChangeColumnsFilters,
       handleChangeColumnsFilter,
       updateRowsCount,

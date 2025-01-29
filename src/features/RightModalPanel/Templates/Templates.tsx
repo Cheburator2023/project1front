@@ -7,6 +7,7 @@ import {
   RenderOptionProps,
   StyledDropdownContainer,
 } from '@admiral-ds/react-ui';
+import { usePermissions } from '@src/shared/hooks';
 
 import { ReactComponent as PlusCircleOutline } from '@admiral-ds/icons/build/service/PlusCircleOutline.svg';
 import { ReactComponent as LockOutline } from '@admiral-ds/icons/build/security/LockOutline.svg';
@@ -35,6 +36,7 @@ import {
   TemplatesGroupWrapper,
 } from './styles';
 
+
 const options = [
   {
     id: 'private',
@@ -56,6 +58,8 @@ export interface TemplatesProps {
 
 export const Templates = ({ templates, onClose, updateTemplates }: TemplatesProps) => {
   const { columnsFilters } = useContext(FiltersContext);
+
+  const { isAddPublicTemplateEnabled } = usePermissions();
 
   const { mutationProtectedFetch } = useFetch({});
 
@@ -188,15 +192,23 @@ export const Templates = ({ templates, onClose, updateTemplates }: TemplatesProp
 
   const model = useMemo(
     () =>
-      options.map(({ id, label, icon }) => ({
-        id,
-        render: (options: RenderOptionProps) => (
-          <StyledMenuItem key={id} dimension="s" data-dimension="s" {...options}>
-            <IconWrapper>{icon}</IconWrapper>
-            {label}
-          </StyledMenuItem>
-        ),
-      })),
+      options
+        .filter((option) => {
+          if (option.id === 'public' && !isAddPublicTemplateEnabled) {
+            return false;
+          }
+
+          return true;
+        })
+        .map(({ id, label, icon }) => ({
+          id,
+          render: (options: RenderOptionProps) => (
+            <StyledMenuItem key={ id } dimension="s" data-dimension="s" { ...options }>
+              <IconWrapper>{ icon }</IconWrapper>
+              { label }
+            </StyledMenuItem>
+          )
+        })),
     [],
   );
 

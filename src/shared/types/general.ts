@@ -68,6 +68,7 @@ type Row = ArtificialRow & {
   model_alias: string | null;
   model_id: string | null;
   model_version: string | null;
+  model_version_validation: string | null;
   model_name: string | null;
   model_name_validation: string | null;
   model_desc: string | null;
@@ -111,8 +112,8 @@ type Row = ArtificialRow & {
   validity_approve_date: string | null;
   bank_document: string | null;
   rs_model_decommiss_date: string | null;
-  remove_date: string | null;
   remove_decision: string | null;
+  remove_date_validation: string | null;
   assignment_contractor: string | null;
   developing_start_date: string | null;
   data_source_description: string | null;
@@ -216,3 +217,4 @@ export {
   ModelSource,
   ModelStatus,
 };
+
