@@ -42,7 +42,7 @@ export interface ModelFormProps {
   rows: Partial<Row>[];
   activeRow?: Partial<Row>;
   // TODO: check this types
-  onSubmit: (newRow: Row, formMode: MODEL_FORM_MODE) => void;
+  onSubmit: (newRow?: Row, formMode?: MODEL_FORM_MODE) => void;
   onClose: () => void;
 }
 
@@ -330,6 +330,7 @@ export const ModelForm = ({
 
           if (res?.data?.data?.cards && res.data.data.cards[0]) {
             newRow = res.data.data.cards[0];
+            console.log('🐸 Pepe said ~ newRow:', newRow);
           }
         }
       }
@@ -349,7 +350,7 @@ export const ModelForm = ({
         newRow = res.data as Row;
       }
 
-      if (newRow && formMode) {
+      if (formMode) {
         onSubmit(newRow, formMode);
         setSubmitLoading(false);
         setSubmitError('');
@@ -406,13 +407,6 @@ export const ModelForm = ({
   useEffect(() => {
     if (formRef.current?.children && editCellName) {
       const editedFieldIndex = fields.findIndex((field) => field.name === editCellName);
-      console.log('🐸 Pepe said ~ useEffect ~ editCellName:', editCellName);
-      console.log('🐸 Pepe said ~ useEffect ~ fields:', fields);
-      console.log(
-        '🐸 Pepe said ~ useEffect ~ editedFieldIndex:',
-        editedFieldIndex,
-        formRef.current.children,
-      );
 
       if (editedFieldIndex !== -1) {
         formRef.current.children[editedFieldIndex]?.scrollIntoView({

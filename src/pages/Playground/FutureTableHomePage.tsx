@@ -1,5 +1,4 @@
 import React from 'react';
-import styled from 'styled-components';
 import { ErrorStatus, Flexbox, Loading, Spacer } from '@shared/ui/atoms';
 import { ACTIVE_SCREEN } from '@shared/constants';
 import { FiltersContext } from '@shared/api';
@@ -8,14 +7,6 @@ import { useTableModels } from '@pages/Home/hooks';
 
 import { AgGridTable } from '../../features/NewTables/AgGridTable';
 import { CompareModelsWidgetNewTable } from '../../widgets/CompareModelsWidget/CompareModelsWidgetNewTable';
-
-// TODO: вынести в atoms/styled
-const StatusWrapper = styled.div`
-  display: flex;
-  width: 100%;
-  padding: 50px 0;
-  justify-content: center;
-`;
 
 export const FutureTableHomePage = () => {
   const { display, modelsTable, filters, context } = useTableModels();
