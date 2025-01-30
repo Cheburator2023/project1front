@@ -67,8 +67,6 @@ export const ColumnFilter = React.memo(
     switch (column.type) {
       case COLUMN_TYPE.QUARTERLY_DATE:
       case COLUMN_TYPE.DATE: {
-        const formattedValue = getFormattedDateValue(value);
-
         return (
           <div
             onClick={(

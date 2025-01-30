@@ -33,6 +33,7 @@ export const useTableChange = ({
 
   // Table data
   const [rows, setRows] = useState(rowList);
+  const [pageRows, setPageRows] = useState(rowList);
   const [cols, setCols] = useState<(AdmiralColumn & Column)[]>([]);
 
   const handleSort = ({ name, sort }: { name: string; sort: 'asc' | 'desc' | 'initial' }) => {
@@ -90,7 +91,7 @@ export const useTableChange = ({
       updateDeleteModelState(selectedRows.length);
     }
 
-    setRows(rowsWithUpdatedSelectedStatus);
+    setPageRows(rowsWithUpdatedSelectedStatus);
   };
 
   const handleChangeColumnsFilter = useCallback(
@@ -155,7 +156,8 @@ export const useTableChange = ({
 
       const pageRows = getPageRows({ rows: newFilteredRows, page, pageSize });
 
-      setRows(pageRows);
+      setPageRows(pageRows);
+      setRows(newFilteredRows);
       updateRowsCount(newFilteredRows.length);
     }
   }, [
@@ -173,6 +175,7 @@ export const useTableChange = ({
   return {
     cols,
     rows,
+    pageRows,
     setRows,
     setCols,
     handleSort,

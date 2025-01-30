@@ -3,7 +3,7 @@ import { ArtificialRow, COLUMN_TYPE, Column, ColumnsFilter } from '@shared/types
 export const initialColumns: Array<Column> = [
   {
     name: 'system_model_id',
-    title: 'Идентифиактор версии модели',
+    title: 'Идентификатор версии модели',
     type: COLUMN_TYPE.STRING,
   },
   {
@@ -29,6 +29,11 @@ export const initialColumns: Array<Column> = [
   {
     name: 'model_version',
     title: 'Версия модели',
+    type: COLUMN_TYPE.STRING,
+  },
+  {
+    name: 'model_version_validation',
+    title: 'Версия Модели от владельца',
     type: COLUMN_TYPE.STRING,
   },
   {
@@ -333,12 +338,17 @@ export const initialColumns: Array<Column> = [
   },
   {
     name: 'rs_model_decommiss_date',
-    title: 'Дата выведения РС / Модели из эксплуатации',
+    title: 'Дата выведения Модели из ПИМ',
     type: COLUMN_TYPE.DATE,
   },
   {
     name: 'remove_decision',
     title: 'Реквизиты решения о выведении из эксплуатации',
+    type: COLUMN_TYPE.STRING,
+  },
+  {
+    name: 'remove_date_validation',
+    title: 'Дата выведения РС / Модели из эксплуатации',
     type: COLUMN_TYPE.STRING,
   },
   {
@@ -367,7 +377,7 @@ export const initialColumns: Array<Column> = [
     type: COLUMN_TYPE.STRING,
   },
   {
-    name: 'analize_text_about_developing',
+    name: 'developing_report',
     title: 'Отчет по разработке',
     type: COLUMN_TYPE.STRING,
   },
@@ -653,6 +663,11 @@ export const initialColumns: Array<Column> = [
     type: COLUMN_TYPE.STRING,
   },
   {
+    name: 'create_date',
+    title: 'Дата создания',
+    type: COLUMN_TYPE.DATE,
+  },
+  {
     name: 'model_source',
     title: 'Система источник данных',
     type: COLUMN_TYPE.STRING,
@@ -664,16 +679,16 @@ export const initialColumns: Array<Column> = [
     sticky: true,
     type: COLUMN_TYPE.ACTION,
   },
-  // {
-  //   name: 'reason_model_delete',
-  //   title: 'Причина удаления модели',
-  //   type: COLUMN_TYPE.STRING,
-  // },
-  // {
-  //   name: 'status',
-  //   title: 'Cтатус',
-  //   type: COLUMN_TYPE.STRING,
-  // },
+  {
+    name: 'reason_model_delete',
+    title: 'Причина удаления модели',
+    type: COLUMN_TYPE.STRING,
+  },
+  {
+    name: 'status',
+    title: 'Cтатус',
+    type: COLUMN_TYPE.STRING,
+  },
 ];
 
 export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
@@ -683,6 +698,7 @@ export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
   model_alias: [],
   model_id: [],
   model_version: [],
+  model_version_validation: [],
   model_name_validation: [],
   model_desc: [],
   model_type: [],
@@ -746,12 +762,13 @@ export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
   bank_document: [],
   rs_model_decommiss_date: [],
   remove_decision: [],
+  remove_date_validation: [],
   assignment_contractor: [],
   developing_start_date: [],
   data_source_description: [],
   target: [],
   calibration_method: [],
-  analize_text_about_developing: [],
+  developing_report: [],
   name_and_version_rating_system: [],
   version_it_implementation: [],
   responsible_subdivision_and_project_lead_for_it_implementation: [],
@@ -823,4 +840,9 @@ export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
   model_creator: [],
   reason_model_delete: [],
   status: [],
+  analize_text_about_developing: [],
+  model_name_dadm: [],
+  custom_model_id: [],
+  custom_model_type: [],
 };
+

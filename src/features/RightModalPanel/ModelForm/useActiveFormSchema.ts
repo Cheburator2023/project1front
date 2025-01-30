@@ -14,6 +14,7 @@ import {
   RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA,
   NOT_ACTIVE_MODEL_SCHEMA,
   SCHEMA_NAME_MAP,
+  VALIDATION_MODEL_SCHEMA,
 } from './constants';
 import { FormFieldsSchema, FormValues } from '../types';
 import { markSchema } from '../helpers';
@@ -51,13 +52,21 @@ const getEditSchema = (
   values?: FormValues,
   activeModelByDefault?: boolean,
 ) => {
-  let formSchema = markSchema(BASE_MODEL_SCHEMA, SCHEMA_NAME_MAP.BASE_MODEL_SCHEMA);
+  let formSchema = getUnionSchema(
+    markSchema(BASE_MODEL_SCHEMA, SCHEMA_NAME_MAP.BASE_MODEL_SCHEMA),
+    markSchema(VALIDATION_MODEL_SCHEMA, SCHEMA_NAME_MAP.VALIDATION_MODEL_SCHEMA),
+  );
 
   if (values) {
     if (values.active_model?.value || activeModelByDefault) {
       formSchema = getUnionSchema(
         markSchema(BASE_MODEL_SCHEMA, SCHEMA_NAME_MAP.BASE_MODEL_SCHEMA),
         markSchema(ACTIVE_MODEL_SCHEMA, SCHEMA_NAME_MAP.ACTIVE_MODEL_SCHEMA),
+      );
+
+      formSchema = getUnionSchema(
+        formSchema,
+        markSchema(VALIDATION_MODEL_SCHEMA, SCHEMA_NAME_MAP.VALIDATION_MODEL_SCHEMA),
       );
 
       // TODO: It is necessary to avoid using string values in conditionals, try to switch them to artifact values (prob need another approach)
@@ -103,6 +112,11 @@ const getEditSchema = (
         markSchema(BASE_MODEL_SCHEMA, SCHEMA_NAME_MAP.BASE_MODEL_SCHEMA),
         markSchema(NOT_ACTIVE_MODEL_SCHEMA, SCHEMA_NAME_MAP.NOT_ACTIVE_MODEL_SCHEMA),
       );
+
+      formSchema = getUnionSchema(
+        formSchema,
+        markSchema(VALIDATION_MODEL_SCHEMA, SCHEMA_NAME_MAP.VALIDATION_MODEL_SCHEMA),
+      );
     }
 
     return formSchema;
@@ -123,6 +137,11 @@ const getAddSchema = (
       formSchema = getUnionSchema(
         markSchema(BASE_MODEL_SCHEMA, SCHEMA_NAME_MAP.BASE_MODEL_SCHEMA),
         markSchema(ACTIVE_MODEL_SCHEMA, SCHEMA_NAME_MAP.ACTIVE_MODEL_SCHEMA),
+      );
+
+      formSchema = getUnionSchema(
+        formSchema,
+        markSchema(VALIDATION_MODEL_SCHEMA, SCHEMA_NAME_MAP.VALIDATION_MODEL_SCHEMA),
       );
 
       // TODO: It is necessary to avoid using string values in conditionals, try to switch them to artifact values (prob need another approach)
@@ -174,10 +193,16 @@ export const useActiveFormSchema = ({
   const [formSchema, setFormSchema] = useState<FormFieldsSchema>(
     activeModelByDefault
       ? getUnionSchema(
-          markSchema(BASE_MODEL_SCHEMA, SCHEMA_NAME_MAP.BASE_MODEL_SCHEMA),
-          markSchema(ACTIVE_MODEL_SCHEMA, SCHEMA_NAME_MAP.ACTIVE_MODEL_SCHEMA),
+          getUnionSchema(
+            markSchema(BASE_MODEL_SCHEMA, SCHEMA_NAME_MAP.BASE_MODEL_SCHEMA),
+            markSchema(ACTIVE_MODEL_SCHEMA, SCHEMA_NAME_MAP.ACTIVE_MODEL_SCHEMA),
+          ),
+          markSchema(VALIDATION_MODEL_SCHEMA, SCHEMA_NAME_MAP.VALIDATION_MODEL_SCHEMA),
         )
-      : markSchema(BASE_MODEL_SCHEMA, SCHEMA_NAME_MAP.BASE_MODEL_SCHEMA),
+      : getUnionSchema(
+          markSchema(BASE_MODEL_SCHEMA, SCHEMA_NAME_MAP.BASE_MODEL_SCHEMA),
+          markSchema(VALIDATION_MODEL_SCHEMA, SCHEMA_NAME_MAP.VALIDATION_MODEL_SCHEMA),
+        ),
   );
 
   useDeepEffect(() => {

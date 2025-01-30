@@ -68,6 +68,7 @@ type Row = ArtificialRow & {
   model_alias: string | null;
   model_id: string | null;
   model_version: string | null;
+  model_version_validation: string | null;
   model_name: string | null;
   model_name_validation: string | null;
   model_desc: string | null;
@@ -112,12 +113,14 @@ type Row = ArtificialRow & {
   bank_document: string | null;
   rs_model_decommiss_date: string | null;
   remove_decision: string | null;
+  remove_date_validation: string | null;
   assignment_contractor: string | null;
   developing_start_date: string | null;
   data_source_description: string | null;
   target: string | null;
-  calibration_method: string | null;
   analize_text_about_developing: string | null;
+  calibration_method: string | null;
+  developing_report: string | null;
   name_and_version_rating_system: string | null;
   version_it_implementation: string | null;
   responsible_subdivision_and_project_lead_for_it_implementation: string | null;
@@ -128,6 +131,7 @@ type Row = ArtificialRow & {
   validation_period: string | null;
   validation_report_approve_date: string | null;
   validation_result: string | null;
+  model_name_dadm: string | null;
   validation_result_approve_date: string | null;
   importance_changes: string | null;
   approve_importance: string | null;
@@ -159,6 +163,8 @@ type Row = ArtificialRow & {
   business_status: string | null;
   model_epic_07: string | null;
   model_epic_07_date: string | null;
+  custom_model_id: string | null;
+  custom_model_type: string | null;
   customer_model_id: string | null;
   model_algorithm: string | null;
   release: string | null;
@@ -198,6 +204,7 @@ enum ModelStatus {
 
 enum ModelSource {
   SUM_RM = 'sum-rm',
+  SUM = 'sum'
 }
 
 export {
@@ -210,3 +217,4 @@ export {
   ModelSource,
   ModelStatus,
 };
+

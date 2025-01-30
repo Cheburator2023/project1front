@@ -12,7 +12,7 @@ import {
 } from 'date-fns';
 
 import { ArtifactType, type Artifact, type ArtifactApi, type ArtifactValue } from '@shared/api';
-import { Column, COLUMN_TYPE, Role, Row } from '@shared/types';
+import { Column, COLUMN_TYPE, ModelSource, Role, Row } from '@shared/types';
 import { initialColumns, RIGHT_PANEL_TYPE, MODEL_FORM_MODE } from '@shared/constants';
 import {
   CommonInputProps,
@@ -358,24 +358,42 @@ export const getStartDateInCurrentYear = (startDate: Date) => {
   return startDate;
 };
 
+const ENABLE_FEBRUARY_EXTENSION = true; // Можно переключать на false при необходимости
+
 const getDateLimits = (quarter: number) => {
-  const currentYear = new Date().getFullYear();
-  const firstDateOfCurrentYear = startOfYear(new Date(currentYear, 0, 1));
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
 
-  const minDate = addMonths(firstDateOfCurrentYear, (quarter - 1) * 3);
+  // Если запрашиваемый квартал — 4 и текущий квартал — 1, использовать прошлый год
+  const effectiveYear = quarter === 4 && currentDate.getMonth() < 3 ? currentYear - 1 : currentYear;
 
-  const lastDayOfQuarter = endOfQuarter(minDate);
+  const firstDateOfEffectiveYear = startOfYear(new Date(effectiveYear, 0, 1));
+  const minDate = addMonths(firstDateOfEffectiveYear, (quarter - 1) * 3);
+  let maxDate = endOfQuarter(minDate);
+
+  // Продление максимальной даты для 4-го квартала до конца февраля
+  if (quarter === 4) {
+    maxDate = ENABLE_FEBRUARY_EXTENSION
+      ? new Date(effectiveYear + 1, 1, 28, 23, 59, 59) // Включаем февраль
+      : new Date(effectiveYear + 1, 0, 31, 23, 59, 59); // Только январь
+  }
 
   return {
     minDate,
-    maxDate: lastDayOfQuarter,
+    maxDate,
   };
 };
 
 const getDisabledStatus = (minDate: Date, maxDate: Date, quarter: number) => {
   const currentDate = new Date();
-
   const currentQuarter = Math.floor((currentDate.getMonth() + 3) / 3);
+
+  const startOfCurrentQuarter = new Date(currentDate.getFullYear(), (currentQuarter - 1) * 3, 1);
+  const monthAfterStartOfCurrentQuarter = addMonths(startOfCurrentQuarter, 1);
+
+  if (currentQuarter === 1 && quarter === 4) {
+    return !isWithinInterval(currentDate, { start: minDate, end: maxDate });
+  }
 
   if (quarter > currentQuarter) {
     return true;
@@ -384,9 +402,6 @@ const getDisabledStatus = (minDate: Date, maxDate: Date, quarter: number) => {
   if (quarter < currentQuarter - 1) {
     return true;
   }
-
-  const startOfCurrentQuarter = new Date(currentDate.getFullYear(), (currentQuarter - 1) * 3, 1);
-  const monthAfterStartOfCurrentQuarter = addMonths(startOfCurrentQuarter, 1);
 
   if (currentDate < monthAfterStartOfCurrentQuarter && quarter === currentQuarter - 1) {
     return false;
@@ -420,6 +435,31 @@ const isUserAllowedForField = (
   return rolesAllowed || businessCustomerAllowed || modelCreatorAllowed;
 };
 
+const canEditArtefact = (artifact?: Artifact, row?: Partial<Row> | undefined): boolean => {
+  if (!artifact || !row) {
+    return false;
+  }
+
+  const isSumEditBlocked = artifact.is_edit_sum_flg === '0';
+
+  if (row.model_source === ModelSource.SUM && isSumEditBlocked) {
+    return false;
+  }
+
+  const isOwnerModel = isInBusinessCustomers(row);
+  const isEditableByRole = artifact.is_editable_by_role === '1';
+  const canBusinessCreatorEdit = artifact.is_edit_for_business_creator_flg === '1' && isOwnerModel;
+
+  if (row.model_source === ModelSource.SUM_RM) {
+    return isEditableByRole || canBusinessCreatorEdit;
+  }
+  if (row.model_source === ModelSource.SUM) {
+    return isEditableByRole || canBusinessCreatorEdit;
+  }
+
+  return false;
+};
+
 const isFieldDisabled = (
   values?: FormValues,
   fieldSchema?: FormFieldsSchema[number],
@@ -448,6 +488,8 @@ const isFieldDisabled = (
 
   const isControlledByConditions =
     fieldSchema?.enabledByValueConditions && isDisabledByValueConditions && isDisabledByConditions;
+
+  // const isDisabledArtifactBySource = !canEditArtefact(artifact, row);
 
   return isGloballyDisabled || isControlledByConditions;
 };

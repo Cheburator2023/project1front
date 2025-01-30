@@ -4,7 +4,7 @@ import { DropdownProvider } from '@admiral-ds/react-ui';
 import Keycloak from 'keycloak-js';
 
 import { FetchContext, DownloadReportContext } from '@shared/api';
-import { ColumnsFilter, Role } from '@shared/types';
+import { ColumnsFilter, Permission, Role } from '@shared/types';
 
 import { useUserStore, useAppInjectStore } from '@src/shared/stores';
 import { Header } from './Header';
@@ -38,11 +38,11 @@ const GlobalStyle = createGlobalStyle`
   body {
     margin: 0;
   }
-  .ag-watermark, 
+  .ag-watermark,
   .ag-watermark-text,
-  .ag-watermark.ag-opacity-zero, 
-  div.ag-watermark.ag-opacity-zero, 
-  div.ag-watermark, 
+  .ag-watermark.ag-opacity-zero,
+  div.ag-watermark.ag-opacity-zero,
+  div.ag-watermark,
   div.ag-watermark-text {
     display: none !important;
     opacity: 0 !important;
@@ -58,7 +58,7 @@ const Layout = ({ children, user, protectedFetch, goToSum, onLogout }: LayoutPro
   const [downloadReportStatus, setDownloadReportStatus] = useState(false);
   const [columnsFilters, setColumnsFilters] = useState<Partial<ColumnsFilter>>();
   const { setCurrentCustomer } = useAppInjectStore();
-  const { setUsername, setGroups, setRoles } = useUserStore();
+  const { setUsername, setGroups, setRoles, setPermissions } = useUserStore();
 
   const updateColumnsFilters = useCallback((newColumnsFilters?: Partial<ColumnsFilter>) => {
     setColumnsFilters(newColumnsFilters);
@@ -93,9 +93,15 @@ const Layout = ({ children, user, protectedFetch, goToSum, onLogout }: LayoutPro
       ) as Role[];
       setRoles(roles);
     }
-  }, [user?.roles, user?.realm_access, setCurrentCustomer]);
 
-  console.log(user);
+    if (user?.realm_access?.roles) {
+      const permissions = user.realm_access.roles.filter((permission) =>
+        Object.values(Permission).includes(permission as Permission),
+      ) as Permission[];
+
+      setPermissions(permissions);
+    }
+  }, [user?.roles, user?.realm_access, setCurrentCustomer]);
 
   const onLogoutHandler = () => {
     if (onLogout) {

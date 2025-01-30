@@ -56,6 +56,11 @@ export const SCHEMA_NAME_MAP: SchemaNameMap = {
     schemaOrder: 5,
   },
   REST_MODEL_SCHEMA: { key: 'REST_MODEL_SCHEMA', title: 'Прочие атрибуты', schemaOrder: 8 },
+  VALIDATION_MODEL_SCHEMA: {
+    key: 'VALIDATION_MODEL_SCHEMA',
+    title: 'Атрибуты валидации',
+    schemaOrder: 9,
+  },
 };
 
 export const BASE_MODEL_SCHEMA: FormFieldsSchema = [
@@ -238,7 +243,7 @@ export const ACTIVE_MODEL_SCHEMA: FormFieldsSchema = [
     maxLength: 250,
   },
   {
-    name: 'analize_text_about_developing',
+    name: 'developing_report',
     customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
     required: true,
     maxLength: 250,
@@ -278,6 +283,32 @@ export const ACTIVE_MODEL_SCHEMA: FormFieldsSchema = [
       },
     ],
     maxLength: 250,
+  },
+  {
+    name: 'model_version',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'model_changes_info',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+    maxLength: 250,
+  },
+  {
+    name: 'developing_end_date',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'model_id',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'update_date',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
   },
 ];
 
@@ -604,6 +635,66 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
       },
     ],
   },
+  {
+    name: 'identifier_model_algorithm_for_rwa',
+    required: false,
+    maxLength: 250,
+  },
+  {
+    name: 'segment_name',
+    required: false,
+    maxLength: 250,
+  },
+  {
+    name: 'bank_document',
+    required: false,
+    maxLength: 250,
+  },
+  {
+    name: 'data_source_description',
+    required: false,
+    maxLength: 250,
+  },
+  {
+    name: 'target',
+    required: false,
+    maxLength: 250,
+  },
+  {
+    name: 'calibration_method',
+    required: false,
+    maxLength: 250,
+  },
+  {
+    name: 'version_it_implementation',
+    required: false,
+    maxLength: 250,
+  },
+  {
+    name: 'responsible_subdivision_and_project_lead_for_it_implementation',
+    required: false,
+    maxLength: 250,
+  },
+  {
+    name: 'date_of_it_introduction_into_operation',
+    required: false,
+    maxLength: 250,
+  },
+  {
+    name: 'psi_protocol',
+    required: false,
+    maxLength: 250,
+  },
+  {
+    name: 'developing_start_date',
+    required: false,
+    maxLength: 250,
+  },
+  {
+    name: 'developing_end_date',
+    required: false,
+    maxLength: 250,
+  },
 ];
 
 export const RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA: FormFieldsSchema = [
@@ -711,6 +802,106 @@ export const RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA: FormFieldsSchema = [
           'Рейтинговые системы, подлежащие согласованию Регулятором',
       },
     ],
+  },
+  {
+    name: 'regulatory_code_of_asset_class',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'method_calculation_model_parameter',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'importance_changes',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'approve_importance',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'approve_importance_changes',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'date_and_number_regulator_notification',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'date_submission_to_regulator',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'decision_date_and_number_of_application_model_for_segment',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'notification_date_and_number_of_application_model_for_segment',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+
+  {
+    name: 'decision_date_and_number_of_application_model',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'notification_date_and_number_of_application_model',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'start_date_of_application_model_approved_regulator',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+];
+
+export const VALIDATION_MODEL_SCHEMA: FormFieldsSchema = [
+  {
+    name: 'validation_department',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+
+  {
+    name: 'plan_validation_type',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'validation_period',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'validation_report_approve_date',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'validation_result',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'auto_validation_result',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'validation_result_approve_date',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
   },
 ];
 
