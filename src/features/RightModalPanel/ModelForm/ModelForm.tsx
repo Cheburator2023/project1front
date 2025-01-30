@@ -292,7 +292,6 @@ export const ModelForm = ({
         formSchema,
         valuesWithAddedOutsideControls,
         wasPreviouslyActiveModel,
-        fields,
       );
       const isAllocationFieldsChanged = checkForAllocationFieldsChanged();
       setInvalidFields(isAllocationFieldsChanged ? [] : newInvalidFields);
@@ -403,10 +402,10 @@ export const ModelForm = ({
   }, [initialRow, artifacts]);
 
   useEffect(() => {
-    if (!isEditByRatingModel) {
-      setActiveModelByDefault(false);
-      return;
-    }
+    // if (!isEditByRatingModel) {
+    //   setActiveModelByDefault(false);
+    //   return;
+    // }
 
     if (activeRow?.active_model === '1') {
       setActiveModelByDefault(true);
@@ -436,15 +435,10 @@ export const ModelForm = ({
 
   useEffect(() => {
     if (dirtyFields.length) {
-      const newInvalidFields = getInvalidFields(
-        formSchema,
-        values,
-        wasPreviouslyActiveModel,
-        fields,
-      );
+      const newInvalidFields = getInvalidFields(formSchema, values, wasPreviouslyActiveModel);
       setInvalidFields(newInvalidFields);
     }
-  }, [values, dirtyFields, formSchema, wasPreviouslyActiveModel, fields]);
+  }, [values, dirtyFields, formSchema, wasPreviouslyActiveModel]);
 
   return (
     <RightPanel
@@ -480,7 +474,7 @@ export const ModelForm = ({
               dimension="s"
               checked={activeModelByDefault}
               onChange={activeModelCheckboxHandler}
-              disabled={!isEditByRatingModel}
+              // disabled={!isEditByRatingModel}
             >
               Действующая Модель/Модуль
             </CheckboxField>
