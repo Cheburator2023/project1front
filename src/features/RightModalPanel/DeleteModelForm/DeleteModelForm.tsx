@@ -243,7 +243,6 @@ export const DeleteModelForm = ({
         deleteFormSchema,
         valuesWithAddedOutsideControls,
         wasPreviouslyActiveModel,
-        fields,
       );
 
       setInvalidFields(newInvalidFields);
@@ -351,15 +350,10 @@ export const DeleteModelForm = ({
 
   useEffect(() => {
     if (dirtyFields.length) {
-      const newInvalidFields = getInvalidFields(
-        deleteFormSchema,
-        values,
-        wasPreviouslyActiveModel,
-        fields,
-      );
+      const newInvalidFields = getInvalidFields(deleteFormSchema, values, wasPreviouslyActiveModel);
       setInvalidFields(newInvalidFields);
     }
-  }, [values, dirtyFields, deleteFormSchema, wasPreviouslyActiveModel, fields]);
+  }, [values, dirtyFields, deleteFormSchema, wasPreviouslyActiveModel]);
 
   const renderFooter = useCallback(() => {
     const modelStatus = values?.status?.value || initialRow?.status;

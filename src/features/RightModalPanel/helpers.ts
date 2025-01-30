@@ -489,9 +489,9 @@ const isFieldDisabled = (
   const isControlledByConditions =
     fieldSchema?.enabledByValueConditions && isDisabledByValueConditions && isDisabledByConditions;
 
-  const isDisabledArtifactBySource = !canEditArtefact(artifact, row);
+  // const isDisabledArtifactBySource = !canEditArtefact(artifact, row);
 
-  return isGloballyDisabled || isControlledByConditions || isDisabledArtifactBySource;
+  return isGloballyDisabled || isControlledByConditions;
 };
 
 // Main mapping function that combine object for proper input format
@@ -502,14 +502,11 @@ const mapArtifactToField = (
   activeRow?: Partial<Row>,
   values?: FormValues,
 ): InputFactoryProps<keyof Row> => {
-  const isDisabled = isFieldDisabled(values, fieldSchema, artifact, activeRow);
-
   const commonAttributes: CommonInputProps<keyof Row> = {
     id: artifact.artefact_id.toString(),
     name: artifact.artefact_tech_label,
     label: artifact.artefact_label,
-    disabled: isDisabled,
-    required: isDisabled ? false : !!fieldSchema?.required,
+    required: !!fieldSchema?.required,
     addNewOptionEnabled: artifact.can_add_new_option === '1',
     maxLength: fieldSchema?.maxLength,
     requireConditions: fieldSchema?.requireConditions,
@@ -518,6 +515,7 @@ const mapArtifactToField = (
     enabledByValueConditions: fieldSchema?.enabledByValueConditions,
     disabledConditions: fieldSchema?.disabledConditions,
     valueConditions: fieldSchema?.valueConditions,
+    disabled: isFieldDisabled(values, fieldSchema, artifact, activeRow),
     placeholder: artifact.artefact_desc ? artifact.artefact_desc : undefined,
     group: artifact.group,
     schemaKey: fieldSchema?.schemaKey || SCHEMA_NAME_MAP.REST_MODEL_SCHEMA.key,
@@ -1003,17 +1001,11 @@ const getInvalidFields = (
   activeFormSchema: FormFieldsSchema,
   values?: FormValues,
   wasPreviouslyActiveModel?: boolean,
-  fields?: FormFields,
 ) => {
   return activeFormSchema
-    .filter((schemaField) => {
-      const { name, required, requireConditions, valueConditions, schemaKey } = schemaField;
+    .filter((field) => {
+      const { name, required, requireConditions, valueConditions, schemaKey } = field;
       const formValue = getFormValue(values?.[name]);
-      const field = fields?.find((_field) => _field.name === name);
-
-      if (field?.disabled) {
-        return false;
-      }
 
       if (
         schemaKey === SCHEMA_NAME_MAP.NOT_ACTIVE_MODEL_SCHEMA.key &&
