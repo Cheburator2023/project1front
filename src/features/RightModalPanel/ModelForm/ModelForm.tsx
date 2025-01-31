@@ -292,6 +292,7 @@ export const ModelForm = ({
         formSchema,
         valuesWithAddedOutsideControls,
         wasPreviouslyActiveModel,
+        fields,
       );
       const isAllocationFieldsChanged = checkForAllocationFieldsChanged();
       setInvalidFields(isAllocationFieldsChanged ? [] : newInvalidFields);
@@ -402,10 +403,10 @@ export const ModelForm = ({
   }, [initialRow, artifacts]);
 
   useEffect(() => {
-    // if (!isEditByRatingModel) {
-    //   setActiveModelByDefault(false);
-    //   return;
-    // }
+    if (!isEditByRatingModel) {
+      setActiveModelByDefault(false);
+      return;
+    }
 
     if (activeRow?.active_model === '1') {
       setActiveModelByDefault(true);
@@ -433,12 +434,17 @@ export const ModelForm = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editCellName, formRef.current]);
 
-  useEffect(() => {
+  useDeepEffect(() => {
     if (dirtyFields.length) {
-      const newInvalidFields = getInvalidFields(formSchema, values, wasPreviouslyActiveModel);
+      const newInvalidFields = getInvalidFields(
+        formSchema,
+        values,
+        wasPreviouslyActiveModel,
+        fields,
+      );
       setInvalidFields(newInvalidFields);
     }
-  }, [values, dirtyFields, formSchema, wasPreviouslyActiveModel]);
+  }, [values, dirtyFields, formSchema, wasPreviouslyActiveModel, fields]);
 
   return (
     <RightPanel
@@ -474,7 +480,7 @@ export const ModelForm = ({
               dimension="s"
               checked={activeModelByDefault}
               onChange={activeModelCheckboxHandler}
-              // disabled={!isEditByRatingModel}
+              disabled={!isEditByRatingModel}
             >
               Действующая Модель/Модуль
             </CheckboxField>
