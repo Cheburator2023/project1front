@@ -56,7 +56,7 @@ export const useCompareModels = (columnsFilters: Partial<ColumnsFilter>) => {
         params = prepareFetchParams(firstDate, secondDate);
       }
 
-      params.excludeError = excludeError.toString();
+      // params.excludeError = excludeError.toString();
 
       const res = await mutationProtectedFetch<
         CompareModelsResponseType,
