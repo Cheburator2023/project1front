@@ -11,24 +11,6 @@ import { CompareModelsWidgetNewTable } from '../../widgets/CompareModelsWidget/C
 export const FutureTableHomePage = () => {
   const { display, modelsTable, filters, context } = useTableModels();
 
-  if (modelsTable.error) {
-    return (
-      <Flexbox flexDirection="column" alignItems="center" justifyContent="center" width="100%">
-        <Spacer />
-        <ErrorStatus text={modelsTable.error} />
-      </Flexbox>
-    );
-  }
-
-  if (modelsTable.loading) {
-    return (
-      <Flexbox flexDirection="column" alignItems="center" justifyContent="center" width="100%">
-        <Spacer />
-        <Loading text="Загрузка данных ..." />
-      </Flexbox>
-    );
-  }
-
   return (
     <FiltersContext.Provider value={context.contextValue}>
       <RightModalPanel

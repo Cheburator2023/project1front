@@ -301,7 +301,7 @@ export const AgGridTable = ({
   };
 
   useDeepEffect(() => {
-    if (rowList.length) {
+    if (rowList?.length) {
       setRows(rowList);
       modelsTable.setTotalRows(rowList.length);
     }

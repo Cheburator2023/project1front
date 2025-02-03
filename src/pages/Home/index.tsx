@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React from 'react';
 import styled from 'styled-components';
 import { ErrorStatus, Loading, Pagination } from '@shared/ui/atoms';
@@ -8,32 +9,8 @@ import { FiltersPanel, RightModalPanel, TemplateFilters, TableModels } from '@fe
 import { useTableModels } from './hooks';
 import { CompareModelsWidget } from '../../widgets';
 
-// TODO: вынести в atoms/styled
-const StatusWrapper = styled.div`
-  display: flex;
-  width: 100%;
-  padding: 50px 0;
-  justify-content: center;
-`;
-
-const Home = () => {
+export const Home = () => {
   const { display, modelsTable, filters, context } = useTableModels();
-
-  if (modelsTable.error) {
-    return (
-      <StatusWrapper>
-        <ErrorStatus text={modelsTable.error} />
-      </StatusWrapper>
-    );
-  }
-
-  if (modelsTable.loading) {
-    return (
-      <StatusWrapper>
-        <Loading text="Загрузка данных ..." />
-      </StatusWrapper>
-    );
-  }
 
   return (
     <FiltersContext.Provider value={context.contextValue}>
@@ -77,6 +54,8 @@ const Home = () => {
             updateRowsCount={modelsTable.setTotalRows}
             setCurrentPage={modelsTable.setPage}
             templates={filters.templates}
+            loading={modelsTable.loading}
+            error={modelsTable.error}
           />
           <Pagination
             page={modelsTable.page}
@@ -101,5 +80,3 @@ const Home = () => {
     </FiltersContext.Provider>
   );
 };
-
-export { Home };

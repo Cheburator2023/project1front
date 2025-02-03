@@ -379,7 +379,7 @@ export const Table: React.FC<TableProps> = ({
   const dragInfo = React.useRef<{ columnName: string; nextColumnName: string | null } | null>(null);
   const [rowDragging, setRowDragging] = useState(false);
 
-  const groupToRowsMap = rowList.reduce<Group>((acc: Group, row) => {
+  const groupToRowsMap = rowList?.reduce<Group>((acc: Group, row) => {
     if (typeof row.groupRows !== 'undefined') {
       acc[row.id] = {
         rows: [...row.groupRows],
@@ -389,19 +389,22 @@ export const Table: React.FC<TableProps> = ({
     return acc;
   }, {});
 
-  const rowToGroupMap = Object.entries(groupToRowsMap).reduce<GroupRows>((acc, [groupId, info]) => {
-    info.rows.forEach((id) => {
-      const row = rowList.find((item) => item.id.toString() === id);
-      if (row && !groupToRowsMap[id]) {
-        acc[id] = { groupId, checked: !!row.selected };
-      }
-    });
-    return acc;
-  }, {});
+  const rowToGroupMap = Object.entries(groupToRowsMap || {})?.reduce<GroupRows>(
+    (acc, [groupId, info]) => {
+      info.rows.forEach((id) => {
+        const row = rowList?.find((item) => item.id.toString() === id);
+        if (row && !groupToRowsMap[id]) {
+          acc[id] = { groupId, checked: !!row.selected };
+        }
+      });
+      return acc;
+    },
+    {},
+  );
 
   const reorderRowsToGroup = () => {
     const tableRows: Array<TableRow> = [];
-    rowList.forEach((row) => {
+    rowList?.forEach((row) => {
       const isGroupRow = !!groupToRowsMap[row.id];
       const rowInGroup = !!rowToGroupMap[row.id];
       if (!rowInGroup) {
@@ -410,7 +413,7 @@ export const Table: React.FC<TableProps> = ({
 
       if (isGroupRow) {
         groupToRowsMap[row.id].rows.forEach((rowId) => {
-          const row = rowList.find((item) => item.id.toString() === rowId);
+          const row = rowList?.find((item) => item.id.toString() === rowId);
           if (row) tableRows.push(row);
         });
       }
@@ -738,7 +741,7 @@ export const Table: React.FC<TableProps> = ({
       const groupCheckStatus = groupInfo && calcGroupCheckStatus(groupInfo);
       const parentGroupNewValue = rowHasGroup && parentGroupWillBeChecked(id);
 
-      const idsMap = rowList.reduce((ids: IdSelectionStatusMap, row) => {
+      const idsMap = rowList?.reduce((ids: IdSelectionStatusMap, row) => {
         if (groupInfo) {
           const rowInCurrentGroup = groupInfo.rows.includes(row.id.toString());
 
@@ -762,7 +765,7 @@ export const Table: React.FC<TableProps> = ({
 
   const handleExpansionChange = React.useCallback(
     (id: RowId) => {
-      const idsMap = rowList.reduce((ids: IdSelectionStatusMap, row) => {
+      const idsMap = rowList?.reduce((ids: IdSelectionStatusMap, row) => {
         const value = row.id === id ? !row.expanded : !!row.expanded;
         ids[row.id] = value;
         return ids;
@@ -773,13 +776,13 @@ export const Table: React.FC<TableProps> = ({
   );
 
   const isSelected = (row: { selected?: boolean }) => row.selected;
-  // When invoked on an empty array, every() always returns true. So we need to check rowList.length.
-  const allRowsChecked = rowList.length > 0 && rowList.every(isSelected);
-  const someRowsChecked = rowList.some(isSelected);
+  // When invoked on an empty array, every() always returns true. So we need to check rowList?.length.
+  const allRowsChecked = rowList?.length > 0 && rowList?.every(isSelected);
+  const someRowsChecked = rowList?.some(isSelected);
 
   const handleHeaderCheckboxChange = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      const toRemove = rowList.reduce((ids: IdSelectionStatusMap, row) => {
+      const toRemove = rowList?.reduce((ids: IdSelectionStatusMap, row) => {
         ids[row.id] = row.checkboxDisabled ? !!row.selected : !someRowsChecked;
         return ids;
       }, {});

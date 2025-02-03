@@ -30,13 +30,6 @@ interface TableModelsProps {
   updateRightPanelType: (newRightPanelType: RIGHT_PANEL_TYPE | null) => void;
 }
 
-const StatusWrapper = styled.div`
-  display: flex;
-  width: 100%;
-  padding: 50px 0;
-  justify-content: center;
-`;
-
 export const CompareModelsNewTable = React.memo(
   ({
     rowList,
@@ -79,7 +72,7 @@ export const CompareModelsNewTable = React.memo(
     const { display, modelsTable, filters, context } = useTableModels();
 
     useEffect(() => {
-      if (rowList.length) {
+      if (rowList?.length) {
         setRows(rowList);
         updateRowsCount(rowList.length);
 
@@ -110,26 +103,19 @@ export const CompareModelsNewTable = React.memo(
       updateRowsCount,
     ]);
 
-    if (error) {
-      return (
-        <StatusWrapper>
-          <ErrorStatus text={error} />
-        </StatusWrapper>
-      );
-    }
-
-    if (loading) {
-      return (
-        <StatusWrapper>
-          <Loading text="Загрузка данных ..." />
-        </StatusWrapper>
-      );
-    }
-
     return (
       <>
         {totalRows > 0 && firstDate && secondDate && !loading ? (
-          <>
+          <div>
+            {loading || error ? (
+              <StatusWrapper>
+                {error ? (
+                  <ErrorStatus text={error} />
+                ) : loading ? (
+                  <Loading text="Загрузка данных ..." />
+                ) : null}
+              </StatusWrapper>
+            ) : null}
             <AgGridTable
               display={display}
               modelsTable={modelsTable}
@@ -139,7 +125,7 @@ export const CompareModelsNewTable = React.memo(
               columnList={columnList}
               rowList={rows}
             />
-          </>
+          </div>
         ) : (
           <StatusWrapper>
             <T font="Subtitle/Subtitle 1">Для сравнения выберите две даты состояния реестра</T>
@@ -151,3 +137,16 @@ export const CompareModelsNewTable = React.memo(
 );
 
 CompareModelsNewTable.displayName = 'CompareModelsNewTable';
+
+const StatusWrapper = styled.div`
+  display: flex;
+  width: 100%;
+  height: 100%;
+  padding: 50px 0;
+  justify-content: center;
+  position: absolute;
+  align-items: center;
+  z-index: 10;
+  background-color: #fffffff0;
+  pointer-events: none;
+`;

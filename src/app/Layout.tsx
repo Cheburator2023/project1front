@@ -150,7 +150,7 @@ const Layout = ({ children, user, protectedFetch, goToSum, onLogout }: LayoutPro
                 goToSum={goToSum}
                 onLogout={onLogoutHandler}
               />
-              {children}
+              <RoutesWrapper>{children}</RoutesWrapper>
             </Container>
           </DownloadReportContext.Provider>
         </DropdownProvider>
@@ -158,6 +158,10 @@ const Layout = ({ children, user, protectedFetch, goToSum, onLogout }: LayoutPro
     </FetchContext.Provider>
   );
 };
+
+const RoutesWrapper = styled.div`
+  position: relative;
+`;
 
 export default Layout;
 export * from './theme/theme';
