@@ -85,7 +85,7 @@ export const AG_GRID_LOCALE_RU = {
   autosizeAllColumns: 'Автоматически задавать размер всем столбцам',
   groupBy: 'Группировать по',
   ungroupBy: 'Разгруппировать по',
-  resetColumns: 'Сбросить столбцы',
+  resetColumns: 'Сбросить сотояние заголовков (порядок, сортировка, закрепление)',
   expandAll: 'Развернуть все',
   collapseAll: 'Свернуть все',
   copy: 'Копировать',

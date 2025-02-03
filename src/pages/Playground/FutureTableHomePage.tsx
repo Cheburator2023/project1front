@@ -1,39 +1,31 @@
 import React from 'react';
-import styled from 'styled-components';
-import { ErrorStatus, Loading } from '@shared/ui/atoms';
+import { ErrorStatus, Flexbox, Loading, Spacer } from '@shared/ui/atoms';
 import { ACTIVE_SCREEN } from '@shared/constants';
 import { FiltersContext } from '@shared/api';
 import { FiltersPanel, RightModalPanel, TemplateFilters } from '@features';
 import { useTableModels } from '@pages/Home/hooks';
 
-import { CompareModelsWidget } from '../../widgets';
-
-import { PlaygroundTable } from './PlaygroundTable';
-
-// TODO: вынести в atoms/styled
-const StatusWrapper = styled.div`
-  display: flex;
-  width: 100%;
-  padding: 50px 0;
-  justify-content: center;
-`;
+import { AgGridTable } from '../../features/NewTables/AgGridTable';
+import { CompareModelsWidgetNewTable } from '../../widgets/CompareModelsWidget/CompareModelsWidgetNewTable';
 
 export const FutureTableHomePage = () => {
   const { display, modelsTable, filters, context } = useTableModels();
 
   if (modelsTable.error) {
     return (
-      <StatusWrapper>
+      <Flexbox flexDirection="column" alignItems="center" justifyContent="center" width="100%">
+        <Spacer />
         <ErrorStatus text={modelsTable.error} />
-      </StatusWrapper>
+      </Flexbox>
     );
   }
 
   if (modelsTable.loading) {
     return (
-      <StatusWrapper>
+      <Flexbox flexDirection="column" alignItems="center" justifyContent="center" width="100%">
+        <Spacer />
         <Loading text="Загрузка данных ..." />
-      </StatusWrapper>
+      </Flexbox>
     );
   }
 
@@ -65,11 +57,16 @@ export const FutureTableHomePage = () => {
             updateActiveScreen={display.setActiveScreen}
             updateRightPanelType={display.setRightPanelType}
           />
-          <PlaygroundTable display={display} modelsTable={modelsTable} filters={filters} templates={filters.templates} />
+          <AgGridTable
+            display={display}
+            modelsTable={modelsTable}
+            filters={filters}
+            templates={filters.templates}
+          />
         </>
       )}
       {display.activeScreen === ACTIVE_SCREEN.COMPARE && (
-        <CompareModelsWidget
+        <CompareModelsWidgetNewTable
           columnsFilters={filters.columnsFilters}
           firstDate={filters.firstDate}
           secondDate={filters.secondDate}

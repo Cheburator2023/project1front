@@ -81,7 +81,7 @@ export type TFilters = {
 export type TContext = {
   updateColumnsFilters: (newColumnsFilters: Partial<ColumnsFilter>) => void;
   downloadReportStatus: boolean;
-  handleSubmit: (newRow: Row | CustomError | ArtifactApi[], formMode: MODEL_FORM_MODE) => void;
+  handleSubmit: (newRow?: Row | CustomError | ArtifactApi[], formMode?: MODEL_FORM_MODE) => void;
   handleOnClose: () => void;
   contextValue: {
     firstDate: string | null;
@@ -158,6 +158,7 @@ export const useTableModels = () => {
   const fetchModels = useCallback(
     async (date?: string) => {
       setLoadingModels(true);
+      console.warn('🐸 Pepe said ~ useTableModels ~ fetchModels');
 
       try {
         const params: Record<string, any> = {};
@@ -293,21 +294,24 @@ export const useTableModels = () => {
     [rowList],
   );
 
-  const handleSubmit = useCallback((newRow: any, formMode: MODEL_FORM_MODE) => {
-    const newRowWithId = { ...newRow, id: newRow.system_model_id, hover: true };
-    if (
-      formMode === MODEL_FORM_MODE.EDIT ||
-      MODEL_FORM_MODE.DELETE ||
-      MODEL_FORM_MODE.DELETE_CONFIRM
-    ) {
-      setRowList((prevRows) =>
-        prevRows.map((row) =>
-          row?.system_model_id === newRowWithId.system_model_id ? newRowWithId : row,
-        ),
-      );
-    } else {
-      setRowList((prevRows) => [newRowWithId, ...prevRows]);
+  const handleSubmit = useCallback((newRow?: any, formMode?: MODEL_FORM_MODE) => {
+    if (newRow) {
+      const newRowWithId = { ...newRow, id: newRow.system_model_id, hover: true };
+      if (
+        formMode === MODEL_FORM_MODE.EDIT ||
+        MODEL_FORM_MODE.DELETE ||
+        MODEL_FORM_MODE.DELETE_CONFIRM
+      ) {
+        setRowList((prevRows) =>
+          prevRows.map((row) =>
+            row?.system_model_id === newRowWithId.system_model_id ? newRowWithId : row,
+          ),
+        );
+      } else {
+        setRowList((prevRows) => [newRowWithId, ...prevRows]);
+      }
     }
+    fetchModels();
   }, []);
 
   const handleOnClose = useCallback(() => {

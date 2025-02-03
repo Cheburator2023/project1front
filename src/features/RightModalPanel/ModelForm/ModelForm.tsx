@@ -42,7 +42,7 @@ export interface ModelFormProps {
   rows: Partial<Row>[];
   activeRow?: Partial<Row>;
   // TODO: check this types
-  onSubmit: (newRow: Row, formMode: MODEL_FORM_MODE) => void;
+  onSubmit: (newRow?: Row, formMode?: MODEL_FORM_MODE) => void;
   onClose: () => void;
 }
 
@@ -335,6 +335,7 @@ export const ModelForm = ({
 
           if (res?.data?.data?.cards && res.data.data.cards[0]) {
             newRow = res.data.data.cards[0];
+            console.log('🐸 Pepe said ~ newRow:', newRow);
           }
         }
       }
@@ -354,7 +355,7 @@ export const ModelForm = ({
         newRow = res.data as Row;
       }
 
-      if (newRow && formMode) {
+      if (formMode) {
         onSubmit(newRow, formMode);
         setSubmitLoading(false);
         setSubmitError('');

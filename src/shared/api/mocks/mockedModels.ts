@@ -2,7 +2,7 @@ import { Row } from '@src/shared/types';
 
 const mockedModels: Array<Partial<Row>> = [
   {
-    active_model: '0',
+    active_model: '1',
     system_model_id: '000f3c2a-7cc3-11ef-b049-8215a604741b',
     model_source: 'sum',
     model_version_id: '000f3c2a-7cc3-11ef-b049-8215a604741b',

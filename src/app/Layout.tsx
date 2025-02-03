@@ -48,6 +48,34 @@ const GlobalStyle = createGlobalStyle`
     opacity: 0 !important;
     visibility: hidden !important;
   }
+
+  .ag-filter-apply-panel {
+    gap: 8px;
+  }
+
+  .ag-ltr .ag-filter-apply-panel-button {
+    margin-left: 0;
+    width: 100%;
+  }
+  .ag-row-is-odd {
+    background-color: aliceblue ;
+  }
+
+  & .ag-custom-cell-value {
+    position: relative;
+  }
+  & .ag-custom-cell-value-changed .ag-custom-cell-value:before {
+    content: '';
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #00bb2f;
+    margin: 18px -10px;
+    position: absolute;
+  }
+  & .ag-custom-cell-value-changed {
+    background-color: #15bf3b14;
+  }
 `;
 
 const Container = styled.div`

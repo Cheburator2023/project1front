@@ -26,7 +26,7 @@ export interface RightModalPanelProps {
   activeRowId?: string;
   activeCellName?: keyof Row;
   updateTemplates: React.Dispatch<React.SetStateAction<Template[]>>;
-  onSubmit: (newRow: CustomError | Row | ArtifactApi[], formMode: MODEL_FORM_MODE) => void;
+  onSubmit: (newRow?: CustomError | Row | ArtifactApi[], formMode?: MODEL_FORM_MODE) => void;
   onClose: () => void;
 }
 
