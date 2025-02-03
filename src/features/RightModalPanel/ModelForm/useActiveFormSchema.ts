@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { MODEL_FORM_MODE } from '@shared/constants';
 import { Row } from '@shared/types';
 import { INPUT_TYPE } from '@shared/ui/organisms';
-import { sortBy } from 'lodash';
+import { sortBy, unionBy } from 'lodash';
 import { useDeepEffect } from '@shared/hooks/useDeepEffect';
 import {
   BASE_MODEL_SCHEMA,
@@ -15,6 +15,7 @@ import {
   NOT_ACTIVE_MODEL_SCHEMA,
   SCHEMA_NAME_MAP,
   VALIDATION_MODEL_SCHEMA,
+  REST_MODEL_SCHEMA,
 } from './constants';
 import { FormFieldsSchema, FormValues } from '../types';
 import { markSchema } from '../helpers';
@@ -52,21 +53,26 @@ const getEditSchema = (
   values?: FormValues,
   activeModelByDefault?: boolean,
 ) => {
-  let formSchema = getUnionSchema(
+  let formSchema = unionBy(
     markSchema(BASE_MODEL_SCHEMA, SCHEMA_NAME_MAP.BASE_MODEL_SCHEMA),
     markSchema(VALIDATION_MODEL_SCHEMA, SCHEMA_NAME_MAP.VALIDATION_MODEL_SCHEMA),
+    markSchema(REST_MODEL_SCHEMA, SCHEMA_NAME_MAP.REST_MODEL_SCHEMA),
+    'name',
   );
 
   if (values) {
     if (values.active_model?.value || activeModelByDefault) {
-      formSchema = getUnionSchema(
+      formSchema = unionBy(
         markSchema(BASE_MODEL_SCHEMA, SCHEMA_NAME_MAP.BASE_MODEL_SCHEMA),
         markSchema(ACTIVE_MODEL_SCHEMA, SCHEMA_NAME_MAP.ACTIVE_MODEL_SCHEMA),
+        markSchema(REST_MODEL_SCHEMA, SCHEMA_NAME_MAP.REST_MODEL_SCHEMA),
+        'name',
       );
 
-      formSchema = getUnionSchema(
+      formSchema = unionBy(
         formSchema,
         markSchema(VALIDATION_MODEL_SCHEMA, SCHEMA_NAME_MAP.VALIDATION_MODEL_SCHEMA),
+        'name',
       );
 
       // TODO: It is necessary to avoid using string values in conditionals, try to switch them to artifact values (prob need another approach)
@@ -108,9 +114,11 @@ const getEditSchema = (
       (activeRow?.active_model === '1' && !values.active_model?.value) ||
       activeModelByDefault === false
     ) {
-      formSchema = getUnionSchema(
+      formSchema = unionBy(
         markSchema(BASE_MODEL_SCHEMA, SCHEMA_NAME_MAP.BASE_MODEL_SCHEMA),
         markSchema(NOT_ACTIVE_MODEL_SCHEMA, SCHEMA_NAME_MAP.NOT_ACTIVE_MODEL_SCHEMA),
+        markSchema(REST_MODEL_SCHEMA, SCHEMA_NAME_MAP.REST_MODEL_SCHEMA),
+        'name',
       );
 
       formSchema = getUnionSchema(
@@ -190,19 +198,23 @@ export const useActiveFormSchema = ({
   mode,
   activeModelByDefault,
 }: UseActiveFormSchemaProps) => {
+  const nonActiveModelSchema = unionBy(
+    markSchema(BASE_MODEL_SCHEMA, SCHEMA_NAME_MAP.BASE_MODEL_SCHEMA),
+    markSchema(VALIDATION_MODEL_SCHEMA, SCHEMA_NAME_MAP.VALIDATION_MODEL_SCHEMA),
+    markSchema(REST_MODEL_SCHEMA, SCHEMA_NAME_MAP.REST_MODEL_SCHEMA),
+    'name',
+  );
+
   const [formSchema, setFormSchema] = useState<FormFieldsSchema>(
     activeModelByDefault
-      ? getUnionSchema(
-          getUnionSchema(
-            markSchema(BASE_MODEL_SCHEMA, SCHEMA_NAME_MAP.BASE_MODEL_SCHEMA),
-            markSchema(ACTIVE_MODEL_SCHEMA, SCHEMA_NAME_MAP.ACTIVE_MODEL_SCHEMA),
-          ),
-          markSchema(VALIDATION_MODEL_SCHEMA, SCHEMA_NAME_MAP.VALIDATION_MODEL_SCHEMA),
-        )
-      : getUnionSchema(
+      ? unionBy(
           markSchema(BASE_MODEL_SCHEMA, SCHEMA_NAME_MAP.BASE_MODEL_SCHEMA),
+          markSchema(ACTIVE_MODEL_SCHEMA, SCHEMA_NAME_MAP.ACTIVE_MODEL_SCHEMA),
           markSchema(VALIDATION_MODEL_SCHEMA, SCHEMA_NAME_MAP.VALIDATION_MODEL_SCHEMA),
-        ),
+          markSchema(REST_MODEL_SCHEMA, SCHEMA_NAME_MAP.REST_MODEL_SCHEMA),
+          'name',
+        )
+      : nonActiveModelSchema,
   );
 
   useDeepEffect(() => {
