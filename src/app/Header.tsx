@@ -103,7 +103,7 @@ const Header = ({
       mutationProtectedFetch<ReportApi, Blob>({
         body: {
           filters: columnsFilters,
-          // excludeError,
+          excludeError,
         },
         fetchApiRoute: API_ROUTES.REPORT,
         fetchMethod: 'POST',
