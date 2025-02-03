@@ -166,7 +166,7 @@ export const useTableModels = () => {
           params.date = getISODateFormat(date);
         }
 
-        // params.excludeError = excludeError.toString();
+        params.excludeError = excludeError.toString();
 
         const res: any = await mutationProtectedFetch<ModelsResponseType, ModelsResponseType>({
           fetchApiRoute: API_ROUTES.MODELS,
