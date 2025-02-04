@@ -360,6 +360,7 @@ export const getStartDateInCurrentYear = (startDate: Date) => {
 };
 
 const ENABLE_FEBRUARY_EXTENSION = true; // Можно переключать на false при необходимости
+const ENABLE_MARCH_EXTENSION = true;
 
 const getDateLimits = (quarter: number) => {
   const currentDate = new Date();
@@ -374,11 +375,17 @@ const getDateLimits = (quarter: number) => {
 
   // Продление максимальной даты для 4-го квартала до конца февраля
   if (quarter === 4) {
-    maxDate = ENABLE_FEBRUARY_EXTENSION
-      ? new Date(effectiveYear + 1, 1, 28, 23, 59, 59) // Включаем февраль
-      : new Date(effectiveYear + 1, 0, 31, 23, 59, 59); // Только январь
+    if (ENABLE_MARCH_EXTENSION) {
+      // Продление максимальной даты для 4-го квартала до конца марта
+      maxDate = new Date(effectiveYear + 1, 2, 31, 23, 59, 59); // Месяц 2 = март
+    } else if (ENABLE_FEBRUARY_EXTENSION) {
+      // Продление максимальной даты для 4-го квартала до конца февраля
+      maxDate = new Date(effectiveYear + 1, 1, 28, 23, 59, 59); // Месяц 1 = февраль
+    } else {
+      // По умолчанию — до конца января
+      maxDate = new Date(effectiveYear + 1, 0, 31, 23, 59, 59); // Месяц 0 = январь
+    }
   }
-
   return {
     minDate,
     maxDate,

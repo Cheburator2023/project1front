@@ -10,5 +10,6 @@ export const usePermissions = () => {
     isAddModelEnabled: hasPermission(Permission.ADD_MODEL),
     isEditModelEnabled: hasPermission(Permission.EDIT_MODEL),
     isAddPublicTemplateEnabled: hasPermission(Permission.ADD_PUBLIC_TEMPLATE),
+    isEditAllocationEnabled: hasPermission(Permission.EDIT_ALLOCATION),
   };
 };
