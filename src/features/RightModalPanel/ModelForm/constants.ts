@@ -24,6 +24,13 @@ export const ALLOCATION_FIELDS_NAMES: Array<keyof Row> = [
   'allocation_kc_comment',
   'allocation_other_comment',
 ];
+export const ALLOCATION_FIELDS_NAMES_USAGE: Array<keyof Row> = [
+  'allocation_kib_usage',
+  'allocation_smb_usage',
+  'allocation_rb_usage',
+  'allocation_kc_usage',
+  'allocation_other_usage',
+];
 
 type SchemaNameMap = {
   [key: string]: {
