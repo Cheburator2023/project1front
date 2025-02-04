@@ -9,46 +9,9 @@ import { FiltersPanel, RightModalPanel, TemplateFilters, TableModels } from '@fe
 import { useTableModels } from './hooks';
 import { CompareModelsWidget } from '../../widgets';
 
-// TODO: вынести в atoms/styled
-const StatusWrapper = styled.div`
-  display: flex;
-  width: 100%;
-  padding: 50px 0;
-  justify-content: center;
-`;
-
-const Row = styled.div`
-  display: flex;
-  background: var(--neutral-neutral-05, #f3f4f6);
-  flex-direction: row;
-  align-items: center;
-  > *:not(:last-child) {
-    margin-right: 6px;
-  }
-  > * {
-    flex: 0 0 auto;
-  }
-`;
-
-const Home = () => {
+export const Home = () => {
   const { display, modelsTable, filters, context } = useTableModels();
   const [checked, setChecked] = useState<boolean>(false);
-
-  if (modelsTable.error) {
-    return (
-      <StatusWrapper>
-        <ErrorStatus text={modelsTable.error} />
-      </StatusWrapper>
-    );
-  }
-
-  if (modelsTable.loading) {
-    return (
-      <StatusWrapper>
-        <Loading text="Загрузка данных ..." />
-      </StatusWrapper>
-    );
-  }
 
   return (
     <FiltersContext.Provider value={context.contextValue}>
@@ -92,6 +55,8 @@ const Home = () => {
             updateRowsCount={modelsTable.setTotalRows}
             setCurrentPage={modelsTable.setPage}
             templates={filters.templates}
+            loading={modelsTable.loading}
+            error={modelsTable.error}
           />
           <Pagination
             page={modelsTable.page}
@@ -128,4 +93,15 @@ const Home = () => {
   );
 };
 
-export { Home };
+const Row = styled.div`
+  display: flex;
+  background: var(--neutral-neutral-05, #f3f4f6);
+  flex-direction: row;
+  align-items: center;
+  > *:not(:last-child) {
+    margin-right: 6px;
+  }
+  > * {
+    flex: 0 0 auto;
+  }
+`;

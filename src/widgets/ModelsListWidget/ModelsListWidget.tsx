@@ -10,14 +10,6 @@ import { FiltersPanel, RightModalPanel, TableModels } from '@features';
 
 import { useModelsListWidget } from './hooks';
 
-// TODO: вынести в atoms/styled
-const StatusWrapper = styled.div`
-  display: flex;
-  width: 100%;
-  padding: 50px 0;
-  justify-content: center;
-`;
-
 interface ModelsListWidgetProps {
   columnsFilters: Partial<ColumnsFilter>;
   templates: Template[];
@@ -40,22 +32,6 @@ export const ModelsListWidget = ({
   updateTemplates,
 }: ModelsListWidgetProps) => {
   const { data, actions } = useModelsListWidget(columnsFilters, setRightPanelType);
-
-  if (data.error) {
-    return (
-      <StatusWrapper>
-        <ErrorStatus text={data.error} />
-      </StatusWrapper>
-    );
-  }
-
-  if (data.loading) {
-    return (
-      <StatusWrapper>
-        <Loading text="Загрузка данных ..." />
-      </StatusWrapper>
-    );
-  }
 
   return (
     <>
@@ -87,6 +63,8 @@ export const ModelsListWidget = ({
         updateRowsCount={actions.setTotalRows}
         setCurrentPage={actions.setPage}
         templates={templates}
+        error={data.error}
+        loading={data.loading}
       />
       <Pagination
         page={data.page}

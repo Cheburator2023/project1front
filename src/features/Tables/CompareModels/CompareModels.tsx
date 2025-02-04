@@ -28,13 +28,6 @@ interface TableModelsProps {
   updateRightPanelType: (newRightPanelType: RIGHT_PANEL_TYPE | null) => void;
 }
 
-const StatusWrapper = styled.div`
-  display: flex;
-  width: 100%;
-  padding: 50px 0;
-  justify-content: center;
-`;
-
 export const TableCompareModels = React.memo(
   ({
     rowList,
@@ -76,7 +69,7 @@ export const TableCompareModels = React.memo(
     });
 
     useEffect(() => {
-      if (rowList.length) {
+      if (rowList?.length) {
         setRows(rowList);
         updateRowsCount(rowList.length);
 
@@ -107,40 +100,36 @@ export const TableCompareModels = React.memo(
       updateRowsCount,
     ]);
 
-    if (error) {
-      return (
-        <StatusWrapper>
-          <ErrorStatus text={error} />
-        </StatusWrapper>
-      );
-    }
-
-    if (loading) {
-      return (
-        <StatusWrapper>
-          <Loading text="Загрузка данных ..." />
-        </StatusWrapper>
-      );
-    }
-
     return (
       <>
-        {totalRows > 0 && firstDate && secondDate && !loading ? (
+        {totalRows > 0 && firstDate && secondDate ? (
           <>
             <ActionsPanel handleSearch={handleSearch} updateRightPanelType={updateRightPanelType} />
-            <CompareTable
-              displayRowSelectionColumn
-              greyHeader
-              headerLineClamp={1}
-              rowList={rows as Array<Partial<Row> & { id: string }>} // fix types
-              columnList={cols}
-              virtualScroll={{ fixedRowHeight: 40 }}
-              style={{ height: 'calc(100vh - 245px)' }}
-              onSortChange={handleSort}
-              onColumnResize={handleResize}
-              onRowSelectionChange={handleSelectionChange}
-              onColumnDragEnd={handleColumnDragEnd}
-            />
+            <div>
+              {loading || error ? (
+                <StatusWrapper>
+                  {error ? (
+                    <ErrorStatus text={error} />
+                  ) : loading ? (
+                    <Loading text="Загрузка данных ..." />
+                  ) : null}
+                </StatusWrapper>
+              ) : null}
+              <CompareTable
+                displayRowSelectionColumn
+                greyHeader
+                headerLineClamp={1}
+                rowList={rows as Array<Partial<Row> & { id: string }>} // fix types
+                columnList={cols}
+                virtualScroll={{ fixedRowHeight: 40 }}
+                style={{ height: 'calc(100vh - 245px)' }}
+                onSortChange={handleSort}
+                onColumnResize={handleResize}
+                onRowSelectionChange={handleSelectionChange}
+                onColumnDragEnd={handleColumnDragEnd}
+              />
+            </div>
+
             <Pagination
               page={page}
               pageSize={pageSize}
@@ -159,3 +148,16 @@ export const TableCompareModels = React.memo(
 );
 
 TableCompareModels.displayName = 'TableCompareModels';
+
+const StatusWrapper = styled.div`
+  display: flex;
+  width: 100%;
+  height: 100%;
+  padding: 50px 0;
+  justify-content: center;
+  position: absolute;
+  align-items: center;
+  z-index: 10;
+  background-color: #fffffff0;
+  pointer-events: none;
+`;

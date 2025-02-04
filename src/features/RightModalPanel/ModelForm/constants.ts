@@ -905,3 +905,13 @@ export const VALIDATION_MODEL_SCHEMA: FormFieldsSchema = [
   },
 ];
 
+export const REST_MODEL_SCHEMA: FormFieldsSchema = [
+  ...ACTIVE_MODEL_SCHEMA,
+  ...RATING_SYSTEM_MODEL_SCHEMA,
+  ...RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA,
+].map((item) => ({
+  ...item,
+  required: false,
+  customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
+}));
+

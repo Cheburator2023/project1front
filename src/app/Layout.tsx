@@ -34,54 +34,6 @@ interface LayoutProps {
   onLogout?: () => void;
 }
 
-const GlobalStyle = createGlobalStyle`
-  body {
-    margin: 0;
-  }
-  .ag-watermark,
-  .ag-watermark-text,
-  .ag-watermark.ag-opacity-zero,
-  div.ag-watermark.ag-opacity-zero,
-  div.ag-watermark,
-  div.ag-watermark-text {
-    display: none !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
-  }
-
-  .ag-filter-apply-panel {
-    gap: 8px;
-  }
-
-  .ag-ltr .ag-filter-apply-panel-button {
-    margin-left: 0;
-    width: 100%;
-  }
-  .ag-row-is-odd {
-    background-color: aliceblue ;
-  }
-
-  & .ag-custom-cell-value {
-    position: relative;
-  }
-  & .ag-custom-cell-value-changed .ag-custom-cell-value:before {
-    content: '';
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    background: #00bb2f;
-    margin: 18px -10px;
-    position: absolute;
-  }
-  & .ag-custom-cell-value-changed {
-    background-color: #15bf3b14;
-  }
-`;
-
-const Container = styled.div`
-  min-width: 1600px;
-`;
-
 const Layout = ({ children, user, protectedFetch, goToSum, onLogout }: LayoutProps) => {
   const [downloadReportStatus, setDownloadReportStatus] = useState(false);
   const [columnsFilters, setColumnsFilters] = useState<Partial<ColumnsFilter>>();
@@ -155,7 +107,7 @@ const Layout = ({ children, user, protectedFetch, goToSum, onLogout }: LayoutPro
                 goToSum={goToSum}
                 onLogout={onLogoutHandler}
               />
-              {children}
+              <RoutesWrapper>{children}</RoutesWrapper>
             </Container>
           </DownloadReportContext.Provider>
         </DropdownProvider>
@@ -164,5 +116,58 @@ const Layout = ({ children, user, protectedFetch, goToSum, onLogout }: LayoutPro
   );
 };
 
+const GlobalStyle = createGlobalStyle`
+  body {
+    margin: 0;
+  }
+  .ag-watermark, 
+  .ag-watermark-text,
+  .ag-watermark.ag-opacity-zero, 
+  div.ag-watermark.ag-opacity-zero, 
+  div.ag-watermark, 
+  div.ag-watermark-text {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+  }
+
+  .ag-filter-apply-panel {
+    gap: 8px;
+  }
+
+  .ag-ltr .ag-filter-apply-panel-button {
+    margin-left: 0;
+    width: 100%;
+  }
+  .ag-row-is-odd {
+    background-color: aliceblue ;
+  }
+
+  & .ag-custom-cell-value {
+    position: relative;
+  }
+  & .ag-custom-cell-value-changed .ag-custom-cell-value:before {
+    content: '';
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #00bb2f;
+    margin: 18px -10px;
+    position: absolute;
+  }
+  & .ag-custom-cell-value-changed {
+    background-color: #15bf3b14;
+  }
+`;
+
+const Container = styled.div`
+  min-width: 1600px;
+`;
+
+const RoutesWrapper = styled.div`
+  position: relative;
+`;
+
 export default Layout;
 export * from './theme/theme';
+
