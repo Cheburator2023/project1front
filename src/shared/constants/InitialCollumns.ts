@@ -763,6 +763,8 @@ export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
   rs_model_decommiss_date: [],
   remove_decision: [],
   remove_date_validation: [],
+  remove_date: [],
+  model_epic_05_date: [],
   assignment_contractor: [],
   developing_start_date: [],
   data_source_description: [],
