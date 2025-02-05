@@ -910,7 +910,8 @@ export const REST_MODEL_SCHEMA: FormFieldsSchema = [
   ...RATING_SYSTEM_MODEL_SCHEMA,
   ...RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA,
 ].map((item) => ({
-  ...item,
+  name: item.name,
+  maxLength: item.maxLength,
   required: false,
   customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
 }));
