@@ -1,5 +1,15 @@
 # Semantic Versioning Changelog
 
+## [1.35.2](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.35.1...v1.35.2) (2025-02-05)
+
+
+### Bug Fixes
+
+* allocation - add march, permission, validation ([a14b43c](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/a14b43cd6f8ae018611cd55a1e8bfc9adb01b662))
+* loading/error overlay fix for tables ([eb137e3](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/eb137e3ef90469c2a765aa3b1011b7a851c5efc2))
+* rest model schema and clearing filed values fix for form ([3baaeb4](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/3baaeb4ec97b47ee73fa4188d31d003bfa381696))
+* types fix ([f5d3fc6](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/f5d3fc6eb85d0f1809710daeaa58ecb3475c395b))
+
 # [1.35.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.34.1...v1.35.0) (2025-01-31)
 
 
