@@ -1,5 +1,13 @@
 # Semantic Versioning Changelog
 
+## [1.35.3](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.35.2...v1.35.3) (2025-02-07)
+
+
+### Bug Fixes
+
+* changed order initial columns ([33fb144](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/33fb1443fc35f3e89ceeb1bbaa996d07d751f8f6))
+* rest fields conditions fixed ([4c953ec](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/4c953ec890b68c571deb52df29d676ed035fd39d))
+
 ## [1.35.2](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.35.1...v1.35.2) (2025-02-05)
 
 
