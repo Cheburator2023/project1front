@@ -17,6 +17,26 @@ export const initialColumns: Array<Column> = [
     type: COLUMN_TYPE.DATE,
   },
   {
+    name: 'classification_of_rs_by_order_of_application_within_pvr',
+    title: 'Классификация РС по порядку применения в рамках ПВР',
+    type: COLUMN_TYPE.STRING,
+  },
+  {
+    name: 'degree_of_regulatory_supervision',
+    title: 'Степень регуляторного надзора',
+    type: COLUMN_TYPE.STRING,
+  },
+  {
+    name: 'materiality_rate',
+    title: 'Уровень материальности',
+    type: COLUMN_TYPE.STRING,
+  },
+  {
+    name: 'impact_coverage',
+    title: 'Охват последствий',
+    type: COLUMN_TYPE.STRING,
+  },
+  {
     name: 'model_alias',
     title: 'Алиас модели',
     type: COLUMN_TYPE.LINK,
@@ -71,11 +91,11 @@ export const initialColumns: Array<Column> = [
     title: 'Подразделение Владельца Модели / Алгоритма',
     type: COLUMN_TYPE.STRING,
   },
-  {
-    name: 'significance_validity',
-    title: 'Уровень значимости Модели / РС',
-    type: COLUMN_TYPE.STRING,
-  },
+  // {
+  //   name: 'significance_validity',
+  //   title: 'Уровень значимости Модели / РС',
+  //   type: COLUMN_TYPE.STRING,
+  // },
   {
     name: 'implementation_validity',
     title: 'Утверждение РС / Модели / Алгоритма в эксплуатацию',
@@ -171,31 +191,31 @@ export const initialColumns: Array<Column> = [
     title: 'Классификация РС / Алгоритма по классам активов',
     type: COLUMN_TYPE.STRING,
   },
-  {
-    name: 'degree_of_regulatory_supervision',
-    title: 'Степень регуляторного надзора',
-    type: COLUMN_TYPE.STRING,
-  },
-  {
-    name: 'materiality_rate',
-    title: 'Уровень материальности',
-    type: COLUMN_TYPE.STRING,
-  },
-  {
-    name: 'impact_coverage',
-    title: 'Охват последствий',
-    type: COLUMN_TYPE.STRING,
-  },
+  // {
+  //   name: 'degree_of_regulatory_supervision',
+  //   title: 'Степень регуляторного надзора',
+  //   type: COLUMN_TYPE.STRING,
+  // },
+  // {
+  //   name: 'materiality_rate',
+  //   title: 'Уровень материальности',
+  //   type: COLUMN_TYPE.STRING,
+  // },
+  // {
+  //   name: 'impact_coverage',
+  //   title: 'Охват последствий',
+  //   type: COLUMN_TYPE.STRING,
+  // },
   {
     name: 'responsible_for_significance_validity',
     title: 'Кем определен уровень значимости Модели / РС',
     type: COLUMN_TYPE.STRING,
   },
-  {
-    name: 'classification_of_rs_by_order_of_application_within_pvr',
-    title: 'Классификация РС по порядку применения в рамках ПВР',
-    type: COLUMN_TYPE.STRING,
-  },
+  // {
+  //   name: 'classification_of_rs_by_order_of_application_within_pvr',
+  //   title: 'Классификация РС по порядку применения в рамках ПВР',
+  //   type: COLUMN_TYPE.STRING,
+  // },
   {
     name: 'credit_risk_component',
     title: 'Компонент кредитного риска',
@@ -655,6 +675,11 @@ export const initialColumns: Array<Column> = [
   {
     name: 'developing_model_reason',
     title: 'Основание для разработки',
+    type: COLUMN_TYPE.STRING,
+  },
+  {
+    name: 'significance_validity',
+    title: 'Уровень значимости Модели / РС',
     type: COLUMN_TYPE.STRING,
   },
   {
