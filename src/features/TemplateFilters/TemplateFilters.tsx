@@ -1,11 +1,11 @@
+/* eslint-disable react/no-unstable-nested-components */
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { Button, TableRow as ATableRow, T, Toggle } from '@admiral-ds/react-ui';
 import { ReactComponent as CloseOutline } from '@admiral-ds/icons/build/service/CloseOutline.svg';
 
-import { COLUMN_TYPE, ColumnsFilter, Row } from '@shared/types';
+import { Column, COLUMN_TYPE, ColumnsFilter, Row } from '@shared/types';
 import { FiltersContext, Template } from '@shared/api';
-import { Table } from '@shared/ui';
 import {
   ACTIVE_SCREEN,
   RIGHT_PANEL_TYPE,
@@ -15,6 +15,10 @@ import {
 import { TemplatesFilter, FilterButtonCount } from '@entities';
 import { useTemplateFilters } from '@src/shared/hooks';
 
+import { Table } from '@src/shared/ui';
+import { ColDef, RowDragMoveEvent, RowSelectedEvent } from 'ag-grid-community';
+import { useDeepEffect } from '@src/shared/hooks/useDeepEffect';
+import { CustomCellRendererProps } from 'ag-grid-react';
 import {
   ActionPanelLeft,
   ActionPanelRight,
@@ -23,6 +27,7 @@ import {
   ChipsCustom,
   Wrapper,
 } from './styles';
+import { AgGridTemplateFilters } from '../NewTables/AgGridTemplateFilters';
 
 export interface TemplateFiltersProps {
   templates: Template[];
@@ -38,7 +43,7 @@ export const TemplateFilters = ({
   const { topFilters, columnsFilters, onChangeColumnsFilters, onChangeTopFilters } =
     useContext(FiltersContext);
 
-  const [rows, setRows] = useState<ATableRow[]>([]);
+  const [rows, setRows] = useState<any[]>([]);
   const [showFilterTemplate, setShowFilterTemplate] = useState(true);
 
   const {
@@ -74,63 +79,64 @@ export const TemplateFilters = ({
     [columnsFilters, topFilters, modifiedFilters, onChangeColumnsFilters, onChangeTopFilters],
   );
 
-  const cols = useMemo(
-    () => [
-      {
-        name: 'name',
-        title: 'Наименование атрибута',
-        width: 600,
-        sticky: true,
-      },
-      {
-        name: 'value',
-        title: 'Выбор',
-        width: 'calc(100% - 600px)',
-        renderCell(filters: string[], row: ATableRow & { id: keyof Row }): React.ReactNode {
-          const filterType = initialColumns.find((column) => column.name === row.id)?.type;
+  const cols: any[] = [
+    {
+      name: 'name',
+      title: 'Наименование атрибута',
+      width: '600px',
+    },
+    {
+      name: 'value',
+      title: 'Выбор',
+      width: 'calc(100% - 600px)',
+      cellRenderer: (params: CustomCellRendererProps) => {
+        console.log('🐸 Pepe said ~ params:', params);
+        const row: any = rows[params.node.id || 0];
+        console.log('🐸 Pepe said ~ row:', row);
+        const filters = Object.keys(columnsFilters);
+        const filterType = initialColumns.find((column) => column.name === row.id)?.type;
 
-          const isTemplate = topFilters.templates.length > 0 && !modifiedFilters.has(row.id);
+        const isTemplate = topFilters.templates.length > 0 && !modifiedFilters.has(row.id);
 
-          if (filterType === COLUMN_TYPE.DATE) {
-            return (
-              <div style={{ display: 'flex', flexDirection: 'row' }}>
-                {filters.length ? (
-                  <ChipsCustom
-                    isTemplate={isTemplate}
-                    dimension="s"
-                    appearance="filled"
-                    onClose={() => handleRemoveColumnFilterValue(row.id, undefined, filterType)}
-                  >
-                    {filters[0]} - {filters[1]}
-                  </ChipsCustom>
-                ) : null}
-              </div>
-            );
-          }
-
+        if (filterType === COLUMN_TYPE.DATE) {
           return (
             <div style={{ display: 'flex', flexDirection: 'row' }}>
-              {filters.map((filterValue) => (
+              {filters.length ? (
                 <ChipsCustom
                   isTemplate={isTemplate}
-                  style={{ marginRight: '5px' }}
-                  key={filterValue}
                   dimension="s"
                   appearance="filled"
-                  onClose={() => handleRemoveColumnFilterValue(row.id, filterValue)}
+                  onClose={() => handleRemoveColumnFilterValue(row.id, undefined, filterType)}
                 >
-                  {filterValue}
+                  {filters[0]} - {filters[1]}
                 </ChipsCustom>
-              ))}
+              ) : null}
             </div>
           );
-        },
-      },
-    ],
-    [handleRemoveColumnFilterValue, modifiedFilters],
-  );
+        }
 
-  useEffect(() => {
+        return (
+          <div style={{ display: 'flex', flexDirection: 'row' }}>
+            {filters.map((filterValue) => (
+              <ChipsCustom
+                isTemplate={isTemplate}
+                style={{ marginRight: '5px' }}
+                key={filterValue}
+                dimension="s"
+                appearance="filled"
+                onClose={() => handleRemoveColumnFilterValue(row.id, filterValue)}
+              >
+                {filterValue}
+              </ChipsCustom>
+            ))}
+          </div>
+        );
+      },
+      // renderCell(filters: string[], row: ATableRow & { id: keyof Row }): React.ReactNode {},
+    },
+  ];
+
+  useDeepEffect(() => {
     const filters = Object.keys(columnsFilters);
 
     const newRows: ATableRow[] = getFilteredColumns(initialColumns, showFilterTemplate)
@@ -164,7 +170,12 @@ export const TemplateFilters = ({
     setRows(newRows);
   }, [columnsFilters, showFilterTemplate, modifiedFilters]);
 
-  const handleDragRows = (rowId: string, nextRowId: string | null, _: string | null) => {
+  const handleDragRows = (event: RowDragMoveEvent) => {
+    const rowId: string = rows[event.overNode?.sourceRowIndex || 0].id as any;
+    const nextRowId: string = rows[event.overIndex || 0 + 1].id as any;
+    console.log('🐸 Pepe said ~ handleDragRows ~ nextRowId:', nextRowId);
+    console.log('🐸 Pepe said ~ handleDragRows ~ rowId:', rowId);
+
     const currentRow = rows.find((row) => row.id === rowId);
     const nextRow = rows.find((row) => row.id === nextRowId);
     if (!currentRow?.selected || !nextRow?.selected) return;
@@ -196,7 +207,11 @@ export const TemplateFilters = ({
     onChangeTopFilters({ ...topFilters, templates: [] });
   };
 
-  const handleSelectionChange = (ids: Record<string, boolean>): void => {
+  const handleSelectionChange = (event: RowSelectedEvent): void => {
+    console.log('🐸 Pepe said ~ handleSelectionChange ~ ids:', event);
+
+    const ids: Record<string, boolean> = {};
+
     const updRows = rows.map((row) => ({ ...row, selected: ids[row.id] }));
 
     const newColumnFilters = Object.entries(ids).reduce((newColumnFilters, currentFilter) => {
@@ -299,7 +314,13 @@ export const TemplateFilters = ({
         </ActionPanelRight>
       </ActionPanelWrapper>
       <div>
-        <Table
+        <AgGridTemplateFilters
+          overrideColumnList={cols}
+          overrideRowList={rows}
+          onRowDragMove={handleDragRows}
+          onRowSelected={handleSelectionChange}
+        />
+        {/* <Table
           rowList={rows}
           columnList={cols}
           disableColumnResize
@@ -307,9 +328,8 @@ export const TemplateFilters = ({
           onRowDrag={handleDragRows}
           displayRowSelectionColumn
           greyHeader
-          onRowSelectionChange={handleSelectionChange}
-          style={{ maxHeight: 'calc(100vh - 185px)' }}
-        />
+          onRowSelectionChange={handleSelectionChange as any}
+        /> */}
       </div>
     </Wrapper>
   );

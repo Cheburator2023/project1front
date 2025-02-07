@@ -5,6 +5,7 @@ import { FiltersContext } from '@shared/api';
 import { FiltersPanel, RightModalPanel, TemplateFilters } from '@features';
 import { useTableModels } from '@pages/Home/hooks';
 
+import { AgGridModelsTable } from '@src/features/NewTables/AgGridModelsTable';
 import { AgGridTable } from '../../features/NewTables/AgGridTable';
 import { CompareModelsWidgetNewTable } from '../../widgets/CompareModelsWidget/CompareModelsWidgetNewTable';
 
@@ -39,11 +40,12 @@ export const FutureTableHomePage = () => {
             updateActiveScreen={display.setActiveScreen}
             updateRightPanelType={display.setRightPanelType}
           />
-          <AgGridTable
+          <AgGridModelsTable
             display={display}
             modelsTable={modelsTable}
-            filters={filters}
             templates={filters.templates}
+            error={modelsTable.error}
+            loading={modelsTable.loading}
           />
         </>
       )}
