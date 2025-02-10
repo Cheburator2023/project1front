@@ -440,26 +440,16 @@ const canEditArtefact = (artifact?: Artifact, row?: Partial<Row> | undefined): b
     return false;
   }
 
-  const isEditableByRole = artifact.is_editable_by_role === '1';
-
   if (!row) {
-    return isEditableByRole;
+    return true
   }
-
-  const isSumEditBlocked = artifact.is_edit_sum_flg === '0';
-
-  if (row.model_source === ModelSource.SUM && isSumEditBlocked) {
-    return false;
-  }
-
-  const isOwnerModel = isInBusinessCustomers(row);
-  const canBusinessCreatorEdit = artifact.is_edit_for_business_creator_flg === '1' && isOwnerModel;
 
   if (row.model_source === ModelSource.SUM_RM) {
-    return isEditableByRole || canBusinessCreatorEdit;
+    return artifact.is_editable_by_role_sum_rm === '1';
   }
+
   if (row.model_source === ModelSource.SUM) {
-    return isEditableByRole || canBusinessCreatorEdit;
+    return artifact.is_editable_by_role_sum === '1';
   }
 
   return false;
@@ -494,9 +484,9 @@ const isFieldDisabled = (
   const isControlledByConditions =
     fieldSchema?.enabledByValueConditions && isDisabledByValueConditions && isDisabledByConditions;
 
-  const isDisabledArtifactByRoles = !canEditArtefact(artifact, row);
+  const isDisabledArtifactBySource = !canEditArtefact(artifact, row);
 
-  return isGloballyDisabled || isControlledByConditions || isDisabledArtifactByRoles;
+  return isGloballyDisabled || isControlledByConditions || isDisabledArtifactBySource;
 };
 
 // Main mapping function that combine object for proper input format
