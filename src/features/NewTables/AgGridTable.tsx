@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
-import React, { useCallback, useMemo, useRef, useState, StrictMode, useEffect } from 'react';
-import { AgGridReact, CustomCellRendererProps } from 'ag-grid-react';
+import { useCallback, useMemo, useRef } from 'react';
+import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 import 'ag-grid-enterprise';
@@ -8,13 +8,13 @@ import 'ag-grid-enterprise';
 import {
   ColDef,
   FilterChangedEvent,
-  FilterModifiedEvent,
+  GetMainMenuItemsParams,
   IDateFilterParams,
   ITooltipParams,
-  RowSelectedEvent,
+  RowClassRules,
   RowSelectionOptions,
   SelectionChangedEvent,
-  ValueGetterParams,
+  themeQuartz,
 } from 'ag-grid-community';
 import { ReactComponent as BrokerOutlineIcon } from '@admiral-ds/icons/build/finance/BrokerOutline.svg';
 import { ReactComponent as MenuOutline } from '@admiral-ds/icons/build/service/MenuOutline.svg';
@@ -22,22 +22,21 @@ import { ReactComponent as PlusCircleSolid } from '@admiral-ds/icons/build/servi
 import { ReactComponent as SettingsOutline } from '@admiral-ds/icons/build/system/SettingsOutline.svg';
 import { ReactComponent as SearchOutline } from '@admiral-ds/icons/build/system/SearchOutline.svg';
 import { ReactComponent as ShowTableOutline } from '@admiral-ds/icons/build/category/ShowTableOutline.svg';
-import { ReactComponent as DeleteSolid } from '@admiral-ds/icons/build/system/DeleteSolid.svg';
+import { Checkbox, T, InputField } from '@admiral-ds/react-ui';
 
 import { Flexbox, Spacer } from '@src/shared/ui/atoms';
 import { TDisplayTableModels, TFilters, TModelsTable } from '@pages/Home/hooks';
 import { IconButton } from '@shared/ui/molecules';
 import { RIGHT_PANEL_TYPE } from '@shared/constants';
 import { useNavigate } from 'react-router-dom';
-import { InputField } from '@admiral-ds/react-ui';
-import { COLUMN_TYPE } from '@src/shared/types';
+import { Column, COLUMN_TYPE, Row } from '@src/shared/types';
 import { useAppInjectStore } from '@src/shared/stores/appInjectStore';
-import { CUSTOMER_MAP } from '@src/shared/constants/customers';
 import { useTableChange } from '@src/features/Tables/hooks';
 import { format } from 'date-fns';
 import { Template } from '@src/shared/api/types';
-import { PlaygroundCustomCell } from './PlaygroundCustomCell';
-import { AG_GRID_LOCALE_RU } from './locale/agGridLocale.ru';
+import { useExcludeErrorStore } from '@src/shared/stores/excludeErrorStore';
+import { AgGridTableCustomCell } from './AgGridTableCustomCell';
+import { AG_GRID_LOCALE_RU } from '../../pages/Playground/locale/agGridLocale.ru';
 import { ROUTES } from '../../app/Routes';
 import { useDeleteRightModelPanelStore } from '../../shared/stores';
 import { usePermissions, useRoles, useTemplateFilters } from '../../shared/hooks';
@@ -51,6 +50,7 @@ const containerStyle = { width: '100%', height: '100%', padding: '10px' };
 const gridStyle = { height: '100%', width: '100%' };
 
 const dateFilterParams: IDateFilterParams = {
+  buttons: ['clear'],
   inRangeInclusive: true,
   comparator: (filterLocalDateAtMidnight: Date, cellValue: string) => {
     if (cellValue == null) return -1;
@@ -72,18 +72,35 @@ const dateFilterParams: IDateFilterParams = {
   inRangeFloatingFilterDateFormat: ' YYYY-MM-DD ',
 };
 
-export const PlaygroundTable = ({
+export const AgGridTable = ({
   display,
   modelsTable,
   filters,
   templates,
+  isCompared = false,
+  columnList: columnListOuter,
+  rowList: rowsOuter,
 }: {
   display: TDisplayTableModels;
   modelsTable: TModelsTable;
   filters: TFilters;
   templates: Template[];
+  isCompared?: boolean;
+  columnList?: Column[];
+  rowList?: Partial<Row>[];
 }) => {
-  const { rowList, setPage, page, setTotalRows, pageSize, searchString, columnList } = modelsTable;
+  const {
+    rowList: rowListInner,
+    setPage,
+    page,
+    setTotalRows,
+    pageSize,
+    searchString,
+    columnList: columnListInner,
+  } = modelsTable;
+
+  const rowList = rowsOuter || rowListInner;
+  const columnList = columnListOuter || columnListInner;
 
   const {
     cols,
@@ -112,6 +129,7 @@ export const PlaygroundTable = ({
   const { currentCustomer } = useAppInjectStore();
   const { modelsCount, modelSource, isDeleteButtonEnabled, userMatches, updateDeleteModelState } =
     useDeleteRightModelPanelStore();
+  const { excludeError, updateExcludeError } = useExcludeErrorStore();
 
   const { shouldResetTemplateOnInitialValueChange } = useTemplateFilters(
     columnsFilters,
@@ -124,7 +142,7 @@ export const PlaygroundTable = ({
   const navigate = useNavigate();
   const gridRef = useRef<AgGridReact>(null);
   const rowData = rows;
-  const columnDefs = modelsTable.columnList.map((data) => ({
+  const columnDefs = columnList.map((data) => ({
     ...data,
     headerName: data.title,
     field: data.name,
@@ -135,14 +153,34 @@ export const PlaygroundTable = ({
         ? 'agDateColumnFilter'
         : data.type === COLUMN_TYPE.NUMBER
         ? 'agNumberColumnFilter'
-        : 'agMultiColumnFilter',
-    filterParams: data.type === COLUMN_TYPE.DATE && dateFilterParams,
+        : 'agTextColumnFilter',
+    filterParams: data.type === COLUMN_TYPE.DATE ? dateFilterParams : { buttons: ['clear'] },
+    cellClass: (params) => {
+      if (isCompared) {
+        const rowIndex = params.node.rowIndex;
+        const prevRow = params.api.getDisplayedRowAtIndex(rowIndex - 1);
+        const colId = params.column.colId;
+        const cellValue = params.data[colId];
+        const prevRowSameCellValue = prevRow?.data[colId];
+        const sameId = params?.data?.id?.split(':')[0] === prevRow?.data?.id?.split(':')[0];
+
+        if (prevRow && sameId && prevRowSameCellValue !== cellValue) {
+          return 'ag-custom-cell-value-changed';
+        }
+      }
+    },
     // pinned: data.name === 'active_model' && currentCustomer === CUSTOMER_MAP.UMRV && 'left',
   }));
 
   const defaultColDef = useMemo<ColDef>(() => {
     return {
-      filter: 'agMultiColumnFilter',
+      filter: 'agTextColumnFilter',
+      mainMenuItems: (params: GetMainMenuItemsParams) => {
+        return params.defaultItems.filter(
+          (item) => item !== 'columnChooser' && item !== 'rowGroup',
+        );
+      },
+      filterParams: { buttons: ['clear'] },
       floatingFilter: true,
       initialWidth: 400,
       minWidth: 250,
@@ -165,7 +203,7 @@ export const PlaygroundTable = ({
       // },
       editable: false,
       toolTipValueGetter,
-      cellRenderer: PlaygroundCustomCell,
+      cellRenderer: AgGridTableCustomCell,
       cellRendererParams: {
         onAction: (action: any, row_system_model_id: any, columnName: any): any => {
           modelsTable.handleClickOnActionCell(action, row_system_model_id, columnName);
@@ -264,24 +302,45 @@ export const PlaygroundTable = ({
   };
 
   useDeepEffect(() => {
-    if (rowList.length) {
+    if (rowList?.length) {
       setRows(rowList);
       modelsTable.setTotalRows(rowList.length);
     }
   }, [rowList, modelsTable.setTotalRows, templates]);
 
+  const rowClassRules = useMemo<RowClassRules>(() => {
+    return {
+      // row style function
+      'ag-row-is-odd': (params) => {
+        return params?.rowIndex % 2 === 0;
+      },
+    };
+  }, []);
+
   return (
     <Flexbox height="calc(100vh - 230px)">
       <div style={containerStyle}>
         <Flexbox alignItems="center" justifyContent="space-between">
-          <Flexbox width="500px" fillChild>
+          <Flexbox width="1500px" fillChild alignItems="center" gap={20}>
             <InputField
               id="filter-text-box"
               onChange={onFilterTextBoxChanged}
               placeholder="Поиск"
               icons={<SearchOutline />}
             />
+
+            <Flexbox gap={6}>
+              <Checkbox
+                dimension="s"
+                checked={excludeError}
+                onChange={(e) => updateExcludeError(e.target.checked)}
+              />
+              <T font="Body/Body 2 Short" as="div">
+                Не включать модели со статусом ошибка заведения
+              </T>
+            </Flexbox>
           </Flexbox>
+
           <div>
             {isAddModelEnabled && (
               <IconButton
@@ -313,7 +372,7 @@ export const PlaygroundTable = ({
           </div>
         </Flexbox>
 
-        <Spacer />
+        <Spacer space={10} />
 
         <div style={gridStyle} className="ag-theme-quartz">
           <AgGridReact
@@ -325,6 +384,7 @@ export const PlaygroundTable = ({
             animateRows
             cellSelection
             onGridReady={onGridReadyGetData}
+            rowClassRules={isCompared ? rowClassRules : undefined}
             selectionColumnDef={{
               pinned: 'left',
               lockPinned: true,
