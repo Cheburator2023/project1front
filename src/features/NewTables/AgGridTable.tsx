@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import { useCallback, useMemo, useRef } from 'react';
+import { forwardRef, useCallback, useMemo, useRef } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
@@ -8,10 +8,14 @@ import 'ag-grid-enterprise';
 import {
   ColDef,
   FilterChangedEvent,
+  FirstDataRenderedEvent,
   GetMainMenuItemsParams,
   IDateFilterParams,
+  IRowNode,
   ITooltipParams,
   RowClassRules,
+  RowDataUpdatedEvent,
+  RowDragEndEvent,
   RowDragMoveEvent,
   RowSelectedEvent,
   RowSelectionOptions,
@@ -63,11 +67,15 @@ interface IAgGridTableProps {
   pageSize?: number;
   searchString?: string;
   onRowDragMove?: (event: RowDragMoveEvent) => void;
+  onRowDragEnd?: (event: RowDragEndEvent) => void;
   onRowSelected?: (event: RowSelectedEvent) => void;
   rowDragManaged?: boolean;
   pagination?: boolean;
   actionPanel?: boolean;
   sidePanel?: boolean;
+  onFirstDataRendered?: (event: FirstDataRenderedEvent) => void;
+  onRowDataUpdated?: (event: RowDataUpdatedEvent) => void;
+  onSelectionChanged?: (event: SelectionChangedEvent) => void;
 }
 
 const sideBarProps = {
@@ -127,352 +135,368 @@ const autoGroupColumnDefProps: ColDef = {
 };
 
 const selectionColumnDef: SelectionColumnDef = {
+  sortable: true,
+  resizable: true,
+  minWidth: 300,
+  suppressHeaderMenuButton: false,
   pinned: 'left',
-  lockPinned: true,
 };
 
-export const AgGridTable = ({
-  display,
-  templates,
-  isCompared = false,
-  columnList,
-  rowList,
-  error,
-  loading,
-  handleClickOnActionCell,
-  setPage = (v) => v,
-  page = 0,
-  setTotalRows = (v) => v,
-  pageSize = 1000,
-  searchString = '',
-  onRowDragMove,
-  onRowSelected,
-  rowDragManaged,
-  pagination = true,
-  actionPanel = true,
-  sidePanel = true,
-}: IAgGridTableProps) => {
-  const {
-    cols,
-    rows,
-    setCols,
-    setRows,
-    // handleSelectionChange,
-    handleResize,
-    handleSort,
-    handleChangeColumnsFilter,
-    handleColumnDragEnd,
-    columnsFilters,
-    onChangeColumnsFilters,
-    onChangeTopFilters,
-    topFilters,
-  } = useTableChange({
-    rowList,
-    setCurrentPage: setPage,
-    page,
-    updateRowsCount: setTotalRows,
-    pageSize,
-    searchString,
-    columnList,
-    templates,
-  });
-  const { currentCustomer } = useAppInjectStore();
-  const { modelsCount, modelSource, isDeleteButtonEnabled, userMatches, updateDeleteModelState } =
-    useDeleteRightModelPanelStore();
-  const { excludeError, updateExcludeError } = useExcludeErrorStore();
+export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
+  (
+    {
+      display,
+      templates,
+      isCompared = false,
+      columnList,
+      rowList,
+      error,
+      loading,
+      handleClickOnActionCell,
+      setPage = (v) => v,
+      page = 0,
+      setTotalRows = (v) => v,
+      pageSize = 1000,
+      searchString = '',
+      onRowDragMove,
+      onRowSelected,
+      rowDragManaged,
+      pagination = true,
+      actionPanel = true,
+      sidePanel = true,
+      onFirstDataRendered,
+      onRowDataUpdated,
+      onSelectionChanged,
+      onRowDragEnd,
+    }: IAgGridTableProps,
+    ref: any,
+  ) => {
+    const {
+      cols,
+      rows,
+      setCols,
+      setRows,
+      // handleSelectionChange,
+      handleResize,
+      handleSort,
+      handleChangeColumnsFilter,
+      handleColumnDragEnd,
+      columnsFilters,
+      onChangeColumnsFilters,
+      onChangeTopFilters,
+      topFilters,
+    } = useTableChange({
+      rowList,
+      setCurrentPage: setPage,
+      page,
+      updateRowsCount: setTotalRows,
+      pageSize,
+      searchString,
+      columnList,
+      templates,
+    });
+    const { currentCustomer } = useAppInjectStore();
+    const { modelsCount, modelSource, isDeleteButtonEnabled, userMatches, updateDeleteModelState } =
+      useDeleteRightModelPanelStore();
+    const { excludeError, updateExcludeError } = useExcludeErrorStore();
 
-  const { shouldResetTemplateOnInitialValueChange } = useTemplateFilters(
-    columnsFilters,
-    templates,
-    topFilters?.templates,
-  );
-  const { isAdmin, isValidatorLead } = useRoles();
-  const { isAddModelEnabled } = usePermissions();
-
-  const navigate = useNavigate();
-  const gridRef = useRef<AgGridReact>(null);
-  console.log('🐸 Pepe said ~ constcolumnDefs:ColDef[]=columnList.map ~ columnList:', columnList);
-
-  const rowData = rows;
-  const columnDefs: ColDef[] = columnList.map((data, colIndex) => ({
-    ...data,
-    headerName: data.title,
-    field: data.name,
-    headerTooltip: data.title,
-    rowDrag: colIndex === 0 && rowDragManaged,
-    // https://www.ag-grid.com/react-data-grid/filter-date/#custom-selection-component
-    filter:
-      data.type === COLUMN_TYPE.DATE
-        ? 'agDateColumnFilter'
-        : data.type === COLUMN_TYPE.NUMBER
-        ? 'agNumberColumnFilter'
-        : 'agTextColumnFilter',
-    filterParams: data.type === COLUMN_TYPE.DATE ? dateFilterParams : { buttons: ['clear'] },
-    cellRenderer: data.cellRenderer,
-    cellClass: (params) => {
-      if (isCompared) {
-        const rowIndex = params.node.rowIndex;
-        const prevRow = params.api.getDisplayedRowAtIndex(Number(rowIndex) - 1);
-        const colId = params.column.getColId();
-        const cellValue = params.data[colId];
-        const prevRowSameCellValue = prevRow?.data[colId];
-        const sameId = params?.data?.id?.split(':')[0] === prevRow?.data?.id?.split(':')[0];
-
-        if (prevRow && sameId && prevRowSameCellValue !== cellValue) {
-          return 'ag-custom-cell-value-changed';
-        }
-      }
-    },
-    // pinned: data.name === 'active_model' && currentCustomer === CUSTOMER_MAP.UMRV && 'left',
-  })) as ColDef[];
-
-  const defaultColDef = useMemo<ColDef>(() => {
-    return {
-      filter: 'agTextColumnFilter',
-      mainMenuItems: (params: GetMainMenuItemsParams) => {
-        return params.defaultItems.filter(
-          (item) => item !== 'columnChooser' && item !== 'rowGroup',
-        );
-      },
-      filterParams: { buttons: ['clear'] },
-      floatingFilter: true,
-      initialWidth: 400,
-      minWidth: 250,
-      maxWidth: 1350,
-      suppressHeaderMenuButton: false,
-      suppressHeaderContextMenu: false,
-      // allow every column to be aggregated
-      enableValue: true,
-      // allow every column to be grouped
-      enableRowGroup: true,
-      // allow every column to be pivoted
-      enablePivot: true,
-      flex: 2,
-      sortable: true,
-      resizable: true,
-      wrapHeaderText: false,
-      autoHeaderHeight: false,
-      // valueGetter: (params: ValueGetterParams) => {
-      //   return `(${params.getValue})`;
-      // },
-      editable: false,
-      toolTipValueGetter,
-      cellRenderer: AgGridTableCustomCell,
-      cellRendererParams: {
-        onAction: (action: any, row_system_model_id: any, columnName: any): any => {
-          handleClickOnActionCell?.(action, row_system_model_id, columnName);
-        },
-      },
-    };
-  }, []);
-
-  const rowSelection = useMemo<RowSelectionOptions | 'single' | 'multiple'>(() => {
-    return {
-      mode: 'multiRow',
-      headerCheckbox: true,
-      selectAll: 'filtered',
-      rowSelected: (params) => {},
-    };
-  }, []);
-
-  const onGridReadyGetData = useCallback(() => {}, []);
-
-  const onFilterTextBoxChanged = useCallback(() => {
-    gridRef.current!.api.setGridOption(
-      'quickFilterText',
-      (document.getElementById('filter-text-box') as HTMLInputElement).value,
+    const { shouldResetTemplateOnInitialValueChange } = useTemplateFilters(
+      columnsFilters,
+      templates,
+      topFilters?.templates,
     );
-  }, []);
+    const { isAdmin, isValidatorLead } = useRoles();
+    const { isAddModelEnabled } = usePermissions();
 
-  const paginationPageSizeSelector = useMemo<number[] | boolean>(() => {
-    return [20, 100, 500, 1000];
-  }, []);
+    const navigate = useNavigate();
+    const gridRefInner = useRef<AgGridReact>(null);
+    const gridRef = ref || gridRefInner;
 
-  let deleteTooltipMessage = '';
+    const rowData = rows;
+    const columnDefs: ColDef[] = columnList.map((data, colIndex) => ({
+      ...data,
+      headerName: data.title,
+      field: data.name,
+      headerTooltip: data.title,
+      rowDrag: colIndex === 0 && rowDragManaged,
+      // https://www.ag-grid.com/react-data-grid/filter-date/#custom-selection-component
+      filter:
+        data.type === COLUMN_TYPE.DATE
+          ? 'agDateColumnFilter'
+          : data.type === COLUMN_TYPE.NUMBER
+          ? 'agNumberColumnFilter'
+          : 'agTextColumnFilter',
+      filterParams: data.type === COLUMN_TYPE.DATE ? dateFilterParams : { buttons: ['clear'] },
+      cellRenderer: data.cellRenderer,
+      cellClass: (params) => {
+        if (isCompared) {
+          const rowIndex = params.node.rowIndex;
+          const prevRow = params.api.getDisplayedRowAtIndex(Number(rowIndex) - 1);
+          const colId = params.column.getColId();
+          const cellValue = params.data[colId];
+          const prevRowSameCellValue = prevRow?.data[colId];
+          const sameId = params?.data?.id?.split(':')[0] === prevRow?.data?.id?.split(':')[0];
 
-  if (modelsCount === 0) {
-    deleteTooltipMessage = 'Выберите модель для удаления';
-  } else if (modelsCount > 1) {
-    deleteTooltipMessage = 'Нельзя удалить несколько моделей';
-  } else if (modelSource !== 'sum-rm') {
-    deleteTooltipMessage = 'Модель должна быть с исчтоником "sum-rm"';
-  } else if (!userMatches && !isAdmin && !isValidatorLead) {
-    deleteTooltipMessage =
-      'Модель может-быть удалена только создателем, владельцем модели или администратором';
-  } else {
-    deleteTooltipMessage = 'Удалить модель';
-  }
+          if (prevRow && sameId && prevRowSameCellValue !== cellValue) {
+            return 'ag-custom-cell-value-changed';
+          }
+        }
+      },
+      // pinned: data.name === 'active_model' && currentCustomer === CUSTOMER_MAP.UMRV && 'left',
+    })) as ColDef[];
 
-  const handleSelectionChange = (event: SelectionChangedEvent): void => {
-    const selectedRows = event.api.getSelectedRows();
+    const defaultColDef = useMemo<ColDef>(() => {
+      return {
+        filter: 'agTextColumnFilter',
+        mainMenuItems: (params: GetMainMenuItemsParams) => {
+          return params.defaultItems.filter(
+            (item) => item !== 'columnChooser' && item !== 'rowGroup',
+          );
+        },
+        filterParams: { buttons: ['clear'] },
+        floatingFilter: true,
+        initialWidth: 400,
+        minWidth: 250,
+        maxWidth: 1350,
+        suppressHeaderMenuButton: false,
+        suppressHeaderContextMenu: false,
+        // allow every column to be aggregated
+        enableValue: true,
+        // allow every column to be grouped
+        enableRowGroup: true,
+        // allow every column to be pivoted
+        enablePivot: true,
+        flex: 2,
+        sortable: true,
+        resizable: true,
+        wrapHeaderText: false,
+        autoHeaderHeight: false,
+        // valueGetter: (params: ValueGetterParams) => {
+        //   return `(${params.getValue})`;
+        // },
+        editable: false,
+        toolTipValueGetter,
+        cellRenderer: AgGridTableCustomCell,
+        cellRendererParams: {
+          onAction: (action: any, row_system_model_id: any, columnName: any): any => {
+            handleClickOnActionCell?.(action, row_system_model_id, columnName);
+          },
+        },
+      };
+    }, []);
 
-    if (selectedRows.length === 1) {
-      const selectedRow = selectedRows[0];
+    const rowSelection = useMemo<RowSelectionOptions | 'single' | 'multiple'>(() => {
+      return {
+        mode: 'multiRow',
+        headerCheckbox: true,
+        selectAll: 'filtered',
+        // rowSelected: (params) => {},
+      };
+    }, []);
 
-      const { model_source, status, id } = selectedRow;
+    const onGridReadyGetData = useCallback(() => {}, []);
 
-      const userMatches = isModelCreator(selectedRow) || isInBusinessCustomers(selectedRow);
+    const onFilterTextBoxChanged = useCallback(() => {
+      gridRef.current!.api.setGridOption(
+        'quickFilterText',
+        (document.getElementById('filter-text-box') as HTMLInputElement).value,
+      );
+    }, []);
 
-      updateDeleteModelState(1, model_source, status, id, userMatches);
+    const paginationPageSizeSelector = useMemo<number[] | boolean>(() => {
+      return [20, 100, 500, 1000];
+    }, []);
+
+    let deleteTooltipMessage = '';
+
+    if (modelsCount === 0) {
+      deleteTooltipMessage = 'Выберите модель для удаления';
+    } else if (modelsCount > 1) {
+      deleteTooltipMessage = 'Нельзя удалить несколько моделей';
+    } else if (modelSource !== 'sum-rm') {
+      deleteTooltipMessage = 'Модель должна быть с исчтоником "sum-rm"';
+    } else if (!userMatches && !isAdmin && !isValidatorLead) {
+      deleteTooltipMessage =
+        'Модель может-быть удалена только создателем, владельцем модели или администратором';
     } else {
-      updateDeleteModelState(selectedRows.length);
+      deleteTooltipMessage = 'Удалить модель';
     }
-  };
 
-  const handleFilterChange = (event: FilterChangedEvent): void => {
-    // @ts-ignore
-    const colDef: any = event.api.getColumnFilterModel(event?.columns[0]?.getColDef());
-    // @ts-ignore
-    const isDate = event?.columns[0]?.colDef?.filterType === 'date';
-    // @ts-ignore
-    const colName: string = event?.columns[0]?.colId;
+    const handleSelectionChange = (event: SelectionChangedEvent): void => {
+      onSelectionChanged?.(event);
+      const selectedRows = event.api.getSelectedRows();
 
-    if (isDate) {
-      const dateFrom = new Date(colDef.dateFrom);
-      const dateTo = new Date(colDef.dateTo || colDef.dateFrom);
-      const toReverse = dateFrom > dateTo;
+      if (selectedRows.length === 1) {
+        const selectedRow = selectedRows[0];
 
-      if (toReverse) {
-        const dateRange = [format(dateTo, 'yyyy-MM-dd'), format(dateFrom, 'yyyy-MM-dd')];
-        handleChangeColumnsFilter(colName, dateRange);
+        const { model_source, status, id } = selectedRow;
+
+        const userMatches = isModelCreator(selectedRow) || isInBusinessCustomers(selectedRow);
+
+        updateDeleteModelState(1, model_source, status, id, userMatches);
       } else {
-        const dateRange = [format(dateFrom, 'yyyy-MM-dd'), format(dateTo, 'yyyy-MM-dd')];
-        handleChangeColumnsFilter(colName, dateRange);
+        updateDeleteModelState(selectedRows.length);
       }
-    } else {
+    };
+
+    const handleFilterChange = (event: FilterChangedEvent): void => {
       // @ts-ignore
-      const value = colDef?.filterModels[1]?.values;
-      const initialTemplateValue = columnsFilters?.[colName] || [];
+      const colDef: any = event.api.getColumnFilterModel(event?.columns[0]?.getColDef());
+      // @ts-ignore
+      const isDate = event?.columns[0]?.colDef?.filterType === 'date';
+      // @ts-ignore
+      const colName: string = event?.columns[0]?.colId;
 
-      if (value) {
-        const arrayValue = Array.isArray(value) ? value : [value];
-        handleChangeColumnsFilter(colName, arrayValue);
+      if (isDate) {
+        const dateFrom = new Date(colDef.dateFrom);
+        const dateTo = new Date(colDef.dateTo || colDef.dateFrom);
+        const toReverse = dateFrom > dateTo;
 
-        if (shouldResetTemplateOnInitialValueChange(arrayValue, initialTemplateValue, colName)) {
-          onChangeTopFilters?.({ ...topFilters, templates: [] });
+        if (toReverse) {
+          const dateRange = [format(dateTo, 'yyyy-MM-dd'), format(dateFrom, 'yyyy-MM-dd')];
+          handleChangeColumnsFilter(colName, dateRange);
+        } else {
+          const dateRange = [format(dateFrom, 'yyyy-MM-dd'), format(dateTo, 'yyyy-MM-dd')];
+          handleChangeColumnsFilter(colName, dateRange);
+        }
+      } else {
+        // @ts-ignore
+        const value = colDef?.filterModels[1]?.values;
+        const initialTemplateValue = columnsFilters?.[colName] || [];
+
+        if (value) {
+          const arrayValue = Array.isArray(value) ? value : [value];
+          handleChangeColumnsFilter(colName, arrayValue);
+
+          if (shouldResetTemplateOnInitialValueChange(arrayValue, initialTemplateValue, colName)) {
+            onChangeTopFilters?.({ ...topFilters, templates: [] });
+          }
         }
       }
-    }
-  };
-
-  useDeepEffect(() => {
-    if (rowList?.length) {
-      setRows(rowList);
-      setTotalRows?.(rowList.length);
-    }
-  }, [rowList, setTotalRows, templates]);
-
-  const rowClassRules = useMemo<RowClassRules>(() => {
-    return {
-      // row style function
-      'ag-row-is-odd': (params) => {
-        return params?.rowIndex % 2 === 0;
-      },
     };
-  }, []);
 
-  return (
-    <Flexbox height="calc(100vh - 230px)">
-      {loading || error ? (
-        <StatusWrapper>
-          {error ? (
-            <ErrorStatus text={error} />
-          ) : loading ? (
-            <Loading text="Загрузка данных ..." />
-          ) : null}
-        </StatusWrapper>
-      ) : null}
-      <div style={containerStyle}>
-        {actionPanel && (
-          <>
-            <Flexbox alignItems="center" justifyContent="space-between">
-              <Flexbox width="1500px" fillChild alignItems="center" gap={20}>
-                <InputField
-                  id="filter-text-box"
-                  onChange={onFilterTextBoxChanged}
-                  placeholder="Поиск"
-                  icons={<SearchOutline />}
-                />
+    useDeepEffect(() => {
+      if (rowList?.length) {
+        setRows(rowList);
+        setTotalRows?.(rowList.length);
+      }
+    }, [rowList, setTotalRows, templates]);
 
-                <Flexbox gap={6}>
-                  <Checkbox
-                    dimension="s"
-                    checked={excludeError}
-                    onChange={(e) => updateExcludeError(e.target.checked)}
+    const rowClassRules = useMemo<RowClassRules>(() => {
+      return {
+        // row style function
+        'ag-row-is-odd': (params) => {
+          return params?.rowIndex % 2 === 0;
+        },
+      };
+    }, []);
+
+    return (
+      <Flexbox height="calc(100vh - 230px)">
+        {loading || error ? (
+          <StatusWrapper>
+            {error ? (
+              <ErrorStatus text={error} />
+            ) : loading ? (
+              <Loading text="Загрузка данных ..." />
+            ) : null}
+          </StatusWrapper>
+        ) : null}
+        <div style={containerStyle}>
+          {actionPanel && (
+            <>
+              <Flexbox alignItems="center" justifyContent="space-between">
+                <Flexbox width="1500px" fillChild alignItems="center" gap={20}>
+                  <InputField
+                    id="filter-text-box"
+                    onChange={onFilterTextBoxChanged}
+                    placeholder="Поиск"
+                    icons={<SearchOutline />}
                   />
-                  <T font="Body/Body 2 Short" as="div">
-                    Не включать модели со статусом ошибка заведения
-                  </T>
+
+                  <Flexbox gap={6}>
+                    <Checkbox
+                      dimension="s"
+                      checked={excludeError}
+                      onChange={(e) => updateExcludeError(e.target.checked)}
+                    />
+                    <T font="Body/Body 2 Short" as="div">
+                      Не включать модели со статусом ошибка заведения
+                    </T>
+                  </Flexbox>
                 </Flexbox>
+
+                <div>
+                  {isAddModelEnabled && (
+                    <IconButton
+                      icon={<PlusCircleSolid />}
+                      tooltip="Добавить модель"
+                      color="#0062FF"
+                      onClick={() => display?.setRightPanelType(RIGHT_PANEL_TYPE.ADD_MODEL)}
+                    />
+                  )}
+                  <IconButton
+                    icon={<DeleteSolid />}
+                    tooltip={deleteTooltipMessage}
+                    color="#0062FF"
+                    onClick={() => display?.setRightPanelType(RIGHT_PANEL_TYPE.DELETE_MODEL)}
+                    disabled={!isDeleteButtonEnabled}
+                  />
+                  <IconButton
+                    icon={<BrokerOutlineIcon />}
+                    tooltip="Графики"
+                    onClick={() => navigate('charts')}
+                  />
+                  <IconButton
+                    icon={<ShowTableOutline />}
+                    tooltip="Текущий интерфейс таблиц"
+                    onClick={() => navigate(ROUTES.MF_HOME_ROUTE)}
+                  />
+                  <IconButton icon={<MenuOutline />} tooltip="Меню" onClick={() => null} />
+                  <IconButton icon={<SettingsOutline />} tooltip="Настройки" onClick={() => null} />
+                </div>
               </Flexbox>
 
-              <div>
-                {isAddModelEnabled && (
-                  <IconButton
-                    icon={<PlusCircleSolid />}
-                    tooltip="Добавить модель"
-                    color="#0062FF"
-                    onClick={() => display?.setRightPanelType(RIGHT_PANEL_TYPE.ADD_MODEL)}
-                  />
-                )}
-                <IconButton
-                  icon={<DeleteSolid />}
-                  tooltip={deleteTooltipMessage}
-                  color="#0062FF"
-                  onClick={() => display?.setRightPanelType(RIGHT_PANEL_TYPE.DELETE_MODEL)}
-                  disabled={!isDeleteButtonEnabled}
-                />
-                <IconButton
-                  icon={<BrokerOutlineIcon />}
-                  tooltip="Графики"
-                  onClick={() => navigate('charts')}
-                />
-                <IconButton
-                  icon={<ShowTableOutline />}
-                  tooltip="Текущий интерфейс таблиц"
-                  onClick={() => navigate(ROUTES.MF_HOME_ROUTE)}
-                />
-                <IconButton icon={<MenuOutline />} tooltip="Меню" onClick={() => null} />
-                <IconButton icon={<SettingsOutline />} tooltip="Настройки" onClick={() => null} />
-              </div>
-            </Flexbox>
+              <Spacer space={10} />
+            </>
+          )}
 
-            <Spacer space={10} />
-          </>
-        )}
-
-        <div style={gridStyle} className="ag-theme-quartz">
-          <AgGridReact
-            pagination={pagination}
-            rowDragManaged={rowDragManaged}
-            ref={gridRef}
-            rowData={rowData}
-            columnDefs={columnDefs as any}
-            defaultColDef={defaultColDef}
-            rowSelection={rowSelection}
-            animateRows
-            cellSelection
-            onGridReady={onGridReadyGetData}
-            rowClassRules={isCompared ? rowClassRules : undefined}
-            selectionColumnDef={selectionColumnDef}
-            autoGroupColumnDef={autoGroupColumnDefProps}
-            sideBar={sidePanel ? sideBarProps : undefined}
-            onSelectionChanged={handleSelectionChange}
-            onFilterChanged={handleFilterChange}
-            paginationPageSize={pageSize}
-            paginationPageSizeSelector={paginationPageSizeSelector}
-            singleClickEdit
-            localeText={AG_GRID_LOCALE_RU}
-            alwaysShowHorizontalScroll
-            tooltipShowDelay={500}
-            onRowDragMove={onRowDragMove}
-            onRowSelected={onRowSelected}
-          />
+          <div style={gridStyle} className="ag-theme-quartz">
+            <AgGridReact
+              pagination={pagination}
+              rowDragManaged={rowDragManaged}
+              ref={gridRef || gridRefInner}
+              rowData={rowData}
+              columnDefs={columnDefs as any}
+              defaultColDef={defaultColDef}
+              rowSelection={rowSelection}
+              animateRows
+              cellSelection
+              onGridReady={onGridReadyGetData}
+              rowClassRules={isCompared ? rowClassRules : undefined}
+              selectionColumnDef={selectionColumnDef}
+              autoGroupColumnDef={autoGroupColumnDefProps}
+              sideBar={sidePanel ? sideBarProps : undefined}
+              onSelectionChanged={handleSelectionChange}
+              onFilterChanged={handleFilterChange}
+              paginationPageSize={pageSize}
+              paginationPageSizeSelector={paginationPageSizeSelector}
+              singleClickEdit
+              localeText={AG_GRID_LOCALE_RU}
+              alwaysShowHorizontalScroll
+              tooltipShowDelay={500}
+              onRowDragMove={onRowDragMove}
+              onRowSelected={onRowSelected}
+              onFirstDataRendered={onFirstDataRendered}
+              onRowDataUpdated={onRowDataUpdated}
+              onRowDragEnd={onRowDragEnd}
+            />
+          </div>
         </div>
-      </div>
-    </Flexbox>
-  );
-};
+      </Flexbox>
+    );
+  },
+);
 
 const StatusWrapper = styled.div`
   display: flex;

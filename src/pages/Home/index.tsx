@@ -4,9 +4,10 @@ import { ErrorStatus, Loading, Pagination } from '@shared/ui/atoms';
 import { ACTIVE_SCREEN } from '@shared/constants';
 import { FiltersContext } from '@shared/api';
 import { ActionsPanel } from '@entities';
-import { FiltersPanel, RightModalPanel, TemplateFilters } from '@features';
+import { FiltersPanel, RightModalPanel } from '@features';
 
 import { AgGridModelsTable } from '@src/features/NewTables/AgGridModelsTable';
+import { TemplateFiltersNew } from '@src/features/TemplateFilters/TemplateFiltersNew';
 import { useTableModels } from './hooks';
 import { CompareModelsWidget } from '../../widgets';
 
@@ -27,7 +28,7 @@ export const Home = () => {
         onClose={context.handleOnClose}
       />
       {display.activeScreen === ACTIVE_SCREEN.TEMPLATE_FILTERS && (
-        <TemplateFilters
+        <TemplateFiltersNew
           templates={filters.templates}
           updateActiveScreen={display.setActiveScreen}
           updateRightPanelType={display.setRightPanelType}
