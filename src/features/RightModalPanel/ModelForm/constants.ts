@@ -24,6 +24,13 @@ export const ALLOCATION_FIELDS_NAMES: Array<keyof Row> = [
   'allocation_kc_comment',
   'allocation_other_comment',
 ];
+export const ALLOCATION_FIELDS_NAMES_USAGE: Array<keyof Row> = [
+  'allocation_kib_usage',
+  'allocation_smb_usage',
+  'allocation_rb_usage',
+  'allocation_kc_usage',
+  'allocation_other_usage',
+];
 
 type SchemaNameMap = {
   [key: string]: {
@@ -904,4 +911,15 @@ export const VALIDATION_MODEL_SCHEMA: FormFieldsSchema = [
     customers: [CUSTOMER_MAP.UMRV],
   },
 ];
+
+export const REST_MODEL_SCHEMA: FormFieldsSchema = [
+  ...ACTIVE_MODEL_SCHEMA,
+  ...RATING_SYSTEM_MODEL_SCHEMA,
+  ...RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA,
+].map((item) => ({
+  name: item.name,
+  maxLength: item.maxLength,
+  required: false,
+  customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
+}));
 

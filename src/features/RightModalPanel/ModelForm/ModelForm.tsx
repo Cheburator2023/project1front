@@ -9,11 +9,12 @@ import { StatusScreen } from '@shared/ui/molecules';
 import { RIGHT_PANEL_TYPE, MODEL_FORM_MODE } from '@shared/constants';
 import { INPUT_TYPE, InputFactory, InputValue, RightPanel } from '@shared/ui/organisms';
 import { API_ROUTES, useFetch, ArtifactApi, ModelEditApi } from '@shared/api';
-import { useModelUserMatch, useRoles } from '@src/shared/hooks';
+import { useModelUserMatch, usePermissions, useRoles } from '@src/shared/hooks';
 
 import { groupBy, isEqual, omit, uniqBy } from 'lodash';
 import { Flexbox, Spacer } from '@shared/ui/atoms';
 import { Artifact } from '@shared/api/types';
+
 
 import { useAppInjectStore } from '@shared/stores/appInjectStore';
 import { useScrollTo } from '@src/shared/hooks/useScrollTo';
@@ -30,7 +31,7 @@ import { ButtonContainer, FormContainer } from './styles';
 import { ParentModelSelect } from './ParentModelSelect';
 import { useActiveFormSchema } from './useActiveFormSchema';
 import { useFormFields } from './useFormFields';
-import { ALLOCATION_FIELDS_NAMES, SCHEMA_NAME_MAP } from './constants';
+import { ALLOCATION_FIELDS_NAMES, ALLOCATION_FIELDS_NAMES_USAGE, SCHEMA_NAME_MAP } from './constants';
 import { ModelFormDotMenu } from './ModelFormDotMenu';
 
 type SubmitType = { checkOnly?: boolean };
@@ -42,7 +43,7 @@ export interface ModelFormProps {
   rows: Partial<Row>[];
   activeRow?: Partial<Row>;
   // TODO: check this types
-  onSubmit: (newRow: Row, formMode: MODEL_FORM_MODE) => void;
+  onSubmit: (newRow?: Row, formMode?: MODEL_FORM_MODE) => void;
   onClose: () => void;
 }
 
@@ -58,6 +59,7 @@ export const ModelForm = ({
   const { mutationProtectedFetch } = useFetch({});
   const formMode = getFormMode(mode);
   const { setCurrentCustomer, currentCustomer } = useAppInjectStore();
+  const { isEditAllocationEnabled } = usePermissions()
 
   const [values, setValues] = useState<FormValues | undefined>();
   const [invalidFields, setInvalidFields] = useState<Array<keyof Row>>([]);
@@ -243,22 +245,15 @@ export const ModelForm = ({
     }, 100);
   }, [completesConditionFields, fields]);
 
-  // TODO: Temporary solution to solve the problem of editing allocations in models that do not have all required fields. This is a technical debt that needs to be fixed.
-  /**
-   * Check if any of the allocation fields have been changed.
-   * @returns {boolean} true if any allocation field has been changed, false otherwise.
-   */
-  const checkForAllocationFieldsChanged = () =>
-    ALLOCATION_FIELDS_NAMES.some((fieldName) => {
+  const checkAllocationFieldsChanged = () => {
+    const fieldsChanged = ALLOCATION_FIELDS_NAMES_USAGE.some((fieldName) => {
       const initialValue = initialRow?.[fieldName] ?? '';
       const newInputValue = values?.[fieldName];
-
       if (!newInputValue) {
         return false;
       }
-
       let newStringValue = '';
-
+  
       if (
         newInputValue.type === INPUT_TYPE.DATE ||
         newInputValue.type === INPUT_TYPE.QUARTERLY_DATE
@@ -266,18 +261,32 @@ export const ModelForm = ({
         if (!newInputValue.value) {
           return false;
         }
-
         newStringValue = format(newInputValue.value, 'yyyy-MM-dd');
       } else {
         const formattedValue = getProperFormatValueForSubmit(newInputValue);
-
         if (!Array.isArray(formattedValue) && formattedValue.artefact_string_value) {
           newStringValue = formattedValue.artefact_string_value;
         }
       }
-
+  
       return initialValue !== newStringValue;
     });
+  
+    const totalPercentage = ALLOCATION_FIELDS_NAMES_USAGE.reduce((acc, fieldName) => {
+      const field = values?.[fieldName];
+      const num = field ? parseFloat(String(field.value)) : 0;
+      return acc + (isNaN(num) ? 0 : num);
+    }, 0);
+  
+    const hasFilled = ALLOCATION_FIELDS_NAMES_USAGE.some((fieldName) => {
+      const field = values?.[fieldName];
+      return field && field.value !== undefined && field.value !== '';
+    });
+  
+    const sumValid = !hasFilled || totalPercentage === 100;
+  
+    return { fieldsChanged, sumValid };
+  };
 
   const handleSubmit = useCallback(
     async ({ checkOnly = false }: SubmitType) => {
@@ -293,12 +302,18 @@ export const ModelForm = ({
         valuesWithAddedOutsideControls,
         wasPreviouslyActiveModel,
       );
-      const isAllocationFieldsChanged = checkForAllocationFieldsChanged();
-      setInvalidFields(isAllocationFieldsChanged ? [] : newInvalidFields);
+
+      const { fieldsChanged, sumValid } = checkAllocationFieldsChanged();
+
+      if (fieldsChanged && !sumValid) {
+        return;
+      }
+
+      setInvalidFields(fieldsChanged ? [] : newInvalidFields);
       scrollToActiveError();
       setDirtyFields((prevDirtyFields) => [...prevDirtyFields, fields[0].name]);
 
-      if (newInvalidFields.length && !isAllocationFieldsChanged) {
+      if (newInvalidFields.length && !fieldsChanged) {
         return;
       }
 
@@ -335,6 +350,7 @@ export const ModelForm = ({
 
           if (res?.data?.data?.cards && res.data.data.cards[0]) {
             newRow = res.data.data.cards[0];
+            console.log('🐸 Pepe said ~ newRow:', newRow);
           }
         }
       }
@@ -354,7 +370,7 @@ export const ModelForm = ({
         newRow = res.data as Row;
       }
 
-      if (newRow && formMode) {
+      if (formMode) {
         onSubmit(newRow, formMode);
         setSubmitLoading(false);
         setSubmitError('');
@@ -493,6 +509,14 @@ export const ModelForm = ({
             {Object.keys(groupedFieldsBySchemaName).map((schemaKey) => {
               const fieldsByGroup = groupedFieldsBySchemaName[schemaKey || 'Аллокация'];
               const schemaTitle = SCHEMA_NAME_MAP[schemaKey]?.title;
+
+              // TODO: bad solution, need to refactor this logic
+              // Determine if allocation fields should be hidden based on permissions
+              // in the future should be determined by field "isEditAllocationEnabled" in the schema or server side
+              const shouldHideAllocationFields = !schemaTitle && !isEditAllocationEnabled;
+              if (shouldHideAllocationFields) {
+                return null;
+              }
 
               return (
                 <div key={schemaKey}>

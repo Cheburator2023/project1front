@@ -16,6 +16,8 @@ export interface TableModelsProps {
   updateRowsCount: (newRowsCount: number) => void;
   setCurrentPage: (newPage: number) => void;
   templates?: Template[];
+  loading?: boolean;
+  error?: string | null;
 }
 
 export type TableChangeProps = Omit<TableModelsProps, 'onActionCell'>;

@@ -26,7 +26,7 @@ export interface RightModalPanelProps {
   activeRowId?: string;
   activeCellName?: keyof Row;
   updateTemplates: React.Dispatch<React.SetStateAction<Template[]>>;
-  onSubmit: (newRow: CustomError | Row | ArtifactApi[], formMode: MODEL_FORM_MODE) => void;
+  onSubmit: (newRow?: CustomError | Row | ArtifactApi[], formMode?: MODEL_FORM_MODE) => void;
   onClose: () => void;
 }
 
@@ -50,9 +50,9 @@ export const RightModalPanel = React.memo(
 
     const activeRow = useMemo(() => {
       if (activeStatus === RIGHT_PANEL_TYPE.DELETE_MODEL) {
-        return rows.find((row) => row.id === activeRowIdDelete);
+        return rows?.find((row) => row.id === activeRowIdDelete);
       }
-      return rows.find((row) => row.id === activeRowId);
+      return rows?.find((row) => row.id === activeRowId);
     }, [rows, activeRowId, activeStatus]);
 
     if (!activeStatus) {

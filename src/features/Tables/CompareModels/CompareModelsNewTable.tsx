@@ -9,6 +9,8 @@ import { ActionsPanel, ColumnFilter } from '@entities';
 
 import { CompareTable } from './styles';
 import { useTableChange } from '../hooks';
+import { AgGridTable } from '../../NewTables/AgGridTable';
+import { useTableModels } from '../../../pages/Home/hooks';
 
 interface TableModelsProps {
   rowList: Array<Partial<Row>>;
@@ -28,7 +30,7 @@ interface TableModelsProps {
   updateRightPanelType: (newRightPanelType: RIGHT_PANEL_TYPE | null) => void;
 }
 
-export const TableCompareModels = React.memo(
+export const CompareModelsNewTable = React.memo(
   ({
     rowList,
     columnList,
@@ -67,6 +69,7 @@ export const TableCompareModels = React.memo(
       searchString,
       columnList,
     });
+    const { display, modelsTable, filters, context } = useTableModels();
 
     useEffect(() => {
       if (rowList?.length) {
@@ -102,41 +105,27 @@ export const TableCompareModels = React.memo(
 
     return (
       <>
-        {totalRows > 0 && firstDate && secondDate ? (
-          <>
-            <ActionsPanel handleSearch={handleSearch} updateRightPanelType={updateRightPanelType} />
-            <div>
-              {loading || error ? (
-                <StatusWrapper>
-                  {error ? (
-                    <ErrorStatus text={error} />
-                  ) : loading ? (
-                    <Loading text="Загрузка данных ..." />
-                  ) : null}
-                </StatusWrapper>
-              ) : null}
-              <CompareTable
-                displayRowSelectionColumn
-                greyHeader
-                headerLineClamp={1}
-                rowList={rows as Array<Partial<Row> & { id: string }>} // fix types
-                columnList={cols}
-                virtualScroll={{ fixedRowHeight: 40 }}
-                style={{ height: 'calc(100vh - 245px)' }}
-                onSortChange={handleSort}
-                onColumnResize={handleResize}
-                onRowSelectionChange={handleSelectionChange}
-                onColumnDragEnd={handleColumnDragEnd}
-              />
-            </div>
-
-            <Pagination
-              page={page}
-              pageSize={pageSize}
-              onChangePage={onChangePage}
-              totalElements={totalRows}
+        {totalRows > 0 && firstDate && secondDate && !loading ? (
+          <div>
+            {loading || error ? (
+              <StatusWrapper>
+                {error ? (
+                  <ErrorStatus text={error} />
+                ) : loading ? (
+                  <Loading text="Загрузка данных ..." />
+                ) : null}
+              </StatusWrapper>
+            ) : null}
+            <AgGridTable
+              display={display}
+              modelsTable={modelsTable}
+              filters={filters}
+              templates={filters.templates}
+              isCompared
+              columnList={columnList}
+              rowList={rows}
             />
-          </>
+          </div>
         ) : (
           <StatusWrapper>
             <T font="Subtitle/Subtitle 1">Для сравнения выберите две даты состояния реестра</T>
@@ -147,7 +136,7 @@ export const TableCompareModels = React.memo(
   },
 );
 
-TableCompareModels.displayName = 'TableCompareModels';
+CompareModelsNewTable.displayName = 'CompareModelsNewTable';
 
 const StatusWrapper = styled.div`
   display: flex;

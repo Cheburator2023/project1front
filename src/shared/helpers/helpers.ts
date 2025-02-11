@@ -138,7 +138,7 @@ const getColumnFilterOptions = (
   columnsFilters?: Partial<ColumnsFilter>,
   filteredRowsIds?: Array<string>,
 ) =>
-  rowList.reduce(
+  rowList?.reduce(
     (columnValues, row) => {
       const columnValue = row[columnName];
       // const activeColumnFilters = columnsFilters?.[columnName];

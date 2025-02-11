@@ -127,7 +127,7 @@ export const useTableChange = ({
 
   // Update filtered rows after searching or changing column filters
   useEffect(() => {
-    if (rowList.length) {
+    if (rowList?.length) {
       let newFilteredRows = rowList;
 
       if (searchString) {

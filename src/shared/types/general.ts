@@ -113,6 +113,7 @@ type Row = ArtificialRow & {
   bank_document: string | null;
   rs_model_decommiss_date: string | null;
   remove_decision: string | null;
+  remove_date: string | null;
   remove_date_validation: string | null;
   assignment_contractor: string | null;
   developing_start_date: string | null;
@@ -157,6 +158,7 @@ type Row = ArtificialRow & {
   model_epic_04: string | null;
   model_epic_04_date: string | null;
   model_epic_05: string | null;
+  model_epic_05_date: string | null;
   model_epic_05a: string | null;
   data_completion_of_stage_05a: string | null;
   solution_to_implement_model: string | null;
@@ -204,7 +206,7 @@ enum ModelStatus {
 
 enum ModelSource {
   SUM_RM = 'sum-rm',
-  SUM = 'sum'
+  SUM = 'sum',
 }
 
 export {
