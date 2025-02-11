@@ -14,6 +14,7 @@ import { usePermissions } from '@src/shared/hooks';
 
 interface AgGridTableCustomCellParams extends CustomCellRendererProps {
   onAction: (action: any, row_system_model_id: any, columnName: any) => any;
+  noCustomCells?: boolean;
   isCompare?: boolean;
 }
 
@@ -62,6 +63,8 @@ export const AgGridTableCustomCell = (params: AgGridTableCustomCellParams) => {
   const [visible, setVisible] = useState(false);
   const { isEditModelEnabled } = usePermissions();
   const colName = params.colDef?.field;
+
+  const noCustomCells = params?.noCustomCells;
 
   const handleActionClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     const { name }: { name?: string } = e.target as HTMLButtonElement;
@@ -112,26 +115,28 @@ export const AgGridTableCustomCell = (params: AgGridTableCustomCellParams) => {
     <div>
       <Wrapper ref={wrapperRef}>
         <div className="ag-custom-cell-value">{value || 'Отсутствуют данные'}</div>
-        <div className="actionButtons">
-          <ActionBtn
-            name="historyChanges"
-            dimension="s"
-            color="#0062FF"
-            icon={<CalendarUpdateOutline />}
-            tooltip="История изменений"
-            onClick={handleActionClick}
-          />
-          {editable && (
+        {!noCustomCells && (
+          <div className="actionButtons">
             <ActionBtn
-              name="edit"
+              name="historyChanges"
               dimension="s"
               color="#0062FF"
-              icon={<EditOutline />}
-              tooltip="Редактировать"
+              icon={<CalendarUpdateOutline />}
+              tooltip="История изменений"
               onClick={handleActionClick}
             />
-          )}
-        </div>
+            {editable && (
+              <ActionBtn
+                name="edit"
+                dimension="s"
+                color="#0062FF"
+                icon={<EditOutline />}
+                tooltip="Редактировать"
+                onClick={handleActionClick}
+              />
+            )}
+          </div>
+        )}
       </Wrapper>
       <Tooltip targetRef={wrapperRef} title={params.value} />
     </div>

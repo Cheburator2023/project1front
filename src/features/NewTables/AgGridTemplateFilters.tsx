@@ -2,11 +2,13 @@ import React, { forwardRef } from 'react';
 import { Column, Row } from '@src/shared/types';
 import {
   FirstDataRenderedEvent,
+  GridReadyEvent,
   RowDataUpdatedEvent,
   RowDragEndEvent,
   RowDragMoveEvent,
   RowSelectedEvent,
   SelectionChangedEvent,
+  SortChangedEvent,
 } from 'ag-grid-community';
 import { AgGridTable } from './AgGridTable';
 
@@ -21,6 +23,9 @@ export const AgGridTemplateFilters = forwardRef(
       onRowDataUpdated?: (event: RowDataUpdatedEvent) => void;
       onSelectionChanged?: (event: SelectionChangedEvent) => void;
       onRowDragEnd?: (event: RowDragEndEvent) => void;
+      onSortChanged?: (event: SortChangedEvent) => void;
+      onGridReady?: (event: GridReadyEvent) => void;
+      noCustomCells?: boolean;
     },
     ref: any,
   ) => {
@@ -41,6 +46,9 @@ export const AgGridTemplateFilters = forwardRef(
           onRowDataUpdated={props.onRowDataUpdated}
           onSelectionChanged={props.onSelectionChanged}
           onRowDragEnd={props.onRowDragEnd}
+          onSortChanged={props.onSortChanged}
+          onGridReady={props.onGridReady}
+          noCustomCells={props.noCustomCells}
         />
       </div>
     );

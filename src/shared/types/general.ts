@@ -193,6 +193,7 @@ type Column = {
   sortable?: boolean;
   renderCell?: ColumnAdmiral['renderCell'];
   cellRenderer?: any;
+  sortIndex?: number;
 };
 
 enum ModelStatus {

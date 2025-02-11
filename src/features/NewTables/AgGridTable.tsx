@@ -10,6 +10,7 @@ import {
   FilterChangedEvent,
   FirstDataRenderedEvent,
   GetMainMenuItemsParams,
+  GridReadyEvent,
   IDateFilterParams,
   IRowNode,
   ITooltipParams,
@@ -21,6 +22,7 @@ import {
   RowSelectionOptions,
   SelectionChangedEvent,
   SelectionColumnDef,
+  SortChangedEvent,
   themeQuartz,
 } from 'ag-grid-community';
 import { ReactComponent as BrokerOutlineIcon } from '@admiral-ds/icons/build/finance/BrokerOutline.svg';
@@ -76,6 +78,9 @@ interface IAgGridTableProps {
   onFirstDataRendered?: (event: FirstDataRenderedEvent) => void;
   onRowDataUpdated?: (event: RowDataUpdatedEvent) => void;
   onSelectionChanged?: (event: SelectionChangedEvent) => void;
+  onSortChanged?: (event: SortChangedEvent) => void;
+  onGridReady?: (event: GridReadyEvent) => void;
+  noCustomCells?: boolean;
 }
 
 const sideBarProps = {
@@ -136,8 +141,8 @@ const autoGroupColumnDefProps: ColDef = {
 
 const selectionColumnDef: SelectionColumnDef = {
   sortable: true,
+  sort: 'desc',
   resizable: true,
-  minWidth: 300,
   suppressHeaderMenuButton: false,
   pinned: 'left',
 };
@@ -168,6 +173,9 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       onRowDataUpdated,
       onSelectionChanged,
       onRowDragEnd,
+      onSortChanged,
+      onGridReady,
+      noCustomCells = false,
     }: IAgGridTableProps,
     ref: any,
   ) => {
@@ -278,6 +286,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
         toolTipValueGetter,
         cellRenderer: AgGridTableCustomCell,
         cellRendererParams: {
+          noCustomCells,
           onAction: (action: any, row_system_model_id: any, columnName: any): any => {
             handleClickOnActionCell?.(action, row_system_model_id, columnName);
           },
@@ -293,8 +302,6 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
         // rowSelected: (params) => {},
       };
     }, []);
-
-    const onGridReadyGetData = useCallback(() => {}, []);
 
     const onFilterTextBoxChanged = useCallback(() => {
       gridRef.current!.api.setGridOption(
@@ -472,7 +479,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
               rowSelection={rowSelection}
               animateRows
               cellSelection
-              onGridReady={onGridReadyGetData}
+              onGridReady={onGridReady}
               rowClassRules={isCompared ? rowClassRules : undefined}
               selectionColumnDef={selectionColumnDef}
               autoGroupColumnDef={autoGroupColumnDefProps}
@@ -490,6 +497,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
               onFirstDataRendered={onFirstDataRendered}
               onRowDataUpdated={onRowDataUpdated}
               onRowDragEnd={onRowDragEnd}
+              onSortChanged={onSortChanged}
             />
           </div>
         </div>

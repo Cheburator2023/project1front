@@ -19,12 +19,14 @@ import {
   ColDef,
   FirstDataRenderedEvent,
   GridApi,
+  GridReadyEvent,
   IRowNode,
   RowDataUpdatedEvent,
   RowDragEndEvent,
   RowDragMoveEvent,
   RowSelectedEvent,
   SelectionChangedEvent,
+  SortChangedEvent,
 } from 'ag-grid-community';
 import { useDeepEffect } from '@src/shared/hooks/useDeepEffect';
 import { AgGridReact, CustomCellRendererProps } from 'ag-grid-react';
@@ -45,17 +47,19 @@ export interface TemplateFiltersProps {
 }
 
 const selectGridRowsByApi = (api: GridApi, selectedRows?: string[]) => {
-  const nodesToSelect: IRowNode[] = [];
-  api.forEachNode((node) => {
-    if (Array.isArray(selectedRows)) {
-      if (selectedRows?.find((rowId) => rowId === node.data?.id)) {
+  setTimeout(() => {
+    const nodesToSelect: IRowNode[] = [];
+    api.forEachNode((node) => {
+      if (Array.isArray(selectedRows)) {
+        if (selectedRows?.find((rowId) => rowId === node.data?.id)) {
+          nodesToSelect.push(node);
+        }
+      } else {
         nodesToSelect.push(node);
       }
-    } else {
-      nodesToSelect.push(node);
-    }
-  });
-  api.setNodesSelected({ nodes: nodesToSelect, newValue: true });
+    });
+    api.setNodesSelected({ nodes: nodesToSelect, newValue: true });
+  }, 100);
 };
 
 export const TemplateFiltersNew = ({
@@ -66,7 +70,7 @@ export const TemplateFiltersNew = ({
   const { topFilters, columnsFilters, onChangeColumnsFilters, onChangeTopFilters } =
     useContext(FiltersContext);
 
-  const [rows, setRows] = useState<any[]>([]);
+  const [rowData, setRowData] = useState<any[]>([]);
   const [showFilterTemplate, setShowFilterTemplate] = useState(true);
   const gridRef = useRef<AgGridReact>(null);
 
@@ -77,6 +81,22 @@ export const TemplateFiltersNew = ({
     resetFilters,
     shouldResetTemplateOnInitialFilterRemove,
   } = useTemplateFilters(columnsFilters, templates, topFilters.templates);
+
+  const onGridReady = useCallback(() => {
+    // add id to each item, needed for immutable store to work
+    const newRows: ATableRow[] = getFilteredColumns(initialColumns, showFilterTemplate).map(
+      (column) => {
+        return {
+          id: column.name,
+          name: column.title,
+          value: columnsFilters[column.name] ?? [],
+        };
+      },
+    );
+    console.log('🐸 Pepe said ~ onGridReady ~ newRows:', newRows);
+
+    setRowData(newRows);
+  }, [columnsFilters, getFilteredColumns, showFilterTemplate]);
 
   // refactor
   const handleRemoveColumnFilterValue = useCallback(
@@ -114,7 +134,7 @@ export const TemplateFiltersNew = ({
       title: 'Выбор',
       width: 'calc(100% - 600px)',
       cellRenderer: (params: CustomCellRendererProps) => {
-        const row: any = rows[params.data?.id || 0];
+        const row: any = rowData[params.data?.id || 0];
         const filters = columnsFilters[params.data?.id || 0];
 
         const filterType = initialColumns.find((column) => column.name === row?.id)?.type;
@@ -158,41 +178,6 @@ export const TemplateFiltersNew = ({
     },
   ];
 
-  const handleDragRows = (event: RowDragMoveEvent) => {
-    const rowId: string = rows[event.overNode?.sourceRowIndex || 0].id as any;
-    const nextRowId: string = rows[event.overIndex || 0 + 1].id as any;
-
-    const currentRow = rows.find((row) => row.id === rowId);
-    const nextRow = rows.find((row) => row.id === nextRowId);
-    if (!currentRow?.selected || !nextRow?.selected) return;
-
-    const keys = Object.keys(columnsFilters);
-    const currentRowIndex = keys.findIndex((key) => key === rowId);
-    const nextRowIndex = keys.findIndex((key) => key === nextRowId);
-    const direction = currentRowIndex > nextRowIndex ? 'up' : 'down';
-
-    keys.splice(currentRowIndex, 1);
-    const nextRowIndexUpdated = keys.findIndex((key) => key === nextRowId);
-
-    if (direction === 'up') {
-      keys.splice(nextRowIndexUpdated, 0, rowId);
-    } else {
-      keys.splice(nextRowIndexUpdated + 1, 0, rowId);
-    }
-
-    onChangeColumnsFilters(
-      keys.reduce((acc, cur) => {
-        if (columnsFilters[cur as keyof typeof columnsFilters]) {
-          acc[cur as keyof typeof columnsFilters] =
-            columnsFilters[cur as keyof typeof columnsFilters];
-        }
-
-        return acc;
-      }, {} as Partial<ColumnsFilter>),
-    );
-    onChangeTopFilters({ ...topFilters, templates: [] });
-  };
-
   const onSelectionChanged = (event: SelectionChangedEvent): void => {
     const eventSource = event.source;
 
@@ -212,6 +197,7 @@ export const TemplateFiltersNew = ({
       onChangeTopFilters({ ...topFilters, templates: [] });
 
       const nodesToSelect: IRowNode[] = [];
+
       event.api.forEachNode((node) => {
         if (selectedRows.find((row) => row.id === node.data?.id)) {
           nodesToSelect.push(node);
@@ -256,19 +242,65 @@ export const TemplateFiltersNew = ({
     }
   };
 
-  const newRows: ATableRow[] = getFilteredColumns(initialColumns, showFilterTemplate).map(
-    (column) => {
+  const onRowDragEnd = (event: RowDragEndEvent) => {
+    const rowId: string = event.node.data.id;
+    const nextRowId: string = rowData[event.overIndex || 0 + 1]?.id as any;
+
+    const keys = Object.keys(columnsFilters);
+    const currentRowIndex = keys.findIndex((key) => key === rowId);
+    const nextRowIndex = keys.findIndex((key) => key === nextRowId);
+    const direction = currentRowIndex > nextRowIndex ? 'up' : 'down';
+
+    keys.splice(currentRowIndex, 1);
+    const nextRowIndexUpdated = keys.findIndex((key) => key === nextRowId);
+
+    if (direction === 'up') {
+      keys.splice(nextRowIndexUpdated, 0, rowId);
+    } else {
+      keys.splice(nextRowIndexUpdated + 1, 0, rowId);
+    }
+
+    const colFilters = keys.reduce((acc, cur) => {
+      if (columnsFilters[cur as keyof typeof columnsFilters]) {
+        acc[cur as keyof typeof columnsFilters] =
+          columnsFilters[cur as keyof typeof columnsFilters];
+      }
+
+      return acc;
+    }, {} as Partial<ColumnsFilter>);
+
+    onChangeColumnsFilters(colFilters);
+    onChangeTopFilters({ ...topFilters, templates: [] });
+  };
+
+  const filters = Object.keys(columnsFilters);
+
+  const newRows: ATableRow[] = getFilteredColumns(initialColumns, showFilterTemplate)
+    .sort((prevColumn, nextColumn) => {
+      const prevIndex = filters.indexOf(prevColumn.name);
+      const nextIndex = filters.indexOf(nextColumn.name);
+
+      if (prevIndex !== -1 && nextIndex !== -1) {
+        return prevIndex - nextIndex;
+      }
+
+      if (prevIndex !== -1) {
+        return -1;
+      }
+
+      if (nextIndex !== -1) {
+        return 1;
+      }
+
+      return 0;
+    })
+    .map((column) => {
       return {
         id: column.name,
         name: column.title,
         value: columnsFilters[column.name] ?? [],
       };
-    },
-  );
-
-  const onRowDragEnd = (event: RowDragEndEvent) => {
-    console.log('🐸 Pepe said ~ onRowDragMove ~ event:', event);
-  };
+    });
 
   return (
     <Wrapper>
@@ -340,6 +372,8 @@ export const TemplateFiltersNew = ({
           onFirstDataRendered={onFirstDataRendered}
           onRowDataUpdated={onRowDataUpdated}
           onSelectionChanged={onSelectionChanged}
+          onGridReady={onGridReady}
+          noCustomCells
         />
       </div>
     </Wrapper>
