@@ -78,7 +78,7 @@ export const ModelForm = ({
 
   const { isValidator, isValidatorLead, isBusinessCustomer } = useRoles();
 
-  const isEditByRatingModel = isValidator || isValidatorLead || isBusinessCustomer;
+  const isEditByRatingModel = formMode === MODEL_FORM_MODE.ADD || isValidator || isValidatorLead || isBusinessCustomer;
 
   const errorElemRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
