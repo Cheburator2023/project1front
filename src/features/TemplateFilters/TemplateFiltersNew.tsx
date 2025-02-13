@@ -93,7 +93,6 @@ export const TemplateFiltersNew = ({
         };
       },
     );
-    console.log('🐸 Pepe said ~ onGridReady ~ newRows:', newRows);
 
     setRowData(newRows);
   }, [columnsFilters, getFilteredColumns, showFilterTemplate]);
@@ -133,6 +132,11 @@ export const TemplateFiltersNew = ({
       name: 'value',
       title: 'Выбор',
       width: 'calc(100% - 600px)',
+      cellStyle: {
+        display: 'flex',
+        alignItems: 'center',
+      },
+
       cellRenderer: (params: CustomCellRendererProps) => {
         const row: any = rowData[params.data?.id || 0];
         const filters = columnsFilters[params.data?.id || 0];

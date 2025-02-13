@@ -233,7 +233,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
           ? 'agDateColumnFilter'
           : data.type === COLUMN_TYPE.NUMBER
           ? 'agNumberColumnFilter'
-          : 'agTextColumnFilter',
+          : 'agSetColumnFilter',
       filterParams: data.type === COLUMN_TYPE.DATE ? dateFilterParams : { buttons: ['clear'] },
       cellRenderer: data.cellRenderer,
       cellClass: (params) => {
@@ -255,7 +255,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
 
     const defaultColDef = useMemo<ColDef>(() => {
       return {
-        filter: 'agTextColumnFilter',
+        filter: 'agSetColumnFilter',
         mainMenuItems: (params: GetMainMenuItemsParams) => {
           return params.defaultItems.filter(
             (item) => item !== 'columnChooser' && item !== 'rowGroup',
@@ -368,7 +368,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
         }
       } else {
         // @ts-ignore
-        const value = colDef?.filterModels[1]?.values;
+        const value = colDef?.filterModels?.[1]?.values;
         const initialTemplateValue = columnsFilters?.[colName] || [];
 
         if (value) {
@@ -454,11 +454,11 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
                     tooltip="Графики"
                     onClick={() => navigate('charts')}
                   />
-                  <IconButton
+                  {/* <IconButton
                     icon={<ShowTableOutline />}
                     tooltip="Текущий интерфейс таблиц"
                     onClick={() => navigate(ROUTES.MF_HOME_ROUTE)}
-                  />
+                  /> */}
                   <IconButton icon={<MenuOutline />} tooltip="Меню" onClick={() => null} />
                   <IconButton icon={<SettingsOutline />} tooltip="Настройки" onClick={() => null} />
                 </div>
