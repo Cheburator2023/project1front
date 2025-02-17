@@ -98,7 +98,7 @@ const ChartsDashboard = () => {
     responseData: metricsData,
     loading: loadingMetrics,
     error: errorMetrics,
-    refetch,
+    refetch: refetchMetrics,
   } = useFetch<MetricsResponseType>({
     apiRoute: API_ROUTES.METRICS,
     params: getQueryParams(filters),
@@ -289,7 +289,9 @@ const ChartsDashboard = () => {
   const handleApplyFilters = () => {
     const { tempStartDate, tempEndDate, tempSelectedStreams } = tempFilters;
 
-    if (!dateError) {
+    if (tempStartDate && tempEndDate) {
+      console.log('handleApplyFilters ~ tempStartDate:', tempStartDate);
+      console.log('handleApplyFilters ~ tempEndDate:', tempEndDate);
       const formattedStartDate = tempStartDate ? switchDateFormat(tempStartDate) : undefined;
       const formattedEndDate = tempEndDate ? switchDateFormat(tempEndDate) : undefined;
 
@@ -299,7 +301,7 @@ const ChartsDashboard = () => {
         selectedStreams: tempSelectedStreams,
       });
 
-      refetch();
+      refetchMetrics();
     }
   };
 
@@ -317,7 +319,7 @@ const ChartsDashboard = () => {
     });
 
     setDateError(false);
-    refetch();
+    refetchMetrics();
   };
 
   const exportToPDF = () => {
@@ -448,7 +450,7 @@ const ChartsDashboard = () => {
               dimension="s"
               id="dates"
               label="Временный срез:"
-              placeholder="__.__.____ – __.__.____"
+              placeholder="__.__.____ - __.__.____"
               dropContainerClassName="dropContainerClass"
               value={
                 tempFilters?.tempStartDate && tempFilters.tempEndDate
