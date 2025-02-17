@@ -464,20 +464,6 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
             classification_of_rs_by_order_of_application_within_pvr:
               'Рейтинговые системы, подлежащие согласованию Регулятором',
           },
-          {
-            significance_validity: 'Высокая',
-          },
-        ],
-      },
-      {
-        value: 'Низкая',
-        conditions: [
-          {
-            significance_validity: 'Средняя',
-          },
-          {
-            significance_validity: 'Низкая',
-          },
         ],
       },
     ],
