@@ -492,9 +492,9 @@ const isFieldDisabled = (
   const isControlledByConditions =
     fieldSchema?.enabledByValueConditions && isDisabledByValueConditions && isDisabledByConditions;
 
-  // const isDisabledArtifactBySource = !canEditArtefact(artifact, row);
+  const isDisabledArtifactBySource = !canEditArtefact(artifact, row);
 
-  return isGloballyDisabled || isControlledByConditions;
+  return isGloballyDisabled || isControlledByConditions || isDisabledArtifactBySource;
 };
 
 // Main mapping function that combine object for proper input format
