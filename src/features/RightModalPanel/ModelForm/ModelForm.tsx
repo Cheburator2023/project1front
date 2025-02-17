@@ -9,7 +9,7 @@ import { StatusScreen } from '@shared/ui/molecules';
 import { RIGHT_PANEL_TYPE, MODEL_FORM_MODE } from '@shared/constants';
 import { INPUT_TYPE, InputFactory, InputValue, RightPanel } from '@shared/ui/organisms';
 import { API_ROUTES, useFetch, ArtifactApi, ModelEditApi } from '@shared/api';
-import { useModelUserMatch, usePermissions, useRoles } from '@src/shared/hooks';
+import { usePermissions, useRoles } from '@src/shared/hooks';
 
 import { groupBy, isEqual, omit, uniqBy } from 'lodash';
 import { Flexbox, Spacer } from '@shared/ui/atoms';
@@ -31,7 +31,7 @@ import { ButtonContainer, FormContainer } from './styles';
 import { ParentModelSelect } from './ParentModelSelect';
 import { useActiveFormSchema } from './useActiveFormSchema';
 import { useFormFields } from './useFormFields';
-import { ALLOCATION_FIELDS_NAMES, ALLOCATION_FIELDS_NAMES_USAGE, SCHEMA_NAME_MAP } from './constants';
+import { ALLOCATION_FIELDS_NAMES_USAGE, SCHEMA_NAME_MAP } from './constants';
 import { ModelFormDotMenu } from './ModelFormDotMenu';
 
 type SubmitType = { checkOnly?: boolean };
@@ -76,10 +76,9 @@ export const ModelForm = ({
     { connectedName: string; connectedValue: string }[] | undefined
   >(undefined);
 
-  const { isValidator, isValidatorLead } = useRoles();
-  const { isInBusinessCustomers } = useModelUserMatch();
+  const { isValidator, isValidatorLead, isBusinessCustomer } = useRoles();
 
-  const isEditByRatingModel = isValidator || isValidatorLead || isInBusinessCustomers(activeRow!);
+  const isEditByRatingModel = formMode === MODEL_FORM_MODE.ADD || isValidator || isValidatorLead || isBusinessCustomer;
 
   const errorElemRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
@@ -301,6 +300,7 @@ export const ModelForm = ({
         formSchema,
         valuesWithAddedOutsideControls,
         wasPreviouslyActiveModel,
+        fields,
       );
 
       const { fieldsChanged, sumValid } = checkAllocationFieldsChanged();
@@ -418,10 +418,10 @@ export const ModelForm = ({
   }, [initialRow, artifacts]);
 
   useEffect(() => {
-    // if (!isEditByRatingModel) {
-    //   setActiveModelByDefault(false);
-    //   return;
-    // }
+    if (!isEditByRatingModel) {
+      setActiveModelByDefault(false);
+      return;
+    }
 
     if (activeRow?.active_model === '1') {
       setActiveModelByDefault(true);
@@ -449,12 +449,17 @@ export const ModelForm = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editCellName, formRef.current]);
 
-  useEffect(() => {
+  useDeepEffect(() => {
     if (dirtyFields.length) {
-      const newInvalidFields = getInvalidFields(formSchema, values, wasPreviouslyActiveModel);
+      const newInvalidFields = getInvalidFields(
+        formSchema,
+        values,
+        wasPreviouslyActiveModel,
+        fields,
+      );
       setInvalidFields(newInvalidFields);
     }
-  }, [values, dirtyFields, formSchema, wasPreviouslyActiveModel]);
+  }, [values, dirtyFields, formSchema, wasPreviouslyActiveModel, fields]);
 
   return (
     <RightPanel
@@ -490,7 +495,7 @@ export const ModelForm = ({
               dimension="s"
               checked={activeModelByDefault}
               onChange={activeModelCheckboxHandler}
-              // disabled={!isEditByRatingModel}
+              disabled={!isEditByRatingModel}
             >
               Действующая Модель/Модуль
             </CheckboxField>
