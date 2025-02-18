@@ -15,7 +15,6 @@ import { groupBy, isEqual, omit, uniqBy } from 'lodash';
 import { Flexbox, Spacer } from '@shared/ui/atoms';
 import { Artifact } from '@shared/api/types';
 
-
 import { useAppInjectStore } from '@shared/stores/appInjectStore';
 import { useScrollTo } from '@src/shared/hooks/useScrollTo';
 import { useDeepEffect } from '@src/shared/hooks/useDeepEffect';
@@ -59,7 +58,7 @@ export const ModelForm = ({
   const { mutationProtectedFetch } = useFetch({});
   const formMode = getFormMode(mode);
   const { setCurrentCustomer, currentCustomer } = useAppInjectStore();
-  const { isEditAllocationEnabled } = usePermissions()
+  const { isEditAllocationEnabled } = usePermissions();
 
   const [values, setValues] = useState<FormValues | undefined>();
   const [invalidFields, setInvalidFields] = useState<Array<keyof Row>>([]);
@@ -78,7 +77,8 @@ export const ModelForm = ({
 
   const { isValidator, isValidatorLead, isBusinessCustomer } = useRoles();
 
-  const isEditByRatingModel = formMode === MODEL_FORM_MODE.ADD || isValidator || isValidatorLead || isBusinessCustomer;
+  const isEditByRatingModel =
+    formMode === MODEL_FORM_MODE.ADD || isValidator || isValidatorLead || isBusinessCustomer;
 
   const errorElemRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
@@ -252,7 +252,7 @@ export const ModelForm = ({
         return false;
       }
       let newStringValue = '';
-  
+
       if (
         newInputValue.type === INPUT_TYPE.DATE ||
         newInputValue.type === INPUT_TYPE.QUARTERLY_DATE
@@ -267,23 +267,23 @@ export const ModelForm = ({
           newStringValue = formattedValue.artefact_string_value;
         }
       }
-  
+
       return initialValue !== newStringValue;
     });
-  
+
     const totalPercentage = ALLOCATION_FIELDS_NAMES_USAGE.reduce((acc, fieldName) => {
       const field = values?.[fieldName];
       const num = field ? parseFloat(String(field.value)) : 0;
-      return acc + (isNaN(num) ? 0 : num);
+      return acc + (Number.isNaN(num) ? 0 : num);
     }, 0);
-  
+
     const hasFilled = ALLOCATION_FIELDS_NAMES_USAGE.some((fieldName) => {
       const field = values?.[fieldName];
       return field && field.value !== undefined && field.value !== '';
     });
-  
+
     const sumValid = !hasFilled || totalPercentage === 100;
-  
+
     return { fieldsChanged, sumValid };
   };
 
@@ -427,7 +427,7 @@ export const ModelForm = ({
       setActiveModelByDefault(true);
     }
   }, [
-    activeRow?.active_model, 
+    activeRow?.active_model,
     // isEditByRatingModel
   ]);
 
