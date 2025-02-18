@@ -300,9 +300,15 @@ const ChartsDashboard = () => {
         endDate: formattedEndDate,
         selectedStreams: tempSelectedStreams,
       });
-
-      refetchMetrics();
+    } else {
+      setFilters({
+        startDate: undefined,
+        endDate: undefined,
+        selectedStreams: tempSelectedStreams,
+      });
     }
+
+    refetchMetrics();
   };
 
   const handleResetFilters = () => {
@@ -471,7 +477,13 @@ const ChartsDashboard = () => {
             />
 
             <ButtonContainer>
-              <Button dimension="s" onClick={handleApplyFilters} value="Submit" type="submit">
+              <Button
+                dimension="s"
+                onClick={handleApplyFilters}
+                value="Submit"
+                type="submit"
+                disabled={dateError}
+              >
                 Применить
               </Button>
               <Button
