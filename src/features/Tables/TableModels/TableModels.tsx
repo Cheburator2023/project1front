@@ -79,8 +79,9 @@ export const TableModels = React.memo(
             }
 
             const editable =
-              isEditModelEnabled &&
-              !(column.name === 'reason_model_delete' || column.name === 'status');
+              process.env.NODE_ENV === 'development' ||
+              (isEditModelEnabled &&
+                !(column.name === 'reason_model_delete' || column.name === 'status'));
 
             return (
               <CustomCell

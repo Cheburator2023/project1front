@@ -1,70 +1,73 @@
-export const mockedMetricsResponse = {
-  distributionByLifecycleStageModels: [
-    ['Инициализация', 882],
-    ['Поиск данных', 5],
-    ['Разработка витрины', 11],
-    ['Разработка модели', 49],
-    ['Пилотирование', 1],
-    ['Внедрение', 1065],
-    ['Внедрение', 1500],
-    ['Внедрение', 1500],
-    ['Внедрение', 1500],
-    ['Внедрение', 1500],
-    ['Внедрение', 1500],
-    ['Внедрение', 1500],
-    ['Внедрение', 1500],
-    ['Внедрение', 1500],
-    ['Внедрение', 1500],
-    [
-      'ВнедрениеВнедрениеВнедрениеВнедрениеВнедрениеВнедрениеВнедрениеВнедрениеВнедрениеВнедрениеВнедрениеВнедрениеВнедрениеВнедрениеВнедрениеВнедрениеВнедрениеВнедрение',
-      1500,
-    ],
-  ] as [string, number][],
+import { MetricsResponseType } from '../types';
+
+export const mockedMetricsResponse: MetricsResponseType = {
   developedModels: {
-    count: 437,
+    count: 361,
     delta: 0,
   },
   implementedModels: {
-    count: 313,
-    delta: 0,
-  },
-  finalStatusModels: {
-    count: 313,
+    count: 349,
     delta: 0,
   },
   sumRmModels: {
-    count: 1143,
+    count: 927,
     delta: 0,
-  },
-  totalModels: {
-    count: 750,
-    delta: 0,
-  },
-  riskCoverageFinalStatusModels: {
-    countPercent: 42,
-    deltaPercent: 0,
-  },
-  registryCoverageModels: {
-    countPercent: 100,
-    deltaPercent: 0,
   },
   pilots: {
-    stage05A: 227,
+    stage05A: 170,
     stage05B: 0,
   },
-  takenOutOfOperationModels: {
-    count: 543,
-    deltaPercent: 0,
+  finalStatusModels: {
+    count: 375,
+    delta: 0,
   },
   onMonitoringModels: {
-    count: 44,
+    count: 38,
     deltaPercent: 0,
   },
-  stalledModelsByMonth: [56, 75, 108, 12, 6, 3, 25, 18, 14, 186, 4, 8],
-  finalStatusByMonthModels: [36, 8, 22, 29, 26, 17, 40, 9, 69, 12, 20, 25],
+  takenOutOfOperationModels: {
+    count: 16,
+    deltaPercent: 0,
+  },
   tasks: {
-    validation: 1082,
-    datasources: 1096,
+    datasources: 68,
+    validation: 0,
+  },
+  stalledModelsByMonth: [13, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  finalStatusByMonthModels: [1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  distributionByLifecycleStageModels: [
+    ['Инициализация', 235],
+    ['Внедрена', 207],
+    ['Разработана, не внедрена', 166],
+    ['Поиск данных', 3],
+    ['Разработка модели', 190],
+    ['Первичная валидация', 4],
+    ['Модель неэффективна в БП Заказчика', 3],
+    ['Данные', 10],
+    ['Разработка витрины', 36],
+    ['Отмена разработки модели', 11],
+    ['Разработка промышленной витрины', 5],
+    ['нет в сум', 1],
+    ['Модель не эффективна в БП Заказчика', 1],
+    ['Архив', 7],
+    ['Сокращенное заведение разработанных моделей', 14],
+    ['Пилотирование модели', 2],
+    ['Настройка среды применения', 1],
+    ['Вывод модели из эксплуатации', 2],
+    ['Продуктивизация модели', 2],
+    ['Тестирование на препрод и перенос на прод контур', 1],
+  ],
+  totalModels: {
+    count: 710,
+    delta: 0,
+  },
+  registryCoverageModels: {
+    countPercent: 77,
+    deltaPercent: 0,
+  },
+  riskCoverageFinalStatusModels: {
+    countPercent: 40,
+    deltaPercent: 0,
   },
 };
 
