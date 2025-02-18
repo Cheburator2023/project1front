@@ -426,7 +426,10 @@ export const ModelForm = ({
     if (activeRow?.active_model === '1') {
       setActiveModelByDefault(true);
     }
-  }, [activeRow?.active_model, isEditByRatingModel]);
+  }, [
+    activeRow?.active_model, 
+    isEditByRatingModel
+  ]);
 
   // Scroll to edit input field
   useEffect(() => {
