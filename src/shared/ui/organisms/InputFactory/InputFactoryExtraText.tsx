@@ -8,7 +8,7 @@ export const InputFactoryExtraText = ({
   isError = false,
 }) => {
   return extraTextInitial ? (
-    <Wrapper title={extraTextInitial} isError={isError}>
+    <Wrapper title={extraTextInitial} isError={isError} justifyContent="flex-start">
       <ErrorOutline width={16} height={16} />
       <Spacer width={5} />
       <div>{conditionText}</div>
