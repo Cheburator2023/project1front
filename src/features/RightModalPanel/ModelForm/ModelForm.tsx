@@ -426,15 +426,18 @@ export const ModelForm = ({
   }, [initialRow, artifacts]);
 
   useEffect(() => {
-    if (!isEditByRatingModel) {
-      setActiveModelByDefault(false);
-      return;
-    }
+    // if (!isEditByRatingModel) {
+    //   setActiveModelByDefault(false);
+    //   return;
+    // }
 
     if (activeRow?.active_model === '1') {
       setActiveModelByDefault(true);
     }
-  }, [activeRow?.active_model, isEditByRatingModel]);
+  }, [
+    activeRow?.active_model,
+    // isEditByRatingModel
+  ]);
 
   // Scroll to edit input field
   useEffect(() => {
@@ -503,7 +506,7 @@ export const ModelForm = ({
               dimension="s"
               checked={activeModelByDefault}
               onChange={activeModelCheckboxHandler}
-              disabled={!isEditByRatingModel}
+              // disabled={!isEditByRatingModel}
             >
               Действующая Модель/Модуль
             </CheckboxField>

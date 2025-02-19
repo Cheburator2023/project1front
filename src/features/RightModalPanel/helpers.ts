@@ -494,7 +494,9 @@ const isFieldDisabled = (
 
   const isDisabledArtifactBySource = !canEditArtefact(artifact, row);
 
-  return isGloballyDisabled || isControlledByConditions || isDisabledArtifactBySource;
+  return isGloballyDisabled  
+      || isControlledByConditions 
+      // || isDisabledArtifactBySource;
 };
 
 // Main mapping function that combine object for proper input format
