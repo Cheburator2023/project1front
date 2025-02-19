@@ -1,5 +1,16 @@
 # Semantic Versioning Changelog
 
+## [1.36.1](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.36.0...v1.36.1) (2025-02-18)
+
+
+### Bug Fixes
+
+* add can edit artefact ([a526d8f](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/a526d8f4c49908d80e39695d5e0fead1f1bc10dc))
+* chart time fix ([659a91f](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/659a91f9dcd28b6932a2de02723660ddfd668a9d))
+* charts valid date refetch fix ([abe1661](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/abe16619802e22a5946c190caf125631047904fa))
+* delete can edit artefact ([3a132d0](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/3a132d01b73ba0117bd6530efe512b1487b8614a))
+* significance_validity form fix ([f245c2d](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/f245c2d8b8b0c132e3504def054fc826323dbf61))
+
 # [1.36.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.35.3...v1.36.0) (2025-02-17)
 
 
