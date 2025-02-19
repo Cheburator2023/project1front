@@ -397,7 +397,7 @@ export const initialColumns: Array<Column> = [
     type: COLUMN_TYPE.STRING,
   },
   {
-    name: 'developing_report',
+    name: 'analize_text_about_developing',
     title: 'Отчет по разработке',
     type: COLUMN_TYPE.STRING,
   },
