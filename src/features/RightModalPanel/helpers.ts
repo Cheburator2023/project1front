@@ -449,7 +449,7 @@ const canEditArtefact = (artifact?: Artifact, row?: Partial<Row> | undefined): b
   }
 
   if (!row) {
-    return true
+    return true;
   }
 
   if (row.model_source === ModelSource.SUM_RM) {
