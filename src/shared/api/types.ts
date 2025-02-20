@@ -171,7 +171,6 @@ export type Artifact = {
   artefact_value?: null | string;
   artefact_value_label?: null | string;
   artefact_regular_expression?: null | string;
-  is_edit_sum_flg?: ArtifactFlag;
   artefact_business_group_id?: number;
   artefact_label: string;
   artefact_desc?: string | null;
@@ -189,8 +188,8 @@ export type Artifact = {
   values: Array<ArtifactValue>;
   start_date_depend_artefact?: keyof Row;
   group?: ArtifactGroupUnion;
-  is_editable_by_role_sum_rm?: string | null;
-  is_editable_by_role_sum?: string | null;
+  is_editable_by_role_sum_rm?: ArtifactFlag;
+  is_editable_by_role_sum?: ArtifactFlag;
 };
 
 export type ArtifactResponse = {
