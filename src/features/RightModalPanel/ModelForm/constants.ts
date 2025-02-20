@@ -250,7 +250,7 @@ export const ACTIVE_MODEL_SCHEMA: FormFieldsSchema = [
     maxLength: 250,
   },
   {
-    name: 'developing_report',
+    name: 'analize_text_about_developing',
     customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
     required: true,
     maxLength: 250,
@@ -321,7 +321,7 @@ export const ACTIVE_MODEL_SCHEMA: FormFieldsSchema = [
 
 export const NOT_ACTIVE_MODEL_SCHEMA: FormFieldsSchema = [
   {
-    name: 'rs_model_decommiss_date',
+    name: 'remove_date_validation',
     requireConditions: ['wasPreviouslyActiveModel'],
     customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
   },
@@ -898,10 +898,18 @@ export const VALIDATION_MODEL_SCHEMA: FormFieldsSchema = [
   },
 ];
 
+const REST_MODEL_SCHEMA_BASE: FormFieldsSchema = [
+  {
+    name: 'rs_model_decommiss_date',
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
+  },
+];
+
 export const REST_MODEL_SCHEMA: FormFieldsSchema = [
   ...ACTIVE_MODEL_SCHEMA,
   ...RATING_SYSTEM_MODEL_SCHEMA,
   ...RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA,
+  ...REST_MODEL_SCHEMA_BASE,
 ].map((item) => ({
   name: item.name,
   maxLength: item.maxLength,
