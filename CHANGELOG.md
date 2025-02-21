@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.36.2](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.36.1...v1.36.2) (2025-02-21)
+
+
+### Bug Fixes
+
+* **ci:** up semver ([b1730d7](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/b1730d79671cff4ac47fab4982c75f23690bff74))
+
 ## [1.36.1](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.36.0...v1.36.1) (2025-02-18)
 
 
