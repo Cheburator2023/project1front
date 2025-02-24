@@ -496,7 +496,7 @@ const isFieldDisabled = (
 
   return isGloballyDisabled  
       || isControlledByConditions 
-      // || isDisabledArtifactBySource;
+      || isDisabledArtifactBySource;
 };
 
 // Main mapping function that combine object for proper input format
