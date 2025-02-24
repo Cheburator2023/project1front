@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import { URL, fileURLToPath } from 'node:url';
 import path from 'path';
+import child_process from 'child_process';
 
 import react from '@vitejs/plugin-react';
 import { loadEnv, defineConfig, HttpProxy } from 'vite';
@@ -21,6 +23,8 @@ const proxyList = {
 };
 // @ts-ignore
 const currentTarget = STAGE ? proxyList[STAGE] : proxyList.dev;
+
+const git_revision = child_process.execSync('git show').toString().trim();
 
 export const viteCommonConfig = ({ appName, base = '/' }: { appName?: string; base?: string }) =>
   defineConfig(({ mode }) => {
@@ -104,6 +108,7 @@ export const viteCommonConfig = ({ appName, base = '/' }: { appName?: string; ba
 
       define: {
         'process.env.MOCKED_REQUESTS': JSON.stringify(process.env.MOCKED_REQUESTS),
+        'process.env.GIT_REVISION': JSON.stringify(git_revision),
       },
 
       // resolve: {
