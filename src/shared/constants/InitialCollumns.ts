@@ -22,6 +22,11 @@ export const initialColumns: Array<Column> = [
     type: COLUMN_TYPE.STRING,
   },
   {
+    name: 'significance_validity',
+    title: 'Уровень значимости Модели / РС',
+    type: COLUMN_TYPE.STRING,
+  },
+  {
     name: 'degree_of_regulatory_supervision',
     title: 'Степень регуляторного надзора',
     type: COLUMN_TYPE.STRING,
@@ -655,11 +660,6 @@ export const initialColumns: Array<Column> = [
   {
     name: 'developing_model_reason',
     title: 'Основание для разработки',
-    type: COLUMN_TYPE.STRING,
-  },
-  {
-    name: 'significance_validity',
-    title: 'Уровень значимости Модели / РС',
     type: COLUMN_TYPE.STRING,
   },
   {

@@ -6,12 +6,12 @@ import { format } from 'date-fns';
 
 import { Row } from '@shared/types';
 import { StatusScreen } from '@shared/ui/molecules';
-import { RIGHT_PANEL_TYPE, MODEL_FORM_MODE } from '@shared/constants';
+import { RIGHT_PANEL_TYPE, MODEL_FORM_MODE, initialColumns } from '@shared/constants';
 import { INPUT_TYPE, InputFactory, InputValue, RightPanel } from '@shared/ui/organisms';
 import { API_ROUTES, useFetch, ArtifactApi, ModelEditApi } from '@shared/api';
 import { usePermissions, useRoles } from '@src/shared/hooks';
 
-import { groupBy, isEqual, omit, uniqBy } from 'lodash';
+import { groupBy, isEqual, omit, sortBy, uniqBy } from 'lodash';
 import { Flexbox, Spacer } from '@shared/ui/atoms';
 import { Artifact } from '@shared/api/types';
 
@@ -67,7 +67,6 @@ export const ModelForm = ({
   const [selectedColSize, setSelectedColSize] = useState<string>('2');
   const [submitLoading, setSubmitLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string>();
-  console.log('🐸 Pepe said ~ submitError:', submitError);
   const [initialRow, setInitialRow] = useState(activeRow);
   const [expandedPanel, setExpandPanel] = useState(true);
   const [showAllFields, setShowAllFields] = useState(false);
@@ -109,6 +108,7 @@ export const ModelForm = ({
 
   const IS_FORM_MODE_ADD = formMode === MODEL_FORM_MODE.ADD;
   const title = IS_FORM_MODE_ADD ? 'Новая модель' : 'Редактирование модели';
+
   const groupedFieldsBySchemaName = groupBy(fields, 'schemaKey');
 
   const handleChange = (name: keyof Row, value: InputValue) => {
@@ -524,6 +524,9 @@ export const ModelForm = ({
           <FormContainer ref={formRef} id="model_form_parent_container">
             {Object.keys(groupedFieldsBySchemaName).map((schemaKey) => {
               const fieldsByGroup = groupedFieldsBySchemaName[schemaKey || 'Аллокация'];
+              const fieldsByGroupSorted = sortBy(fieldsByGroup, (v) =>
+                initialColumns.findIndex((c) => c.name === v.name),
+              );
               const schemaTitle = SCHEMA_NAME_MAP[schemaKey]?.title;
 
               // TODO: bad solution, need to refactor this logic
@@ -539,7 +542,7 @@ export const ModelForm = ({
                   <T font="Subtitle/Subtitle 2">{schemaTitle || 'Аллокация'}</T>
                   <Spacer />
                   <Flexbox wrap="wrap" gap={20}>
-                    {fieldsByGroup.map((field) => {
+                    {fieldsByGroupSorted.map((field) => {
                       return (
                         <Flexbox
                           flexBasis={
