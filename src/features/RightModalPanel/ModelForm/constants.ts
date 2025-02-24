@@ -348,6 +348,71 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
     ],
   },
   {
+    name: 'classification_of_rs_by_order_of_application_within_pvr',
+    maxLength: 250,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
+    requireConditions: [
+      { model_type: 'Модели ВПОДК', model_risk_type: 'Кредитный риск' },
+      {
+        model_type: 'Риск-модели',
+        model_risk_type: 'Кредитный риск',
+        rating_model: 'Да',
+      },
+    ],
+  },
+  /// Степень регуляторного надзора
+  {
+    name: 'degree_of_regulatory_supervision',
+    maxLength: 250,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
+    requireConditions: [
+      { model_type: 'Модели ВПОДК', model_risk_type: 'Кредитный риск' },
+      {
+        model_type: 'Риск-модели',
+        model_risk_type: 'Кредитный риск',
+        rating_model: 'Да',
+      },
+    ],
+    optionConditions: [
+      {
+        // Уровень значимости Модели
+        connected_field: 'significance_validity',
+        value: 'Высокая',
+        options: ['Высокая', 'Средняя'],
+      },
+    ],
+    autoCompleteConditions: [
+      {
+        value: 'Высокая',
+        conditions: [
+          {
+            significance_validity: 'Высокая',
+          },
+        ],
+      },
+    ],
+    valueConditions: [
+      {
+        value: 'Высокая',
+        conditions: [
+          {
+            model_type: 'Модели ВПОДК',
+            model_risk_type: 'Кредитный риск',
+            classification_of_rs_by_order_of_application_within_pvr:
+              'Рейтинговые системы, подлежащие согласованию Регулятором',
+          },
+          {
+            model_type: 'Риск-модели',
+            model_risk_type: 'Кредитный риск',
+            rating_model: 'Да',
+            classification_of_rs_by_order_of_application_within_pvr:
+              'Рейтинговые системы, подлежащие согласованию Регулятором',
+          },
+        ],
+      },
+    ],
+  },
+  {
     // уровень значимости
     name: 'significance_validity',
     required: true,
@@ -413,58 +478,6 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
         model_type: 'Риск-модели',
         model_risk_type: 'Кредитный риск',
         rating_model: 'Да',
-      },
-    ],
-  },
-  /// Степень регуляторного надзора
-  {
-    name: 'degree_of_regulatory_supervision',
-    maxLength: 250,
-    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
-    requireConditions: [
-      { model_type: 'Модели ВПОДК', model_risk_type: 'Кредитный риск' },
-      {
-        model_type: 'Риск-модели',
-        model_risk_type: 'Кредитный риск',
-        rating_model: 'Да',
-      },
-    ],
-    optionConditions: [
-      {
-        // Уровень значимости Модели
-        connected_field: 'significance_validity',
-        value: 'Высокая',
-        options: ['Высокая', 'Средняя'],
-      },
-    ],
-    autoCompleteConditions: [
-      {
-        value: 'Высокая',
-        conditions: [
-          {
-            significance_validity: 'Высокая',
-          },
-        ],
-      },
-    ],
-    valueConditions: [
-      {
-        value: 'Высокая',
-        conditions: [
-          {
-            model_type: 'Модели ВПОДК',
-            model_risk_type: 'Кредитный риск',
-            classification_of_rs_by_order_of_application_within_pvr:
-              'Рейтинговые системы, подлежащие согласованию Регулятором',
-          },
-          {
-            model_type: 'Риск-модели',
-            model_risk_type: 'Кредитный риск',
-            rating_model: 'Да',
-            classification_of_rs_by_order_of_application_within_pvr:
-              'Рейтинговые системы, подлежащие согласованию Регулятором',
-          },
-        ],
       },
     ],
   },
@@ -565,19 +578,6 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
   },
   {
     name: 'classification_rs_algorithm_by_asset_classes',
-    maxLength: 250,
-    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
-    requireConditions: [
-      { model_type: 'Модели ВПОДК', model_risk_type: 'Кредитный риск' },
-      {
-        model_type: 'Риск-модели',
-        model_risk_type: 'Кредитный риск',
-        rating_model: 'Да',
-      },
-    ],
-  },
-  {
-    name: 'classification_of_rs_by_order_of_application_within_pvr',
     maxLength: 250,
     customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
     requireConditions: [
