@@ -188,8 +188,8 @@ export type Artifact = {
   values: Array<ArtifactValue>;
   start_date_depend_artefact?: keyof Row;
   group?: ArtifactGroupUnion;
-  is_editable_by_role_sum_rm?: string | null;
-  is_editable_by_role_sum?: string | null;
+  is_editable_by_role_sum_rm?: ArtifactFlag;
+  is_editable_by_role_sum?: ArtifactFlag;
 };
 
 export type ArtifactResponse = {

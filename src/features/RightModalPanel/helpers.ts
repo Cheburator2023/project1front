@@ -449,7 +449,7 @@ const canEditArtefact = (artifact?: Artifact, row?: Partial<Row> | undefined): b
   }
 
   if (!row) {
-    return true
+    return true;
   }
 
   if (row.model_source === ModelSource.SUM_RM) {
@@ -496,7 +496,7 @@ const isFieldDisabled = (
 
   return isGloballyDisabled  
       || isControlledByConditions 
-      // || isDisabledArtifactBySource;
+      || isDisabledArtifactBySource;
 };
 
 // Main mapping function that combine object for proper input format

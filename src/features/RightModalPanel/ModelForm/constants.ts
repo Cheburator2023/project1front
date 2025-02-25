@@ -250,7 +250,7 @@ export const ACTIVE_MODEL_SCHEMA: FormFieldsSchema = [
     maxLength: 250,
   },
   {
-    name: 'developing_report',
+    name: 'analize_text_about_developing',
     customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
     required: true,
     maxLength: 250,
@@ -321,7 +321,7 @@ export const ACTIVE_MODEL_SCHEMA: FormFieldsSchema = [
 
 export const NOT_ACTIVE_MODEL_SCHEMA: FormFieldsSchema = [
   {
-    name: 'rs_model_decommiss_date',
+    name: 'remove_date_validation',
     requireConditions: ['wasPreviouslyActiveModel'],
     customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
   },
@@ -344,6 +344,71 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
         model_type: 'Риск-модели',
         model_risk_type: 'Кредитный риск',
         rating_model: 'Да',
+      },
+    ],
+  },
+  {
+    name: 'classification_of_rs_by_order_of_application_within_pvr',
+    maxLength: 250,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
+    requireConditions: [
+      { model_type: 'Модели ВПОДК', model_risk_type: 'Кредитный риск' },
+      {
+        model_type: 'Риск-модели',
+        model_risk_type: 'Кредитный риск',
+        rating_model: 'Да',
+      },
+    ],
+  },
+  /// Степень регуляторного надзора
+  {
+    name: 'degree_of_regulatory_supervision',
+    maxLength: 250,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
+    requireConditions: [
+      { model_type: 'Модели ВПОДК', model_risk_type: 'Кредитный риск' },
+      {
+        model_type: 'Риск-модели',
+        model_risk_type: 'Кредитный риск',
+        rating_model: 'Да',
+      },
+    ],
+    optionConditions: [
+      {
+        // Уровень значимости Модели
+        connected_field: 'significance_validity',
+        value: 'Высокая',
+        options: ['Высокая', 'Средняя'],
+      },
+    ],
+    autoCompleteConditions: [
+      {
+        value: 'Высокая',
+        conditions: [
+          {
+            significance_validity: 'Высокая',
+          },
+        ],
+      },
+    ],
+    valueConditions: [
+      {
+        value: 'Высокая',
+        conditions: [
+          {
+            model_type: 'Модели ВПОДК',
+            model_risk_type: 'Кредитный риск',
+            classification_of_rs_by_order_of_application_within_pvr:
+              'Рейтинговые системы, подлежащие согласованию Регулятором',
+          },
+          {
+            model_type: 'Риск-модели',
+            model_risk_type: 'Кредитный риск',
+            rating_model: 'Да',
+            classification_of_rs_by_order_of_application_within_pvr:
+              'Рейтинговые системы, подлежащие согласованию Регулятором',
+          },
+        ],
       },
     ],
   },
@@ -413,58 +478,6 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
         model_type: 'Риск-модели',
         model_risk_type: 'Кредитный риск',
         rating_model: 'Да',
-      },
-    ],
-  },
-  /// Степень регуляторного надзора
-  {
-    name: 'degree_of_regulatory_supervision',
-    maxLength: 250,
-    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
-    requireConditions: [
-      { model_type: 'Модели ВПОДК', model_risk_type: 'Кредитный риск' },
-      {
-        model_type: 'Риск-модели',
-        model_risk_type: 'Кредитный риск',
-        rating_model: 'Да',
-      },
-    ],
-    optionConditions: [
-      {
-        // Уровень значимости Модели
-        connected_field: 'significance_validity',
-        value: 'Высокая',
-        options: ['Высокая', 'Средняя'],
-      },
-    ],
-    autoCompleteConditions: [
-      {
-        value: 'Высокая',
-        conditions: [
-          {
-            significance_validity: 'Высокая',
-          },
-        ],
-      },
-    ],
-    valueConditions: [
-      {
-        value: 'Высокая',
-        conditions: [
-          {
-            model_type: 'Модели ВПОДК',
-            model_risk_type: 'Кредитный риск',
-            classification_of_rs_by_order_of_application_within_pvr:
-              'Рейтинговые системы, подлежащие согласованию Регулятором',
-          },
-          {
-            model_type: 'Риск-модели',
-            model_risk_type: 'Кредитный риск',
-            rating_model: 'Да',
-            classification_of_rs_by_order_of_application_within_pvr:
-              'Рейтинговые системы, подлежащие согласованию Регулятором',
-          },
-        ],
       },
     ],
   },
@@ -565,19 +578,6 @@ export const RATING_SYSTEM_MODEL_SCHEMA: FormFieldsSchema = [
   },
   {
     name: 'classification_rs_algorithm_by_asset_classes',
-    maxLength: 250,
-    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
-    requireConditions: [
-      { model_type: 'Модели ВПОДК', model_risk_type: 'Кредитный риск' },
-      {
-        model_type: 'Риск-модели',
-        model_risk_type: 'Кредитный риск',
-        rating_model: 'Да',
-      },
-    ],
-  },
-  {
-    name: 'classification_of_rs_by_order_of_application_within_pvr',
     maxLength: 250,
     customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
     requireConditions: [
@@ -898,10 +898,18 @@ export const VALIDATION_MODEL_SCHEMA: FormFieldsSchema = [
   },
 ];
 
+const REST_MODEL_SCHEMA_BASE: FormFieldsSchema = [
+  {
+    name: 'rs_model_decommiss_date',
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
+  },
+];
+
 export const REST_MODEL_SCHEMA: FormFieldsSchema = [
   ...ACTIVE_MODEL_SCHEMA,
   ...RATING_SYSTEM_MODEL_SCHEMA,
   ...RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA,
+  ...REST_MODEL_SCHEMA_BASE,
 ].map((item) => ({
   name: item.name,
   maxLength: item.maxLength,

@@ -4,11 +4,14 @@ const webpack = require('webpack');
 const { DefinePlugin } = webpack;
 const common = require('./webpack.common.js');
 
+const git_revision = require('child_process').execSync('git show').toString().trim();
+
 module.exports = merge(common, {
   mode: 'production',
   plugins: [
     new DefinePlugin({
       'process.env.MOCKED_REQUESTS': JSON.stringify(process.env.MOCKED_REQUESTS || ''),
+      'process.env.GIT_REVISION': JSON.stringify(git_revision || ''),
     }),
   ],
 });

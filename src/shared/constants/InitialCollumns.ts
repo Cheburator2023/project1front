@@ -22,6 +22,11 @@ export const initialColumns: Array<Column> = [
     type: COLUMN_TYPE.STRING,
   },
   {
+    name: 'significance_validity',
+    title: 'Уровень значимости Модели / РС',
+    type: COLUMN_TYPE.STRING,
+  },
+  {
     name: 'degree_of_regulatory_supervision',
     title: 'Степень регуляторного надзора',
     type: COLUMN_TYPE.STRING,
@@ -191,31 +196,11 @@ export const initialColumns: Array<Column> = [
     title: 'Классификация РС / Алгоритма по классам активов',
     type: COLUMN_TYPE.STRING,
   },
-  // {
-  //   name: 'degree_of_regulatory_supervision',
-  //   title: 'Степень регуляторного надзора',
-  //   type: COLUMN_TYPE.STRING,
-  // },
-  // {
-  //   name: 'materiality_rate',
-  //   title: 'Уровень материальности',
-  //   type: COLUMN_TYPE.STRING,
-  // },
-  // {
-  //   name: 'impact_coverage',
-  //   title: 'Охват последствий',
-  //   type: COLUMN_TYPE.STRING,
-  // },
   {
     name: 'responsible_for_significance_validity',
     title: 'Кем определен уровень значимости Модели / РС',
     type: COLUMN_TYPE.STRING,
   },
-  // {
-  //   name: 'classification_of_rs_by_order_of_application_within_pvr',
-  //   title: 'Классификация РС по порядку применения в рамках ПВР',
-  //   type: COLUMN_TYPE.STRING,
-  // },
   {
     name: 'credit_risk_component',
     title: 'Компонент кредитного риска',
@@ -369,7 +354,7 @@ export const initialColumns: Array<Column> = [
   {
     name: 'remove_date_validation',
     title: 'Дата выведения РС / Модели из эксплуатации',
-    type: COLUMN_TYPE.STRING,
+    type: COLUMN_TYPE.DATE,
   },
   {
     name: 'assignment_contractor',
@@ -397,7 +382,7 @@ export const initialColumns: Array<Column> = [
     type: COLUMN_TYPE.STRING,
   },
   {
-    name: 'developing_report',
+    name: 'analize_text_about_developing',
     title: 'Отчет по разработке',
     type: COLUMN_TYPE.STRING,
   },
@@ -675,11 +660,6 @@ export const initialColumns: Array<Column> = [
   {
     name: 'developing_model_reason',
     title: 'Основание для разработки',
-    type: COLUMN_TYPE.STRING,
-  },
-  {
-    name: 'significance_validity',
-    title: 'Уровень значимости Модели / РС',
     type: COLUMN_TYPE.STRING,
   },
   {
