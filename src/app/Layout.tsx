@@ -12,6 +12,10 @@ import { themes } from './theme/theme';
 
 import { CUSTOMER_MAP } from '../shared/constants/customers';
 
+const GIT_REVISION = process.env.GIT_REVISION;
+
+console.log('GIT_REVISION IS:', GIT_REVISION);
+
 interface LayoutProps {
   children: React.ReactNode;
   user?: Keycloak.KeycloakTokenParsed & {
