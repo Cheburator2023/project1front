@@ -1,5 +1,13 @@
 # Semantic Versioning Changelog
 
+## [1.37.1](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.37.0...v1.37.1) (2025-02-28)
+
+
+### Bug Fixes
+
+* rename artefact analize_text_about_developing ([6d5966b](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/6d5966b69da215a4a849ae8a00ca1ec12810dc7e))
+* required developing_report and allocation ([61dc09b](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/61dc09b22e8184dac15317350df9b28169e5c0c8))
+
 # [1.37.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.36.2...v1.37.0) (2025-02-25)
 
 
