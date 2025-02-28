@@ -382,7 +382,7 @@ export const initialColumns: Array<Column> = [
     type: COLUMN_TYPE.STRING,
   },
   {
-    name: 'analize_text_about_developing',
+    name: 'developing_report',
     title: 'Отчет по разработке',
     type: COLUMN_TYPE.STRING,
   },
@@ -847,7 +847,6 @@ export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
   model_creator: [],
   reason_model_delete: [],
   status: [],
-  analize_text_about_developing: [],
   model_name_dadm: [],
   custom_model_id: [],
   custom_model_type: [],
