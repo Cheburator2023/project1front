@@ -359,8 +359,8 @@ export const getStartDateInCurrentYear = (startDate: Date) => {
   return startDate;
 };
 
-const ENABLE_FEBRUARY_EXTENSION = true; // Можно переключать на false при необходимости
-const ENABLE_MARCH_EXTENSION = true;
+const ENABLE_FEBRUARY_EXTENSION = false; // Можно переключать на false при необходимости
+const ENABLE_MARCH_EXTENSION = false;
 
 const getDateLimits = (quarter: number) => {
   const currentDate = new Date();
@@ -392,9 +392,19 @@ const getDateLimits = (quarter: number) => {
   };
 };
 
-const getDisabledStatus = (minDate: Date, maxDate: Date, quarter: number) => {
+const getDisabledStatus = (
+  minDate: Date,
+  maxDate: Date,
+  quarter: number,
+  activeRow: Partial<Row> | undefined,
+) => {
   const currentDate = new Date();
   const currentQuarter = Math.floor((currentDate.getMonth() + 3) / 3);
+
+  // TODO: Временно отключаем все поля для sum-rm, пересмотреть позже
+  if (activeRow?.model_source === ModelSource.SUM_RM) {
+    return true;
+  }
 
   const startOfCurrentQuarter = new Date(currentDate.getFullYear(), (currentQuarter - 1) * 3, 1);
   const monthAfterStartOfCurrentQuarter = addMonths(startOfCurrentQuarter, 1);
@@ -494,9 +504,7 @@ const isFieldDisabled = (
 
   const isDisabledArtifactBySource = !canEditArtefact(artifact, row);
 
-  return isGloballyDisabled  
-      || isControlledByConditions 
-      || isDisabledArtifactBySource;
+  return isGloballyDisabled || isControlledByConditions || isDisabledArtifactBySource;
 };
 
 // Main mapping function that combine object for proper input format
@@ -577,7 +585,7 @@ const mapArtifactToField = (
 
       // Вычисление минимальной и максимальной даты для квартала
       const { minDate, maxDate } = getDateLimits(fields);
-      const quarterDisabledStatus = getDisabledStatus(minDate, maxDate, fields);
+      const quarterDisabledStatus = getDisabledStatus(minDate, maxDate, fields, activeRow);
 
       return {
         ...commonAttributes,
@@ -649,7 +657,7 @@ const mapArtifactToField = (
       // ****
 
       const { minDate, maxDate } = getDateLimits(fields);
-      const quarterDisabledStatus = getDisabledStatus(minDate, maxDate, fields);
+      const quarterDisabledStatus = getDisabledStatus(minDate, maxDate, fields, activeRow);
 
       return {
         ...commonAttributes,
