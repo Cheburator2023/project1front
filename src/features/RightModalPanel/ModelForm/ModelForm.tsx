@@ -308,7 +308,7 @@ export const ModelForm = ({
 
       if (fieldsChanged && !sumValid) {
         console.log(
-          '🐸 Pepe said ~ sumValid: OUT fieldsChanged / sumValid',
+          '📝 FORM LOGS: ~ sumValid: OUT 1 fieldsChanged / !sumValid',
           fieldsChanged,
           sumValid,
         );
@@ -319,7 +319,14 @@ export const ModelForm = ({
       scrollToActiveError();
       setDirtyFields((prevDirtyFields) => [...prevDirtyFields, fields[0].name]);
 
+      console.log('📝 FORM LOGS: >> newInvalidFields:', newInvalidFields);
+
       if (newInvalidFields.length && !fieldsChanged) {
+        console.log(
+          '📝 FORM LOGS: ~ sumValid: OUT 2 !fieldsChanged / newInvalidFields > 0',
+          fieldsChanged,
+          newInvalidFields,
+        );
         return;
       }
 
@@ -332,8 +339,8 @@ export const ModelForm = ({
 
       if (!IS_FORM_MODE_ADD && initialRow && !checkOnly) {
         const { system_model_id, model_source } = initialRow;
-        console.log('🐸 Pepe said ~ system_model_id:', system_model_id);
-        console.log('🐸 Pepe said ~ model_source:', model_source);
+        console.log('📝 FORM LOGS: ~ system_model_id:', system_model_id);
+        console.log('📝 FORM LOGS: ~ model_source:', model_source);
 
         if (system_model_id && model_source) {
           // TODO: fix response type and structure and input type ModelEditApi[]
@@ -358,7 +365,7 @@ export const ModelForm = ({
 
           if (res?.data?.data?.cards && res.data.data.cards[0]) {
             newRow = res.data.data.cards[0];
-            console.log('🐸 Pepe said ~ newRow:', newRow);
+            console.log('📝 FORM LOGS: ~ newRow:', newRow);
           }
         }
       }
@@ -434,10 +441,7 @@ export const ModelForm = ({
     if (activeRow?.active_model === '1') {
       setActiveModelByDefault(true);
     }
-  }, [
-    activeRow?.active_model,
-    isEditByRatingModel
-  ]);
+  }, [activeRow?.active_model, isEditByRatingModel]);
 
   // Scroll to edit input field
   useEffect(() => {
