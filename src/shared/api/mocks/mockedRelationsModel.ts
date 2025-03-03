@@ -32,7 +32,7 @@ export const mockedRelationsResponse: RelationsModelResponseType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -236,7 +236,7 @@ export const mockedRelationsResponse: RelationsModelResponseType = {
           data_source_description: null,
           target: null,
           calibration_method: null,
-          analize_text_about_developing: null,
+
           name_and_version_rating_system: null,
           version_it_implementation: null,
           responsible_subdivision_and_project_lead_for_it_implementation: null,
@@ -357,7 +357,7 @@ export const mockedRelationsResponse: RelationsModelResponseType = {
           data_source_description: null,
           target: null,
           calibration_method: null,
-          analize_text_about_developing: null,
+
           name_and_version_rating_system: null,
           version_it_implementation: null,
           responsible_subdivision_and_project_lead_for_it_implementation: null,
@@ -482,7 +482,7 @@ export const mockedRelationsResponse: RelationsModelResponseType = {
           data_source_description: null,
           target: null,
           calibration_method: null,
-          analize_text_about_developing: null,
+
           name_and_version_rating_system: null,
           version_it_implementation: null,
           responsible_subdivision_and_project_lead_for_it_implementation: null,
@@ -604,7 +604,7 @@ export const mockedRelationsResponse: RelationsModelResponseType = {
           data_source_description: null,
           target: null,
           calibration_method: null,
-          analize_text_about_developing: null,
+
           name_and_version_rating_system: null,
           version_it_implementation: null,
           responsible_subdivision_and_project_lead_for_it_implementation: null,

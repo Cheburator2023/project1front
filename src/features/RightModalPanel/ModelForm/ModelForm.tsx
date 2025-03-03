@@ -593,6 +593,7 @@ export const ModelForm = ({
               onClick={() => handleSubmit({ checkOnly: false })}
               value="Submit"
               type="submit"
+              disabled={submitLoading || invalidFields.length > 0}
             >
               Сохранить
             </Button>
@@ -602,6 +603,7 @@ export const ModelForm = ({
               appearance="secondary"
               value="Submit"
               type="submit"
+              disabled={submitLoading}
             >
               Отменить
             </Button>
