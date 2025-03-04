@@ -421,7 +421,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
                     icons={<SearchOutline />}
                   />
 
-                  <Flexbox gap={6}>
+                  <Flexbox gap={6} alignItems="center" justifyContent="flex-start">
                     <Checkbox
                       dimension="s"
                       checked={excludeError}
