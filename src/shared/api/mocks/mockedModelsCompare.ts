@@ -39,7 +39,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -95,7 +95,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '14.02.2022 14:23',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -153,7 +153,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -209,7 +209,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -266,7 +266,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -321,7 +321,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '08.06.2022 14:06',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -378,7 +378,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -433,7 +433,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -491,7 +491,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -547,7 +547,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -604,7 +604,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -659,7 +659,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '26.02.2022 20:31',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -716,7 +716,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -775,7 +775,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -831,7 +831,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -887,7 +887,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -941,7 +941,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -999,7 +999,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -1055,7 +1055,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -1113,7 +1113,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -1169,7 +1169,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -1226,7 +1226,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -1281,7 +1281,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '09.02.2023 12:24',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -1338,7 +1338,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -1393,7 +1393,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -1449,7 +1449,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -1507,7 +1507,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -1565,7 +1565,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -1620,7 +1620,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -1677,7 +1677,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -1732,7 +1732,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '27.12.2021 20:23',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -1789,7 +1789,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -1844,7 +1844,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '13.12.2021 14:31',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -1901,7 +1901,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -1956,7 +1956,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -2014,7 +2014,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -2070,7 +2070,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -2127,7 +2127,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -2182,7 +2182,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -2238,7 +2238,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -2292,7 +2292,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '16.12.2022 12:36',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -2349,7 +2349,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -2404,7 +2404,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -2462,7 +2462,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '30.06.2022 19:32',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -2518,7 +2518,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '30.06.2022 19:32',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -2574,7 +2574,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '22.11.2022 14:32',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -2628,7 +2628,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '22.11.2022 14:32',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -2684,7 +2684,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -2738,7 +2738,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '06.07.2021 14:37',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -2795,7 +2795,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -2850,7 +2850,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -2908,7 +2908,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -2964,7 +2964,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -3021,7 +3021,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -3076,7 +3076,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -3133,7 +3133,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -3188,7 +3188,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -3245,7 +3245,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -3300,7 +3300,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '14.02.2022 14:25',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -3357,7 +3357,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -3412,7 +3412,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -3469,7 +3469,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -3527,7 +3527,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -3582,7 +3582,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -3639,7 +3639,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -3697,7 +3697,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -3755,7 +3755,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -3810,7 +3810,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -3866,7 +3866,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -3920,7 +3920,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -3976,7 +3976,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -4030,7 +4030,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '14.12.2021 13:47',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -4087,7 +4087,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -4142,7 +4142,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -4199,7 +4199,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -4254,7 +4254,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '03.06.2022 15:32',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -4311,7 +4311,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -4366,7 +4366,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -4423,7 +4423,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -4478,7 +4478,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -4535,7 +4535,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -4590,7 +4590,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -4647,7 +4647,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -4702,7 +4702,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -4759,7 +4759,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -4814,7 +4814,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '04.03.2022 14:04',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -4872,7 +4872,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -4928,7 +4928,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -4984,7 +4984,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -5038,7 +5038,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '01.06.2021 23:42',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -5094,7 +5094,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -5148,7 +5148,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '12.10.2021 12:14',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -5206,7 +5206,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -5262,7 +5262,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -5320,7 +5320,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -5376,7 +5376,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -5433,7 +5433,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -5492,7 +5492,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '29.03.2022 14:35',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -5548,7 +5548,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '29.03.2022 14:35',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -5606,7 +5606,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -5662,7 +5662,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -5718,7 +5718,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -5772,7 +5772,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -5828,7 +5828,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -5882,7 +5882,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '22.05.2023 16:38',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -5939,7 +5939,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -5998,7 +5998,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -6054,7 +6054,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -6111,7 +6111,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -6169,7 +6169,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -6224,7 +6224,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '15.06.2021 17:17',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -6282,7 +6282,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -6338,7 +6338,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -6394,7 +6394,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -6448,7 +6448,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '31.08.2021 13:47',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -6505,7 +6505,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -6560,7 +6560,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -6616,7 +6616,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -6670,7 +6670,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -6727,7 +6727,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -6782,7 +6782,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -6838,7 +6838,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -6892,7 +6892,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '28.09.2021 16:45',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -6949,7 +6949,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -7004,7 +7004,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -7061,7 +7061,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -7116,7 +7116,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -7174,7 +7174,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -7230,7 +7230,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '14.02.2022 09:40',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -7286,7 +7286,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -7340,7 +7340,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '02.08.2021 16:35',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -7397,7 +7397,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -7454,7 +7454,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -7508,7 +7508,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -7564,7 +7564,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -7618,7 +7618,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -7675,7 +7675,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -7730,7 +7730,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -7788,7 +7788,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -7844,7 +7844,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '14.02.2022 14:16',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -7901,7 +7901,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -7956,7 +7956,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '01.03.2022 15:53',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -8013,7 +8013,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -8068,7 +8068,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '01.04.2022 10:58',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -8124,7 +8124,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -8178,7 +8178,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -8235,7 +8235,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -8290,7 +8290,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -8347,7 +8347,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -8402,7 +8402,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -8459,7 +8459,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -8517,7 +8517,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -8572,7 +8572,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -8629,7 +8629,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -8687,7 +8687,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -8745,7 +8745,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -8800,7 +8800,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -8857,7 +8857,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -8912,7 +8912,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -8969,7 +8969,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -9024,7 +9024,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '16.12.2022 15:19',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -9081,7 +9081,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -9136,7 +9136,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -9193,7 +9193,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -9248,7 +9248,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -9306,7 +9306,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -9362,7 +9362,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -9419,7 +9419,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -9474,7 +9474,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '30.09.2021 16:51',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -9532,7 +9532,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -9590,7 +9590,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -9645,7 +9645,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -9703,7 +9703,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -9761,7 +9761,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -9820,7 +9820,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -9876,7 +9876,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -9932,7 +9932,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -9986,7 +9986,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '28.09.2021 14:42',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -10044,7 +10044,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -10100,7 +10100,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '31.12.2021 00:00',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -10157,7 +10157,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -10212,7 +10212,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -10269,7 +10269,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -10324,7 +10324,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -10380,7 +10380,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -10434,7 +10434,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '01.03.2022 12:00',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -10490,7 +10490,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -10544,7 +10544,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -10602,7 +10602,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '22.04.2022 14:43',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -10658,7 +10658,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '22.04.2022 14:43',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -10715,7 +10715,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -10770,7 +10770,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '03.06.2021 15:27',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -10826,7 +10826,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '01.05.2021 12:00',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -10885,7 +10885,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -10941,7 +10941,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -10999,7 +10999,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -11058,7 +11058,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -11117,7 +11117,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -11173,7 +11173,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '09.08.2022 14:34',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -11230,7 +11230,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -11285,7 +11285,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -11341,7 +11341,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -11395,7 +11395,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -11451,7 +11451,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -11505,7 +11505,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '21.12.2021 14:59',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -11561,7 +11561,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -11615,7 +11615,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '10.01.2021 12:14',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -11672,7 +11672,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -11727,7 +11727,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -11784,7 +11784,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -11839,7 +11839,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -11897,7 +11897,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -11953,7 +11953,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -12009,7 +12009,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -12067,7 +12067,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -12122,7 +12122,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -12179,7 +12179,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -12234,7 +12234,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -12292,7 +12292,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -12348,7 +12348,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '07.02.2023 16:23',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -12405,7 +12405,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -12460,7 +12460,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -12516,7 +12516,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -12570,7 +12570,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '02.08.2021 16:59',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -12626,7 +12626,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -12680,7 +12680,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -12737,7 +12737,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -12792,7 +12792,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '16.12.2022 15:17',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -12848,7 +12848,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -12902,7 +12902,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -12959,7 +12959,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -13014,7 +13014,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -13070,7 +13070,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -13124,7 +13124,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '27.12.2021 11:28',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -13181,7 +13181,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -13236,7 +13236,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -13293,7 +13293,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -13348,7 +13348,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -13405,7 +13405,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -13460,7 +13460,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -13517,7 +13517,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -13572,7 +13572,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -13629,7 +13629,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -13684,7 +13684,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -13741,7 +13741,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -13796,7 +13796,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -13854,7 +13854,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -13910,7 +13910,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -13966,7 +13966,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -14020,7 +14020,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: 'Invalid date',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -14077,7 +14077,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -14132,7 +14132,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -14189,7 +14189,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -14246,7 +14246,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -14304,7 +14304,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -14362,7 +14362,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -14417,7 +14417,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -14474,7 +14474,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -14529,7 +14529,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -14585,7 +14585,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -14639,7 +14639,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -14696,7 +14696,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -14751,7 +14751,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -14807,7 +14807,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -14861,7 +14861,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '16.12.2022 12:09',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -14918,7 +14918,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -14973,7 +14973,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -15031,7 +15031,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '20.12.2020 14:03',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -15087,7 +15087,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '20.12.2020 14:03',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -15144,7 +15144,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -15199,7 +15199,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -15256,7 +15256,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -15315,7 +15315,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -15371,7 +15371,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -15430,7 +15430,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -15488,7 +15488,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -15543,7 +15543,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '17.03.2023 15:48',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -15600,7 +15600,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -15655,7 +15655,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -15712,7 +15712,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -15767,7 +15767,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -15824,7 +15824,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -15879,7 +15879,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '01.04.2021 21:11',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -15936,7 +15936,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -15994,7 +15994,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -16052,7 +16052,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -16110,7 +16110,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -16165,7 +16165,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -16222,7 +16222,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -16277,7 +16277,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -16333,7 +16333,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -16387,7 +16387,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '31.08.2021 23:59',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -16444,7 +16444,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -16499,7 +16499,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -16556,7 +16556,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -16611,7 +16611,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -16669,7 +16669,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -16725,7 +16725,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -16781,7 +16781,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -16840,7 +16840,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -16896,7 +16896,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -16952,7 +16952,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -17011,7 +17011,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -17067,7 +17067,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -17123,7 +17123,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -17177,7 +17177,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -17234,7 +17234,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -17289,7 +17289,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -17346,7 +17346,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -17401,7 +17401,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -17457,7 +17457,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -17515,7 +17515,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '01.05.2021 15:31',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -17570,7 +17570,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '01.05.2021 15:31',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -17627,7 +17627,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -17682,7 +17682,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -17740,7 +17740,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -17796,7 +17796,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -17853,7 +17853,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -17908,7 +17908,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -17965,7 +17965,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -18020,7 +18020,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -18077,7 +18077,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -18136,7 +18136,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -18194,7 +18194,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -18251,7 +18251,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -18305,7 +18305,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '22.09.2022 16:57',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -18361,7 +18361,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -18415,7 +18415,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '12.10.2021 13:13',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -18472,7 +18472,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -18527,7 +18527,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '27.12.2021 14:45',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -18585,7 +18585,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -18641,7 +18641,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -18698,7 +18698,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -18756,7 +18756,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -18813,7 +18813,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -18872,7 +18872,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -18928,7 +18928,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -18986,7 +18986,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -19042,7 +19042,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -19099,7 +19099,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -19157,7 +19157,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -19212,7 +19212,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -19270,7 +19270,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -19326,7 +19326,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -19383,7 +19383,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -19438,7 +19438,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '06.07.2021 14:47',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -19496,7 +19496,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -19552,7 +19552,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -19609,7 +19609,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -19664,7 +19664,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '31.03.2022 10:14',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -19722,7 +19722,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -19778,7 +19778,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -19835,7 +19835,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -19890,7 +19890,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '31.12.2021 00:00',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -19947,7 +19947,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: null,
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,
@@ -20002,7 +20002,7 @@ const mockedModelsCompare: MockedModelsType = {
       developing_end_date: '09.02.2023 13:01',
       data_source_description: null,
       target: null,
-      analize_text_about_developing: null,
+
       psi_protocol: null,
       validation_department: null,
       validation_period: null,

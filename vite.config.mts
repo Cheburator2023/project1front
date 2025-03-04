@@ -24,7 +24,7 @@ const proxyList = {
 // @ts-ignore
 const currentTarget = STAGE ? proxyList[STAGE] : proxyList.dev;
 
-const git_revision = child_process.execSync('git show').toString().trim();
+const git_revision = child_process.execSync('git show --format="short" -s').toString().trim();
 
 export const viteCommonConfig = ({ appName, base = '/' }: { appName?: string; base?: string }) =>
   defineConfig(({ mode }) => {
