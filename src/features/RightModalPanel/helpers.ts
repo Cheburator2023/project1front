@@ -1008,10 +1008,13 @@ const getInvalidFields = (
   return activeFormSchema
     .filter((schemaField) => {
       const { name, required, requireConditions, valueConditions, schemaKey } = schemaField;
-      const formValue = getFormValue(values?.[name]);
-      const field = fields?.find((_field) => _field.name === name);
 
-      if (field?.disabled) {
+      const formValue = getFormValue(values?.[name]);
+      const field = fields?.find((_field) => {
+        return _field.name === name;
+      });
+
+      if (field?.disabled || field === undefined) {
         return false;
       }
 

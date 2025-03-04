@@ -179,6 +179,7 @@ type Row = ArtificialRow & {
   provides_piloting: string | null;
   operational_monitoring: string | null;
   analytical_monitoring: string | null;
+  bpmn_key: string | null;
 };
 
 type ColumnsFilter = Record<keyof Row, Array<string>>;

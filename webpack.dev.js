@@ -6,7 +6,10 @@ const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin'
 const { DefinePlugin } = webpack;
 
 const common = require('./webpack.common.js');
-const git_revision = require('child_process').execSync('git show').toString().trim();
+const git_revision = require('child_process')
+  .execSync('git show --format="short" -s')
+  .toString()
+  .trim();
 
 module.exports = merge(common, {
   mode: 'development',
