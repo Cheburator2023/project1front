@@ -1,5 +1,82 @@
 # Semantic Versioning Changelog
 
+## [1.37.1](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.37.0...v1.37.1) (2025-02-28)
+
+
+### Bug Fixes
+
+* rename artefact analize_text_about_developing ([6d5966b](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/6d5966b69da215a4a849ae8a00ca1ec12810dc7e))
+* required developing_report and allocation ([61dc09b](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/61dc09b22e8184dac15317350df9b28169e5c0c8))
+
+# [1.37.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.36.2...v1.37.0) (2025-02-25)
+
+
+### Bug Fixes
+
+* art replace fix - rs_model_decommiss_date =\> remove_date_validation ([47a3b1e](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/47a3b1e49dc1451886039f4105bd0b83f0b46c65))
+* delete is_edit_sum_flg ([f1cf974](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/f1cf9744efb302a74ed4114dd4b82fb88c530656))
+* edit form artifact rename fix ([4872184](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/4872184f470150fda37352a3a0207ab4a6ca8087))
+* form fields order fix ([a858f34](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/a858f340435d148a77e960ce3046fa0cc51099ee))
+* git loggin fix ([39e4ee1](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/39e4ee1011ad508e007ff03a4129d9098e1fc914))
+* nan fix ([ecd4c9c](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/ecd4c9c6de1836d4080c000598bb5a582cc98d6b))
+* order sorting fix ([2ea64e7](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/2ea64e7734b2b50730274ddb645fb6360c422a34))
+
+
+### Features
+
+* add can edit artefact ([3b72584](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/3b72584df7873dc1c0202d5ba7bec78e787830df))
+
+## [1.36.2](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.36.1...v1.36.2) (2025-02-21)
+
+
+### Bug Fixes
+
+* **ci:** up semver ([b1730d7](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/b1730d79671cff4ac47fab4982c75f23690bff74))
+
+## [1.36.1](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.36.0...v1.36.1) (2025-02-18)
+
+
+### Bug Fixes
+
+* add can edit artefact ([a526d8f](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/a526d8f4c49908d80e39695d5e0fead1f1bc10dc))
+* chart time fix ([659a91f](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/659a91f9dcd28b6932a2de02723660ddfd668a9d))
+* charts valid date refetch fix ([abe1661](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/abe16619802e22a5946c190caf125631047904fa))
+* delete can edit artefact ([3a132d0](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/3a132d01b73ba0117bd6530efe512b1487b8614a))
+* significance_validity form fix ([f245c2d](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/f245c2d8b8b0c132e3504def054fc826323dbf61))
+
+# [1.36.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.35.3...v1.36.0) (2025-02-17)
+
+
+### Bug Fixes
+
+* can edit artefact ([98a3391](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/98a3391d41999eb9f511c55b4e83daa1eb9b9677))
+* delete can edit artefact ([4ec5ca1](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/4ec5ca1ffb1418881422cc81313e1ff482b6da80))
+
+
+### Features
+
+* can edit artefact ([e3647c1](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/e3647c1c51caf18d32f248917bd6cc4f64d104f6))
+* can edit artefact ([6adb183](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/6adb183de7115cd0062e854266be761b8e490005))
+* can edit artefact ([6b8c00b](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/6b8c00b5f8663fa9ca9f4b58f5ec8d495fd0cdac))
+
+## [1.35.3](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.35.2...v1.35.3) (2025-02-07)
+
+
+### Bug Fixes
+
+* changed order initial columns ([33fb144](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/33fb1443fc35f3e89ceeb1bbaa996d07d751f8f6))
+* rest fields conditions fixed ([4c953ec](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/4c953ec890b68c571deb52df29d676ed035fd39d))
+
+## [1.35.2](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.35.1...v1.35.2) (2025-02-05)
+
+
+### Bug Fixes
+
+* allocation - add march, permission, validation ([a14b43c](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/a14b43cd6f8ae018611cd55a1e8bfc9adb01b662))
+* loading/error overlay fix for tables ([eb137e3](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/eb137e3ef90469c2a765aa3b1011b7a851c5efc2))
+* rest model schema and clearing filed values fix for form ([3baaeb4](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/3baaeb4ec97b47ee73fa4188d31d003bfa381696))
+* types fix ([f5d3fc6](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/f5d3fc6eb85d0f1809710daeaa58ecb3475c395b))
+
 # [1.35.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.34.1...v1.35.0) (2025-01-31)
 
 

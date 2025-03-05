@@ -158,7 +158,6 @@ export const useTableModels = () => {
   const fetchModels = useCallback(
     async (date?: string) => {
       setLoadingModels(true);
-      console.warn('🐸 Pepe said ~ useTableModels ~ fetchModels');
 
       try {
         const params: Record<string, any> = {};

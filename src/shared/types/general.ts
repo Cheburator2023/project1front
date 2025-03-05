@@ -119,7 +119,6 @@ type Row = ArtificialRow & {
   developing_start_date: string | null;
   data_source_description: string | null;
   target: string | null;
-  analize_text_about_developing: string | null;
   calibration_method: string | null;
   developing_report: string | null;
   name_and_version_rating_system: string | null;
@@ -180,6 +179,7 @@ type Row = ArtificialRow & {
   provides_piloting: string | null;
   operational_monitoring: string | null;
   analytical_monitoring: string | null;
+  bpmn_key: string | null;
 };
 
 type ColumnsFilter = Record<keyof Row, Array<string>>;

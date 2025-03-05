@@ -188,9 +188,8 @@ export type Artifact = {
   values: Array<ArtifactValue>;
   start_date_depend_artefact?: keyof Row;
   group?: ArtifactGroupUnion;
-  is_editable_by_role?: string | null;
-  is_edit_sum_flg?: string | null;
-  is_edit_for_business_creator_flg?: string | null;
+  is_editable_by_role_sum_rm?: ArtifactFlag;
+  is_editable_by_role_sum?: ArtifactFlag;
 };
 
 export type ArtifactResponse = {

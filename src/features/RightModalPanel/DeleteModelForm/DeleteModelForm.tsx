@@ -13,6 +13,7 @@ import { API_ROUTES, ArtifactApi, useFetch } from '@shared/api';
 import { groupBy } from 'lodash';
 import { Flexbox, Spacer } from '@shared/ui/atoms';
 import { Artifact, CustomError, ModelEditApi } from '@shared/api/types';
+import { useDeepEffect } from '@src/shared/hooks/useDeepEffect';
 
 import { useAppInjectStore } from '@shared/stores/appInjectStore';
 import { useDeleteRightModelPanelStore } from '@src/shared/stores';
@@ -243,6 +244,7 @@ export const DeleteModelForm = ({
         deleteFormSchema,
         valuesWithAddedOutsideControls,
         wasPreviouslyActiveModel,
+        fields,
       );
 
       setInvalidFields(newInvalidFields);
@@ -348,12 +350,17 @@ export const DeleteModelForm = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editCellName, formRef.current]);
 
-  useEffect(() => {
+  useDeepEffect(() => {
     if (dirtyFields.length) {
-      const newInvalidFields = getInvalidFields(deleteFormSchema, values, wasPreviouslyActiveModel);
+      const newInvalidFields = getInvalidFields(
+        deleteFormSchema,
+        values,
+        wasPreviouslyActiveModel,
+        fields,
+      );
       setInvalidFields(newInvalidFields);
     }
-  }, [values, dirtyFields, deleteFormSchema, wasPreviouslyActiveModel]);
+  }, [values, dirtyFields, deleteFormSchema, wasPreviouslyActiveModel, fields]);
 
   const renderFooter = useCallback(() => {
     const modelStatus = values?.status?.value || initialRow?.status;

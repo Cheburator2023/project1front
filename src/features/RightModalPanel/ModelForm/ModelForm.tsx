@@ -6,12 +6,12 @@ import { format } from 'date-fns';
 
 import { Row } from '@shared/types';
 import { StatusScreen } from '@shared/ui/molecules';
-import { RIGHT_PANEL_TYPE, MODEL_FORM_MODE } from '@shared/constants';
+import { RIGHT_PANEL_TYPE, MODEL_FORM_MODE, initialColumns } from '@shared/constants';
 import { INPUT_TYPE, InputFactory, InputValue, RightPanel } from '@shared/ui/organisms';
 import { API_ROUTES, useFetch, ArtifactApi, ModelEditApi } from '@shared/api';
-import { useModelUserMatch, useRoles } from '@src/shared/hooks';
+import { usePermissions, useRoles } from '@src/shared/hooks';
 
-import { groupBy, isEqual, omit, uniqBy } from 'lodash';
+import { groupBy, isEqual, omit, sortBy, uniqBy } from 'lodash';
 import { Flexbox, Spacer } from '@shared/ui/atoms';
 import { Artifact } from '@shared/api/types';
 
@@ -30,7 +30,7 @@ import { ButtonContainer, FormContainer } from './styles';
 import { ParentModelSelect } from './ParentModelSelect';
 import { useActiveFormSchema } from './useActiveFormSchema';
 import { useFormFields } from './useFormFields';
-import { ALLOCATION_FIELDS_NAMES, SCHEMA_NAME_MAP } from './constants';
+import { ALLOCATION_FIELDS_NAMES_USAGE, SCHEMA_NAME_MAP } from './constants';
 import { ModelFormDotMenu } from './ModelFormDotMenu';
 
 type SubmitType = { checkOnly?: boolean };
@@ -58,6 +58,7 @@ export const ModelForm = ({
   const { mutationProtectedFetch } = useFetch({});
   const formMode = getFormMode(mode);
   const { setCurrentCustomer, currentCustomer } = useAppInjectStore();
+  const { isEditAllocationEnabled } = usePermissions();
 
   const [values, setValues] = useState<FormValues | undefined>();
   const [invalidFields, setInvalidFields] = useState<Array<keyof Row>>([]);
@@ -74,10 +75,10 @@ export const ModelForm = ({
     { connectedName: string; connectedValue: string }[] | undefined
   >(undefined);
 
-  const { isValidator, isValidatorLead } = useRoles();
-  const { isInBusinessCustomers } = useModelUserMatch();
+  const { isValidator, isValidatorLead, isBusinessCustomer } = useRoles();
 
-  const isEditByRatingModel = isValidator || isValidatorLead || isInBusinessCustomers(activeRow!);
+  const isEditByRatingModel =
+    formMode === MODEL_FORM_MODE.ADD || isValidator || isValidatorLead || isBusinessCustomer;
 
   const errorElemRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
@@ -107,6 +108,7 @@ export const ModelForm = ({
 
   const IS_FORM_MODE_ADD = formMode === MODEL_FORM_MODE.ADD;
   const title = IS_FORM_MODE_ADD ? 'Новая модель' : 'Редактирование модели';
+
   const groupedFieldsBySchemaName = groupBy(fields, 'schemaKey');
 
   const handleChange = (name: keyof Row, value: InputValue) => {
@@ -243,20 +245,13 @@ export const ModelForm = ({
     }, 100);
   }, [completesConditionFields, fields]);
 
-  // TODO: Temporary solution to solve the problem of editing allocations in models that do not have all required fields. This is a technical debt that needs to be fixed.
-  /**
-   * Check if any of the allocation fields have been changed.
-   * @returns {boolean} true if any allocation field has been changed, false otherwise.
-   */
-  const checkForAllocationFieldsChanged = () =>
-    ALLOCATION_FIELDS_NAMES.some((fieldName) => {
+  const checkAllocationFieldsChanged = () => {
+    const fieldsChanged = ALLOCATION_FIELDS_NAMES_USAGE.some((fieldName) => {
       const initialValue = initialRow?.[fieldName] ?? '';
       const newInputValue = values?.[fieldName];
-
       if (!newInputValue) {
         return false;
       }
-
       let newStringValue = '';
 
       if (
@@ -266,11 +261,9 @@ export const ModelForm = ({
         if (!newInputValue.value) {
           return false;
         }
-
         newStringValue = format(newInputValue.value, 'yyyy-MM-dd');
       } else {
         const formattedValue = getProperFormatValueForSubmit(newInputValue);
-
         if (!Array.isArray(formattedValue) && formattedValue.artefact_string_value) {
           newStringValue = formattedValue.artefact_string_value;
         }
@@ -278,6 +271,22 @@ export const ModelForm = ({
 
       return initialValue !== newStringValue;
     });
+
+    const totalPercentage = ALLOCATION_FIELDS_NAMES_USAGE.reduce((acc, fieldName) => {
+      const field = values?.[fieldName];
+      const num = field ? parseFloat(String(field.value)) : 0;
+      return acc + (Number.isNaN(num) ? 0 : num);
+    }, 0);
+
+    const hasFilled = ALLOCATION_FIELDS_NAMES_USAGE.some((fieldName) => {
+      const field = values?.[fieldName];
+      return field && field.value !== undefined && field.value !== '';
+    });
+
+    const sumValid = !hasFilled || totalPercentage === 100;
+
+    return { fieldsChanged, sumValid };
+  };
 
   const handleSubmit = useCallback(
     async ({ checkOnly = false }: SubmitType) => {
@@ -292,13 +301,32 @@ export const ModelForm = ({
         formSchema,
         valuesWithAddedOutsideControls,
         wasPreviouslyActiveModel,
+        fields,
       );
-      const isAllocationFieldsChanged = checkForAllocationFieldsChanged();
-      setInvalidFields(isAllocationFieldsChanged ? [] : newInvalidFields);
+
+      const { fieldsChanged, sumValid } = checkAllocationFieldsChanged();
+
+      if (fieldsChanged && !sumValid) {
+        console.log(
+          '📝 FORM LOGS: ~ sumValid: OUT 1 fieldsChanged / !sumValid',
+          fieldsChanged,
+          sumValid,
+        );
+        return;
+      }
+
+      setInvalidFields(fieldsChanged ? [] : newInvalidFields);
       scrollToActiveError();
       setDirtyFields((prevDirtyFields) => [...prevDirtyFields, fields[0].name]);
 
-      if (newInvalidFields.length && !isAllocationFieldsChanged) {
+      console.log('📝 FORM LOGS: >> newInvalidFields:', newInvalidFields);
+
+      if (newInvalidFields.length && !fieldsChanged) {
+        console.log(
+          '📝 FORM LOGS: ~ sumValid: OUT 2 !fieldsChanged / newInvalidFields > 0',
+          fieldsChanged,
+          newInvalidFields,
+        );
         return;
       }
 
@@ -311,6 +339,8 @@ export const ModelForm = ({
 
       if (!IS_FORM_MODE_ADD && initialRow && !checkOnly) {
         const { system_model_id, model_source } = initialRow;
+        console.log('📝 FORM LOGS: ~ system_model_id:', system_model_id);
+        console.log('📝 FORM LOGS: ~ model_source:', model_source);
 
         if (system_model_id && model_source) {
           // TODO: fix response type and structure and input type ModelEditApi[]
@@ -335,7 +365,7 @@ export const ModelForm = ({
 
           if (res?.data?.data?.cards && res.data.data.cards[0]) {
             newRow = res.data.data.cards[0];
-            console.log('🐸 Pepe said ~ newRow:', newRow);
+            console.log('📝 FORM LOGS: ~ newRow:', newRow);
           }
         }
       }
@@ -403,10 +433,10 @@ export const ModelForm = ({
   }, [initialRow, artifacts]);
 
   useEffect(() => {
-    // if (!isEditByRatingModel) {
-    //   setActiveModelByDefault(false);
-    //   return;
-    // }
+    if (!isEditByRatingModel) {
+      setActiveModelByDefault(false);
+      return;
+    }
 
     if (activeRow?.active_model === '1') {
       setActiveModelByDefault(true);
@@ -434,12 +464,17 @@ export const ModelForm = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editCellName, formRef.current]);
 
-  useEffect(() => {
+  useDeepEffect(() => {
     if (dirtyFields.length) {
-      const newInvalidFields = getInvalidFields(formSchema, values, wasPreviouslyActiveModel);
+      const newInvalidFields = getInvalidFields(
+        formSchema,
+        values,
+        wasPreviouslyActiveModel,
+        fields,
+      );
       setInvalidFields(newInvalidFields);
     }
-  }, [values, dirtyFields, formSchema, wasPreviouslyActiveModel]);
+  }, [values, dirtyFields, formSchema, wasPreviouslyActiveModel, fields]);
 
   return (
     <RightPanel
@@ -475,7 +510,7 @@ export const ModelForm = ({
               dimension="s"
               checked={activeModelByDefault}
               onChange={activeModelCheckboxHandler}
-              // disabled={!isEditByRatingModel}
+              disabled={!isEditByRatingModel}
             >
               Действующая Модель/Модуль
             </CheckboxField>
@@ -493,14 +528,25 @@ export const ModelForm = ({
           <FormContainer ref={formRef} id="model_form_parent_container">
             {Object.keys(groupedFieldsBySchemaName).map((schemaKey) => {
               const fieldsByGroup = groupedFieldsBySchemaName[schemaKey || 'Аллокация'];
+              const fieldsByGroupSorted = sortBy(fieldsByGroup, (v) =>
+                initialColumns.findIndex((c) => c.name === v.name),
+              );
               const schemaTitle = SCHEMA_NAME_MAP[schemaKey]?.title;
+
+              // TODO: bad solution, need to refactor this logic
+              // Determine if allocation fields should be hidden based on permissions
+              // in the future should be determined by field "isEditAllocationEnabled" in the schema or server side
+              const shouldHideAllocationFields = !schemaTitle && !isEditAllocationEnabled;
+              if (shouldHideAllocationFields) {
+                return null;
+              }
 
               return (
                 <div key={schemaKey}>
                   <T font="Subtitle/Subtitle 2">{schemaTitle || 'Аллокация'}</T>
                   <Spacer />
                   <Flexbox wrap="wrap" gap={20}>
-                    {fieldsByGroup.map((field) => {
+                    {fieldsByGroupSorted.map((field) => {
                       return (
                         <Flexbox
                           flexBasis={
@@ -547,6 +593,7 @@ export const ModelForm = ({
               onClick={() => handleSubmit({ checkOnly: false })}
               value="Submit"
               type="submit"
+              disabled={submitLoading || invalidFields.length > 0}
             >
               Сохранить
             </Button>
@@ -556,6 +603,7 @@ export const ModelForm = ({
               appearance="secondary"
               value="Submit"
               type="submit"
+              disabled={submitLoading}
             >
               Отменить
             </Button>
