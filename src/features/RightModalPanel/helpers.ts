@@ -360,7 +360,7 @@ export const getStartDateInCurrentYear = (startDate: Date) => {
 };
 
 const ENABLE_FEBRUARY_EXTENSION = false; // Можно переключать на false при необходимости
-const ENABLE_MARCH_EXTENSION = false;
+const ENABLE_MARCH_EXTENSION = true;
 
 const getDateLimits = (quarter: number) => {
   const currentDate = new Date();
