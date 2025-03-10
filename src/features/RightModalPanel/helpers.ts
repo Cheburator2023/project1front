@@ -360,7 +360,7 @@ export const getStartDateInCurrentYear = (startDate: Date) => {
 };
 
 const ENABLE_FEBRUARY_EXTENSION = false; // Можно переключать на false при необходимости
-const ENABLE_MARCH_EXTENSION = false;
+const ENABLE_MARCH_EXTENSION = true;
 
 const getDateLimits = (quarter: number) => {
   const currentDate = new Date();
@@ -402,9 +402,9 @@ const getDisabledStatus = (
   const currentQuarter = Math.floor((currentDate.getMonth() + 3) / 3);
 
   // TODO: Временно отключаем все поля для sum-rm, пересмотреть позже
-  if (activeRow?.model_source === ModelSource.SUM_RM) {
-    return true;
-  }
+  // if (activeRow?.model_source === ModelSource.SUM_RM) {
+  //   return true;
+  // }
 
   const startOfCurrentQuarter = new Date(currentDate.getFullYear(), (currentQuarter - 1) * 3, 1);
   const monthAfterStartOfCurrentQuarter = addMonths(startOfCurrentQuarter, 1);
