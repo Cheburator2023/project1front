@@ -252,7 +252,7 @@ export const ACTIVE_MODEL_SCHEMA: FormFieldsSchema = [
   {
     name: 'developing_report',
     customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
-    required: false,
+    required: true,
     maxLength: 250,
   },
   {
