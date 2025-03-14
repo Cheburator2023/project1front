@@ -1,5 +1,17 @@
 # Semantic Versioning Changelog
 
+# [1.39.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.38.0...v1.39.0) (2025-03-14)
+
+
+### Bug Fixes
+
+* developing report required ([5c45027](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/5c45027665b4d15c7e27d22291fd26165915a22f))
+
+
+### Features
+
+* **readme:** up version ([8e4244d](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/8e4244dd6488e4daf4be63659966b8cf53d0547e))
+
 # [1.38.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.37.1...v1.38.0) (2025-03-10)
 
 
