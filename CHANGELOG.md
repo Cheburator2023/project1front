@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.39.1](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.39.0...v1.39.1) (2025-03-26)
+
+
+### Bug Fixes
+
+* allocation disabled and exclude error dashboards ([e951d6d](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/e951d6d450d67a859795e5eaea3e3492cb45e892))
+
 # [1.39.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.38.0...v1.39.0) (2025-03-14)
 
 
