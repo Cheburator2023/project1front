@@ -1,5 +1,19 @@
 # Semantic Versioning Changelog
 
+# [1.38.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.37.1...v1.38.0) (2025-03-10)
+
+
+### Bug Fixes
+
+* form logging added wip ([ee80d16](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/ee80d16f53b6e625ea413e1233fbdb7bdd69bf3b))
+* no artifact in schemas fix ([ef8d6d7](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/ef8d6d73c389dc256aa5b66534e63f98b038a4cf))
+
+
+### Features
+
+* allocation q4 ([26d9482](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/26d948220f35de0518e6dffe57b8a982e58fc57d))
+* allocation q4 ([7a3ca95](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/7a3ca9596918113134dc1770fb4c1e8a6853c683))
+
 ## [1.37.1](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.37.0...v1.37.1) (2025-02-28)
 
 

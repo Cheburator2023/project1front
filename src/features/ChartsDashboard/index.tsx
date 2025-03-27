@@ -7,6 +7,7 @@ import { ReactComponent as DownloadOutline } from '@admiral-ds/icons/build/syste
 import { ErrorStatus, Loading } from '@src/shared/ui/atoms';
 import { API_ROUTES, mockedMetricsResponse, useFetch } from '@src/shared/api';
 import { MetricsResponseType } from '@src/shared/api/types';
+import { useExcludeErrorStore } from '@src/shared/stores';
 
 import { switchDateFormat, validateDateRange } from './helpers';
 import {
@@ -49,11 +50,14 @@ import {
 import { MenuIconSelect } from './MenuIconSelect';
 import { MetricsCaption } from './types';
 
-const getQueryParams = (filters: {
-  startDate?: string;
-  endDate?: string;
-  selectedStreams?: string[];
-}) => {
+const getQueryParams = (
+  filters: {
+    startDate?: string;
+    endDate?: string;
+    selectedStreams?: string[];
+  },
+  excludeError: boolean,
+) => {
   const params: Record<string, any> = {};
 
   if (filters.startDate) {
@@ -63,6 +67,8 @@ const getQueryParams = (filters: {
   if (filters.endDate) {
     params.endDate = filters.endDate;
   }
+
+  params.excludeError = excludeError.toString();
 
   const hasStreamsSelected = filters.selectedStreams && filters.selectedStreams.length > 0;
   const allStreamsSelected =
@@ -94,6 +100,8 @@ const ChartsDashboard = () => {
     tempSelectedStreams: dsStreamArtifactOptions.options.map((option) => option.value),
   });
 
+  // const { excludeError } = useExcludeErrorStore();
+
   const {
     responseData: metricsData,
     loading: loadingMetrics,
@@ -101,7 +109,7 @@ const ChartsDashboard = () => {
     refetch: refetchMetrics,
   } = useFetch<MetricsResponseType>({
     apiRoute: API_ROUTES.METRICS,
-    params: getQueryParams(filters),
+    params: getQueryParams(filters, true /* true - excludeError */),
     mockedResponse: mockedMetricsResponse,
   });
 
