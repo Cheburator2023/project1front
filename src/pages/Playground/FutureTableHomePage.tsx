@@ -2,9 +2,11 @@ import React from 'react';
 import { ErrorStatus, Flexbox, Loading, Spacer } from '@shared/ui/atoms';
 import { ACTIVE_SCREEN } from '@shared/constants';
 import { FiltersContext } from '@shared/api';
-import { FiltersPanel, RightModalPanel, TemplateFilters } from '@features';
+import { FiltersPanel, RightModalPanel } from '@features';
 import { useTableModels } from '@pages/Home/hooks';
 
+import { AgGridModelsTable } from '@src/features/NewTables/AgGridModelsTable';
+import { TemplateFiltersNew } from '@src/features/TemplateFilters/TemplateFiltersNew';
 import { AgGridTable } from '../../features/NewTables/AgGridTable';
 import { CompareModelsWidgetNewTable } from '../../widgets/CompareModelsWidget/CompareModelsWidgetNewTable';
 
@@ -24,7 +26,7 @@ export const FutureTableHomePage = () => {
         onClose={context.handleOnClose}
       />
       {display.activeScreen === ACTIVE_SCREEN.TEMPLATE_FILTERS && (
-        <TemplateFilters
+        <TemplateFiltersNew
           templates={filters.templates}
           updateActiveScreen={display.setActiveScreen}
           updateRightPanelType={display.setRightPanelType}
@@ -39,11 +41,12 @@ export const FutureTableHomePage = () => {
             updateActiveScreen={display.setActiveScreen}
             updateRightPanelType={display.setRightPanelType}
           />
-          <AgGridTable
+          <AgGridModelsTable
             display={display}
             modelsTable={modelsTable}
-            filters={filters}
             templates={filters.templates}
+            error={modelsTable.error}
+            loading={modelsTable.loading}
           />
         </>
       )}

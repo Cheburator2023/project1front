@@ -11,6 +11,37 @@ import {
 } from '@shared/api';
 import { filterColumnsByColumnsFilters } from '@shared/helpers';
 
+export interface ModelsListWidgetData {
+  rowList: Array<Partial<Row>>;
+  columnList: Column[];
+  loading: boolean;
+  error: string | null;
+  activeRowId: string | undefined;
+  activeCellName: keyof Row | undefined;
+  searchString: string;
+  pageSize: number;
+  page: number;
+  totalRows: number;
+}
+
+export interface ModelsListWidgetActions {
+  setRowList: React.Dispatch<React.SetStateAction<Partial<Row>[]>>;
+  setColumnList: React.Dispatch<React.SetStateAction<Column[]>>;
+  handleSearch: (newSearchString: string) => void;
+  handleChangePage: (result: { page: number; pageSize: number }) => void;
+  setTotalRows: React.Dispatch<React.SetStateAction<number>>;
+  setPageSize: React.Dispatch<React.SetStateAction<number>>;
+  setPage: React.Dispatch<React.SetStateAction<number>>;
+  updateColumnList: () => void;
+  handleClickOnActionCell: (
+    action: RIGHT_PANEL_TYPE.EDIT_MODEL | RIGHT_PANEL_TYPE.HISTORY_CHANGES,
+    rowId: string,
+    cellName: keyof Row,
+  ) => void;
+  handleSubmit: (newRow?: any, formMode?: MODEL_FORM_MODE) => void;
+  handleOnClose: () => void;
+}
+
 export const useModelsListWidget = (
   columnsFilters: Partial<ColumnsFilter>,
   setRightPanelType: React.Dispatch<React.SetStateAction<RIGHT_PANEL_TYPE | null>>,
@@ -122,31 +153,35 @@ export const useModelsListWidget = (
     setActiveRowId(undefined);
   }, []);
 
+  const data: ModelsListWidgetData = {
+    rowList,
+    columnList,
+    loading,
+    error,
+    activeRowId,
+    activeCellName,
+    searchString,
+    pageSize,
+    page,
+    totalRows,
+  };
+
+  const actions: ModelsListWidgetActions = {
+    setRowList,
+    setColumnList,
+    handleSearch,
+    handleChangePage,
+    setTotalRows,
+    setPageSize,
+    setPage,
+    updateColumnList,
+    handleClickOnActionCell,
+    handleSubmit,
+    handleOnClose,
+  };
+
   return {
-    data: {
-      rowList,
-      columnList,
-      loading,
-      error,
-      activeRowId,
-      activeCellName,
-      searchString,
-      pageSize,
-      page,
-      totalRows,
-    },
-    actions: {
-      setRowList,
-      setColumnList,
-      handleSearch,
-      handleChangePage,
-      setTotalRows,
-      setPageSize,
-      setPage,
-      updateColumnList,
-      handleClickOnActionCell,
-      handleSubmit,
-      handleOnClose,
-    },
+    data,
+    actions,
   };
 };

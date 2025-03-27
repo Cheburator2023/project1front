@@ -192,6 +192,8 @@ type Column = {
   sticky?: boolean;
   sortable?: boolean;
   renderCell?: ColumnAdmiral['renderCell'];
+  cellRenderer?: any;
+  sortIndex?: number;
 };
 
 enum ModelStatus {

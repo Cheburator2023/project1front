@@ -6,8 +6,9 @@ import { ACTIVE_SCREEN, MODEL_FORM_MODE, RIGHT_PANEL_TYPE } from '@shared/consta
 import { Template } from '@shared/api';
 import { ActionsPanel } from '@entities';
 import { ColumnsFilter, Row } from '@shared/types';
-import { FiltersPanel, RightModalPanel, TableModels } from '@features';
+import { FiltersPanel, RightModalPanel } from '@features';
 
+import { AgGridModelsListWidget } from '@src/features/NewTables/AgGridModelsListWidget';
 import { useModelsListWidget } from './hooks';
 
 interface ModelsListWidgetProps {
@@ -53,25 +54,7 @@ export const ModelsListWidget = ({
         updateRightPanelType={setRightPanelType}
       />
       <ActionsPanel handleSearch={actions.handleSearch} updateRightPanelType={setRightPanelType} />
-      <TableModels
-        rowList={data.rowList}
-        columnList={data.columnList}
-        page={data.page}
-        pageSize={data.pageSize}
-        searchString={data.searchString}
-        onActionCell={actions.handleClickOnActionCell}
-        updateRowsCount={actions.setTotalRows}
-        setCurrentPage={actions.setPage}
-        templates={templates}
-        error={data.error}
-        loading={data.loading}
-      />
-      <Pagination
-        page={data.page}
-        pageSize={data.pageSize}
-        onChangePage={actions.handleChangePage}
-        totalElements={data.totalRows}
-      />
+      <AgGridModelsListWidget data={data} templates={templates} actions={actions} />
     </>
   );
 };

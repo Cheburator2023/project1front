@@ -14,6 +14,7 @@ import {
 import { initialColumns } from '@src/shared/constants';
 import { useDeleteRightModelPanelStore, useUserStore } from '@src/shared/stores';
 import { useModelUserMatch } from '@src/shared/hooks';
+import { useDeepEffect } from '@src/shared/hooks/useDeepEffect';
 import { TableChangeProps } from '../types';
 
 export const useTableChange = ({
@@ -126,7 +127,7 @@ export const useTableChange = ({
   };
 
   // Update filtered rows after searching or changing column filters
-  useEffect(() => {
+  useDeepEffect(() => {
     if (rowList?.length) {
       let newFilteredRows = rowList;
 
@@ -154,23 +155,20 @@ export const useTableChange = ({
         );
       }
 
-      const pageRows = getPageRows({ rows: newFilteredRows, page, pageSize });
+      const _pageRows = getPageRows({ rows: newFilteredRows, page, pageSize });
 
-      setPageRows(pageRows);
+      setPageRows(_pageRows);
       setRows(newFilteredRows);
       updateRowsCount(newFilteredRows.length);
     }
-  }, [
-    columnsFilters,
-    rowList,
-    cols,
-    pageSize,
-    page,
-    searchString,
-    columnList,
-    updateRowsCount,
-    setCurrentPage,
-  ]);
+  }, [columnsFilters, rowList, cols, pageSize, page, searchString, columnList]);
+  // console.log('🐸 Pepe said ~ columnList:', columnList);
+  // console.log('🐸 Pepe said ~ searchString:', searchString);
+  // console.log('🐸 Pepe said ~ page:', page);
+  // console.log('🐸 Pepe said ~ pageSize:', pageSize);
+  // console.log('🐸 Pepe said ~ cols:', cols);
+  // console.log('🐸 Pepe said ~ rowList:', rowList);
+  // console.log('🐸 Pepe said ~ columnsFilters:', columnsFilters);
 
   return {
     cols,

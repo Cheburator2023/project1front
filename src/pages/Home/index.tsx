@@ -4,8 +4,10 @@ import { ErrorStatus, Loading, Pagination } from '@shared/ui/atoms';
 import { ACTIVE_SCREEN } from '@shared/constants';
 import { FiltersContext } from '@shared/api';
 import { ActionsPanel } from '@entities';
-import { FiltersPanel, RightModalPanel, TemplateFilters, TableModels } from '@features';
+import { FiltersPanel, RightModalPanel } from '@features';
 
+import { AgGridModelsTable } from '@src/features/NewTables/AgGridModelsTable';
+import { TemplateFiltersNew } from '@src/features/TemplateFilters/TemplateFiltersNew';
 import { useTableModels } from './hooks';
 import { CompareModelsWidget } from '../../widgets';
 
@@ -26,7 +28,7 @@ export const Home = () => {
         onClose={context.handleOnClose}
       />
       {display.activeScreen === ACTIVE_SCREEN.TEMPLATE_FILTERS && (
-        <TemplateFilters
+        <TemplateFiltersNew
           templates={filters.templates}
           updateActiveScreen={display.setActiveScreen}
           updateRightPanelType={display.setRightPanelType}
@@ -41,28 +43,12 @@ export const Home = () => {
             updateActiveScreen={display.setActiveScreen}
             updateRightPanelType={display.setRightPanelType}
           />
-          <ActionsPanel
-            handleSearch={display.handleSearch}
-            updateRightPanelType={display.setRightPanelType}
-          />
-          <TableModels
-            rowList={modelsTable.rowList}
-            columnList={modelsTable.columnList}
-            page={modelsTable.page}
-            pageSize={modelsTable.pageSize}
-            searchString={modelsTable.searchString}
-            onActionCell={modelsTable.handleClickOnActionCell}
-            updateRowsCount={modelsTable.setTotalRows}
-            setCurrentPage={modelsTable.setPage}
+          <AgGridModelsTable
+            display={display}
+            modelsTable={modelsTable}
             templates={filters.templates}
-            loading={modelsTable.loading}
             error={modelsTable.error}
-          />
-          <Pagination
-            page={modelsTable.page}
-            pageSize={modelsTable.pageSize}
-            onChangePage={modelsTable.handleChangePage}
-            totalElements={modelsTable.totalRows}
+            loading={modelsTable.loading}
           />
           {/* <Row>
             <Checkbox
