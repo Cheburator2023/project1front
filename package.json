@@ -1,8 +1,14 @@
 {
-  "name": "sumrm",
+  "name": "sumrm-frontend",
   "version": "1.0.0",
   "description": "",
   "private": true,
+  "release_logs": {
+    "features": [],
+    "fixes": [],
+    "refactors": [],
+    "hotfixes": []
+  },
   "engines": {
     "npm": ">=9.0.0",
     "node": ">=20.0.0"
