@@ -2,7 +2,7 @@ FROM docker.repo-ci.sfera.inno.local/sumd-docker-lib/ubi8-base-mrms-frontned:v1.
 ### image with packages
 #FROM docker.repo-ci.sfera.inno.local/sumd-docker-lib/ubi8-base-mrms-frontned:v1.0.1 as build-deps
 #FROM nexus-ci.corp.dev.vtb/sumd-docker-lib/ubi8-python39-npm:1.2 as build-deps
-
+#
 #ARG NPM_REGISTRY
 ##ARG NPM_ADMIRAL_REGISTRY
 #ARG NPM_EMAIL
