@@ -25,7 +25,7 @@ import {
   getISODateFormat,
 } from '@shared/helpers';
 import { ArtifactApi, CustomError } from '@src/shared/api/types';
-import { useExcludeErrorStore } from '@src/shared/stores';
+import { useExploitationModeStore } from '@src/shared/stores';
 
 export type TDisplayTableModels = {
   activeScreen: ACTIVE_SCREEN;
@@ -137,7 +137,7 @@ export const useTableModels = () => {
   const [loadingModels, setLoadingModels] = useState(true);
   const [errorModels, setErrorModels] = useState<string>('');
 
-  const { excludeError } = useExcludeErrorStore();
+  const { selectedExploitationModes } = useExploitationModeStore();
 
   const { responseData: templateData, mutationProtectedFetch } = useFetch<Template[]>({
     apiRoute: API_ROUTES.TEMPLATES,
@@ -166,7 +166,9 @@ export const useTableModels = () => {
           params.date = getISODateFormat(date);
         }
 
-        params.excludeError = excludeError.toString();
+        if (selectedExploitationModes.length > 0) {
+          params.mode = selectedExploitationModes;
+        }
 
         const res: any = await mutationProtectedFetch<ModelsResponseType, ModelsResponseType>({
           fetchApiRoute: API_ROUTES.MODELS,
@@ -188,7 +190,7 @@ export const useTableModels = () => {
         setLoadingModels(false);
       }
     },
-    [excludeError],
+    [selectedExploitationModes],
   );
 
   // Initial models loading

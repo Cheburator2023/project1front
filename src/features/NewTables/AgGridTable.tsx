@@ -34,7 +34,7 @@ import { useAppInjectStore } from '@src/shared/stores/appInjectStore';
 import { useTableChange } from '@src/features/Tables/hooks';
 import { format } from 'date-fns';
 import { Template } from '@src/shared/api/types';
-import { useExcludeErrorStore } from '@src/shared/stores/excludeErrorStore';
+// import { useExcludeErrorStore } from '@src/shared/stores/excludeErrorStore';
 import { AgGridTableCustomCell } from './AgGridTableCustomCell';
 import { AG_GRID_LOCALE_RU } from '../../pages/Playground/locale/agGridLocale.ru';
 import { ROUTES } from '../../app/Routes';
@@ -129,7 +129,7 @@ export const AgGridTable = ({
   const { currentCustomer } = useAppInjectStore();
   const { modelsCount, modelSource, isDeleteButtonEnabled, userMatches, updateDeleteModelState } =
     useDeleteRightModelPanelStore();
-  const { excludeError, updateExcludeError } = useExcludeErrorStore();
+  // const { excludeError, updateExcludeError } = useExcludeErrorStore();
 
   const { shouldResetTemplateOnInitialValueChange } = useTemplateFilters(
     columnsFilters,
@@ -329,7 +329,7 @@ export const AgGridTable = ({
               icons={<SearchOutline />}
             />
 
-            <Flexbox gap={6}>
+            {/* <Flexbox gap={6}>
               <Checkbox
                 dimension="s"
                 checked={excludeError}
@@ -338,7 +338,7 @@ export const AgGridTable = ({
               <T font="Body/Body 2 Short" as="div">
                 Не включать модели со статусом ошибка заведения
               </T>
-            </Flexbox>
+            </Flexbox> */}
           </Flexbox>
 
           <div>

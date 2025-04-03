@@ -5,7 +5,6 @@ type TopFilters = {
   tags: string[];
   objectTypeRegistry: string[];
   dates: string[];
-  exploitation: string[];
 };
 
 enum COLUMN_TYPE {
