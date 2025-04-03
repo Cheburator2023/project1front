@@ -359,8 +359,9 @@ export const getStartDateInCurrentYear = (startDate: Date) => {
   return startDate;
 };
 
-const ENABLE_FEBRUARY_EXTENSION = false; // Можно переключать на false при необходимости
-const ENABLE_MARCH_EXTENSION = true;
+const ENABLE_FEBRUARY_EXTENSION = false;
+const ENABLE_MARCH_EXTENSION = false;
+const ENABLE_4Q_EXTENSION_UNTIL_APRIL_13 = true;
 
 const getDateLimits = (quarter: number) => {
   const currentDate = new Date();
@@ -375,17 +376,17 @@ const getDateLimits = (quarter: number) => {
 
   // Продление максимальной даты для 4-го квартала до конца февраля
   if (quarter === 4) {
-    if (ENABLE_MARCH_EXTENSION) {
-      // Продление максимальной даты для 4-го квартала до конца марта
-      maxDate = new Date(effectiveYear + 1, 2, 31, 23, 59, 59); // Месяц 2 = март
+    if (ENABLE_4Q_EXTENSION_UNTIL_APRIL_13) {
+      maxDate = new Date(`${effectiveYear + 1}-04-13T23:59:59`);
+    } else if (ENABLE_MARCH_EXTENSION) {
+      maxDate = new Date(`${effectiveYear + 1}-03-31T23:59:59`);
     } else if (ENABLE_FEBRUARY_EXTENSION) {
-      // Продление максимальной даты для 4-го квартала до конца февраля
-      maxDate = new Date(effectiveYear + 1, 1, 28, 23, 59, 59); // Месяц 1 = февраль
+      maxDate = new Date(`${effectiveYear + 1}-02-28T23:59:59`);
     } else {
-      // По умолчанию — до конца января
-      maxDate = new Date(effectiveYear + 1, 0, 31, 23, 59, 59); // Месяц 0 = январь
+      maxDate = new Date(`${effectiveYear + 1}-01-31T23:59:59`);
     }
   }
+
   return {
     minDate,
     maxDate,
@@ -393,36 +394,40 @@ const getDateLimits = (quarter: number) => {
 };
 
 const getDisabledStatus = (minDate: Date, maxDate: Date, quarter: number, canEdit?: boolean) => {
-  if (!canEdit) {
-    return true;
-  }
+  if (!canEdit) return true;
 
   const currentDate = new Date();
   const currentQuarter = Math.floor((currentDate.getMonth() + 3) / 3);
 
+  // Специальная логика для 4-го квартала
+  if (quarter === 4) {
+    // В 1 квартале — редактирование разрешено до maxDate (в зависимости от флагов)
+    if (currentQuarter === 1) {
+      return !isWithinInterval(currentDate, { start: minDate, end: maxDate });
+    }
+
+    // В 2 квартале — разрешено только до 13 апреля
+    if (currentQuarter === 2 && ENABLE_4Q_EXTENSION_UNTIL_APRIL_13) {
+      const april13 = new Date(`${currentDate.getFullYear()}-04-13T23:59:59`);
+      return !(currentDate <= april13);
+    }
+
+    // В остальных — запрещено
+    return true;
+  }
+
+  // Общая логика для всех остальных кварталов
+  if (quarter > currentQuarter) return true;
+  if (quarter < currentQuarter - 1) return true;
+
   const startOfCurrentQuarter = new Date(currentDate.getFullYear(), (currentQuarter - 1) * 3, 1);
   const monthAfterStartOfCurrentQuarter = addMonths(startOfCurrentQuarter, 1);
-
-  if (currentQuarter === 1 && quarter === 4) {
-    return !isWithinInterval(currentDate, { start: minDate, end: maxDate });
-  }
-
-  if (quarter > currentQuarter) {
-    return true;
-  }
-
-  if (quarter < currentQuarter - 1) {
-    return true;
-  }
 
   if (currentDate < monthAfterStartOfCurrentQuarter && quarter === currentQuarter - 1) {
     return false;
   }
 
-  return !isWithinInterval(currentDate, {
-    start: minDate,
-    end: maxDate,
-  });
+  return !isWithinInterval(currentDate, { start: minDate, end: maxDate });
 };
 
 const isUserAllowedForField = (
