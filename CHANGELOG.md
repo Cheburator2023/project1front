@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.40.2](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.40.1...v1.40.2) (2025-04-04)
+
+
+### Bug Fixes
+
+* enable allocation extension until april ([79a7db2](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/79a7db2c607f2b4e9a590d7d2aabb2f11f83f903))
+
 ## [1.40.1](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.40.0...v1.40.1) (2025-04-03)
 
 
