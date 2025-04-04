@@ -44,7 +44,6 @@ import { useAppInjectStore } from '@src/shared/stores/appInjectStore';
 import { useTableChange } from '@src/features/Tables/hooks';
 import { format } from 'date-fns';
 import { Template } from '@src/shared/api/types';
-import { useExcludeErrorStore } from '@src/shared/stores/excludeErrorStore';
 import styled from 'styled-components';
 import { AgGridTableCustomCell } from './AgGridTableCustomCell';
 import { AG_GRID_LOCALE_RU } from '../../pages/Playground/locale/agGridLocale.ru';
@@ -206,7 +205,6 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     const { currentCustomer } = useAppInjectStore();
     const { modelsCount, modelSource, isDeleteButtonEnabled, userMatches, updateDeleteModelState } =
       useDeleteRightModelPanelStore();
-    const { excludeError, updateExcludeError } = useExcludeErrorStore();
 
     const { shouldResetTemplateOnInitialValueChange } = useTemplateFilters(
       columnsFilters,
@@ -420,17 +418,6 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
                     placeholder="Поиск"
                     icons={<SearchOutline />}
                   />
-
-                  <Flexbox gap={6} alignItems="center" justifyContent="flex-start">
-                    <Checkbox
-                      dimension="s"
-                      checked={excludeError}
-                      onChange={(e) => updateExcludeError(e.target.checked)}
-                    />
-                    <T font="Body/Body 2 Short" as="div">
-                      Не включать модели со статусом ошибка заведения
-                    </T>
-                  </Flexbox>
                 </Flexbox>
 
                 <div>

@@ -11,7 +11,7 @@ import {
 } from '@shared/api';
 import { filterColumnsByColumnsFilters } from '@shared/helpers';
 import { CellWrapper, CellContentFactory } from '@entities';
-import { useExcludeErrorStore } from '@src/shared/stores';
+import { useExploitationModeStore } from '@src/shared/stores';
 
 import { initialColumns } from '@src/shared/constants';
 import { compareValues, prepareFetchParams, processFetchData } from '../helpers';
@@ -37,7 +37,7 @@ export const useCompareModels = (columnsFilters: Partial<ColumnsFilter>) => {
   const [page, setPage] = useState(1);
   const [totalRows, setTotalRows] = useState<number>(0);
 
-  const { excludeError } = useExcludeErrorStore();
+  const { selectedExploitationModes } = useExploitationModeStore();
 
   const { mutationProtectedFetch } = useFetch({});
 
@@ -55,7 +55,9 @@ export const useCompareModels = (columnsFilters: Partial<ColumnsFilter>) => {
         params = prepareFetchParams(firstDate, secondDate);
       }
 
-      params.excludeError = excludeError.toString();
+      if (selectedExploitationModes.length > 0) {
+        params.mode = [...selectedExploitationModes];
+      }
 
       const res = await mutationProtectedFetch<
         CompareModelsResponseType,

@@ -7,7 +7,7 @@ import { ReactComponent as DownloadOutline } from '@admiral-ds/icons/build/syste
 import { ErrorStatus, Loading } from '@src/shared/ui/atoms';
 import { API_ROUTES, mockedMetricsResponse, useFetch } from '@src/shared/api';
 import { MetricsResponseType } from '@src/shared/api/types';
-import { useExcludeErrorStore } from '@src/shared/stores';
+import { useExploitationModeStore } from '@src/shared/stores';
 
 import { switchDateFormat, validateDateRange } from './helpers';
 import {
@@ -56,7 +56,7 @@ const getQueryParams = (
     endDate?: string;
     selectedStreams?: string[];
   },
-  excludeError: boolean,
+  selectedExploitationModes: string[],
 ) => {
   const params: Record<string, any> = {};
 
@@ -68,7 +68,9 @@ const getQueryParams = (
     params.endDate = filters.endDate;
   }
 
-  params.excludeError = excludeError.toString();
+  if (selectedExploitationModes.length > 0) {
+    params.mode = selectedExploitationModes;
+  }
 
   const hasStreamsSelected = filters.selectedStreams && filters.selectedStreams.length > 0;
   const allStreamsSelected =
@@ -100,7 +102,7 @@ const ChartsDashboard = () => {
     tempSelectedStreams: dsStreamArtifactOptions.options.map((option) => option.value),
   });
 
-  // const { excludeError } = useExcludeErrorStore();
+  const { selectedExploitationModes } = useExploitationModeStore();
 
   const {
     responseData: metricsData,
@@ -109,7 +111,7 @@ const ChartsDashboard = () => {
     refetch: refetchMetrics,
   } = useFetch<MetricsResponseType>({
     apiRoute: API_ROUTES.METRICS,
-    params: getQueryParams(filters, true /* true - excludeError */),
+    params: getQueryParams(filters, selectedExploitationModes),
     mockedResponse: mockedMetricsResponse,
   });
 
