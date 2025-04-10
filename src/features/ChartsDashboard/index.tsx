@@ -56,7 +56,7 @@ const getQueryParams = (
     endDate?: string;
     selectedStreams?: string[];
   },
-  selectedExploitationModes: string[],
+  // selectedExploitationModes: string[],
 ) => {
   const params: Record<string, any> = {};
 
@@ -68,9 +68,9 @@ const getQueryParams = (
     params.endDate = filters.endDate;
   }
 
-  if (selectedExploitationModes.length > 0) {
-    params.mode = selectedExploitationModes;
-  }
+  // if (selectedExploitationModes.length > 0) {
+  //   params.mode = selectedExploitationModes;
+  // }
 
   const hasStreamsSelected = filters.selectedStreams && filters.selectedStreams.length > 0;
   const allStreamsSelected =
@@ -102,7 +102,7 @@ const ChartsDashboard = () => {
     tempSelectedStreams: dsStreamArtifactOptions.options.map((option) => option.value),
   });
 
-  const { selectedExploitationModes } = useExploitationModeStore();
+  // const { selectedExploitationModes } = useExploitationModeStore();
 
   const {
     responseData: metricsData,
@@ -111,7 +111,7 @@ const ChartsDashboard = () => {
     refetch: refetchMetrics,
   } = useFetch<MetricsResponseType>({
     apiRoute: API_ROUTES.METRICS,
-    params: getQueryParams(filters, selectedExploitationModes),
+    params: getQueryParams(filters),
     mockedResponse: mockedMetricsResponse,
   });
 
