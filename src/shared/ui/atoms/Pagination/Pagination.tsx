@@ -1,8 +1,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import { Checkbox, PaginationOne, T } from '@admiral-ds/react-ui';
-import { useExcludeErrorStore } from '@src/shared/stores/excludeErrorStore';
+import { PaginationOne } from '@admiral-ds/react-ui';
 
 export interface PaginationProps {
   page: number;
@@ -43,20 +42,8 @@ export const Pagination = ({
   pageSizes = [10, 20, 50, 100, 200],
   onChangePage,
 }: PaginationProps) => {
-  const { excludeError, updateExcludeError } = useExcludeErrorStore();
-
   return (
     <Container>
-      <Row>
-        <Checkbox
-          dimension="s"
-          checked={excludeError}
-          onChange={(e) => updateExcludeError(e.target.checked)}
-        />
-        <T font="Body/Body 2 Short" as="div">
-          Не включать модели со статусом ошибка заведения
-        </T>
-      </Row>
       <CustomPagination
         page={page}
         pageSize={pageSize}
