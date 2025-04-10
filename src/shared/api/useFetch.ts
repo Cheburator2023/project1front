@@ -1,5 +1,6 @@
+/* eslint-disable no-use-before-define */
 import { useContext, useEffect, useState } from 'react';
-import qs from 'qs';
+
 import { FetchContext } from './FetchContext';
 import { API_ROUTES } from './constants';
 import { stringToBoolean } from '../helpers/typeops';
@@ -7,18 +8,18 @@ import { stringToBoolean } from '../helpers/typeops';
 const MOCKED_REQUESTS = stringToBoolean(process.env.MOCKED_REQUESTS);
 
 export interface MutationProtectedFetchProps<T, N> {
+  // TODO: check this types
   body?: T extends N ? T : any;
   fetchApiRoute: API_ROUTES;
   fetchMethod: 'POST' | 'PUT' | 'DELETE' | 'GET';
   routeParam?: string | number;
   fileName?: string;
-  newParams?: Record<string, any>;
+  newParams?: Record<string, string>;
   mockedResponse?: N;
 }
-
 interface FetchProps<T> {
   apiRoute?: API_ROUTES;
-  params?: Record<string, any>;
+  params?: Record<string, string>;
   method?: 'POST' | 'GET' | 'PUT' | 'DELETE';
   mockedResponse?: T;
   delay?: number;
@@ -37,30 +38,35 @@ export const useFetch = <T>({
   delay = 200,
 }: FetchProps<T>) => {
   const mockedResponse = MOCKED_REQUESTS ? _mockedResponse : undefined;
+
   const [responseData, setResponseData] = useState<T | undefined>(mockedResponse);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
   const [refetchStatus, setRefetchStatus] = useState(false);
 
   const { protectedFetch } = useContext(FetchContext);
 
   useEffect(() => {
-    if (method !== 'GET' || !apiRoute) return;
+    if (method !== 'GET' || !apiRoute) {
+      return;
+    }
 
     setLoading(true);
 
+    // eslint-disable-next-line consistent-return
     (async () => {
       try {
-        if (delay) await asyncFunc(delay);
+        if (delay) {
+          await asyncFunc(delay);
+        }
+
         if (mockedResponse) {
           setLoading(false);
           return mockedResponse;
         }
 
-        const serializedParams = qs.stringify(params, { arrayFormat: 'repeat' });
-        const fullUrl = serializedParams ? `${apiRoute}?${serializedParams}` : apiRoute;
-
-        const response = await protectedFetch?.<void, T>(fullUrl, undefined);
+        const response = await protectedFetch?.<void, T>(apiRoute, params);
 
         if (response && !response.error) {
           setResponseData(response.data as T);
@@ -78,10 +84,12 @@ export const useFetch = <T>({
   }, [apiRoute, protectedFetch, mockedResponse, method, delay, refetchStatus]);
 
   const refetch = () => {
-    setRefetchStatus((prev) => !prev);
+    setRefetchStatus((prevStatus) => !prevStatus);
   };
 
   return {
+    // fetch for CREATE, UPDATE, DELETE operations
+    // TODO: check this types
     mutationProtectedFetch: async <N, M>({
       body,
       fetchApiRoute,
@@ -92,9 +100,16 @@ export const useFetch = <T>({
       mockedResponse: __mockedResponseProtected = undefined,
     }: MutationProtectedFetchProps<N, M>) => {
       const mockedResponseProtected = MOCKED_REQUESTS ? __mockedResponseProtected : undefined;
-      const baseRoute = fetchApiRoute || apiRoute;
 
-      const route = routeParam ? `${baseRoute}/${routeParam}` : baseRoute;
+      const getRoute = () => {
+        if (routeParam && fetchApiRoute) {
+          return `${fetchApiRoute}/${routeParam}`;
+        }
+
+        return fetchApiRoute || apiRoute;
+      };
+
+      const route = getRoute();
 
       if (mockedResponseProtected) {
         await asyncFunc(1000);
@@ -102,10 +117,7 @@ export const useFetch = <T>({
       }
 
       if (route) {
-        const serializedParams = qs.stringify(newParams, { arrayFormat: 'repeat' });
-        const fullUrl = serializedParams ? `${route}?${serializedParams}` : route;
-
-        return protectedFetch?.<N, M>(fullUrl, undefined, body, fetchMethod ?? method, fileName);
+        return protectedFetch?.<N, M>(route, newParams, body, fetchMethod ?? method, fileName);
       }
     },
     refetch,
