@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.42.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.41.1...v1.42.0) (2025-04-11)
+
+
+### Features
+
+* **docker:** up version ([ddbe443](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/ddbe443113f33aa62c5da4c8c681f983789ff38f))
+
 ## [1.41.1](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.41.0...v1.41.1) (2025-04-11)
 
 
