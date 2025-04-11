@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.41.1](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.41.0...v1.41.1) (2025-04-11)
+
+
+### Bug Fixes
+
+* add default archive ([6af3dde](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/6af3ddecefb4931623ca90021b88bd057a035614))
+
 # [1.41.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.40.2...v1.41.0) (2025-04-10)
 
 
