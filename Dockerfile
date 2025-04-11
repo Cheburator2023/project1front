@@ -20,7 +20,7 @@ FROM docker.repo-ci.sfera.inno.local/sumd-docker-lib/ubi8-base-mrms-frontned:v1.
 ##    npm config set @admiral-ds:registry https://${NPM_ADMIRAL_REGISTRY} && \
 ##    npm config set //${NPM_ADMIRAL_REGISTRY}:_auth ${NPM_AUTH} && \
 #    npm i --only-production --registry=https://${NPM_REGISTRY}
-#
+
 COPY . ./
 RUN npm run build
 
