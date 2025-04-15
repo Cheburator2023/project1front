@@ -13,5 +13,5 @@ export enum API_ROUTES {
   ARTIFACTS_EDIT = '/artefacts/update',
   REPORT = '/report',
   METRICS = '/metrics',
-  METRICS_RAW = '/metrics/raw'
+  METRICS_EXPORT = '/metrics/export',
 }

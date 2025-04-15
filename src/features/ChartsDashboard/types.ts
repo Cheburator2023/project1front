@@ -35,16 +35,16 @@ enum MetricsEnum {
   ImplementedModelsMetric = 'implementedModels',
   DevelopedModelsMetric = 'developedModels',
   MrmModelsMetric = 'sumRmModels',
-  PilotsMetric = 'pilots',
+  // PilotsMetric = 'pilots',
   TasksMetric = 'tasks',
   TakenOutOfOperationModelsMetric = 'takenOutOfOperationModels',
-  StalledModelsByMonthMetric = 'stalledModelsByMonth',
-  RiskCoverageFinalStatusModelsMetric = 'riskCoverageFinalStatusModels',
-  RegistryCoverageModelsMetric = 'registryCoverageModels',
+  // StalledModelsByMonthMetric = 'stalledModelsByMonth',
+  // RiskCoverageFinalStatusModelsMetric = 'riskCoverageFinalStatusModels',
+  // RegistryCoverageModelsMetric = 'registryCoverageModels',
   OnMonitoringModelsMetric = 'onMonitoringModels',
-  FinalStatusModelsMetric = 'finalStatusModels',
-  FinalStatusByMonthModelsMetric = 'finalStatusByMonthModels',
-  DistributionByLifecycleStageModelsMetric = 'distributionByLifecycleStageModels',
+  // FinalStatusModelsMetric = 'finalStatusModels',
+  // FinalStatusByMonthModelsMetric = 'finalStatusByMonthModels',
+  // DistributionByLifecycleStageModelsMetric = 'distributionByLifecycleStageModels',
 }
 
 export { MetricsEnum, StatisticDataProps, MetricsCaption, FrameSizeType }

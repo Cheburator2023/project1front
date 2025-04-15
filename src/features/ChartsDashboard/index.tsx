@@ -28,6 +28,7 @@ import {
   dsStreamArtifactOptions,
   metricsOptions,
   itemsExport,
+  metricLabelMap,
 } from './constants';
 import MetricDisplay from './MetricDisplay';
 import './styles.css';
@@ -49,7 +50,8 @@ import {
   CustomSearchSelect,
 } from './style';
 import { MenuIconSelect } from './MenuIconSelect';
-import { MetricsCaption } from './types';
+import { MetricsCaption, MetricsEnum } from './types';
+import qs from 'qs';
 
 const ChartsDashboard = () => {
   const [filters, setFilters] = useState({
@@ -75,7 +77,7 @@ const ChartsDashboard = () => {
     mockedResponse: mockedMetricsResponse,
   });
 
-  const { mutationProtectedFetch } = useFetch({})
+  const { mutationProtectedFetch } = useFetch({});
 
   // const [kpiSum, setKpiSum] = useState(initialKPI_SUM);
   const [totalModels, setTotalModels] = useState(initialTotalModels);
@@ -113,6 +115,7 @@ const ChartsDashboard = () => {
   const [dateError, setDateError] = useState<boolean>(false);
 
   const [selectedMetric, setSelectedMetric] = useState<string | undefined>();
+  const [isExportingMetric, setIsExportingMetric] = useState(false);
 
   useEffect(() => {
     if (!metricsData) return;
@@ -291,6 +294,8 @@ const ChartsDashboard = () => {
       tempSelectedStreams: dsStreamArtifactOptions.options.map((option) => option.value),
     });
 
+    setSelectedMetric(undefined);
+
     setDateError(false);
     refetchMetrics();
   };
@@ -407,48 +412,36 @@ const ChartsDashboard = () => {
 
   const handleExportSelectedMetric = async () => {
     if (!selectedMetric) return;
-  
-    const queryParams: Record<string, string> = {
+
+    setIsExportingMetric(true);
+
+    const queryParams = {
       metric: selectedMetric,
+      startDate: tempFilters.tempStartDate && switchDateFormat(tempFilters.tempStartDate),
+      endDate: tempFilters.tempEndDate && switchDateFormat(tempFilters.tempEndDate),
+      stream: tempFilters.tempSelectedStreams,
     };
-  
-    if (tempFilters.tempStartDate) {
-      queryParams.startDate = switchDateFormat(tempFilters.tempStartDate);
-    }
-  
-    if (tempFilters.tempEndDate) {
-      queryParams.endDate = switchDateFormat(tempFilters.tempEndDate);
-    }
-  
-    tempFilters.tempSelectedStreams.forEach((stream, index) => {
-      queryParams[`stream[${index}]`] = stream;
-    });
-  
+
+    const queryString = qs.stringify(queryParams, { arrayFormat: 'repeat' });
+
+    const today = new Date();
+    const dateStr = `${String(today.getDate()).padStart(2, '0')}.${String(
+      today.getMonth() + 1,
+    ).padStart(2, '0')}.${today.getFullYear()}`;
+
+    const readableLabel = metricLabelMap[selectedMetric] || selectedMetric;
+
     try {
-      const response = await mutationProtectedFetch<void, { system_model_id: string }[]>({
-        fetchApiRoute: API_ROUTES.METRICS_RAW,
+      await mutationProtectedFetch<void, Blob>({
+        fetchApiRoute: `${API_ROUTES.METRICS_EXPORT}?${queryString}` as any,
         fetchMethod: 'GET',
-        newParams: queryParams,
+        fileName: `${readableLabel} ${dateStr}.xlsx`,
       });
-  
-      const data = response?.data;
-  
-      if (Array.isArray(data) && data.length > 0) {
-        const ids = data.map((item) => item.system_model_id).join('\n');
-  
-        const blob = new Blob([ids], { type: 'text/plain' });
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `${selectedMetric}_models.txt`;
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-      }
-    } catch {
+    } catch (error) {
+    } finally {
+      setIsExportingMetric(false);
     }
-  };  
-  
+  };
 
   if (errorMetrics) {
     return (
@@ -488,6 +481,18 @@ const ChartsDashboard = () => {
               onChange={handleStreamChange}
             />
 
+            <CustomSearchSelect
+              id="metric-select"
+              label="Метрика для выгрузки"
+              name="selectedMetric"
+              options={metricsOptions}
+              multiple={false}
+              selectAllEnabled={false}
+              selectEmptyEnabled={false}
+              selectedValues={selectedMetric ? [selectedMetric] : []}
+              onChange={(_, [value]) => setSelectedMetric(value)}
+            />
+
             <ButtonContainer>
               <Button
                 dimension="s"
@@ -500,6 +505,15 @@ const ChartsDashboard = () => {
               </Button>
               <Button
                 dimension="s"
+                appearance="primary"
+                onClick={handleExportSelectedMetric}
+                disabled={!selectedMetric}
+                loading={isExportingMetric}
+              >
+                Выгрузить метрику
+              </Button>
+              <Button
+                dimension="s"
                 onClick={handleResetFilters}
                 appearance="secondary"
                 value="Submit"
@@ -508,30 +522,6 @@ const ChartsDashboard = () => {
                 Сбросить
               </Button>
             </ButtonContainer>
-
-            <CustomSearchSelect
-              id="metric-select"
-              label="Метрика для выгрузки"
-              name="selectedMetric"
-              options={metricsOptions}
-              multiple={false}
-              selectAllEnabled={false}
-              selectEmptyEnabled={false}
-              selectedValues={selectedMetric ? [selectedMetric] : []}
-              onChange={(_, value) => {
-                setSelectedMetric(value.length > 0 ? value[0] : undefined);
-              }}
-            />
-
-            <Button
-              dimension="s"
-              appearance="secondary"
-              onClick={handleExportSelectedMetric}
-              disabled={!selectedMetric}
-            >
-              Выгрузить метрику
-            </Button>
-
           </FlexContainerFilter>
         </Container>
       </WrapperFilter>
