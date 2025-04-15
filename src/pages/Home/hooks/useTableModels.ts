@@ -167,7 +167,9 @@ export const useTableModels = () => {
         }
 
         if (selectedExploitationModes.length > 0) {
-          params.mode = selectedExploitationModes;
+          selectedExploitationModes.forEach((mode, index) => {
+            params[`mode[${index}]`] = mode;
+          });
         }
 
         const res: any = await mutationProtectedFetch<ModelsResponseType, ModelsResponseType>({
