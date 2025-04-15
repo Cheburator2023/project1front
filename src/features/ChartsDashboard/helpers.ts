@@ -1,4 +1,5 @@
-import { format, isAfter, isValid, parse } from 'date-fns';
+import { format, isValid, parse } from 'date-fns';
+import { dsStreamArtifactOptions } from './constants';
 
 const generateChartData = (delta: number): number[] => {
   const metricValue = Math.abs(delta);
@@ -44,5 +45,41 @@ const validateDateRange = (startDate: string, endDate: string): boolean => {
     parsedStartDate <= parsedEndDate
   );
 };
-export { generateChartData, switchDateFormat, validateDateRange };
+
+const getQueryParams = (
+  filters: {
+    startDate?: string;
+    endDate?: string;
+    selectedStreams?: string[];
+  },
+) => {
+  const params: Record<string, any> = {};
+
+  if (filters.startDate) {
+    params.startDate = filters.startDate;
+  }
+
+  if (filters.endDate) {
+    params.endDate = filters.endDate;
+  }
+
+  const hasStreamsSelected = filters.selectedStreams && filters.selectedStreams.length > 0;
+  const allStreamsSelected =
+    filters.selectedStreams?.length === dsStreamArtifactOptions.options.length;
+
+  if (!hasStreamsSelected || allStreamsSelected) {
+    dsStreamArtifactOptions.options.forEach((stream, index) => {
+      params[`stream[${index}]`] = stream.value;
+    });
+  } else {
+    filters?.selectedStreams?.forEach((stream, index) => {
+      params[`stream[${index}]`] = stream;
+    });
+  }
+
+  return params;
+};
+
+export { generateChartData, switchDateFormat, validateDateRange, getQueryParams };
+
 

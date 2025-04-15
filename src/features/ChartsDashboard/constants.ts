@@ -1,6 +1,27 @@
 import { SELECT_TYPE, SelectStringProps } from '@src/shared/ui/organisms';
 import * as Highcharts from 'highcharts';
-import { MetricsCaption } from './types';
+import { MetricsCaption, MetricsEnum } from './types';
+
+const metricLabelMap: Record<MetricsEnum, MetricsCaption> = {
+  [MetricsEnum.ImplementedModelsMetric]: MetricsCaption.IMPLEMENTED_MODELS,
+  [MetricsEnum.DevelopedModelsMetric]: MetricsCaption.DEVELOPED_MODELS,
+  [MetricsEnum.MrmModelsMetric]: MetricsCaption.SUM_RM_MODELS,
+  [MetricsEnum.PilotsMetric]: MetricsCaption.PILOTS,
+  [MetricsEnum.TasksMetric]: MetricsCaption.DYNAMIC_BY_STREAMS_MODELS,
+  [MetricsEnum.TakenOutOfOperationModelsMetric]: MetricsCaption.TAKEN_OUT_OF_OPERATION_MODELS,
+  [MetricsEnum.StalledModelsByMonthMetric]: MetricsCaption.STALLED_MODLES_BY_MONTH,
+  [MetricsEnum.RiskCoverageFinalStatusModelsMetric]: MetricsCaption.RISK_COVERAGE_FINAL_STATUS_MODELS,
+  [MetricsEnum.RegistryCoverageModelsMetric]: MetricsCaption.REGISTRY_COVERAGE_MODELS,
+  [MetricsEnum.OnMonitoringModelsMetric]: MetricsCaption.ON_MONITORING_MODELS,
+  [MetricsEnum.FinalStatusModelsMetric]: MetricsCaption.FINAL_STATUS_MODELS,
+  [MetricsEnum.FinalStatusByMonthModelsMetric]: MetricsCaption.FINAL_STATUS_BY_MONTH_MODELS,
+  [MetricsEnum.DistributionByLifecycleStageModelsMetric]: MetricsCaption.DISTRIBUTION_BY_LIFECYCLE_STAGE_MODELS,
+};
+
+const itemsExport = [
+  { id: 'pdf', label: 'Экспортировать в PDF', value: 'PDF' },
+  { id: 'png', label: 'Экспортировать в PNG', value: 'PNG' },
+];
 
 const dsStreamArtifactOptions = {
   type: SELECT_TYPE.STRING,
@@ -26,6 +47,14 @@ const dsStreamArtifactOptions = {
       text: 'Модели партнерств и платформы больших данных',
     },
   ],
+} as SelectStringProps;
+
+const metricsOptions = {
+  type: SELECT_TYPE.STRING,
+  options: Object.values(MetricsEnum).map((metric) => ({
+    value: metric,
+    text: metricLabelMap[metric],
+  })),
 } as SelectStringProps;
 
 const initialKPI_SUM = { caption: MetricsCaption.KPI_SUM, value: 0, delta: 0, relative: true };
@@ -530,5 +559,8 @@ export {
   initialChartPilots,
   initialChartDistributionByLifecycleStageModels,
   dsStreamArtifactOptions,
+  itemsExport,
+  metricLabelMap,
+  metricsOptions
 };
 

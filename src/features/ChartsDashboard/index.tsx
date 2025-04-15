@@ -7,9 +7,8 @@ import { ReactComponent as DownloadOutline } from '@admiral-ds/icons/build/syste
 import { ErrorStatus, Loading } from '@src/shared/ui/atoms';
 import { API_ROUTES, mockedMetricsResponse, useFetch } from '@src/shared/api';
 import { MetricsResponseType } from '@src/shared/api/types';
-import { useExploitationModeStore } from '@src/shared/stores';
 
-import { switchDateFormat, validateDateRange } from './helpers';
+import { getQueryParams, switchDateFormat, validateDateRange } from './helpers';
 import {
   initialChartModelDynamicsByStreams,
   initialChartFinalStatusByMonthModels,
@@ -27,6 +26,8 @@ import {
   initialOnMonitoringModels,
   initialTakenOutOfOperationModels,
   dsStreamArtifactOptions,
+  metricsOptions,
+  itemsExport,
 } from './constants';
 import MetricDisplay from './MetricDisplay';
 import './styles.css';
@@ -50,45 +51,6 @@ import {
 import { MenuIconSelect } from './MenuIconSelect';
 import { MetricsCaption } from './types';
 
-const getQueryParams = (
-  filters: {
-    startDate?: string;
-    endDate?: string;
-    selectedStreams?: string[];
-  },
-  // selectedExploitationModes: string[],
-) => {
-  const params: Record<string, any> = {};
-
-  if (filters.startDate) {
-    params.startDate = filters.startDate;
-  }
-
-  if (filters.endDate) {
-    params.endDate = filters.endDate;
-  }
-
-  // if (selectedExploitationModes.length > 0) {
-  //   params.mode = selectedExploitationModes;
-  // }
-
-  const hasStreamsSelected = filters.selectedStreams && filters.selectedStreams.length > 0;
-  const allStreamsSelected =
-    filters.selectedStreams?.length === dsStreamArtifactOptions.options.length;
-
-  if (!hasStreamsSelected || allStreamsSelected) {
-    dsStreamArtifactOptions.options.forEach((stream, index) => {
-      params[`stream[${index}]`] = stream.value;
-    });
-  } else {
-    filters?.selectedStreams?.forEach((stream, index) => {
-      params[`stream[${index}]`] = stream;
-    });
-  }
-
-  return params;
-};
-
 const ChartsDashboard = () => {
   const [filters, setFilters] = useState({
     startDate: undefined as string | undefined,
@@ -102,8 +64,6 @@ const ChartsDashboard = () => {
     tempSelectedStreams: dsStreamArtifactOptions.options.map((option) => option.value),
   });
 
-  // const { selectedExploitationModes } = useExploitationModeStore();
-
   const {
     responseData: metricsData,
     loading: loadingMetrics,
@@ -114,6 +74,8 @@ const ChartsDashboard = () => {
     params: getQueryParams(filters),
     mockedResponse: mockedMetricsResponse,
   });
+
+  const { mutationProtectedFetch } = useFetch({})
 
   // const [kpiSum, setKpiSum] = useState(initialKPI_SUM);
   const [totalModels, setTotalModels] = useState(initialTotalModels);
@@ -150,10 +112,7 @@ const ChartsDashboard = () => {
 
   const [dateError, setDateError] = useState<boolean>(false);
 
-  const itemsExport = [
-    { id: 'pdf', label: 'Экспортировать в PDF', value: 'PDF' },
-    { id: 'png', label: 'Экспортировать в PNG', value: 'PNG' },
-  ];
+  const [selectedMetric, setSelectedMetric] = useState<string | undefined>();
 
   useEffect(() => {
     if (!metricsData) return;
@@ -300,8 +259,6 @@ const ChartsDashboard = () => {
     const { tempStartDate, tempEndDate, tempSelectedStreams } = tempFilters;
 
     if (tempStartDate && tempEndDate) {
-      console.log('handleApplyFilters ~ tempStartDate:', tempStartDate);
-      console.log('handleApplyFilters ~ tempEndDate:', tempEndDate);
       const formattedStartDate = tempStartDate ? switchDateFormat(tempStartDate) : undefined;
       const formattedEndDate = tempEndDate ? switchDateFormat(tempEndDate) : undefined;
 
@@ -448,6 +405,51 @@ const ChartsDashboard = () => {
     handleExport(value);
   };
 
+  const handleExportSelectedMetric = async () => {
+    if (!selectedMetric) return;
+  
+    const queryParams: Record<string, string> = {
+      metric: selectedMetric,
+    };
+  
+    if (tempFilters.tempStartDate) {
+      queryParams.startDate = switchDateFormat(tempFilters.tempStartDate);
+    }
+  
+    if (tempFilters.tempEndDate) {
+      queryParams.endDate = switchDateFormat(tempFilters.tempEndDate);
+    }
+  
+    tempFilters.tempSelectedStreams.forEach((stream, index) => {
+      queryParams[`stream[${index}]`] = stream;
+    });
+  
+    try {
+      const response = await mutationProtectedFetch<void, { system_model_id: string }[]>({
+        fetchApiRoute: API_ROUTES.METRICS_RAW,
+        fetchMethod: 'GET',
+        newParams: queryParams,
+      });
+  
+      const data = response?.data;
+  
+      if (Array.isArray(data) && data.length > 0) {
+        const ids = data.map((item) => item.system_model_id).join('\n');
+  
+        const blob = new Blob([ids], { type: 'text/plain' });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${selectedMetric}_models.txt`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      }
+    } catch {
+    }
+  };  
+  
+
   if (errorMetrics) {
     return (
       <StatusWrapper>
@@ -506,6 +508,30 @@ const ChartsDashboard = () => {
                 Сбросить
               </Button>
             </ButtonContainer>
+
+            <CustomSearchSelect
+              id="metric-select"
+              label="Метрика для выгрузки"
+              name="selectedMetric"
+              options={metricsOptions}
+              multiple={false}
+              selectAllEnabled={false}
+              selectEmptyEnabled={false}
+              selectedValues={selectedMetric ? [selectedMetric] : []}
+              onChange={(_, value) => {
+                setSelectedMetric(value.length > 0 ? value[0] : undefined);
+              }}
+            />
+
+            <Button
+              dimension="s"
+              appearance="secondary"
+              onClick={handleExportSelectedMetric}
+              disabled={!selectedMetric}
+            >
+              Выгрузить метрику
+            </Button>
+
           </FlexContainerFilter>
         </Container>
       </WrapperFilter>

@@ -1,4 +1,4 @@
-export type FrameSizeType =
+type FrameSizeType =
   | 'stat-sm'
   | 'stat-md'
   | 'stat-lg'
@@ -6,14 +6,14 @@ export type FrameSizeType =
   | 'chart-md'
   | 'chart-lg';
 
-export type StatisticDataProps = {
+type StatisticDataProps = {
   caption: string;
   value: number;
   delta: number;
   relative?: boolean;
 };
 
-export enum MetricsCaption {
+enum MetricsCaption {
   KPI_SUM = 'КПЭ СУМ',
   TOTAL_MODELS = 'Всего моделей',
   IMPLEMENTED_MODELS = 'Внедренные модели',
@@ -31,3 +31,20 @@ export enum MetricsCaption {
   DYNAMIC_BY_STREAMS_MODELS = 'Динамика моделей по стримам',
 }
 
+enum MetricsEnum {
+  ImplementedModelsMetric = 'implementedModels',
+  DevelopedModelsMetric = 'developedModels',
+  MrmModelsMetric = 'sumRmModels',
+  PilotsMetric = 'pilots',
+  TasksMetric = 'tasks',
+  TakenOutOfOperationModelsMetric = 'takenOutOfOperationModels',
+  StalledModelsByMonthMetric = 'stalledModelsByMonth',
+  RiskCoverageFinalStatusModelsMetric = 'riskCoverageFinalStatusModels',
+  RegistryCoverageModelsMetric = 'registryCoverageModels',
+  OnMonitoringModelsMetric = 'onMonitoringModels',
+  FinalStatusModelsMetric = 'finalStatusModels',
+  FinalStatusByMonthModelsMetric = 'finalStatusByMonthModels',
+  DistributionByLifecycleStageModelsMetric = 'distributionByLifecycleStageModels',
+}
+
+export { MetricsEnum, StatisticDataProps, MetricsCaption, FrameSizeType }
