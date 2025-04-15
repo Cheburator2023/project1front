@@ -114,7 +114,7 @@ export const AgGridTableCustomCell = (params: AgGridTableCustomCellParams) => {
   return (
     <div>
       <Wrapper ref={wrapperRef}>
-        <div className="ag-custom-cell-value">{value || 'Отсутствуют данные'}</div>
+        <div className="ag-custom-cell-value">{value || ''}</div>
         {!noCustomCells && (
           <div className="actionButtons">
             <ActionBtn
