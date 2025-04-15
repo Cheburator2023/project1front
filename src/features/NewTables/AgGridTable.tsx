@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import { forwardRef, useCallback, useMemo, useRef } from 'react';
+import { forwardRef, useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
@@ -10,6 +10,7 @@ import {
   FilterChangedEvent,
   FirstDataRenderedEvent,
   GetMainMenuItemsParams,
+  GridApi,
   GridReadyEvent,
   IDateFilterParams,
   IRowNode,
@@ -22,6 +23,7 @@ import {
   RowSelectionOptions,
   SelectionChangedEvent,
   SelectionColumnDef,
+  SideBarDef,
   SortChangedEvent,
   themeQuartz,
 } from 'ag-grid-community';
@@ -52,6 +54,7 @@ import { useDeleteRightModelPanelStore } from '../../shared/stores';
 import { usePermissions, useRoles, useTemplateFilters } from '../../shared/hooks';
 import { isInBusinessCustomers, isModelCreator } from '../../shared/helpers';
 import { useDeepEffect } from '../../shared/hooks/useDeepEffect';
+import { globalStore } from '../../shared/stores/globalStore';
 
 interface IAgGridTableProps {
   templates?: Template[];
@@ -80,9 +83,10 @@ interface IAgGridTableProps {
   onSortChanged?: (event: SortChangedEvent) => void;
   onGridReady?: (event: GridReadyEvent) => void;
   noCustomCells?: boolean;
+  pivot?: boolean;
 }
 
-const sideBarProps = {
+const sideBarProps: SideBarDef | string | string[] | boolean | null = {
   toolPanels: [
     {
       id: 'columns',
@@ -174,10 +178,22 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       onRowDragEnd,
       onSortChanged,
       onGridReady,
+      pivot = false,
       noCustomCells = false,
     }: IAgGridTableProps,
     ref: any,
   ) => {
+    const tableProps = useTableChange({
+      rowList,
+      setCurrentPage: setPage,
+      page,
+      updateRowsCount: setTotalRows,
+      pageSize,
+      searchString,
+      columnList,
+      templates,
+    });
+
     const {
       cols,
       rows,
@@ -192,17 +208,9 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       onChangeColumnsFilters,
       onChangeTopFilters,
       topFilters,
-    } = useTableChange({
-      rowList,
-      setCurrentPage: setPage,
-      page,
-      updateRowsCount: setTotalRows,
-      pageSize,
-      searchString,
-      columnList,
-      templates,
-    });
-    const { currentCustomer } = useAppInjectStore();
+    } = tableProps;
+
+    const { filtersResetCount } = globalStore();
     const { modelsCount, modelSource, isDeleteButtonEnabled, userMatches, updateDeleteModelState } =
       useDeleteRightModelPanelStore();
 
@@ -271,7 +279,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
         // allow every column to be grouped
         enableRowGroup: true,
         // allow every column to be pivoted
-        enablePivot: true,
+        enablePivot: pivot,
         flex: 2,
         sortable: true,
         resizable: true,
@@ -336,9 +344,9 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
 
         const { model_source, status, id } = selectedRow;
 
-        const userMatches = isModelCreator(selectedRow) || isInBusinessCustomers(selectedRow);
+        const _userMatches = isModelCreator(selectedRow) || isInBusinessCustomers(selectedRow);
 
-        updateDeleteModelState(1, model_source, status, id, userMatches);
+        updateDeleteModelState(1, model_source, status, id, _userMatches);
       } else {
         updateDeleteModelState(selectedRows.length);
       }
@@ -380,6 +388,21 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       }
     };
 
+    const clearFilters = useCallback(() => {
+      const api: GridApi | undefined = gridRef.current;
+      api?.setFilterModel(null);
+      api?.setFilterModel(null);
+      api?.setGridOption('quickFilterText', '');
+    }, []);
+
+    useEffect(() => {
+      if (filtersResetCount) {
+        console.log('🐸 Pepe said >> useEffect >> resetCount:', filtersResetCount);
+
+        clearFilters();
+      }
+    }, [filtersResetCount]);
+
     useDeepEffect(() => {
       if (rowList?.length) {
         setRows(rowList);
@@ -398,20 +421,20 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
 
     return (
       <Flexbox height="calc(100vh - 230px)">
-        {loading || error ? (
-          <StatusWrapper>
-            {error ? (
-              <ErrorStatus text={error} />
-            ) : loading ? (
-              <Loading text="Загрузка данных ..." />
-            ) : null}
-          </StatusWrapper>
+        {error ? (
+          <StatusWrapper>{error ? <ErrorStatus text={error} /> : null}</StatusWrapper>
         ) : null}
         <div style={containerStyle}>
           {actionPanel && (
             <>
               <Flexbox alignItems="center" justifyContent="space-between">
-                <Flexbox width="1500px" fillChild alignItems="center" gap={20}>
+                <Flexbox
+                  width="1000px"
+                  fillChild
+                  alignItems="center"
+                  gap={20}
+                  key={filtersResetCount}
+                >
                   <InputField
                     id="filter-text-box"
                     onChange={onFilterTextBoxChanged}
@@ -455,7 +478,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
             </>
           )}
 
-          <div style={gridStyle} className="ag-theme-quartz">
+          <GridWrapper style={gridStyle} className="ag-theme-quartz">
             <AgGridReact
               pagination={pagination}
               rowDragManaged={rowDragManaged}
@@ -465,6 +488,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
               defaultColDef={defaultColDef}
               rowSelection={rowSelection}
               animateRows
+              pivotMode={pivot}
               cellSelection
               onGridReady={onGridReady}
               rowClassRules={isCompared ? rowClassRules : undefined}
@@ -485,13 +509,20 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
               onRowDataUpdated={onRowDataUpdated}
               onRowDragEnd={onRowDragEnd}
               onSortChanged={onSortChanged}
+              loading={loading}
             />
-          </div>
+          </GridWrapper>
         </div>
       </Flexbox>
     );
   },
 );
+
+const GridWrapper = styled.div`
+  & .ag-pivot-mode-panel {
+    display: none;
+  }
+`;
 
 const StatusWrapper = styled.div`
   display: flex;

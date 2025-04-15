@@ -79,15 +79,3 @@ export const Home = () => {
   );
 };
 
-const Row = styled.div`
-  display: flex;
-  background: var(--neutral-neutral-05, #f3f4f6);
-  flex-direction: row;
-  align-items: center;
-  > *:not(:last-child) {
-    margin-right: 6px;
-  }
-  > * {
-    flex: 0 0 auto;
-  }
-`;
