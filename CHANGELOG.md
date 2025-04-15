@@ -1,5 +1,32 @@
 # Semantic Versioning Changelog
 
+# [1.42.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.41.1...v1.42.0) (2025-04-11)
+
+
+### Features
+
+* **docker:** up version ([ddbe443](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/ddbe443113f33aa62c5da4c8c681f983789ff38f))
+
+## [1.41.1](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.41.0...v1.41.1) (2025-04-11)
+
+
+### Bug Fixes
+
+* add default archive ([6af3dde](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/6af3ddecefb4931623ca90021b88bd057a035614))
+
+# [1.41.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.40.2...v1.41.0) (2025-04-10)
+
+
+### Bug Fixes
+
+* refactoring usefetch ([52259da](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/52259dac264c63c17cd667ac5a03316697500bf4))
+
+
+### Features
+
+* add exploitation mode filters ([bbc8f65](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/bbc8f65e2ab350b67ac9951e88bff1d2a31ae5a1))
+* new attributes ([4a8b967](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/4a8b967d68053274da30139bab28545266980ec4))
+
 ## [1.40.2](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.40.1...v1.40.2) (2025-04-04)
 
 
