@@ -388,17 +388,17 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       }
     };
 
-    const clearFilters = useCallback(() => {
-      const api: GridApi | undefined = gridRef.current;
-      api?.setFilterModel(null);
-      api?.setFilterModel(null);
-      api?.setGridOption('quickFilterText', '');
-    }, []);
+    const clearFilters = () => {
+      const api: GridApi | undefined = gridRef.current.api;
+      if (api) {
+        api?.setFilterModel(null);
+        api?.setFilterModel(null);
+        api?.setGridOption('quickFilterText', '');
+      }
+    };
 
     useEffect(() => {
       if (filtersResetCount) {
-        console.log('🐸 Pepe said >> useEffect >> resetCount:', filtersResetCount);
-
         clearFilters();
       }
     }, [filtersResetCount]);
@@ -519,7 +519,11 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
 );
 
 const GridWrapper = styled.div`
-  & .ag-pivot-mode-panel {
+  & .ag-column-panel .ag-pivot-mode-panel {
+    display: none;
+  }
+
+  & .ag-column-panel .ag-unselectable.ag-column-drop {
     display: none;
   }
 `;
