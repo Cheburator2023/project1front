@@ -56,7 +56,9 @@ export const useCompareModels = (columnsFilters: Partial<ColumnsFilter>) => {
       }
 
       if (selectedExploitationModes.length > 0) {
-        params.mode = [...selectedExploitationModes];
+        selectedExploitationModes.forEach((mode, index) => {
+          params[`mode[${index}]`] = mode;
+        });
       }
 
       const res = await mutationProtectedFetch<
