@@ -433,22 +433,15 @@ const isUserAllowedForField = (
   fieldSchema?: FormFieldsSchema[number],
   row?: Partial<Row> | undefined,
 ): boolean | undefined => {
-  const { hasRole } = useUserStore.getState();
-
-  if (
-    !fieldSchema?.rolesAllowed &&
-    !fieldSchema?.businessCustomerAllowed &&
-    !fieldSchema?.modelCreatorAllowed
-  ) {
+  if (!fieldSchema?.businessCustomerAllowed && !fieldSchema?.modelCreatorAllowed) {
     return true;
   }
 
-  const rolesAllowed = fieldSchema?.rolesAllowed?.some((role: Role) => hasRole(role));
   const businessCustomerAllowed =
     fieldSchema?.businessCustomerAllowed && isInBusinessCustomers(row);
   const modelCreatorAllowed = fieldSchema?.modelCreatorAllowed && isModelCreator(row);
 
-  return rolesAllowed || businessCustomerAllowed || modelCreatorAllowed;
+  return businessCustomerAllowed || modelCreatorAllowed;
 };
 
 const canEditArtefact = (artifact?: Artifact, row?: Partial<Row> | undefined): boolean => {
