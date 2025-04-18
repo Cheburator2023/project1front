@@ -43,7 +43,6 @@ export const DELETE_MODEL_SCHEMA: FormFieldsSchema = [
     required: true,
     maxLength: 250,
     customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
-    rolesAllowed: [Role.ADMIN_IT, Role.ADMIN_IT_LEAD],
     businessCustomerAllowed: true,
     modelCreatorAllowed: true,
   },
@@ -55,13 +54,11 @@ export const DELETE_CONFIRM_MODEL_SCHEMA: FormFieldsSchema = [
     required: true,
     maxLength: 250,
     customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
-    rolesAllowed: [Role.VALIDATOR_LEAD],
   },
   {
     name: 'lead_validator_comment_model_delete',
     maxLength: 250,
     customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
-    rolesAllowed: [Role.VALIDATOR_LEAD],
     requireConditions: [
       {
         lead_validator_resolution_model_delete: 'Отрицательно',
