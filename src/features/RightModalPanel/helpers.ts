@@ -429,21 +429,6 @@ const getDisabledStatus = (minDate: Date, maxDate: Date, quarter: number, canEdi
   return !isWithinInterval(currentDate, { start: minDate, end: maxDate });
 };
 
-const isUserAllowedForField = (
-  fieldSchema?: FormFieldsSchema[number],
-  row?: Partial<Row> | undefined,
-): boolean | undefined => {
-  if (!fieldSchema?.businessCustomerAllowed && !fieldSchema?.modelCreatorAllowed) {
-    return true;
-  }
-
-  const businessCustomerAllowed =
-    fieldSchema?.businessCustomerAllowed && isInBusinessCustomers(row);
-  const modelCreatorAllowed = fieldSchema?.modelCreatorAllowed && isModelCreator(row);
-
-  return businessCustomerAllowed || modelCreatorAllowed;
-};
-
 const canEditArtefact = (artifact?: Artifact, row?: Partial<Row> | undefined): boolean => {
   if (!artifact) {
     return false;
@@ -472,10 +457,6 @@ const isFieldDisabled = (
   canEdit?: boolean,
 ): boolean | undefined => {
   if (fieldSchema?.alwaysDisabled) {
-    return true;
-  }
-
-  if (!isUserAllowedForField(fieldSchema, row)) {
     return true;
   }
 
