@@ -1,5 +1,4 @@
 import { CUSTOMER_MAP } from '@src/shared/constants/customers';
-import { Role } from '@src/shared/types';
 import { FormFieldsSchema } from '../types';
 
 type SchemaNameMap = {
@@ -43,8 +42,6 @@ export const DELETE_MODEL_SCHEMA: FormFieldsSchema = [
     required: true,
     maxLength: 250,
     customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.EVERY_CUSTOMER],
-    businessCustomerAllowed: true,
-    modelCreatorAllowed: true,
   },
 ];
 
