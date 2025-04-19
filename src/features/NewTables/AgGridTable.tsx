@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import { forwardRef, useCallback, useContext, useEffect, useMemo, useRef } from 'react';
+import { forwardRef, useCallback, useState, useEffect, useMemo, useRef } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
@@ -54,7 +54,7 @@ import { useDeleteRightModelPanelStore } from '../../shared/stores';
 import { usePermissions, useRoles, useTemplateFilters } from '../../shared/hooks';
 import { isInBusinessCustomers, isModelCreator } from '../../shared/helpers';
 import { useDeepEffect } from '../../shared/hooks/useDeepEffect';
-import { globalStore } from '../../shared/stores/globalStore';
+import { useGlobalStore } from '../../shared/stores/globalStore';
 
 interface IAgGridTableProps {
   templates?: Template[];
@@ -194,23 +194,11 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       templates,
     });
 
-    const {
-      cols,
-      rows,
-      setCols,
-      setRows,
-      // handleSelectionChange,
-      handleResize,
-      handleSort,
-      handleChangeColumnsFilter,
-      handleColumnDragEnd,
-      columnsFilters,
-      onChangeColumnsFilters,
-      onChangeTopFilters,
-      topFilters,
-    } = tableProps;
+    const { filtersResetCount, setAgGridApi } = useGlobalStore();
 
-    const { filtersResetCount } = globalStore();
+    const { setRows, handleChangeColumnsFilter, columnsFilters, onChangeTopFilters, topFilters } =
+      tableProps;
+
     const { modelsCount, modelSource, isDeleteButtonEnabled, userMatches, updateDeleteModelState } =
       useDeleteRightModelPanelStore();
 
@@ -226,7 +214,6 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     const gridRefInner = useRef<AgGridReact>(null);
     const gridRef = ref || gridRefInner;
 
-    const rowData = rows;
     const columnDefs: ColDef[] = columnList.map((data, colIndex) => ({
       ...data,
       headerName: data.title,
@@ -353,12 +340,9 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     };
 
     const handleFilterChange = (event: FilterChangedEvent): void => {
-      // @ts-ignore
-      const colDef: any = event.api.getColumnFilterModel(event?.columns[0]?.getColDef());
-      // @ts-ignore
-      const isDate = event?.columns[0]?.colDef?.filterType === 'date';
-      // @ts-ignore
-      const colName: string = event?.columns[0]?.colId;
+      const colName: string = event?.columns[0]?.getColId();
+      const colDef: any = event.api.getColumnFilterModel(colName);
+      const isDate = colDef?.filterType === 'date';
 
       if (isDate) {
         const dateFrom = new Date(colDef.dateFrom);
@@ -374,7 +358,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
         }
       } else {
         // @ts-ignore
-        const value = colDef?.filterModels?.[1]?.values;
+        const value = colDef?.filterModels?.[1]?.values || colDef?.values;
         const initialTemplateValue = columnsFilters?.[colName] || [];
 
         if (value) {
@@ -418,6 +402,21 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
         },
       };
     }, []);
+
+    const _onGridReady = useCallback((event: GridReadyEvent) => {
+      onGridReady?.(event);
+      setAgGridApi(event.api);
+    }, []);
+
+    const _onFirstDataRendered = useCallback((event: FirstDataRenderedEvent) => {
+      onFirstDataRendered?.(event);
+    }, []);
+
+    // useDeepEffect(() => {
+    //   if (rows.length && initialRowData === undefined) {
+    //     setInitialRowData(rows as any);
+    //   }
+    // }, [JSON.stringify(rows), initialRowData]);
 
     return (
       <Flexbox height="calc(100vh - 230px)">
@@ -483,14 +482,14 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
               pagination={pagination}
               rowDragManaged={rowDragManaged}
               ref={gridRef || gridRefInner}
-              rowData={rowData}
+              rowData={rowList}
               columnDefs={columnDefs as any}
               defaultColDef={defaultColDef}
               rowSelection={rowSelection}
               animateRows
               pivotMode={pivot}
               cellSelection
-              onGridReady={onGridReady}
+              onGridReady={_onGridReady}
               rowClassRules={isCompared ? rowClassRules : undefined}
               selectionColumnDef={selectionColumnDef}
               autoGroupColumnDef={autoGroupColumnDefProps}
@@ -505,7 +504,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
               tooltipShowDelay={500}
               onRowDragMove={onRowDragMove}
               onRowSelected={onRowSelected}
-              onFirstDataRendered={onFirstDataRendered}
+              onFirstDataRendered={_onFirstDataRendered}
               onRowDataUpdated={onRowDataUpdated}
               onRowDragEnd={onRowDragEnd}
               onSortChanged={onSortChanged}
