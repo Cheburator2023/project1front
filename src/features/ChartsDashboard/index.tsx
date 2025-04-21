@@ -50,14 +50,11 @@ import {
 import { MenuIconSelect } from './MenuIconSelect';
 import { MetricsCaption } from './types';
 
-const getQueryParams = (
-  filters: {
-    startDate?: string;
-    endDate?: string;
-    selectedStreams?: string[];
-  },
-  // selectedExploitationModes: string[],
-) => {
+const getQueryParams = (filters: {
+  startDate?: string;
+  endDate?: string;
+  selectedStreams?: string[];
+}) => {
   const params: Record<string, any> = {};
 
   if (filters.startDate) {
@@ -67,10 +64,6 @@ const getQueryParams = (
   if (filters.endDate) {
     params.endDate = filters.endDate;
   }
-
-  // if (selectedExploitationModes.length > 0) {
-  //   params.mode = selectedExploitationModes;
-  // }
 
   const hasStreamsSelected = filters.selectedStreams && filters.selectedStreams.length > 0;
   const allStreamsSelected =
@@ -101,8 +94,6 @@ const ChartsDashboard = () => {
     tempEndDate: undefined as string | undefined,
     tempSelectedStreams: dsStreamArtifactOptions.options.map((option) => option.value),
   });
-
-  // const { selectedExploitationModes } = useExploitationModeStore();
 
   const {
     responseData: metricsData,
