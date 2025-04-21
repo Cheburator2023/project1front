@@ -12,7 +12,7 @@ import {
 import { TemplatesFilter, FilterButtonCount } from '@entities';
 
 import { Container, CustomDateField, FiltersDivider, FilterButton, FiltersBox } from './styles';
-import { globalStore } from '../../shared/stores/globalStore';
+import { useGlobalStore } from '../../shared/stores/globalStore';
 
 export interface FiltersPanelProps {
   compareMode?: boolean;
@@ -47,7 +47,7 @@ export const FiltersPanel = ({
     onChangeSecondDate,
     columnsFilters,
   } = useContext(FiltersContext);
-  const { setFiltersResetCount } = globalStore();
+  const { setFiltersResetCount } = useGlobalStore();
 
   const { exploitationModeOptions, selectedExploitationModes, updateSelectedExploitationModes } =
     useExploitationModeStore();
@@ -174,3 +174,4 @@ export const FiltersPanel = ({
     </Container>
   );
 };
+
