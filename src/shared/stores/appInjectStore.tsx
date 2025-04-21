@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 
+import { GridApi } from 'ag-grid-community';
 import { DEFAULT_CUSTOMER, CUSTOMER_TYPE } from '../constants/customers';
 
 export type AppInjectStoreState = {
