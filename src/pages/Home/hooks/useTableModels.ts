@@ -27,6 +27,23 @@ import {
 import { ArtifactApi, CustomError } from '@src/shared/api/types';
 import { useExploitationModeStore } from '@src/shared/stores';
 
+export const getQueryParams = (
+  selectedExploitationModes: string[],
+  date?: string,
+): Record<string, any> => {
+  const params: Record<string, any> = {};
+
+  if (date) {
+    params.date = getISODateFormat(date);
+  }
+
+  selectedExploitationModes.forEach((mode, i) => {
+    params[`mode[${i}]`] = mode;
+  });
+
+  return params;
+};
+
 export type TDisplayTableModels = {
   activeScreen: ACTIVE_SCREEN;
   setActiveScreen: (newActiveScreen: ACTIVE_SCREEN) => void;
@@ -137,7 +154,9 @@ export const useTableModels = () => {
   const [loadingModels, setLoadingModels] = useState(true);
   const [errorModels, setErrorModels] = useState<string>('');
 
-  const { selectedExploitationModes } = useExploitationModeStore();
+  const selectedExploitationModes = useExploitationModeStore(
+    (state) => state.selectedExploitationModes,
+  );
 
   const { responseData: templateData, mutationProtectedFetch } = useFetch<Template[]>({
     apiRoute: API_ROUTES.TEMPLATES,
@@ -155,50 +174,41 @@ export const useTableModels = () => {
     setTotalRows(formattedRows.length);
   };
 
-  const fetchModels = useCallback(
-    async (date?: string) => {
-      setLoadingModels(true);
+  const fetchModels = useCallback(async (date?: string) => {
+    const { selectedExploitationModes } = useExploitationModeStore.getState();
 
-      try {
-        const params: Record<string, any> = {};
+    setLoadingModels(true);
 
-        if (date) {
-          params.date = getISODateFormat(date);
-        }
+    try {
+      const res: any = await mutationProtectedFetch<ModelsResponseType, ModelsResponseType>({
+        fetchApiRoute: API_ROUTES.MODELS,
+        fetchMethod: 'GET',
+        mockedResponse: mockedModelsResponse,
+        newParams: getQueryParams(selectedExploitationModes, date),
+      });
 
-        if (selectedExploitationModes.length > 0) {
-          selectedExploitationModes.forEach((mode, index) => {
-            params[`mode[${index}]`] = mode;
-          });
-        }
-
-        const res: any = await mutationProtectedFetch<ModelsResponseType, ModelsResponseType>({
-          fetchApiRoute: API_ROUTES.MODELS,
-          fetchMethod: 'GET',
-          mockedResponse: mockedModelsResponse,
-          newParams: params,
-        });
-
-        if (res && !res?.error) {
-          updateRows(res.data);
-          setErrorModels('');
-        } else if (res) {
-          setErrorModels(res.data.message);
-        }
-
-        setLoadingModels(false);
-      } catch {
-        setErrorModels('Ошибка загрузки моделей');
-        setLoadingModels(false);
+      if (res && !res?.error) {
+        updateRows(res.data);
+        setErrorModels('');
+      } else if (res) {
+        setErrorModels(res.data.message);
       }
-    },
-    [selectedExploitationModes],
-  );
+
+      setLoadingModels(false);
+    } catch {
+      setErrorModels('Ошибка загрузки моделей');
+      setLoadingModels(false);
+    }
+  }, []);
 
   // Initial models loading
   useEffect(() => {
     fetchModels();
   }, [fetchModels]);
+
+  useEffect(() => {
+    fetchModels();
+  }, [selectedExploitationModes]);
 
   useEffect(() => {
     if (templateData) {

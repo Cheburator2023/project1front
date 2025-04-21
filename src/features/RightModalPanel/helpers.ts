@@ -29,8 +29,6 @@ import {
 import { ArtifactGroup } from '@src/shared/api/types';
 import { concat, uniqBy } from 'lodash';
 import { CUSTOMER_MAP, CUSTOMER_TYPE } from '@src/shared/constants/customers';
-import { useUserStore } from '@src/shared/stores';
-import { isInBusinessCustomers, isModelCreator } from '@src/shared/helpers';
 import {
   FormFieldConditions,
   FormFieldValueConditions,
@@ -429,46 +427,21 @@ const getDisabledStatus = (minDate: Date, maxDate: Date, quarter: number, canEdi
   return !isWithinInterval(currentDate, { start: minDate, end: maxDate });
 };
 
-const isUserAllowedForField = (
-  fieldSchema?: FormFieldsSchema[number],
-  row?: Partial<Row> | undefined,
-): boolean | undefined => {
-  const { hasRole } = useUserStore.getState();
+const canEditArtefact = (artifact?: Artifact, row?: Partial<Row>): boolean => {
+  if (!artifact) return false;
+  if (!row) return true;
 
-  if (
-    !fieldSchema?.rolesAllowed &&
-    !fieldSchema?.businessCustomerAllowed &&
-    !fieldSchema?.modelCreatorAllowed
-  ) {
-    return true;
+  const isEditableBySum = artifact.is_editable_by_role_sum === '1';
+  const isEditableBySumRm = artifact.is_editable_by_role_sum_rm === '1';
+
+  switch (row.model_source) {
+    case ModelSource.SUM:
+      return isEditableBySum;
+    case ModelSource.SUM_RM:
+      return isEditableBySumRm;
+    default:
+      return false;
   }
-
-  const rolesAllowed = fieldSchema?.rolesAllowed?.some((role: Role) => hasRole(role));
-  const businessCustomerAllowed =
-    fieldSchema?.businessCustomerAllowed && isInBusinessCustomers(row);
-  const modelCreatorAllowed = fieldSchema?.modelCreatorAllowed && isModelCreator(row);
-
-  return rolesAllowed || businessCustomerAllowed || modelCreatorAllowed;
-};
-
-const canEditArtefact = (artifact?: Artifact, row?: Partial<Row> | undefined): boolean => {
-  if (!artifact) {
-    return false;
-  }
-
-  if (!row) {
-    return true;
-  }
-
-  if (row.model_source === ModelSource.SUM_RM) {
-    return artifact.is_editable_by_role_sum_rm === '1';
-  }
-
-  if (row.model_source === ModelSource.SUM) {
-    return artifact.is_editable_by_role_sum === '1';
-  }
-
-  return false;
 };
 
 const isFieldDisabled = (
@@ -479,10 +452,6 @@ const isFieldDisabled = (
   canEdit?: boolean,
 ): boolean | undefined => {
   if (fieldSchema?.alwaysDisabled) {
-    return true;
-  }
-
-  if (!isUserAllowedForField(fieldSchema, row)) {
     return true;
   }
 
