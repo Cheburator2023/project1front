@@ -304,7 +304,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     }, []);
 
     const paginationPageSizeSelector = useMemo<number[] | boolean>(() => {
-      return [20, 100, 500, 1000];
+      return [20, 100, 200, 500, 1000];
     }, []);
 
     let deleteTooltipMessage = '';
