@@ -154,6 +154,10 @@ export const useTableModels = () => {
   const [loadingModels, setLoadingModels] = useState(true);
   const [errorModels, setErrorModels] = useState<string>('');
 
+  const selectedExploitationModes = useExploitationModeStore(
+    (state) => state.selectedExploitationModes,
+  );
+
   const { responseData: templateData, mutationProtectedFetch } = useFetch<Template[]>({
     apiRoute: API_ROUTES.TEMPLATES,
     mockedResponse: mockedTemplatesResponse,
@@ -201,6 +205,10 @@ export const useTableModels = () => {
   useEffect(() => {
     fetchModels();
   }, [fetchModels]);
+
+  useEffect(() => {
+    fetchModels();
+  }, [selectedExploitationModes]);
 
   useEffect(() => {
     if (templateData) {
