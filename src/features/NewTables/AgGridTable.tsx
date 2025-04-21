@@ -144,7 +144,7 @@ const autoGroupColumnDefProps: ColDef = {
 
 const selectionColumnDef: SelectionColumnDef = {
   sortable: true,
-  sort: 'desc',
+  // sort: 'desc',
   resizable: true,
   suppressHeaderMenuButton: false,
   pinned: 'left',
