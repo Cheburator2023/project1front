@@ -40,6 +40,7 @@ const CompareModelsWidgetNewTable = React.memo(
           compareOnlyChanged={compareModelsTable.compareOnlyChanged}
           handleCompareOnlyChanged={compareModelsTable.setCompareOnlyChanged}
           compareMode={compareMode}
+          compareModelsTableLoading={compareModelsTable.loading}
           handleChangeCompare={handleChangeCompare}
           templates={templates}
           updateActiveScreen={updateActiveScreen}

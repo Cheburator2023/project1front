@@ -20,6 +20,7 @@ export interface FiltersPanelProps {
   disabledCompare?: boolean;
   handleChangeCompare: (checked: boolean) => void;
   handleCompareOnlyChanged?: (checked: boolean) => void;
+  compareModelsTableLoading?: boolean;
   handleUpdateCompareList?: () => void;
   templates: Template[];
   updateActiveScreen: (newActiveScreen: ACTIVE_SCREEN) => void;
@@ -30,6 +31,7 @@ export const FiltersPanel = ({
   compareMode = false,
   compareOnlyChanged = false,
   disabledCompare = true,
+  compareModelsTableLoading = false,
   handleChangeCompare,
   handleUpdateCompareList = () => null,
   handleCompareOnlyChanged = () => null,
@@ -112,9 +114,9 @@ export const FiltersPanel = ({
             <FilterButton
               onClick={handleUpdateCompareList}
               dimension="s"
-              disabled={disabledCompare}
+              disabled={disabledCompare || compareModelsTableLoading}
             >
-              Сравнить
+              {compareModelsTableLoading ? 'Загрузка' : 'Сравнить'}
             </FilterButton>
           </>
         ) : (
