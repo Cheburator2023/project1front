@@ -39,6 +39,7 @@ const CompareModelsWidget = React.memo(
         <FiltersPanel
           compareOnlyChanged={compareModelsTable.compareOnlyChanged}
           handleCompareOnlyChanged={compareModelsTable.setCompareOnlyChanged}
+          compareModelsTableLoading={compareModelsTable.loading}
           compareMode={compareMode}
           handleChangeCompare={handleChangeCompare}
           templates={templates}

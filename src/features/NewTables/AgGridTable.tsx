@@ -84,6 +84,7 @@ interface IAgGridTableProps {
   onGridReady?: (event: GridReadyEvent) => void;
   noCustomCells?: boolean;
   pivot?: boolean;
+  overlayNoRowsTemplate?: string;
 }
 
 const sideBarProps: SideBarDef | string | string[] | boolean | null = {
@@ -180,6 +181,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       onGridReady,
       pivot = false,
       noCustomCells = false,
+      overlayNoRowsTemplate,
     }: IAgGridTableProps,
     ref: any,
   ) => {
@@ -509,6 +511,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
               onRowDragEnd={onRowDragEnd}
               onSortChanged={onSortChanged}
               loading={loading}
+              overlayNoRowsTemplate={overlayNoRowsTemplate}
             />
           </GridWrapper>
         </div>

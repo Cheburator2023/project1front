@@ -102,39 +102,24 @@ export const CompareModelsNewTable = React.memo(
     ]);
 
     return (
-      <>
-        {totalRows > 0 && firstDate && secondDate && !loading ? (
-          <AgGridModelsTable
-            display={display}
-            modelsTable={modelsTable}
-            templates={filters.templates}
-            isCompared
-            overrideColumnList={columnList}
-            overrideRowList={rows}
-            error={error}
-            loading={loading}
-          />
-        ) : (
-          <StatusWrapper>
-            <T font="Subtitle/Subtitle 1">Для сравнения выберите две даты состояния реестра</T>
-          </StatusWrapper>
-        )}
-      </>
+      <AgGridModelsTable
+        display={display}
+        modelsTable={modelsTable}
+        templates={filters.templates}
+        isCompared
+        overrideColumnList={columnList}
+        overrideRowList={rows}
+        error={error}
+        loading={loading}
+        overlayNoRowsTemplate={
+          totalRows > 0 && firstDate && secondDate
+            ? 'Нет данных'
+            : 'Для сравнения выберите две даты состояния реестра'
+        }
+      />
     );
   },
 );
 
 CompareModelsNewTable.displayName = 'CompareModelsNewTable';
 
-const StatusWrapper = styled.div`
-  display: flex;
-  width: 100%;
-  height: 100%;
-  padding: 50px 0;
-  justify-content: center;
-  position: absolute;
-  align-items: center;
-  z-index: 10;
-  background-color: #fffffff0;
-  pointer-events: none;
-`;

@@ -13,6 +13,7 @@ export const AgGridModelsTable = (props: {
   overrideRowList?: Partial<Row>[];
   error: string | null;
   loading: boolean;
+  overlayNoRowsTemplate?: string;
 }) => {
   const { rowList, setPage, page, setTotalRows, pageSize, searchString, columnList } =
     props.modelsTable;
@@ -32,6 +33,7 @@ export const AgGridModelsTable = (props: {
       handleClickOnActionCell={props.modelsTable.handleClickOnActionCell}
       error={props.error}
       loading={props.loading}
+      overlayNoRowsTemplate={props.overlayNoRowsTemplate}
     />
   );
 };

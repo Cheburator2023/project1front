@@ -10,6 +10,7 @@ import { AgGridModelsTable } from '@src/features/NewTables/AgGridModelsTable';
 import { TemplateFiltersNew } from '@src/features/TemplateFilters/TemplateFiltersNew';
 import { useTableModels } from './hooks';
 import { CompareModelsWidget } from '../../widgets';
+import { TemplateFilters } from '../../features/TemplateFilters/TemplateFilters';
 
 export const Home = () => {
   const { display, modelsTable, filters, context } = useTableModels();
@@ -28,7 +29,7 @@ export const Home = () => {
         onClose={context.handleOnClose}
       />
       {display.activeScreen === ACTIVE_SCREEN.TEMPLATE_FILTERS && (
-        <TemplateFiltersNew
+        <TemplateFilters
           templates={filters.templates}
           updateActiveScreen={display.setActiveScreen}
           updateRightPanelType={display.setRightPanelType}
