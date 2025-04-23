@@ -13,8 +13,10 @@ import { themes } from './theme/theme';
 import { CUSTOMER_MAP } from '../shared/constants/customers';
 
 const GIT_REVISION = process.env.GIT_REVISION;
+const RC_STATS = process.env.RC_STATS;
 
 console.log('GIT_REVISION IS:', GIT_REVISION);
+console.log('RELEASE_STATS IS:', RC_STATS);
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -124,11 +126,11 @@ const GlobalStyle = createGlobalStyle`
   body {
     margin: 0;
   }
-  .ag-watermark, 
+  .ag-watermark,
   .ag-watermark-text,
-  .ag-watermark.ag-opacity-zero, 
-  div.ag-watermark.ag-opacity-zero, 
-  div.ag-watermark, 
+  .ag-watermark.ag-opacity-zero,
+  div.ag-watermark.ag-opacity-zero,
+  div.ag-watermark,
   div.ag-watermark-text {
     display: none !important;
     opacity: 0 !important;

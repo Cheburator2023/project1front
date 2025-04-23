@@ -6,10 +6,13 @@ const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin'
 const { DefinePlugin } = webpack;
 
 const common = require('./webpack.common.js');
+const packageJSON = require('./package.json');
 const git_revision = require('child_process')
   .execSync('git show --format="short" -s')
   .toString()
   .trim();
+
+const RC_STATS = packageJSON.release_stats;
 
 module.exports = merge(common, {
   mode: 'development',
@@ -22,6 +25,7 @@ module.exports = merge(common, {
     new ReactRefreshWebpackPlugin({ overlay: false }),
     new DefinePlugin({
       'process.env.MOCKED_REQUESTS': JSON.stringify(process.env.MOCKED_REQUESTS || ''),
+      'process.env.RC_STATS': JSON.stringify(RC_STATS || ''),
       'process.env.GIT_REVISION': JSON.stringify(git_revision || ''),
     }),
   ],

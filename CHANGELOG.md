@@ -1,5 +1,17 @@
 # Semantic Versioning Changelog
 
+## [1.42.1](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.42.0...v1.42.1) (2025-04-21)
+
+
+### Bug Fixes
+
+* add exploitation storage ([1b54385](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/1b54385e84351e7b2d169cb2d4d76722605404fc))
+* add index query params mode ([17e1bc7](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/17e1bc791f06e9629aee7e717382cb235d52d9f8))
+* delete roles allowed ([05a14cf](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/05a14cf5dd47f844be96bc51462bc7360e898462))
+* disabled delete model ([b1211cd](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/b1211cdf94990b955e41793f54f58b8d5343de2d))
+* get query parametrs ([8899d28](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/8899d28a78e81bee11aa5793d6df6d69f7f010b3))
+* selected exploitation modes ([47e30fe](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/47e30fe65748a902fd05351f58c6873cb0e0396e))
+
 # [1.42.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.41.1...v1.42.0) (2025-04-11)
 
 
