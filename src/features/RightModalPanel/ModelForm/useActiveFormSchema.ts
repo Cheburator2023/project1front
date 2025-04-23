@@ -1,7 +1,7 @@
 /* eslint-disable no-sequences */
 /* eslint-disable no-return-assign */
 /* eslint-disable no-constant-condition */
-import { useCallback, useEffect, useState } from 'react';
+import { useState } from 'react';
 import { MODEL_FORM_MODE } from '@shared/constants';
 import { Row } from '@shared/types';
 import { INPUT_TYPE } from '@shared/ui/organisms';
