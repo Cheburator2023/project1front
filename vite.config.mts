@@ -76,9 +76,9 @@ export const viteCommonConfig = ({ appName, base = '/' }: { appName?: string; ba
         react({
           // jsxImportSource: '@emotion/react',
           // extra babel plugins
-          // babel: {
-          //   plugins: ['@emotion/babel-plugin'],
-          // },
+          babel: {
+            plugins: ['./plugins/babel/babel-plugin-react-add-test-id.js'],
+          },
         }),
         svgr({
           dimensions: false,
