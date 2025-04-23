@@ -16,7 +16,6 @@ interface UseFormFieldsProps {
   initialRow?: Partial<Row>;
   showAllFields?: boolean;
   currentCustomer: CUSTOMER_TYPE;
-  activeModelByDefault?: boolean;
   wasPreviouslyActiveModel?: boolean;
 }
 
