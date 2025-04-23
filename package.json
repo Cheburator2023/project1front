@@ -3,10 +3,18 @@
   "version": "1.0.0",
   "description": "",
   "private": true,
-  "release_logs": {
-    "features": [],
-    "fixes": [],
-    "refactors": [],
+  "release_stats": {
+    "features": [
+      "feat/ag_grid_overhaul"
+    ],
+    "fixes": [
+      "fix/ds_lead_ds_active_model",
+      "fix/new_table_qa_fixes"
+    ],
+    "refactors": [
+      "refactor/data-test-ids-added",
+      "refactor/rc_stats_parsing_webpack_vite"
+    ],
     "hotfixes": []
   },
   "engines": {
