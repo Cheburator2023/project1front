@@ -1,5 +1,14 @@
 # Semantic Versioning Changelog
 
+## [1.42.2](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.42.1...v1.42.2) (2025-04-24)
+
+
+### Bug Fixes
+
+* active model logic altered, roles added ([4d716de](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/4d716de004d9a17fab8ee11ccb992a3455e30493))
+* active model logic altered, roles added, debug vars deleted ([0e73014](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/0e730143c980ae2d6d606383a51b55ef16d73364))
+* is edit by rating model ([4fb79ef](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/4fb79efb7c49f6409c807de88d7d82f2bdec3e31))
+
 ## [1.42.1](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.42.0...v1.42.1) (2025-04-21)
 
 
