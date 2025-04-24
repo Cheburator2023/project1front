@@ -79,7 +79,7 @@ export const ModelForm = ({
 
   const isEditByRatingModel =
     formMode === MODEL_FORM_MODE.ADD || isValidator || isValidatorLead || isBusinessCustomer;
-  const hasNoAccessToActiveModel = true || isDs || isDsLead;
+  const hasNoAccessToActiveModel = isDs || isDsLead;
 
   const errorElemRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
