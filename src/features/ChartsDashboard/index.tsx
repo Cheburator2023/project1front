@@ -249,14 +249,20 @@ const ChartsDashboard = () => {
       series: [
         {
           ...modelDynamicsByStreams.series[0],
-          data: [metricsData.tasks.datasources],
-        },
-        {
-          ...modelDynamicsByStreams.series[1],
-          data: [metricsData.tasks.validation],
+          data: [
+            metricsData.tasks.ds_lead,
+            metricsData.tasks.ds,
+            metricsData.tasks.de_lead,
+            metricsData.tasks.de,
+            metricsData.tasks.modelops_lead,
+            metricsData.tasks.modelops,
+            metricsData.tasks.business_customer,
+            metricsData.tasks.validator_lead,
+            metricsData.tasks.validator,
+          ],
         },
       ],
-    });
+    });    
   }, [metricsData]);
 
   const handleDateChange = (newDateRange: string | undefined) => {
