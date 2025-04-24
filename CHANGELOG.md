@@ -1,5 +1,98 @@
 # Semantic Versioning Changelog
 
+## [1.42.1](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.42.0...v1.42.1) (2025-04-21)
+
+
+### Bug Fixes
+
+* add exploitation storage ([1b54385](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/1b54385e84351e7b2d169cb2d4d76722605404fc))
+* add index query params mode ([17e1bc7](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/17e1bc791f06e9629aee7e717382cb235d52d9f8))
+* delete roles allowed ([05a14cf](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/05a14cf5dd47f844be96bc51462bc7360e898462))
+* disabled delete model ([b1211cd](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/b1211cdf94990b955e41793f54f58b8d5343de2d))
+* get query parametrs ([8899d28](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/8899d28a78e81bee11aa5793d6df6d69f7f010b3))
+* selected exploitation modes ([47e30fe](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/47e30fe65748a902fd05351f58c6873cb0e0396e))
+
+# [1.42.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.41.1...v1.42.0) (2025-04-11)
+
+
+### Features
+
+* **docker:** up version ([ddbe443](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/ddbe443113f33aa62c5da4c8c681f983789ff38f))
+
+## [1.41.1](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.41.0...v1.41.1) (2025-04-11)
+
+
+### Bug Fixes
+
+* add default archive ([6af3dde](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/6af3ddecefb4931623ca90021b88bd057a035614))
+
+# [1.41.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.40.2...v1.41.0) (2025-04-10)
+
+
+### Bug Fixes
+
+* refactoring usefetch ([52259da](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/52259dac264c63c17cd667ac5a03316697500bf4))
+
+
+### Features
+
+* add exploitation mode filters ([bbc8f65](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/bbc8f65e2ab350b67ac9951e88bff1d2a31ae5a1))
+* new attributes ([4a8b967](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/4a8b967d68053274da30139bab28545266980ec4))
+
+## [1.40.2](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.40.1...v1.40.2) (2025-04-04)
+
+
+### Bug Fixes
+
+* enable allocation extension until april ([79a7db2](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/79a7db2c607f2b4e9a590d7d2aabb2f11f83f903))
+
+## [1.40.1](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.40.0...v1.40.1) (2025-04-03)
+
+
+### Bug Fixes
+
+* enable allocation extension until april ([5a4e067](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/5a4e06704b3ee2da8e68d0e78f4bd6f94c63d010))
+
+# [1.40.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.39.1...v1.40.0) (2025-03-28)
+
+
+### Features
+
+* **docker:** up version ([60e669a](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/60e669a5cebac085bde006ba0727df3f177314b9))
+
+## [1.39.1](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.39.0...v1.39.1) (2025-03-26)
+
+
+### Bug Fixes
+
+* allocation disabled and exclude error dashboards ([e951d6d](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/e951d6d450d67a859795e5eaea3e3492cb45e892))
+
+# [1.39.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.38.0...v1.39.0) (2025-03-14)
+
+
+### Bug Fixes
+
+* developing report required ([5c45027](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/5c45027665b4d15c7e27d22291fd26165915a22f))
+
+
+### Features
+
+* **readme:** up version ([8e4244d](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/8e4244dd6488e4daf4be63659966b8cf53d0547e))
+
+# [1.38.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.37.1...v1.38.0) (2025-03-10)
+
+
+### Bug Fixes
+
+* form logging added wip ([ee80d16](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/ee80d16f53b6e625ea413e1233fbdb7bdd69bf3b))
+* no artifact in schemas fix ([ef8d6d7](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/ef8d6d73c389dc256aa5b66534e63f98b038a4cf))
+
+
+### Features
+
+* allocation q4 ([26d9482](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/26d948220f35de0518e6dffe57b8a982e58fc57d))
+* allocation q4 ([7a3ca95](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/7a3ca9596918113134dc1770fb4c1e8a6853c683))
+
 ## [1.37.1](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.37.0...v1.37.1) (2025-02-28)
 
 

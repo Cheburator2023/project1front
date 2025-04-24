@@ -368,7 +368,7 @@ export const DeleteModelForm = ({
     return (
       <>
         <T font="Caption/Caption 1" color="Neutral/Neutral 50" as="div">
-          Вы действительно хотите удалить модель?
+          Вы подтверждаете удаление модели?
         </T>
         <ButtonContainer>
           <Button

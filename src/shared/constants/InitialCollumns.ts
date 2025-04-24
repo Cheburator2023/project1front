@@ -648,21 +648,6 @@ export const initialColumns: Array<Column> = [
     type: COLUMN_TYPE.DATE,
   },
   {
-    name: 'model_status',
-    title: 'Этап ЖЦМ',
-    type: COLUMN_TYPE.STRING,
-  },
-  {
-    name: 'model_status_assignee',
-    title: 'Исполнитель текущего этапа ЖЦМ',
-    type: COLUMN_TYPE.STRING,
-  },
-  {
-    name: 'developing_model_reason',
-    title: 'Основание для разработки',
-    type: COLUMN_TYPE.STRING,
-  },
-  {
     name: 'pvr',
     title: 'ПВР',
     type: COLUMN_TYPE.STRING,
@@ -692,6 +677,36 @@ export const initialColumns: Array<Column> = [
   {
     name: 'status',
     title: 'Cтатус',
+    type: COLUMN_TYPE.STRING,
+  },
+  {
+    name: 'model_status',
+    title: 'Этап ЖЦМ',
+    type: COLUMN_TYPE.STRING,
+  },
+  {
+    name: 'model_status_assignee',
+    title: 'Исполнитель текущего этапа ЖЦМ',
+    type: COLUMN_TYPE.STRING,
+  },
+  {
+    name: 'developing_model_reason',
+    title: 'Основание для разработки',
+    type: COLUMN_TYPE.STRING,
+  },
+  {
+    name: 'output_table',
+    title: 'Выходная таблица',
+    type: COLUMN_TYPE.STRING,
+  },
+  {
+    name: 'allocation_assessment_class',
+    title: 'Класс оценки аллокаций',
+    type: COLUMN_TYPE.STRING,
+  },
+  {
+    name: 'allocation_assessment_parameters',
+    title: 'Параметры оценки аллокаций',
     type: COLUMN_TYPE.STRING,
   },
 ];
@@ -847,6 +862,9 @@ export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
   model_creator: [],
   reason_model_delete: [],
   status: [],
+  output_table: [],
+  allocation_assessment_class: [],
+  allocation_assessment_parameters: [],
   model_name_dadm: [],
   custom_model_id: [],
   custom_model_type: [],

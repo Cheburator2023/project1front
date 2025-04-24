@@ -7,7 +7,6 @@ const initialTopFilters: TopFilters = {
   tags: [],
   objectTypeRegistry: [],
   dates: [],
-  exploitation: [],
 };
 
 const modelsSelectOptions = {
@@ -45,31 +44,5 @@ const tagsSelectOptions = {
   ],
 } as SelectTagsProps;
 
-const exploitationSelectOptions = {
-  type: SELECT_TYPE.STRING,
-  options: [
-    {
-      value: 'Active',
-      text: 'Действующая',
-    },
-    {
-      value: 'Pilot',
-      text: 'Пилотирование',
-    },
-    {
-      value: 'Exploitation',
-      text: 'Эксплуатации (модели)',
-    },
-    {
-      value: 'Develop',
-      text: 'Разработка',
-    },
-    {
-      value: 'Archive',
-      text: 'Архив',
-    },
-  ],
-} as SelectStringProps;
-
-export { tagsSelectOptions, modelsSelectOptions, exploitationSelectOptions, initialTopFilters };
+export { tagsSelectOptions, modelsSelectOptions, initialTopFilters };
 

@@ -20,9 +20,6 @@ type FormFieldsSchema = Array<{
   valueConditions?: FormFieldValueConditions;
   disabledConditions?: FormFieldConditions | string[];
   enabledByValueConditions?: FormFieldValueConditions;
-  businessCustomerAllowed?: boolean;
-  modelCreatorAllowed?: boolean;
-  rolesAllowed?: UserRoles;
   alwaysDisabled?: boolean;
   schemaKey?: string;
   schemaOrder?: number;

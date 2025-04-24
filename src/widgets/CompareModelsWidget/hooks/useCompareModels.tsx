@@ -11,11 +11,29 @@ import {
 } from '@shared/api';
 import { filterColumnsByColumnsFilters } from '@shared/helpers';
 import { CellWrapper, CellContentFactory } from '@entities';
-import { useExcludeErrorStore } from '@src/shared/stores';
+import { useExploitationModeStore } from '@src/shared/stores';
 
 import { initialColumns } from '@src/shared/constants';
 import { compareValues, prepareFetchParams, processFetchData } from '../helpers';
 import { TableRow } from '../../../shared/ui';
+
+export const getQueryParams = (
+  firstDate: string,
+  secondDate: string,
+  selectedExploitationModes: string[],
+) => {
+  let params: Record<string, any> = {};
+
+  if (firstDate && secondDate) {
+    params = prepareFetchParams(firstDate, secondDate);
+  }
+
+  selectedExploitationModes.forEach((mode, i) => {
+    params[`mode[${i}]`] = mode;
+  });
+
+  return params;
+};
 
 export const useCompareModels = (columnsFilters: Partial<ColumnsFilter>) => {
   const cellRef = useRef(null);
@@ -38,7 +56,9 @@ export const useCompareModels = (columnsFilters: Partial<ColumnsFilter>) => {
   const [page, setPage] = useState(1);
   const [totalRows, setTotalRows] = useState<number>(0);
 
-  const { excludeError } = useExcludeErrorStore();
+  const selectedExploitationModes = useExploitationModeStore(
+    (state) => state.selectedExploitationModes,
+  );
 
   const { mutationProtectedFetch } = useFetch({});
 
@@ -50,14 +70,6 @@ export const useCompareModels = (columnsFilters: Partial<ColumnsFilter>) => {
     setLoading(true);
     setError(null);
     try {
-      let params: Record<string, any> = {};
-
-      if (firstDate && secondDate) {
-        params = prepareFetchParams(firstDate, secondDate);
-      }
-
-      params.excludeError = excludeError.toString();
-
       const res = await mutationProtectedFetch<
         CompareModelsResponseType,
         CompareModelsResponseType
@@ -65,7 +77,7 @@ export const useCompareModels = (columnsFilters: Partial<ColumnsFilter>) => {
         fetchApiRoute: API_ROUTES.COMPARE_MODELS,
         fetchMethod: 'GET',
         mockedResponse: mockedModelsCompareResponse,
-        newParams: params,
+        newParams: getQueryParams(firstDate, secondDate, selectedExploitationModes),
       });
 
       if (res?.error) {

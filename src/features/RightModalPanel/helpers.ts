@@ -29,8 +29,6 @@ import {
 import { ArtifactGroup } from '@src/shared/api/types';
 import { concat, uniqBy } from 'lodash';
 import { CUSTOMER_MAP, CUSTOMER_TYPE } from '@src/shared/constants/customers';
-import { useUserStore } from '@src/shared/stores';
-import { isInBusinessCustomers, isModelCreator } from '@src/shared/helpers';
 import {
   FormFieldConditions,
   FormFieldValueConditions,
@@ -359,118 +357,91 @@ export const getStartDateInCurrentYear = (startDate: Date) => {
   return startDate;
 };
 
-const ENABLE_FEBRUARY_EXTENSION = false; // Можно переключать на false при необходимости
+const ENABLE_FEBRUARY_EXTENSION = false;
 const ENABLE_MARCH_EXTENSION = false;
+const ENABLE_4Q_EXTENSION_UNTIL_APRIL_13 = true;
 
 const getDateLimits = (quarter: number) => {
   const currentDate = new Date();
   const currentYear = currentDate.getFullYear();
+  const currentQuarter = Math.floor((currentDate.getMonth() + 3) / 3); // TODO: Преобразуем месяц (0-11) в квартал (1-4)
 
-  // Если запрашиваемый квартал — 4 и текущий квартал — 1, использовать прошлый год
-  const effectiveYear = quarter === 4 && currentDate.getMonth() < 3 ? currentYear - 1 : currentYear;
+  // TODO: Если просят 4-й квартал, а сейчас 1-й или 2-й, значит речь о прошлом годе — корректируем effectiveYear
+  const effectiveYear = quarter === 4 && currentQuarter <= 2 ? currentYear - 1 : currentYear;
 
-  const firstDateOfEffectiveYear = startOfYear(new Date(effectiveYear, 0, 1));
-  const minDate = addMonths(firstDateOfEffectiveYear, (quarter - 1) * 3);
-  let maxDate = endOfQuarter(minDate);
+  const firstDateOfEffectiveYear = startOfYear(new Date(effectiveYear, 0, 1)); // TODO: Получаем 1 января effectiveYear
+  const minDate = addMonths(firstDateOfEffectiveYear, (quarter - 1) * 3); // TODO: Старт квартала
+  let maxDate = endOfQuarter(minDate); // TODO: По умолчанию — конец квартала
 
-  // Продление максимальной даты для 4-го квартала до конца февраля
+  // TODO: Специальная логика продления срока редактирования для 4 квартала
   if (quarter === 4) {
-    if (ENABLE_MARCH_EXTENSION) {
-      // Продление максимальной даты для 4-го квартала до конца марта
-      maxDate = new Date(effectiveYear + 1, 2, 31, 23, 59, 59); // Месяц 2 = март
+    if (ENABLE_4Q_EXTENSION_UNTIL_APRIL_13) {
+      maxDate = new Date(`${effectiveYear + 1}-04-13T23:59:59`);
+      // TODO: Если включено продление — разрешаем редактирование до 13 апреля следующего года
+    } else if (ENABLE_MARCH_EXTENSION) {
+      maxDate = new Date(`${effectiveYear + 1}-03-31T23:59:59`);
+      // TODO: Альтернативное продление — до конца марта
     } else if (ENABLE_FEBRUARY_EXTENSION) {
-      // Продление максимальной даты для 4-го квартала до конца февраля
-      maxDate = new Date(effectiveYear + 1, 1, 28, 23, 59, 59); // Месяц 1 = февраль
+      maxDate = new Date(`${effectiveYear + 1}-02-28T23:59:59`);
+      // TODO: Продление только до конца февраля
     } else {
-      // По умолчанию — до конца января
-      maxDate = new Date(effectiveYear + 1, 0, 31, 23, 59, 59); // Месяц 0 = январь
+      maxDate = new Date(`${effectiveYear + 1}-01-31T23:59:59`);
+      // TODO: Без продления — редактирование доступно только до конца января
     }
   }
-  return {
-    minDate,
-    maxDate,
-  };
+
+  return { minDate, maxDate };
 };
 
-const getDisabledStatus = (
-  minDate: Date,
-  maxDate: Date,
-  quarter: number,
-  activeRow: Partial<Row> | undefined,
-) => {
+const getDisabledStatus = (minDate: Date, maxDate: Date, quarter: number, canEdit?: boolean) => {
+  if (!canEdit) return true; // TODO: Если редактирование отключено по правам — сразу запрещаем
+
   const currentDate = new Date();
-  const currentQuarter = Math.floor((currentDate.getMonth() + 3) / 3);
+  const currentQuarter = Math.floor((currentDate.getMonth() + 3) / 3); // TODO: Вычисляем текущий квартал
 
-  // TODO: Временно отключаем все поля для sum-rm, пересмотреть позже
-  if (activeRow?.model_source === ModelSource.SUM_RM) {
+  if (quarter === 4) {
+    // TODO: Для 4 квартала в Q1 и Q2 разрешаем редактирование до maxDate (в зависимости от флагов)
+    if (currentQuarter === 1 || currentQuarter === 2) {
+      return !isWithinInterval(currentDate, { start: minDate, end: maxDate });
+    }
+
+    // TODO: В остальных случаях редактирование запрещено
     return true;
   }
 
-  const startOfCurrentQuarter = new Date(currentDate.getFullYear(), (currentQuarter - 1) * 3, 1);
-  const monthAfterStartOfCurrentQuarter = addMonths(startOfCurrentQuarter, 1);
+  // TODO: Нельзя редактировать будущие кварталы
+  if (quarter > currentQuarter) return true;
 
-  if (currentQuarter === 1 && quarter === 4) {
-    return !isWithinInterval(currentDate, { start: minDate, end: maxDate });
-  }
+  // TODO: Нельзя редактировать кварталы старше чем на 1 назад
+  if (quarter < currentQuarter - 1) return true;
 
-  if (quarter > currentQuarter) {
-    return true;
-  }
+  const startOfCurrentQuarter = new Date(currentDate.getFullYear(), (currentQuarter - 1) * 3, 1); // TODO: Получаем 1 число текущего квартала
+  const monthAfterStartOfCurrentQuarter = addMonths(startOfCurrentQuarter, 1); // TODO: Один месяц после начала квартала
 
-  if (quarter < currentQuarter - 1) {
-    return true;
-  }
-
+  // TODO: Если мы в первом месяце текущего квартала, можно редактировать предыдущий квартал
   if (currentDate < monthAfterStartOfCurrentQuarter && quarter === currentQuarter - 1) {
     return false;
   }
 
-  return !isWithinInterval(currentDate, {
-    start: minDate,
-    end: maxDate,
-  });
+  // TODO: В остальных случаях проверяем, попадает ли дата в разрешённый интервал
+  return !isWithinInterval(currentDate, { start: minDate, end: maxDate });
 };
 
-const isUserAllowedForField = (
-  fieldSchema?: FormFieldsSchema[number],
-  row?: Partial<Row> | undefined,
-): boolean | undefined => {
-  const { hasRole } = useUserStore.getState();
+const canEditArtefact = (artifact?: Artifact, row?: Partial<Row>): boolean => {
+  if (!artifact) return false;
+  if (!row) return true;
 
-  if (
-    !fieldSchema?.rolesAllowed &&
-    !fieldSchema?.businessCustomerAllowed &&
-    !fieldSchema?.modelCreatorAllowed
-  ) {
-    return true;
+  const isEditableBySum = artifact.is_editable_by_role_sum === '1';
+  const isEditableBySumRm = artifact.is_editable_by_role_sum_rm === '1';
+
+  switch (row.model_source) {
+    case ModelSource.SUM:
+      return isEditableBySum;
+    case ModelSource.SUM_RM:
+      return isEditableBySumRm;
+    default:
+      return false;
   }
-
-  const rolesAllowed = fieldSchema?.rolesAllowed?.some((role: Role) => hasRole(role));
-  const businessCustomerAllowed =
-    fieldSchema?.businessCustomerAllowed && isInBusinessCustomers(row);
-  const modelCreatorAllowed = fieldSchema?.modelCreatorAllowed && isModelCreator(row);
-
-  return rolesAllowed || businessCustomerAllowed || modelCreatorAllowed;
-};
-
-const canEditArtefact = (artifact?: Artifact, row?: Partial<Row> | undefined): boolean => {
-  if (!artifact) {
-    return false;
-  }
-
-  if (!row) {
-    return true;
-  }
-
-  if (row.model_source === ModelSource.SUM_RM) {
-    return artifact.is_editable_by_role_sum_rm === '1';
-  }
-
-  if (row.model_source === ModelSource.SUM) {
-    return artifact.is_editable_by_role_sum === '1';
-  }
-
-  return false;
 };
 
 const isFieldDisabled = (
@@ -478,12 +449,9 @@ const isFieldDisabled = (
   fieldSchema?: FormFieldsSchema[number],
   artifact?: Artifact,
   row?: Partial<Row> | undefined,
+  canEdit?: boolean,
 ): boolean | undefined => {
   if (fieldSchema?.alwaysDisabled) {
-    return true;
-  }
-
-  if (!isUserAllowedForField(fieldSchema, row)) {
     return true;
   }
 
@@ -502,7 +470,7 @@ const isFieldDisabled = (
   const isControlledByConditions =
     fieldSchema?.enabledByValueConditions && isDisabledByValueConditions && isDisabledByConditions;
 
-  const isDisabledArtifactBySource = !canEditArtefact(artifact, row);
+  const isDisabledArtifactBySource = !canEdit;
 
   return isGloballyDisabled || isControlledByConditions || isDisabledArtifactBySource;
 };
@@ -515,7 +483,9 @@ const mapArtifactToField = (
   activeRow?: Partial<Row>,
   values?: FormValues,
 ): InputFactoryProps<keyof Row> => {
-  const isDisabled = isFieldDisabled(values, fieldSchema, artifact, activeRow);
+  const canEdit = canEditArtefact(artifact, activeRow);
+
+  const isDisabled = isFieldDisabled(values, fieldSchema, artifact, activeRow, canEdit);
 
   const commonAttributes: CommonInputProps<keyof Row> = {
     id: artifact.artefact_id.toString(),
@@ -585,7 +555,7 @@ const mapArtifactToField = (
 
       // Вычисление минимальной и максимальной даты для квартала
       const { minDate, maxDate } = getDateLimits(fields);
-      const quarterDisabledStatus = getDisabledStatus(minDate, maxDate, fields, activeRow);
+      const quarterDisabledStatus = getDisabledStatus(minDate, maxDate, fields, canEdit);
 
       return {
         ...commonAttributes,
@@ -657,7 +627,7 @@ const mapArtifactToField = (
       // ****
 
       const { minDate, maxDate } = getDateLimits(fields);
-      const quarterDisabledStatus = getDisabledStatus(minDate, maxDate, fields, activeRow);
+      const quarterDisabledStatus = getDisabledStatus(minDate, maxDate, fields, canEdit);
 
       return {
         ...commonAttributes,

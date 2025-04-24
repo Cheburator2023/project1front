@@ -7,6 +7,7 @@ import { ReactComponent as DownloadOutline } from '@admiral-ds/icons/build/syste
 import { ErrorStatus, Loading } from '@src/shared/ui/atoms';
 import { API_ROUTES, mockedMetricsResponse, useFetch } from '@src/shared/api';
 import { MetricsResponseType } from '@src/shared/api/types';
+import { useExploitationModeStore } from '@src/shared/stores';
 
 import { switchDateFormat, validateDateRange } from './helpers';
 import {
