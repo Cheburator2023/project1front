@@ -75,8 +75,9 @@ export const ModelForm = ({
     { connectedName: string; connectedValue: string }[] | undefined
   >(undefined);
 
-  const { isValidator, isValidatorLead, isBusinessCustomer } = useRoles();
-
+  const { isValidator, isValidatorLead, isBusinessCustomer, isDs, isDsLead } = useRoles();
+  
+  const hasNoAccessToActiveModel = isDs || isDsLead;
   const isEditByRatingModel = isValidator || isValidatorLead || isBusinessCustomer;
 
   const errorElemRef = useRef<HTMLDivElement>(null);
@@ -90,7 +91,9 @@ export const ModelForm = ({
     values,
     initialRow,
     mode: formMode,
-    activeModelByDefault,
+    activeModelByDefault: hasNoAccessToActiveModel
+      ? wasPreviouslyActiveModel
+      : activeModelByDefault,
   });
 
   const { fields } = useFormFields({
@@ -101,7 +104,6 @@ export const ModelForm = ({
     artifacts,
     showAllFields,
     currentCustomer,
-    activeModelByDefault,
     wasPreviouslyActiveModel,
   });
 
@@ -289,16 +291,19 @@ export const ModelForm = ({
 
   const handleSubmit = useCallback(
     async ({ checkOnly = false }: SubmitType) => {
-      const valuesWithAddedOutsideControls: FormValues = {
+      const valuesWithAddedOutsideControls = {
         ...values,
         active_model: {
           type: INPUT_TYPE.FLAG,
-          value: activeModelByDefault || false,
+          value: hasNoAccessToActiveModel
+            ? wasPreviouslyActiveModel
+            : activeModelByDefault || false,
         },
       };
+
       const newInvalidFields = getInvalidFields(
         formSchema,
-        valuesWithAddedOutsideControls,
+        valuesWithAddedOutsideControls as any,
         wasPreviouslyActiveModel,
         fields,
       );
@@ -329,7 +334,10 @@ export const ModelForm = ({
         return;
       }
 
-      const artifactApiItems = getArtifactApiItems(valuesWithAddedOutsideControls, parentModelId);
+      const artifactApiItems = getArtifactApiItems(
+        valuesWithAddedOutsideControls as any,
+        parentModelId,
+      );
 
       // TODO: check this type
       let newRow: Row | undefined;
@@ -340,6 +348,11 @@ export const ModelForm = ({
         const { system_model_id, model_source } = initialRow;
         console.log('📝 FORM LOGS: ~ system_model_id:', system_model_id);
         console.log('📝 FORM LOGS: ~ model_source:', model_source);
+        console.log('📝 FORM LOGS: ~ sent artifacts:', artifactApiItems);
+        console.log(
+          '📝 FORM LOGS: ~ sent valuesWithAddedOutsideControls:',
+          valuesWithAddedOutsideControls,
+        );
 
         if (system_model_id && model_source) {
           // TODO: fix response type and structure and input type ModelEditApi[]
@@ -390,7 +403,7 @@ export const ModelForm = ({
         setSubmitError('');
       }
     },
-    [values, formSchema, formMode, activeModelByDefault, fields],
+    [values, formSchema, formMode, activeModelByDefault, hasNoAccessToActiveModel, fields],
   );
 
   const handleChangeParentModel = useCallback(
@@ -432,15 +445,17 @@ export const ModelForm = ({
   }, [initialRow, artifacts]);
 
   useEffect(() => {
-    if (!isEditByRatingModel) {
-      setActiveModelByDefault(false);
-      return;
-    }
+    if (!hasNoAccessToActiveModel) {
+      if (!isEditByRatingModel) {
+        setActiveModelByDefault(false);
+        return;
+      }
 
-    if (activeRow?.active_model === '1') {
-      setActiveModelByDefault(true);
+      if (activeRow?.active_model === '1') {
+        setActiveModelByDefault(true);
+      }
     }
-  }, [activeRow?.active_model, isEditByRatingModel]);
+  }, [activeRow?.active_model, isEditByRatingModel, hasNoAccessToActiveModel]);
 
   // Scroll to edit input field
   useEffect(() => {
@@ -507,7 +522,7 @@ export const ModelForm = ({
             <CheckboxField
               id="activeModelByDefault_checkbox"
               dimension="s"
-              checked={activeModelByDefault}
+              checked={hasNoAccessToActiveModel ? wasPreviouslyActiveModel : activeModelByDefault}
               onChange={activeModelCheckboxHandler}
               disabled={!isEditByRatingModel}
             >
