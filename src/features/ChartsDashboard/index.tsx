@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react';
 import html2canvas from 'html2canvas';
 import JS_PDF from 'jspdf';
 import { Button, Spinner } from '@admiral-ds/react-ui';
+import qs from 'qs';
 import { ReactComponent as DownloadOutline } from '@admiral-ds/icons/build/system/DownloadOutline.svg';
 
 import { ErrorStatus, Loading } from '@src/shared/ui/atoms';
 import { API_ROUTES, mockedMetricsResponse, useFetch } from '@src/shared/api';
 import { MetricsResponseType } from '@src/shared/api/types';
-import { useExploitationModeStore } from '@src/shared/stores';
 
 import { switchDateFormat, validateDateRange } from './helpers';
 import {
@@ -27,6 +27,9 @@ import {
   initialOnMonitoringModels,
   initialTakenOutOfOperationModels,
   dsStreamArtifactOptions,
+  metricsOptions,
+  itemsExport,
+  metricLabelMap,
 } from './constants';
 import MetricDisplay from './MetricDisplay';
 import './styles.css';
@@ -106,6 +109,8 @@ const ChartsDashboard = () => {
     mockedResponse: mockedMetricsResponse,
   });
 
+  const { mutationProtectedFetch } = useFetch({});
+
   // const [kpiSum, setKpiSum] = useState(initialKPI_SUM);
   const [totalModels, setTotalModels] = useState(initialTotalModels);
   const [implementedModels, setImplementedModels] = useState(initialImplementedModels);
@@ -141,10 +146,8 @@ const ChartsDashboard = () => {
 
   const [dateError, setDateError] = useState<boolean>(false);
 
-  const itemsExport = [
-    { id: 'pdf', label: 'Экспортировать в PDF', value: 'PDF' },
-    { id: 'png', label: 'Экспортировать в PNG', value: 'PNG' },
-  ];
+  const [selectedMetric, setSelectedMetric] = useState<string | undefined>();
+  const [isExportingMetric, setIsExportingMetric] = useState(false);
 
   useEffect(() => {
     if (!metricsData) return;
@@ -291,8 +294,6 @@ const ChartsDashboard = () => {
     const { tempStartDate, tempEndDate, tempSelectedStreams } = tempFilters;
 
     if (tempStartDate && tempEndDate) {
-      console.log('handleApplyFilters ~ tempStartDate:', tempStartDate);
-      console.log('handleApplyFilters ~ tempEndDate:', tempEndDate);
       const formattedStartDate = tempStartDate ? switchDateFormat(tempStartDate) : undefined;
       const formattedEndDate = tempEndDate ? switchDateFormat(tempEndDate) : undefined;
 
@@ -324,6 +325,8 @@ const ChartsDashboard = () => {
       tempEndDate: undefined,
       tempSelectedStreams: dsStreamArtifactOptions.options.map((option) => option.value),
     });
+
+    setSelectedMetric(undefined);
 
     setDateError(false);
     refetchMetrics();
@@ -439,6 +442,39 @@ const ChartsDashboard = () => {
     handleExport(value);
   };
 
+  const handleExportSelectedMetric = async () => {
+    if (!selectedMetric) return;
+
+    setIsExportingMetric(true);
+
+    const queryParams = {
+      metric: selectedMetric,
+      startDate: tempFilters.tempStartDate && switchDateFormat(tempFilters.tempStartDate),
+      endDate: tempFilters.tempEndDate && switchDateFormat(tempFilters.tempEndDate),
+      stream: tempFilters.tempSelectedStreams,
+    };
+
+    const queryString = qs.stringify(queryParams, { arrayFormat: 'repeat' });
+
+    const today = new Date();
+    const dateStr = `${String(today.getDate()).padStart(2, '0')}.${String(
+      today.getMonth() + 1,
+    ).padStart(2, '0')}.${today.getFullYear()}`;
+
+    const readableLabel = metricLabelMap[selectedMetric] || selectedMetric;
+
+    try {
+      await mutationProtectedFetch<void, Blob>({
+        fetchApiRoute: `${API_ROUTES.METRICS_EXPORT}?${queryString}` as any,
+        fetchMethod: 'GET',
+        fileName: `${readableLabel} ${dateStr}.xlsx`,
+      });
+    } catch (error) {
+    } finally {
+      setIsExportingMetric(false);
+    }
+  };
+
   if (errorMetrics) {
     return (
       <StatusWrapper>
@@ -477,6 +513,18 @@ const ChartsDashboard = () => {
               onChange={handleStreamChange}
             />
 
+            <CustomSearchSelect
+              id="metric-select"
+              label="Метрика для выгрузки"
+              name="selectedMetric"
+              options={metricsOptions}
+              multiple={false}
+              selectAllEnabled={false}
+              selectEmptyEnabled={false}
+              selectedValues={selectedMetric ? [selectedMetric] : []}
+              onChange={(_, [value]) => setSelectedMetric(value)}
+            />
+
             <ButtonContainer>
               <Button
                 dimension="s"
@@ -486,6 +534,15 @@ const ChartsDashboard = () => {
                 disabled={dateError}
               >
                 Применить
+              </Button>
+              <Button
+                dimension="s"
+                appearance="primary"
+                onClick={handleExportSelectedMetric}
+                disabled={!selectedMetric}
+                loading={isExportingMetric}
+              >
+                Выгрузить метрику
               </Button>
               <Button
                 dimension="s"
