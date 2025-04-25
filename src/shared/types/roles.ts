@@ -6,6 +6,9 @@ export enum Role {
   BUSINESS_CUSTOMER = 'business_customer',
   DS = 'ds',
   DS_LEAD = 'ds_lead',
+  MODEL_OPS = 'modelops',
+  MODEL_OPS_LEAD = 'modelops_lead',
+  MIPM = 'mipm',
 }
 
 export type UserRoles = Role[];

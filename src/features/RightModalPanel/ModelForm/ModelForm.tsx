@@ -75,9 +75,18 @@ export const ModelForm = ({
     { connectedName: string; connectedValue: string }[] | undefined
   >(undefined);
 
-  const { isValidator, isValidatorLead, isBusinessCustomer, isDs, isDsLead } = useRoles();
-  
-  const hasNoAccessToActiveModel = isDs || isDsLead;
+  const {
+    isValidator,
+    isValidatorLead,
+    isBusinessCustomer,
+    isDs,
+    isDsLead,
+    isModelOps,
+    isModelOpsLead,
+    isMIPM,
+  } = useRoles();
+
+  const hasNoAccessToActiveModel = isDs || isDsLead || isModelOps || isModelOpsLead || isMIPM;
   const isEditByRatingModel = isValidator || isValidatorLead || isBusinessCustomer;
 
   const errorElemRef = useRef<HTMLDivElement>(null);
