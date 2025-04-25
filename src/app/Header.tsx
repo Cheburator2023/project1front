@@ -13,7 +13,7 @@ import { Loading, Tooltip } from '@shared/ui/atoms';
 import { IconButton } from '@shared/ui/molecules';
 import { API_ROUTES, useFetch, ReportApi } from '@shared/api';
 
-import { useExcludeErrorStore } from '@src/shared/stores';
+import { useExploitationModeStore } from '@src/shared/stores';
 import { ReactComponent as LogoIcon } from './logo.svg';
 import { ColumnsFilter } from '../shared/types';
 import { ROUTES } from './Routes';
@@ -96,14 +96,16 @@ const Header = ({
 }: HeaderProps) => {
   const sumBtnRef = useRef(null);
   const { mutationProtectedFetch } = useFetch({});
-  const { excludeError } = useExcludeErrorStore();
+  const selectedExploitationModes = useExploitationModeStore(
+    (state) => state.selectedExploitationModes,
+  );
 
   useEffect(() => {
     if (columnsFilters && downloadReportStatus) {
       mutationProtectedFetch<ReportApi, Blob>({
         body: {
           filters: columnsFilters,
-          excludeError,
+          mode: selectedExploitationModes,
         },
         fetchApiRoute: API_ROUTES.REPORT,
         fetchMethod: 'POST',
@@ -113,7 +115,7 @@ const Header = ({
         updateColumnsFilters(undefined);
       });
     }
-  }, [columnsFilters, downloadReportStatus, excludeError]);
+  }, [columnsFilters, downloadReportStatus, selectedExploitationModes]);
 
   const userName =
     user?.family_name && user?.given_name

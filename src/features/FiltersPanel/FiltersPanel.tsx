@@ -2,10 +2,10 @@ import React, { useContext } from 'react';
 import { Button, Checkbox, T, Toggle } from '@admiral-ds/react-ui';
 import { Template, FiltersContext } from '@shared/api';
 import { CustomSearchSelect } from '@shared/ui/organisms';
+import { useExploitationModeStore } from '@src/shared/stores';
 import {
   ACTIVE_SCREEN,
   RIGHT_PANEL_TYPE,
-  exploitationSelectOptions,
   initialColumnsFilters,
   modelsSelectOptions,
 } from '@shared/constants';
@@ -47,6 +47,9 @@ export const FiltersPanel = ({
     columnsFilters,
   } = useContext(FiltersContext);
 
+  const { exploitationModeOptions, selectedExploitationModes, updateSelectedExploitationModes } =
+    useExploitationModeStore();
+
   const handleChange = (name: string, value: string[]) => {
     onChangeTopFilters({ ...topFilters, templates: [], [name]: value });
   };
@@ -54,6 +57,10 @@ export const FiltersPanel = ({
   const handleResetFilters = () => {
     onChangeColumnsFilters(initialColumnsFilters);
     onChangeTopFilters({ ...topFilters, templates: [] });
+  };
+
+  const handleChangeExploitationModes = (value: string[]) => {
+    updateSelectedExploitationModes(value);
   };
 
   return (
@@ -111,12 +118,11 @@ export const FiltersPanel = ({
           <>
             <CustomSearchSelect
               id="exploitation"
-              maxRowCount={1}
               label="Режим эксплуатации:"
               name="exploitation"
-              options={exploitationSelectOptions}
-              selectedValues={topFilters.exploitation}
-              onChange={handleChange}
+              options={exploitationModeOptions}
+              selectedValues={selectedExploitationModes}
+              onChange={(_, value) => handleChangeExploitationModes(value)}
             />
             <CustomDateField
               type="date"

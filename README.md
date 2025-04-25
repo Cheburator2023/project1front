@@ -9,7 +9,7 @@ nvm install 14.17.0
 nvm use 14.17.0
 ```
 
-## 🏃‍♀️ Running the app locally
+## 🏃‍♀️ Running the application locally
 
 #### _Installing dependencies:_
 
