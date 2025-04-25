@@ -80,13 +80,24 @@ export const ModelForm = ({
     isValidatorLead,
     isBusinessCustomer,
     isDs,
+    isDe,
     isDsLead,
+    isBICCustomerBroker,
+    isDeLead,
     isModelOps,
     isModelOpsLead,
     isMIPM,
   } = useRoles();
 
-  const hasNoAccessToActiveModel = isDs || isDsLead || isModelOps || isModelOpsLead || isMIPM;
+  const hasNoAccessToActiveModel =
+    isDs ||
+    isDsLead ||
+    isModelOps ||
+    isModelOpsLead ||
+    isMIPM ||
+    isDe ||
+    isDeLead ||
+    isBICCustomerBroker;
   const isEditByRatingModel = isValidator || isValidatorLead || isBusinessCustomer;
 
   const errorElemRef = useRef<HTMLDivElement>(null);
