@@ -89,16 +89,18 @@ export const ModelForm = ({
     isMIPM,
   } = useRoles();
 
-  const hasNoAccessToActiveModel =
-    isDs ||
-    isDsLead ||
-    isModelOps ||
-    isModelOpsLead ||
-    isMIPM ||
-    isDe ||
-    isDeLead ||
-    isBICCustomerBroker;
   const isEditByRatingModel = isValidator || isValidatorLead || isBusinessCustomer;
+  const hasNoAccessToActiveModel =
+    isValidator || isValidatorLead || isBusinessCustomer
+      ? false
+      : isDs ||
+        isDsLead ||
+        isModelOps ||
+        isModelOpsLead ||
+        isMIPM ||
+        isDe ||
+        isDeLead ||
+        isBICCustomerBroker;
 
   const errorElemRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
