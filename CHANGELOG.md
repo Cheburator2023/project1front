@@ -1,5 +1,24 @@
 # Semantic Versioning Changelog
 
+# [1.43.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.42.2...v1.43.0) (2025-04-25)
+
+
+### Features
+
+* new roles added for form connection with active model ([89c2a66](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/89c2a66d831bf7e83fb9ace06e6ac30d5e6cea71))
+* new roles added for form connection with active model ([7320a95](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/7320a9551dd0d47c877c0dc1511ef1372a41004e))
+* new roles added for form connection with active model ([791ce17](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/791ce176adfa1238a6de8e08cf5e451db6285cf5))
+* new roles added for form connection with active model ([a3094c2](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/a3094c2a65acbbf9e44ba5c72978acd3adaa3032))
+
+## [1.42.2](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.42.1...v1.42.2) (2025-04-24)
+
+
+### Bug Fixes
+
+* active model logic altered, roles added ([4d716de](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/4d716de004d9a17fab8ee11ccb992a3455e30493))
+* active model logic altered, roles added, debug vars deleted ([0e73014](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/0e730143c980ae2d6d606383a51b55ef16d73364))
+* is edit by rating model ([4fb79ef](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/4fb79efb7c49f6409c807de88d7d82f2bdec3e31))
+
 ## [1.42.1](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.42.0...v1.42.1) (2025-04-21)
 
 
