@@ -140,54 +140,53 @@ const getAddSchema = (
 ) => {
   let formSchema = markSchema(BASE_MODEL_SCHEMA, SCHEMA_NAME_MAP.BASE_MODEL_SCHEMA);
 
-  if (values) {
-    if (values.active_model?.value || activeModelByDefault) {
-      formSchema = getUnionSchema(
-        markSchema(BASE_MODEL_SCHEMA, SCHEMA_NAME_MAP.BASE_MODEL_SCHEMA),
-        markSchema(ACTIVE_MODEL_SCHEMA, SCHEMA_NAME_MAP.ACTIVE_MODEL_SCHEMA),
-      );
+  console.log('getAddSchema >> values:', values);
 
+  if (activeModelByDefault) {
+    formSchema = getUnionSchema(
+      markSchema(BASE_MODEL_SCHEMA, SCHEMA_NAME_MAP.BASE_MODEL_SCHEMA),
+      markSchema(ACTIVE_MODEL_SCHEMA, SCHEMA_NAME_MAP.ACTIVE_MODEL_SCHEMA),
+    );
+
+    formSchema = getUnionSchema(
+      formSchema,
+      markSchema(VALIDATION_MODEL_SCHEMA, SCHEMA_NAME_MAP.VALIDATION_MODEL_SCHEMA),
+    );
+
+    // TODO: It is necessary to avoid using string values in conditionals, try to switch them to artifact values (prob need another approach)
+    if (
+      values?.rating_model &&
+      values?.rating_model.type === INPUT_TYPE.SELECT &&
+      (Array.isArray(values.rating_model?.value)
+        ? values?.rating_model?.value.some((item) => item.text === 'Да')
+        : values?.rating_model?.value?.text === 'Да')
+    ) {
       formSchema = getUnionSchema(
         formSchema,
-        markSchema(VALIDATION_MODEL_SCHEMA, SCHEMA_NAME_MAP.VALIDATION_MODEL_SCHEMA),
+        markSchema(RATING_SYSTEM_MODEL_SCHEMA, SCHEMA_NAME_MAP.RATING_SYSTEM_MODEL_SCHEMA),
       );
 
-      // TODO: It is necessary to avoid using string values in conditionals, try to switch them to artifact values (prob need another approach)
       if (
-        values.rating_model &&
-        values.rating_model.type === INPUT_TYPE.SELECT &&
-        (Array.isArray(values.rating_model?.value)
-          ? values.rating_model?.value.some((item) => item.text === 'Да')
-          : values.rating_model?.value?.text === 'Да')
+        values.classification_of_rs_by_order_of_application_within_pvr &&
+        values.classification_of_rs_by_order_of_application_within_pvr.type === INPUT_TYPE.SELECT &&
+        (Array.isArray(values.classification_of_rs_by_order_of_application_within_pvr?.value)
+          ? values.classification_of_rs_by_order_of_application_within_pvr?.value?.some(
+              (item) => item.text === 'Рейтинговые системы, подлежащие согласованию Регулятором',
+            )
+          : values.classification_of_rs_by_order_of_application_within_pvr?.value?.text ===
+            'Рейтинговые системы, подлежащие согласованию Регулятором')
       ) {
         formSchema = getUnionSchema(
           formSchema,
-          markSchema(RATING_SYSTEM_MODEL_SCHEMA, SCHEMA_NAME_MAP.RATING_SYSTEM_MODEL_SCHEMA),
+          markSchema(
+            RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA,
+            SCHEMA_NAME_MAP.RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA,
+          ),
         );
-
-        if (
-          values.classification_of_rs_by_order_of_application_within_pvr &&
-          values.classification_of_rs_by_order_of_application_within_pvr.type ===
-            INPUT_TYPE.SELECT &&
-          (Array.isArray(values.classification_of_rs_by_order_of_application_within_pvr?.value)
-            ? values.classification_of_rs_by_order_of_application_within_pvr?.value?.some(
-                (item) => item.text === 'Рейтинговые системы, подлежащие согласованию Регулятором',
-              )
-            : values.classification_of_rs_by_order_of_application_within_pvr?.value?.text ===
-              'Рейтинговые системы, подлежащие согласованию Регулятором')
-        ) {
-          formSchema = getUnionSchema(
-            formSchema,
-            markSchema(
-              RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA,
-              SCHEMA_NAME_MAP.RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA,
-            ),
-          );
-        }
       }
     }
-    return formSchema;
   }
+  return formSchema;
 
   return formSchema;
 };
