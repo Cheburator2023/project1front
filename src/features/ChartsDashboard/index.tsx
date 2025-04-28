@@ -262,7 +262,7 @@ const ChartsDashboard = () => {
           ],
         },
       ],
-    });    
+    });
   }, [metricsData]);
 
   const handleDateChange = (newDateRange: string | undefined) => {
@@ -300,8 +300,8 @@ const ChartsDashboard = () => {
     const { tempStartDate, tempEndDate, tempSelectedStreams } = tempFilters;
 
     if (tempStartDate && tempEndDate) {
-      const formattedStartDate = tempStartDate ? switchDateFormat(tempStartDate) : undefined;
-      const formattedEndDate = tempEndDate ? switchDateFormat(tempEndDate) : undefined;
+      const formattedStartDate = tempStartDate && switchDateFormat(tempStartDate);
+      const formattedEndDate = tempEndDate && switchDateFormat(tempEndDate);
 
       setFilters({
         startDate: formattedStartDate,
@@ -453,14 +453,16 @@ const ChartsDashboard = () => {
 
     setIsExportingMetric(true);
 
-    const queryParams = {
-      metric: selectedMetric,
+    const baseQueryParams = getQueryParams({
       startDate: tempFilters.tempStartDate && switchDateFormat(tempFilters.tempStartDate),
       endDate: tempFilters.tempEndDate && switchDateFormat(tempFilters.tempEndDate),
-      stream: tempFilters.tempSelectedStreams,
-    };
+      selectedStreams: tempFilters.tempSelectedStreams,
+    });
 
-    const queryString = qs.stringify(queryParams, { arrayFormat: 'repeat' });
+    const queryParams = {
+      ...baseQueryParams,
+      metric: selectedMetric,
+    };
 
     const today = new Date();
     const dateStr = `${String(today.getDate()).padStart(2, '0')}.${String(
@@ -471,11 +473,13 @@ const ChartsDashboard = () => {
 
     try {
       await mutationProtectedFetch<void, Blob>({
-        fetchApiRoute: `${API_ROUTES.METRICS_EXPORT}?${queryString}` as any,
+        fetchApiRoute: API_ROUTES.METRICS_EXPORT,
         fetchMethod: 'GET',
+        newParams: queryParams,
         fileName: `${readableLabel} ${dateStr}.xlsx`,
       });
     } catch (error) {
+      //
     } finally {
       setIsExportingMetric(false);
     }
