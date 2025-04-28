@@ -126,14 +126,14 @@ const initialChartModelDynamicsByStreams = () => ({
   },
   xAxis: {
     categories: [
-      'Рук. DS',
+      'Руководитель DS',
       'DS',
-      'Рук. DE',
+      'Руководитель DE',
       'DE',
-      'Рук. ModelOps',
+      'Руководитель ModelOps',
       'ModelOps',
       'Бизнес-партнер',
-      'Рук. Валидации',
+      'Руководитель Валидации',
       'Валидатор',
     ],
     labels: {

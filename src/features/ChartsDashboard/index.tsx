@@ -256,7 +256,7 @@ const ChartsDashboard = () => {
             metricsData.tasks.de,
             metricsData.tasks.modelops_lead,
             metricsData.tasks.modelops,
-            metricsData.tasks.business_customer,
+            metricsData.tasks.mipm,
             metricsData.tasks.validator_lead,
             metricsData.tasks.validator,
           ],

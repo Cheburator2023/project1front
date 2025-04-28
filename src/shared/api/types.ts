@@ -95,7 +95,7 @@ export type MetricsResponseType = {
     de_lead: number;
     modelops: number;
     modelops_lead: number;
-    business_customer: number;
+    mipm: number;
     validator: number;
     validator_lead: number;
   };
