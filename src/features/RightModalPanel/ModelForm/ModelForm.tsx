@@ -126,7 +126,6 @@ export const ModelForm = ({
     artifacts,
     showAllFields,
     currentCustomer,
-    wasPreviouslyActiveModel,
   });
 
   const IS_FORM_MODE_ADD = formMode === MODEL_FORM_MODE.ADD;
@@ -569,11 +568,15 @@ export const ModelForm = ({
               );
               const schemaTitle = SCHEMA_NAME_MAP[schemaKey]?.title;
 
+              console.log('FORM LOGS / fieldsByGroup IS:', fieldsByGroupSorted, fieldsByGroup);
+
               // TODO: bad solution, need to refactor this logic
               // Determine if allocation fields should be hidden based on permissions
               // in the future should be determined by field "isEditAllocationEnabled" in the schema or server side
               const shouldHideAllocationFields = !schemaTitle && !isEditAllocationEnabled;
               if (shouldHideAllocationFields) {
+                console.log('FORM LOGS / HIDDEN FIELD IS:', schemaKey);
+
                 return null;
               }
 
