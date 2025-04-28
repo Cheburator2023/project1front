@@ -113,9 +113,10 @@ export const ModelForm = ({
     values,
     initialRow,
     mode: formMode,
-    activeModelByDefault: hasNoAccessToActiveModel
-      ? wasPreviouslyActiveModel
-      : activeModelByDefault,
+    activeModelByDefault:
+      hasNoAccessToActiveModel && formMode === MODEL_FORM_MODE.EDIT
+        ? wasPreviouslyActiveModel
+        : activeModelByDefault,
   });
 
   const { fields } = useFormFields({

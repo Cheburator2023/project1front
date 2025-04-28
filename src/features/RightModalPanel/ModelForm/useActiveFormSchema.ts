@@ -198,6 +198,8 @@ export const useActiveFormSchema = ({
   mode,
   activeModelByDefault,
 }: UseActiveFormSchemaProps) => {
+  console.log('activeModelByDefault:', activeModelByDefault);
+
   const nonActiveModelSchema = unionBy(
     markSchema(BASE_MODEL_SCHEMA, SCHEMA_NAME_MAP.BASE_MODEL_SCHEMA),
     markSchema(VALIDATION_MODEL_SCHEMA, SCHEMA_NAME_MAP.VALIDATION_MODEL_SCHEMA),
