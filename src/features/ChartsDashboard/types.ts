@@ -28,7 +28,7 @@ enum MetricsCaption {
   STALLED_MODLES_BY_MONTH = 'Количество моделей, которые не продвигаются больше 5 дней',
   DISTRIBUTION_BY_LIFECYCLE_STAGE_MODELS = 'Распределение моделей по этапам жцм',
   PILOTS = 'Пилоты',
-  DYNAMIC_BY_STREAMS_MODELS = 'Динамика моделей по стримам',
+  DYNAMIC_BY_STREAMS_MODELS = 'Динамика задач по моделям в разрезе ролей',
 }
 
 enum MetricsEnum {

@@ -89,8 +89,15 @@ export type MetricsResponseType = {
   stalledModelsByMonth: number[];
   finalStatusByMonthModels: number[];
   tasks: {
-    validation: number;
-    datasources: number;
+    ds: number;
+    ds_lead: number;
+    de: number;
+    de_lead: number;
+    modelops: number;
+    modelops_lead: number;
+    mipm: number;
+    validator: number;
+    validator_lead: number;
   };
 };
 
