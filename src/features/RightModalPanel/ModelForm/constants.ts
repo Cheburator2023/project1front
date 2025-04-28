@@ -210,6 +210,12 @@ export const ACTIVE_MODEL_SCHEMA: FormFieldsSchema = [
     ],
   },
   {
+    name: 'business_model_risk_subtype',
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
+    required: true,
+    maxLength: 250,
+  },
+  {
     name: 'responsible_for_significance_validity',
     customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
     required: true,
