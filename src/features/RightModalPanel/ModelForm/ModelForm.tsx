@@ -90,6 +90,7 @@ export const ModelForm = ({
   } = useRoles();
 
   const isEditByRatingModel = isValidator || isValidatorLead || isBusinessCustomer;
+  console.log('🐸 Pepe said >> isEditByRatingModel:', isEditByRatingModel);
   const hasNoAccessToActiveModel =
     isValidator || isValidatorLead || isBusinessCustomer
       ? false
@@ -101,6 +102,7 @@ export const ModelForm = ({
         isDe ||
         isDeLead ||
         isBICCustomerBroker;
+  console.log('🐸 Pepe said >> hasNoAccessToActiveModel:', hasNoAccessToActiveModel);
 
   const errorElemRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
