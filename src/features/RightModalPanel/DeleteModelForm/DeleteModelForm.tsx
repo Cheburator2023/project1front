@@ -187,7 +187,6 @@ export const DeleteModelForm = ({
     artifacts,
     showAllFields,
     currentCustomer,
-    wasPreviouslyActiveModel,
   });
 
   const title = 'Удаление модели';
