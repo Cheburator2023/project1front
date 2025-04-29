@@ -1,6 +1,27 @@
 import { SELECT_TYPE, SelectStringProps } from '@src/shared/ui/organisms';
 import * as Highcharts from 'highcharts';
-import { MetricsCaption } from './types';
+import { MetricsCaption, MetricsEnum } from './types';
+
+const metricLabelMap: Record<MetricsEnum, MetricsCaption> = {
+  [MetricsEnum.ImplementedModelsMetric]: MetricsCaption.IMPLEMENTED_MODELS,
+  [MetricsEnum.DevelopedModelsMetric]: MetricsCaption.DEVELOPED_MODELS,
+  [MetricsEnum.MrmModelsMetric]: MetricsCaption.SUM_RM_MODELS,
+  // [MetricsEnum.PilotsMetric]: MetricsCaption.PILOTS,
+  [MetricsEnum.TasksMetric]: MetricsCaption.DYNAMIC_BY_STREAMS_MODELS,
+  [MetricsEnum.TakenOutOfOperationModelsMetric]: MetricsCaption.TAKEN_OUT_OF_OPERATION_MODELS,
+  // [MetricsEnum.StalledModelsByMonthMetric]: MetricsCaption.STALLED_MODLES_BY_MONTH,
+  // [MetricsEnum.RiskCoverageFinalStatusModelsMetric]: MetricsCaption.RISK_COVERAGE_FINAL_STATUS_MODELS,
+  // [MetricsEnum.RegistryCoverageModelsMetric]: MetricsCaption.REGISTRY_COVERAGE_MODELS,
+  [MetricsEnum.OnMonitoringModelsMetric]: MetricsCaption.ON_MONITORING_MODELS,
+  // [MetricsEnum.FinalStatusModelsMetric]: MetricsCaption.FINAL_STATUS_MODELS,
+  // [MetricsEnum.FinalStatusByMonthModelsMetric]: MetricsCaption.FINAL_STATUS_BY_MONTH_MODELS,
+  // [MetricsEnum.DistributionByLifecycleStageModelsMetric]: MetricsCaption.DISTRIBUTION_BY_LIFECYCLE_STAGE_MODELS,
+};
+
+const itemsExport = [
+  { id: 'pdf', label: 'Экспортировать в PDF', value: 'PDF' },
+  { id: 'png', label: 'Экспортировать в PNG', value: 'PNG' },
+];
 
 const dsStreamArtifactOptions = {
   type: SELECT_TYPE.STRING,
@@ -26,6 +47,14 @@ const dsStreamArtifactOptions = {
       text: 'Модели партнерств и платформы больших данных',
     },
   ],
+} as SelectStringProps;
+
+const metricsOptions = {
+  type: SELECT_TYPE.STRING,
+  options: Object.values(MetricsEnum).map((metric) => ({
+    value: metric,
+    text: metricLabelMap[metric],
+  })),
 } as SelectStringProps;
 
 const initialKPI_SUM = { caption: MetricsCaption.KPI_SUM, value: 0, delta: 0, relative: true };
@@ -86,87 +115,64 @@ const initialTakenOutOfOperationModels = {
 
 const initialChartModelDynamicsByStreams = () => ({
   chart: {
-    height: 300,
-    marginTop: 25,
+    type: 'bar',
+    height: 280,
+    spacingBottom: 30,
+    marginLeft: 80,
   },
-  accessibility: {
-    enabled: true,
-  },
+  title: { text: undefined },
   credits: {
     enabled: false,
   },
-  title: {
-    text: undefined,
-  },
-  yAxis: {
-    title: {
-      text: undefined,
+  xAxis: {
+    categories: [
+      'Руководитель DS',
+      'DS',
+      'Руководитель DE',
+      'DE',
+      'Руководитель ModelOps',
+      'ModelOps',
+      'Бизнес-партнер',
+      'Руководитель Валидации',
+      'Валидатор',
+    ],
+    labels: {
+      style: { fontSize: '12px' },
     },
-    min: 0,
-    max: 100,
+    lineWidth: 1,
     gridLineWidth: 1,
-    lineWidth: 0,
     gridLineDashStyle: 'Dash' as Highcharts.DashStyleValue,
   },
-  xAxis: {
-    visible: false,
+  yAxis: {
+    title: { text: null },
+    min: 0,
+  },
+  legend: { enabled: false },
+  tooltip: {
+    backgroundColor: '#333',
+    borderRadius: 4,
+    style: { color: '#fff' },
+    format: '<b>{point.category}</b><br/><span>{point.y} задач</span>',
   },
   plotOptions: {
     bar: {
-      dataLabels: {
-        inside: true,
-        enabled: true,
-      },
+      groupPadding: 0.1,
+      pointPadding: 0.1,
+      borderRadius: 4,
+      dataLabels: { enabled: true },
     },
-    pointWidth: 25,
-    groupPadding: 0.03,
   },
-  legend: {
-    align: 'left' as Highcharts.AlignValue,
-    x: -10,
-    symbolRadius: 0,
-  },
-  tooltip: {
-    shared: false,
-    backgroundColor: 'var(--neutral-neutral-80, #333333)',
-    borderRadius: 4,
-    shadow: true,
-    style: {
-      color: 'var(--neutral-neutral-00, #ffffff)',
-    },
-    hideDelay: 500,
-    format:
-      '<span class="tooltip-key">{series.name}</span><br/><span class="tooltip-value">{y} моделей</span>',
-  },
+  colors: ['#8DA0CB', '#E78AC3', '#FC8D62', '#A6D854', '#FFD92F', '#66C2A5', '#B3B3B3', '#FFB347', '#B39EB5'],
   series: [
     {
+      name: 'Количество задач',
       type: 'bar',
-      borderRadius: 0,
-      dataLabels: [
-        {
-          align: 'left' as Highcharts.AlignValue,
-          format: '{y}',
-        },
-      ],
-      data: [0],
-      name: 'Источники данных',
-      color: 'var(--neutral-neutral-50, #8DA0CB)',
-    },
-    {
-      type: 'bar',
-      borderRadius: 0,
-      dataLabels: [
-        {
-          align: 'left' as Highcharts.AlignValue,
-          format: '{y}',
-        },
-      ],
-      data: [0],
-      name: 'Валидация',
-      color: 'var(--magenta-magenta-30,  #E78AC3)',
+      data: [12, 18, 8, 15, 5, 9, 6, 7, 10],
+      colorByPoint: true,
     },
   ] as Highcharts.SeriesBarOptions[],
 });
+
 
 const initialChartFinalStatusByMonthModels = () => ({
   chart: {
@@ -530,5 +536,8 @@ export {
   initialChartPilots,
   initialChartDistributionByLifecycleStageModels,
   dsStreamArtifactOptions,
+  itemsExport,
+  metricLabelMap,
+  metricsOptions
 };
 
