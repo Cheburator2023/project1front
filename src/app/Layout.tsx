@@ -57,6 +57,7 @@ const Layout = ({ children, user, protectedFetch, goToSum, onLogout }: LayoutPro
         user?.groups?.toString().includes('validator') ||
         user?.groups?.toString().includes('ds_validator') ||
         user?.groups?.toString().includes('validator_lead') ||
+        user?.groups?.toString().includes('business_customer') ||
         user?.groups?.toString().includes('Validator_lead')
       ) {
         setCurrentCustomer(CUSTOMER_MAP.UMRV);
@@ -124,11 +125,11 @@ const GlobalStyle = createGlobalStyle`
   body {
     margin: 0;
   }
-  .ag-watermark, 
+  .ag-watermark,
   .ag-watermark-text,
-  .ag-watermark.ag-opacity-zero, 
-  div.ag-watermark.ag-opacity-zero, 
-  div.ag-watermark, 
+  .ag-watermark.ag-opacity-zero,
+  div.ag-watermark.ag-opacity-zero,
+  div.ag-watermark,
   div.ag-watermark-text {
     display: none !important;
     opacity: 0 !important;
