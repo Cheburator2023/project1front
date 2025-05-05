@@ -1,5 +1,23 @@
 # Semantic Versioning Changelog
 
+# [1.45.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.44.0...v1.45.0) (2025-05-05)
+
+
+### Bug Fixes
+
+* ag grid integration fixes ([7c8098b](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/7c8098b3e4152c48a29df6c031f0c32780d0fc2d))
+* ag grid integration fixes ([fe233b0](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/fe233b0dc949e4998d07d499311d2bfbc7c19cdc))
+* compare loader fix ([2cffcce](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/2cffccea2255cc4bff6a2e8eab21a6a096626ae9))
+* report export fix ([a9a569d](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/a9a569d382abbb0c78fc535d7cd16d4e47b9b910))
+* report export fix ([b06a62b](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/b06a62b38bdb22f113da395d8f1929504ffc2e54))
+* report export fix ([fb95f1f](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/fb95f1fad6b9757621394bd9b63d4d3239265998))
+* template filters rollback ([afeb4e0](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/afeb4e02bfa7d3d1ee03d149211af81029ded678))
+
+
+### Features
+
+* new tables overhaul ([358c3d2](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/358c3d29592db533e478584942d254638f7393f7))
+
 # [1.44.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.43.0...v1.44.0) (2025-05-05)
 
 
