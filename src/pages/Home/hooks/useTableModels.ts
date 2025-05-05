@@ -146,7 +146,7 @@ export const useTableModels = () => {
   const [searchString, setSearchString] = useState<string>('');
 
   // Pagination
-  const [pageSize, setPageSize] = useState(20);
+  const [pageSize, setPageSize] = useState(100);
   const [page, setPage] = useState(1);
   const [totalRows, setTotalRows] = useState<number>(0);
   const [templates, setTemplates] = useState<Template[]>([]);

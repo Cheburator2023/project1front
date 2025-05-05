@@ -12,6 +12,7 @@ import {
 import { TemplatesFilter, FilterButtonCount } from '@entities';
 
 import { Container, CustomDateField, FiltersDivider, FilterButton, FiltersBox } from './styles';
+import { useGlobalStore } from '../../shared/stores/globalStore';
 
 export interface FiltersPanelProps {
   compareMode?: boolean;
@@ -19,6 +20,7 @@ export interface FiltersPanelProps {
   disabledCompare?: boolean;
   handleChangeCompare: (checked: boolean) => void;
   handleCompareOnlyChanged?: (checked: boolean) => void;
+  compareModelsTableLoading?: boolean;
   handleUpdateCompareList?: () => void;
   templates: Template[];
   updateActiveScreen: (newActiveScreen: ACTIVE_SCREEN) => void;
@@ -29,6 +31,7 @@ export const FiltersPanel = ({
   compareMode = false,
   compareOnlyChanged = false,
   disabledCompare = true,
+  compareModelsTableLoading = false,
   handleChangeCompare,
   handleUpdateCompareList = () => null,
   handleCompareOnlyChanged = () => null,
@@ -46,6 +49,7 @@ export const FiltersPanel = ({
     onChangeSecondDate,
     columnsFilters,
   } = useContext(FiltersContext);
+  const { setFiltersResetCount } = useGlobalStore();
 
   const { exploitationModeOptions, selectedExploitationModes, updateSelectedExploitationModes } =
     useExploitationModeStore();
@@ -57,6 +61,7 @@ export const FiltersPanel = ({
   const handleResetFilters = () => {
     onChangeColumnsFilters(initialColumnsFilters);
     onChangeTopFilters({ ...topFilters, templates: [] });
+    setFiltersResetCount();
   };
 
   const handleChangeExploitationModes = (value: string[]) => {
@@ -109,9 +114,9 @@ export const FiltersPanel = ({
             <FilterButton
               onClick={handleUpdateCompareList}
               dimension="s"
-              disabled={disabledCompare}
+              disabled={disabledCompare || compareModelsTableLoading}
             >
-              Сравнить
+              {compareModelsTableLoading ? 'Загрузка' : 'Сравнить'}
             </FilterButton>
           </>
         ) : (
@@ -171,3 +176,4 @@ export const FiltersPanel = ({
     </Container>
   );
 };
+

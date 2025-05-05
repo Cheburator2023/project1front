@@ -3,13 +3,11 @@ import { Column as AdmiralColumn, T } from '@admiral-ds/react-ui';
 import styled from 'styled-components';
 
 import { COLUMN_TYPE, Column, Row } from '@shared/types';
-import { ErrorStatus, Loading, Pagination } from '@shared/ui/atoms';
 import { RIGHT_PANEL_TYPE } from '@shared/constants';
 import { ActionsPanel, ColumnFilter } from '@entities';
 
-import { CompareTable } from './styles';
+import { AgGridModelsTable } from '@src/features/NewTables/AgGridModelsTable';
 import { useTableChange } from '../hooks';
-import { AgGridTable } from '../../NewTables/AgGridTable';
 import { useTableModels } from '../../../pages/Home/hooks';
 
 interface TableModelsProps {
@@ -104,49 +102,24 @@ export const CompareModelsNewTable = React.memo(
     ]);
 
     return (
-      <>
-        {totalRows > 0 && firstDate && secondDate && !loading ? (
-          <div>
-            {loading || error ? (
-              <StatusWrapper>
-                {error ? (
-                  <ErrorStatus text={error} />
-                ) : loading ? (
-                  <Loading text="Загрузка данных ..." />
-                ) : null}
-              </StatusWrapper>
-            ) : null}
-            <AgGridTable
-              display={display}
-              modelsTable={modelsTable}
-              filters={filters}
-              templates={filters.templates}
-              isCompared
-              columnList={columnList}
-              rowList={rows}
-            />
-          </div>
-        ) : (
-          <StatusWrapper>
-            <T font="Subtitle/Subtitle 1">Для сравнения выберите две даты состояния реестра</T>
-          </StatusWrapper>
-        )}
-      </>
+      <AgGridModelsTable
+        display={display}
+        modelsTable={modelsTable}
+        templates={filters.templates}
+        isCompared
+        overrideColumnList={columnList}
+        overrideRowList={rows}
+        error={error}
+        loading={loading}
+        overlayNoRowsTemplate={
+          totalRows > 0 && firstDate && secondDate
+            ? 'Нет данных'
+            : 'Для сравнения выберите две даты состояния реестра'
+        }
+      />
     );
   },
 );
 
 CompareModelsNewTable.displayName = 'CompareModelsNewTable';
 
-const StatusWrapper = styled.div`
-  display: flex;
-  width: 100%;
-  height: 100%;
-  padding: 50px 0;
-  justify-content: center;
-  position: absolute;
-  align-items: center;
-  z-index: 10;
-  background-color: #fffffff0;
-  pointer-events: none;
-`;

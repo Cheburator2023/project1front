@@ -15,7 +15,6 @@ import { useExploitationModeStore } from '@src/shared/stores';
 
 import { initialColumns } from '@src/shared/constants';
 import { compareValues, prepareFetchParams, processFetchData } from '../helpers';
-import { TableRow } from '../../../shared/ui';
 
 export const getQueryParams = (
   firstDate: string,
@@ -102,7 +101,7 @@ export const useCompareModels = (columnsFilters: Partial<ColumnsFilter>) => {
 
   const cellRender = (
     value: string,
-    record: TableRow & { comparisonKey: number },
+    record: Row & { comparisonKey: number },
     field: keyof Row,
     column: Column,
   ): ReactNode => {
@@ -133,7 +132,7 @@ export const useCompareModels = (columnsFilters: Partial<ColumnsFilter>) => {
     const renderedColumnList = newColumnList.map((column) => {
       return {
         ...column,
-        renderCell: (data: any, row: TableRow & { comparisonKey: number }) =>
+        renderCell: (data: any, row: Row & { comparisonKey: number }) =>
           cellRender(data, row, column.name as keyof Row, column),
       };
     });

@@ -3,7 +3,7 @@ import { format } from 'date-fns';
 
 import { RIGHT_PANEL_TYPE } from '@src/shared/constants';
 import { CustomCellRendererProps } from 'ag-grid-react';
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { ReactComponent as EditOutline } from '@admiral-ds/icons/build/system/EditOutline.svg';
 import { ReactComponent as CalendarUpdateOutline } from '@admiral-ds/icons/build/system/CalendarUpdateOutline.svg';
@@ -14,6 +14,7 @@ import { usePermissions } from '@src/shared/hooks';
 
 interface AgGridTableCustomCellParams extends CustomCellRendererProps {
   onAction: (action: any, row_system_model_id: any, columnName: any) => any;
+  noCustomCells?: boolean;
   isCompare?: boolean;
 }
 
@@ -59,25 +60,19 @@ const valueFactory = ({
 
 export const AgGridTableCustomCell = (params: AgGridTableCustomCellParams) => {
   const wrapperRef = useRef<any>(null);
-  const [visible, setVisible] = React.useState(false);
-
+  const [visible, setVisible] = useState(false);
   const { isEditModelEnabled } = usePermissions();
+  const colName = params.colDef?.field;
+
+  const noCustomCells = params?.noCustomCells;
 
   const handleActionClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    const { name } = e.target as HTMLButtonElement;
+    const { name }: { name?: string } = e.target as HTMLButtonElement;
 
     if (name === 'edit') {
-      params.onAction(
-        RIGHT_PANEL_TYPE.EDIT_MODEL,
-        params.data.system_model_id,
-        params.colDef?.field,
-      );
+      params.onAction(RIGHT_PANEL_TYPE.EDIT_MODEL, params.data.system_model_id, colName);
     } else {
-      params.onAction(
-        RIGHT_PANEL_TYPE.HISTORY_CHANGES,
-        params.data.system_model_id,
-        params.colDef?.field,
-      );
+      params.onAction(RIGHT_PANEL_TYPE.HISTORY_CHANGES, params.data.system_model_id, colName);
     }
   };
 
@@ -113,30 +108,35 @@ export const AgGridTableCustomCell = (params: AgGridTableCustomCellParams) => {
     isCompare: params?.isCompare,
   });
 
+  const editable =
+    isEditModelEnabled && !(colName === 'reason_model_delete' || colName === 'status');
+
   return (
     <div>
       <Wrapper ref={wrapperRef}>
-        <div className="ag-custom-cell-value">{value || 'Отсутствуют данные'}</div>
-        <div className="actionButtons">
-          <ActionBtn
-            name="historyChanges"
-            dimension="s"
-            color="#0062FF"
-            icon={<CalendarUpdateOutline />}
-            tooltip="История изменений"
-            onClick={handleActionClick}
-          />
-          {isEditModelEnabled && (
+        <div className="ag-custom-cell-value">{value || ''}</div>
+        {!noCustomCells && (
+          <div className="actionButtons">
             <ActionBtn
-              name="edit"
+              name="historyChanges"
               dimension="s"
               color="#0062FF"
-              icon={<EditOutline />}
-              tooltip="Редактировать"
+              icon={<CalendarUpdateOutline />}
+              tooltip="История изменений"
               onClick={handleActionClick}
             />
-          )}
-        </div>
+            {editable && (
+              <ActionBtn
+                name="edit"
+                dimension="s"
+                color="#0062FF"
+                icon={<EditOutline />}
+                tooltip="Редактировать"
+                onClick={handleActionClick}
+              />
+            )}
+          </div>
+        )}
       </Wrapper>
       <Tooltip targetRef={wrapperRef} title={params.value} />
     </div>
@@ -168,3 +168,4 @@ const ActionBtn = styled(IconButton)`
 
   cursor: pointer;
 `;
+

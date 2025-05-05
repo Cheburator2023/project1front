@@ -96,9 +96,7 @@ const Header = ({
 }: HeaderProps) => {
   const sumBtnRef = useRef(null);
   const { mutationProtectedFetch } = useFetch({});
-  const selectedExploitationModes = useExploitationModeStore(
-    (state) => state.selectedExploitationModes,
-  );
+  const { selectedExploitationModes } = useExploitationModeStore();
 
   useEffect(() => {
     if (columnsFilters && downloadReportStatus) {
@@ -171,3 +169,4 @@ const Header = ({
 };
 
 export { Header };
+

@@ -2,8 +2,9 @@ import React from 'react';
 
 import { ACTIVE_SCREEN, RIGHT_PANEL_TYPE } from '@shared/constants';
 import { ColumnsFilter } from '@src/shared/types';
-import { FiltersPanel, TableCompareModels } from '@features';
+import { FiltersPanel } from '@features';
 
+import { CompareModelsNewTable } from '@src/features/Tables/CompareModels/CompareModelsNewTable';
 import { useCompareModels } from './hooks';
 import { Template } from '../../shared/api';
 
@@ -38,6 +39,7 @@ const CompareModelsWidget = React.memo(
         <FiltersPanel
           compareOnlyChanged={compareModelsTable.compareOnlyChanged}
           handleCompareOnlyChanged={compareModelsTable.setCompareOnlyChanged}
+          compareModelsTableLoading={compareModelsTable.loading}
           compareMode={compareMode}
           handleChangeCompare={handleChangeCompare}
           templates={templates}
@@ -54,7 +56,7 @@ const CompareModelsWidget = React.memo(
             }
           }}
         />
-        <TableCompareModels
+        <CompareModelsNewTable
           firstDate={firstDate}
           secondDate={secondDate}
           error={compareModelsTable.error}
