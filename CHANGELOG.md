@@ -1,5 +1,17 @@
 # Semantic Versioning Changelog
 
+# [1.44.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.43.0...v1.44.0) (2025-05-05)
+
+
+### Bug Fixes
+
+* double fetchModels req fixed ([815e713](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/815e7131b64660d9e419241f5b1045b6c017d649))
+
+
+### Features
+
+* new roles added to layout effect hook ([5cd82ec](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/5cd82ec2ff7243e1eea677b2e9453d186e45cffd))
+
 # [1.43.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.42.1...v1.43.0) (2025-04-29)
 
 
