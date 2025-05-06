@@ -34,7 +34,6 @@ export const useTableChange = ({
 
   // Table data
   const [rows, setRows] = useState(rowList);
-  const [pageRows, setPageRows] = useState(rowList);
   const [cols, setCols] = useState<(AdmiralColumn & Column)[]>([]);
 
   const handleSort = ({ name, sort }: { name: string; sort: 'asc' | 'desc' | 'initial' }) => {
@@ -91,8 +90,6 @@ export const useTableChange = ({
     } else {
       updateDeleteModelState(selectedRows.length);
     }
-
-    setPageRows(rowsWithUpdatedSelectedStatus);
   };
 
   const handleChangeColumnsFilter = useCallback(
@@ -126,8 +123,7 @@ export const useTableChange = ({
     onChangeTopFilters({ ...topFilters, templates: [] });
   };
 
-  // Update filtered rows after searching or changing column filters
-  useDeepEffect(() => {
+  const handleUpdate = ({ withRows = false }) => {
     if (rowList?.length) {
       let newFilteredRows = rowList;
 
@@ -155,25 +151,30 @@ export const useTableChange = ({
         );
       }
 
-      const _pageRows = getPageRows({ rows: newFilteredRows, page, pageSize });
+      if (withRows) {
+        setRows(newFilteredRows);
+      }
 
-      setPageRows(_pageRows);
-      setRows(newFilteredRows);
       updateRowsCount(newFilteredRows.length);
     }
+  };
+
+  // Update filtered rows after searching or changing column filters
+  useDeepEffect(() => {
+    handleUpdate({
+      withRows: false,
+    });
   }, [columnsFilters, rowList, cols, pageSize, page, searchString, columnList]);
-  // console.log('🐸 Pepe said ~ columnList:', columnList);
-  // console.log('🐸 Pepe said ~ searchString:', searchString);
-  // console.log('🐸 Pepe said ~ page:', page);
-  // console.log('🐸 Pepe said ~ pageSize:', pageSize);
-  // console.log('🐸 Pepe said ~ cols:', cols);
-  // console.log('🐸 Pepe said ~ rowList:', rowList);
-  // console.log('🐸 Pepe said ~ columnsFilters:', columnsFilters);
+
+  useDeepEffect(() => {
+    handleUpdate({
+      withRows: true,
+    });
+  }, [rowList, cols, pageSize, page, searchString, columnList]);
 
   return {
     cols,
     rows,
-    pageRows,
     setRows,
     setCols,
     handleSort,
