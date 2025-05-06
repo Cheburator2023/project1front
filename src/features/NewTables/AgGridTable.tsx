@@ -198,8 +198,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
 
     const { filtersResetCount, setAgGridApi } = useGlobalStore();
 
-    const { setRows, handleChangeColumnsFilter, columnsFilters, onChangeTopFilters, topFilters } =
-      tableProps;
+    const { setRows, columnsFilters, onChangeTopFilters, topFilters, rows } = tableProps;
 
     const { modelsCount, modelSource, isDeleteButtonEnabled, userMatches, updateDeleteModelState } =
       useDeleteRightModelPanelStore();
@@ -344,32 +343,15 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     const handleFilterChange = (event: FilterChangedEvent): void => {
       const colName: string = event?.columns[0]?.getColId();
       const colDef: any = event.api.getColumnFilterModel(colName);
-      const isDate = colDef?.filterType === 'date';
 
-      if (isDate) {
-        const dateFrom = new Date(colDef.dateFrom);
-        const dateTo = new Date(colDef.dateTo || colDef.dateFrom);
-        const toReverse = dateFrom > dateTo;
+      // @ts-ignore
+      const value = colDef?.filterModels?.[1]?.values || colDef?.values;
+      const initialTemplateValue = columnsFilters?.[colName] || [];
 
-        if (toReverse) {
-          const dateRange = [format(dateTo, 'yyyy-MM-dd'), format(dateFrom, 'yyyy-MM-dd')];
-          handleChangeColumnsFilter(colName, dateRange);
-        } else {
-          const dateRange = [format(dateFrom, 'yyyy-MM-dd'), format(dateTo, 'yyyy-MM-dd')];
-          handleChangeColumnsFilter(colName, dateRange);
-        }
-      } else {
-        // @ts-ignore
-        const value = colDef?.filterModels?.[1]?.values || colDef?.values;
-        const initialTemplateValue = columnsFilters?.[colName] || [];
-
-        if (value) {
-          const arrayValue = Array.isArray(value) ? value : [value];
-          handleChangeColumnsFilter(colName, arrayValue);
-
-          if (shouldResetTemplateOnInitialValueChange(arrayValue, initialTemplateValue, colName)) {
-            onChangeTopFilters?.({ ...topFilters, templates: [] });
-          }
+      if (value) {
+        const arrayValue = Array.isArray(value) ? value : [value];
+        if (shouldResetTemplateOnInitialValueChange(arrayValue, initialTemplateValue, colName)) {
+          onChangeTopFilters?.({ ...topFilters, templates: [] });
         }
       }
     };
@@ -484,7 +466,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
               pagination={pagination}
               rowDragManaged={rowDragManaged}
               ref={gridRef || gridRefInner}
-              rowData={rowList}
+              rowData={rows}
               columnDefs={columnDefs as any}
               defaultColDef={defaultColDef}
               rowSelection={rowSelection}
