@@ -1,5 +1,14 @@
 # Semantic Versioning Changelog
 
+## [1.45.1](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.45.0...v1.45.1) (2025-05-07)
+
+
+### Bug Fixes
+
+* business_model_risk_subtype is non req ([c58cf8e](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/c58cf8eadc3ae0812f7f18ebc4f4360bb73e3a5b))
+* row data update by inner filters ([645eb13](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/645eb133856b3799fe9e091173cef170f2c74cd2))
+* row data update by inner filters ([853234d](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/853234d767b4eae6ce125f85f97568cc7fed07aa))
+
 # [1.45.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.44.0...v1.45.0) (2025-05-05)
 
 
