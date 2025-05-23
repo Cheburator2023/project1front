@@ -9,6 +9,7 @@ import {
   ColDef,
   FilterChangedEvent,
   FirstDataRenderedEvent,
+  GetContextMenuItems,
   GetMainMenuItemsParams,
   GridApi,
   GridReadyEvent,
@@ -246,7 +247,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
         }
       },
       // pinned: data.name === 'active_model' && currentCustomer === CUSTOMER_MAP.UMRV && 'left',
-    })) as ColDef[];
+    })).filter(col => col.name !== 'relations') as ColDef[];
 
     const defaultColDef = useMemo<ColDef>(() => {
       return {
@@ -414,6 +415,16 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       onFirstDataRendered?.(event);
     }, []);
 
+    const getContextMenuItems =(params: any) => {
+
+
+      if(params.column.colId === "model_alias") {
+        return [];
+      } 
+      return params.defaultItems
+     
+  }
+
     // useDeepEffect(() => {
     //   if (rows.length && initialRowData === undefined) {
     //     setInitialRowData(rows as any);
@@ -504,6 +515,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
               localeText={AG_GRID_LOCALE_RU}
               alwaysShowHorizontalScroll
               tooltipShowDelay={500}
+              getContextMenuItems={getContextMenuItems}
               onRowDragMove={onRowDragMove}
               onRowSelected={onRowSelected}
               onFirstDataRendered={_onFirstDataRendered}
