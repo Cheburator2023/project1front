@@ -9,7 +9,7 @@ const metricLabelMap: Record<MetricsEnum, MetricsCaption> = {
   // [MetricsEnum.PilotsMetric]: MetricsCaption.PILOTS,
   [MetricsEnum.TasksMetric]: MetricsCaption.DYNAMIC_BY_STREAMS_MODELS,
   [MetricsEnum.TakenOutOfOperationModelsMetric]: MetricsCaption.TAKEN_OUT_OF_OPERATION_MODELS,
-  // [MetricsEnum.StalledModelsByMonthMetric]: MetricsCaption.STALLED_MODLES_BY_MONTH,
+  [MetricsEnum.StalledModelsByMonthMetric]: MetricsCaption.STALLED_MODLES_BY_MONTH,
   // [MetricsEnum.RiskCoverageFinalStatusModelsMetric]: MetricsCaption.RISK_COVERAGE_FINAL_STATUS_MODELS,
   // [MetricsEnum.RegistryCoverageModelsMetric]: MetricsCaption.REGISTRY_COVERAGE_MODELS,
   [MetricsEnum.OnMonitoringModelsMetric]: MetricsCaption.ON_MONITORING_MODELS,

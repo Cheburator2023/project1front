@@ -38,7 +38,7 @@ enum MetricsEnum {
   // PilotsMetric = 'pilots',
   TasksMetric = 'tasks',
   TakenOutOfOperationModelsMetric = 'takenOutOfOperationModels',
-  // StalledModelsByMonthMetric = 'stalledModelsByMonth',
+  StalledModelsByMonthMetric = 'stalledModelsByMonth',
   // RiskCoverageFinalStatusModelsMetric = 'riskCoverageFinalStatusModels',
   // RegistryCoverageModelsMetric = 'registryCoverageModels',
   OnMonitoringModelsMetric = 'onMonitoringModels',
