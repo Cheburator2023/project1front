@@ -1,5 +1,17 @@
 # Semantic Versioning Changelog
 
+# [1.46.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.45.1...v1.46.0) (2025-05-29)
+
+
+### Bug Fixes
+
+* hide table side bar ([1899543](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/1899543423469a6cd5f578224f67304bd5a712c9))
+
+
+### Features
+
+* кол-во моделей которые не продвигаются больше 5 дней ([8340228](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/83402281070a8c8c2e2eb80edd09cef7c0b6ef54))
+
 ## [1.45.1](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.45.0...v1.45.1) (2025-05-07)
 
 
