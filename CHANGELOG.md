@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.46.1](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.46.0...v1.46.1) (2025-05-30)
+
+
+### Bug Fixes
+
+* правка по стилям по дэшборду динамика в разрезе ролей ([5ebc527](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/5ebc527bf601aa0977803fdfe39442cbcbaf729a))
+
 # [1.46.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.45.1...v1.46.0) (2025-05-29)
 
 
