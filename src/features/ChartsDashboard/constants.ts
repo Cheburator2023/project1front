@@ -1,6 +1,7 @@
 import { SELECT_TYPE, SelectStringProps } from '@src/shared/ui/organisms';
 import * as Highcharts from 'highcharts';
 import { MetricsCaption, MetricsEnum } from './types';
+import { width } from '@admiral-ds/react-ui';
 
 const metricLabelMap: Record<MetricsEnum, MetricsCaption> = {
   [MetricsEnum.ImplementedModelsMetric]: MetricsCaption.IMPLEMENTED_MODELS,
@@ -118,7 +119,6 @@ const initialChartModelDynamicsByStreams = () => ({
     type: 'bar',
     height: 280,
     spacingBottom: 30,
-    marginLeft: 80,
   },
   title: { text: undefined },
   credits: {
@@ -137,7 +137,7 @@ const initialChartModelDynamicsByStreams = () => ({
       'Валидатор',
     ],
     labels: {
-      style: { fontSize: '12px' },
+      style: { fontSize: '12px', width: 155 },
     },
     lineWidth: 1,
     gridLineWidth: 1,
