@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.46.2](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.46.1...v1.46.2) (2025-06-03)
+
+
+### Bug Fixes
+
+* ag grid cell context fixes for model alias, empty utility col hidden ([2e5e4e8](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/2e5e4e82fca6231474922a6d9028114af24fbbe6))
+
 ## [1.46.1](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.46.0...v1.46.1) (2025-05-30)
 
 
