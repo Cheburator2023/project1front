@@ -675,13 +675,13 @@ export const initialColumns: Array<Column> = [
     type: COLUMN_TYPE.STRING,
   },
   {
-    name: 'status',
-    title: 'Cтатус',
+    name: 'model_status',
+    title: 'Этап ЖЦМ',
     type: COLUMN_TYPE.STRING,
   },
   {
-    name: 'model_status',
-    title: 'Этап ЖЦМ',
+    name: 'business_status',
+    title: 'Статус',
     type: COLUMN_TYPE.STRING,
   },
   {
