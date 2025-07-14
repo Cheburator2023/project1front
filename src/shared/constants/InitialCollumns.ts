@@ -680,13 +680,13 @@ export const initialColumns: Array<Column> = [
     type: COLUMN_TYPE.STRING,
   },
   {
-    name: 'business_status',
-    title: 'Статус',
+    name: 'model_status_assignee',
+    title: 'Исполнитель текущего этапа ЖЦМ',
     type: COLUMN_TYPE.STRING,
   },
   {
-    name: 'model_status_assignee',
-    title: 'Исполнитель текущего этапа ЖЦМ',
+    name: 'business_status',
+    title: 'Статус',
     type: COLUMN_TYPE.STRING,
   },
   {
