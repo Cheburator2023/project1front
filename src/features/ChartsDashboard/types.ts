@@ -42,9 +42,9 @@ enum MetricsEnum {
   // RiskCoverageFinalStatusModelsMetric = 'riskCoverageFinalStatusModels',
   // RegistryCoverageModelsMetric = 'registryCoverageModels',
   OnMonitoringModelsMetric = 'onMonitoringModels',
-  // FinalStatusModelsMetric = 'finalStatusModels',
-  // FinalStatusByMonthModelsMetric = 'finalStatusByMonthModels',
-  DistributionByLifecycleStageModelsMetric = 'distributionByLifecycleStageModels',
+  FinalStatusModelsMetric = 'finalStatusModels',
+  FinalStatusByMonthModelsMetric = 'finalStatusByMonthModels',
+  // DistributionByLifecycleStageModelsMetric = 'distributionByLifecycleStageModels',
 }
 
 export { MetricsEnum, StatisticDataProps, MetricsCaption, FrameSizeType }
