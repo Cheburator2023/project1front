@@ -15,7 +15,7 @@ const metricLabelMap: Record<MetricsEnum, MetricsCaption> = {
   // [MetricsEnum.RegistryCoverageModelsMetric]: MetricsCaption.REGISTRY_COVERAGE_MODELS,
   [MetricsEnum.OnMonitoringModelsMetric]: MetricsCaption.ON_MONITORING_MODELS,
   [MetricsEnum.FinalStatusModelsMetric]: MetricsCaption.FINAL_STATUS_MODELS,
-  // [MetricsEnum.FinalStatusByMonthModelsMetric]: MetricsCaption.FINAL_STATUS_BY_MONTH_MODELS,
+  [MetricsEnum.FinalStatusByMonthModelsMetric]: MetricsCaption.FINAL_STATUS_BY_MONTH_MODELS,
   // [MetricsEnum.DistributionByLifecycleStageModelsMetric]: MetricsCaption.DISTRIBUTION_BY_LIFECYCLE_STAGE_MODELS,
 };
 
