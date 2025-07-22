@@ -397,6 +397,39 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       }
     }, [rowList, setTotalRows, templates]);
 
+    useDeepEffect(() => {
+      const api: GridApi | undefined = gridRef.current?.api;
+      if (api && columnsFilters) {
+        const filterModel: any = {};
+
+        Object.entries(columnsFilters).forEach(([columnName, filterValues]) => {
+          if (filterValues && filterValues.length > 0) {
+            const columnType = columnList.find((col) => col.name === columnName)?.type;
+
+            if (columnType === COLUMN_TYPE.DATE && filterValues.length === 2) {
+              filterModel[columnName] = {
+                filterType: 'date',
+                type: 'inRange',
+                dateFrom: filterValues[0],
+                dateTo: filterValues[1]
+              };
+            } else {
+              filterModel[columnName] = {
+                filterType: 'set',
+                values: filterValues
+              };
+            }
+          }
+        });
+
+        const hasFilters = Object.keys(filterModel).length > 0;
+        if (hasFilters || Object.keys(columnsFilters).length === 0) {
+          api.setFilterModel(hasFilters ? filterModel : null);
+        }
+      }
+    }, [columnsFilters, columnList]);
+
+
     const rowClassRules = useMemo<RowClassRules>(() => {
       return {
         // row style function
@@ -420,9 +453,9 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
 
       if(params.column.colId === "model_alias") {
         return [];
-      } 
+      }
       return params.defaultItems
-     
+
   }
 
     // useDeepEffect(() => {

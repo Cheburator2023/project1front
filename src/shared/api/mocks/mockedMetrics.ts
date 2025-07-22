@@ -36,7 +36,7 @@ export const mockedMetricsResponse: MetricsResponseType = {
     de: 15,
     modelops_lead: 5,
     modelops: 9,
-    business_customer: 6,
+    mipm: 6,
     validator_lead: 7,
     validator: 10,
   },
