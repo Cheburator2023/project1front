@@ -119,6 +119,7 @@ const dateFilterParams: IDateFilterParams = {
   buttons: ['clear'],
   inRangeInclusive: true,
   maxNumConditions: 1,
+  filterOptions: ['equals', 'inRange'],
   comparator: (filterLocalDateAtMidnight: Date, cellValue: string) => {
     if (cellValue == null) return -1;
 
@@ -400,13 +401,8 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       }
     }, [rowList, setTotalRows, templates]);
 
-    const api: GridApi | undefined = gridRef.current?.api;
-
-    const fmodel = api?.getFilterModel();
-    console.log('🐸 Pepe said >> fmodel:', fmodel);
-
-    // your fix start here
     useDeepEffect(() => {
+      // set filters on data load
       const api: GridApi | undefined = gridRef.current?.api;
       if (api && columnsFilters) {
         const filterModel: any = {};
@@ -416,31 +412,22 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
             const columnType = columnList.find((col) => col.name === columnName)?.type;
 
             if (columnType === COLUMN_TYPE.DATE) {
-              console.log('🐸 Pepe said >> filterValues:', filterValues);
 
-              if (filterValues[0] === filterValues[1] && filterValues[0] === '1970-01-01') {
+              if (filterValues[0] === filterValues[1]) {
                 filterModel[columnName] = {
                   filterType: 'date',
-                  dateFrom: null,
-                  dateTo: null,
-                  type: 'blank',
+                  dateFrom: filterValues[0],
+                  dateTo: filterValues[1],
+                  type: "equals",
                 };
               } else if (filterValues.length === 2) {
                 // Date range filter
                 filterModel[columnName] = {
                   filterType: 'date',
-                  type: 'inRange',
                   dateFrom: filterValues[0],
                   dateTo: filterValues[1],
+                  type: 'inRange',
                 };
-              } else if (filterValues.length === 1) {
-                // Single date filter
-                filterModel[columnName] = {
-                  filterType: 'date',
-                  type: 'equals',
-                  dateFrom: filterValues[0],
-                };
-
               }
             } else {
               // Set filter for non-date columns
@@ -458,7 +445,6 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
         }
       }
     }, [columnsFilters, columnList]);
-    // your fix ends here
 
     const rowClassRules = useMemo<RowClassRules>(() => {
       return {
