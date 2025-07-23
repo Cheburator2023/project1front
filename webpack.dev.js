@@ -36,9 +36,17 @@ module.exports = merge(common, {
   devServer: {
     static: './',
     port: 8001,
-    historyApiFallback: { disableDotRule: true },
     hot: true,
     allowedHosts: ['all'],
+    historyApiFallback: {
+      // disableDotRule: true ,
+      rewrites: [
+        // Exclude remoteEntry.js from SPA routing
+        { from: /^\/remoteEntry\.js$/, to: '/remoteEntry.js' },
+        // Other SPA routes still work
+        { from: /^\/.*$/, to: '/index.html' }
+      ]
+    },
     client: {
       overlay: {
         runtimeErrors: (error) => {

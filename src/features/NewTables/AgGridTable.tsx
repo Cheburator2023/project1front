@@ -118,6 +118,7 @@ const gridStyle = { height: '100%', width: '100%' };
 const dateFilterParams: IDateFilterParams = {
   buttons: ['clear'],
   inRangeInclusive: true,
+  maxNumConditions: 1,
   comparator: (filterLocalDateAtMidnight: Date, cellValue: string) => {
     if (cellValue == null) return -1;
 
@@ -217,37 +218,39 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     const gridRefInner = useRef<AgGridReact>(null);
     const gridRef = ref || gridRefInner;
 
-    const columnDefs: ColDef[] = columnList.map((data, colIndex) => ({
-      ...data,
-      headerName: data.title,
-      field: data.name,
-      headerTooltip: data.title,
-      rowDrag: colIndex === 0 && rowDragManaged,
-      // https://www.ag-grid.com/react-data-grid/filter-date/#custom-selection-component
-      filter:
-        data.type === COLUMN_TYPE.DATE
-          ? 'agDateColumnFilter'
-          : data.type === COLUMN_TYPE.NUMBER
-          ? 'agNumberColumnFilter'
-          : 'agSetColumnFilter',
-      filterParams: data.type === COLUMN_TYPE.DATE ? dateFilterParams : { buttons: ['clear'] },
-      cellRenderer: data.cellRenderer,
-      cellClass: (params) => {
-        if (isCompared) {
-          const rowIndex = params.node.rowIndex;
-          const prevRow = params.api.getDisplayedRowAtIndex(Number(rowIndex) - 1);
-          const colId = params.column.getColId();
-          const cellValue = params.data[colId];
-          const prevRowSameCellValue = prevRow?.data[colId];
-          const sameId = params?.data?.id?.split(':')[0] === prevRow?.data?.id?.split(':')[0];
+    const columnDefs: ColDef[] = columnList
+      .map((data, colIndex) => ({
+        ...data,
+        headerName: data.title,
+        field: data.name,
+        headerTooltip: data.title,
+        rowDrag: colIndex === 0 && rowDragManaged,
+        // https://www.ag-grid.com/react-data-grid/filter-date/#custom-selection-component
+        filter:
+          data.type === COLUMN_TYPE.DATE
+            ? 'agDateColumnFilter'
+            : data.type === COLUMN_TYPE.NUMBER
+            ? 'agNumberColumnFilter'
+            : 'agSetColumnFilter',
+        filterParams: data.type === COLUMN_TYPE.DATE ? dateFilterParams : { buttons: ['clear'] },
+        cellRenderer: data.cellRenderer,
+        cellClass: (params) => {
+          if (isCompared) {
+            const rowIndex = params.node.rowIndex;
+            const prevRow = params.api.getDisplayedRowAtIndex(Number(rowIndex) - 1);
+            const colId = params.column.getColId();
+            const cellValue = params.data[colId];
+            const prevRowSameCellValue = prevRow?.data[colId];
+            const sameId = params?.data?.id?.split(':')[0] === prevRow?.data?.id?.split(':')[0];
 
-          if (prevRow && sameId && prevRowSameCellValue !== cellValue) {
-            return 'ag-custom-cell-value-changed';
+            if (prevRow && sameId && prevRowSameCellValue !== cellValue) {
+              return 'ag-custom-cell-value-changed';
+            }
           }
-        }
-      },
-      // pinned: data.name === 'active_model' && currentCustomer === CUSTOMER_MAP.UMRV && 'left',
-    })).filter(col => col.name !== 'relations') as ColDef[];
+        },
+        // pinned: data.name === 'active_model' && currentCustomer === CUSTOMER_MAP.UMRV && 'left',
+      }))
+      .filter((col) => col.name !== 'relations') as ColDef[];
 
     const defaultColDef = useMemo<ColDef>(() => {
       return {
@@ -397,6 +400,12 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       }
     }, [rowList, setTotalRows, templates]);
 
+    const api: GridApi | undefined = gridRef.current?.api;
+
+    const fmodel = api?.getFilterModel();
+    console.log('🐸 Pepe said >> fmodel:', fmodel);
+
+    // your fix start here
     useDeepEffect(() => {
       const api: GridApi | undefined = gridRef.current?.api;
       if (api && columnsFilters) {
@@ -406,17 +415,38 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
           if (filterValues && filterValues.length > 0) {
             const columnType = columnList.find((col) => col.name === columnName)?.type;
 
-            if (columnType === COLUMN_TYPE.DATE && filterValues.length === 2) {
-              filterModel[columnName] = {
-                filterType: 'date',
-                type: 'inRange',
-                dateFrom: filterValues[0],
-                dateTo: filterValues[1]
-              };
+            if (columnType === COLUMN_TYPE.DATE) {
+              console.log('🐸 Pepe said >> filterValues:', filterValues);
+
+              if (filterValues[0] === filterValues[1] && filterValues[0] === '1970-01-01') {
+                filterModel[columnName] = {
+                  filterType: 'date',
+                  dateFrom: null,
+                  dateTo: null,
+                  type: 'blank',
+                };
+              } else if (filterValues.length === 2) {
+                // Date range filter
+                filterModel[columnName] = {
+                  filterType: 'date',
+                  type: 'inRange',
+                  dateFrom: filterValues[0],
+                  dateTo: filterValues[1],
+                };
+              } else if (filterValues.length === 1) {
+                // Single date filter
+                filterModel[columnName] = {
+                  filterType: 'date',
+                  type: 'equals',
+                  dateFrom: filterValues[0],
+                };
+
+              }
             } else {
+              // Set filter for non-date columns
               filterModel[columnName] = {
                 filterType: 'set',
-                values: filterValues
+                values: filterValues,
               };
             }
           }
@@ -428,7 +458,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
         }
       }
     }, [columnsFilters, columnList]);
-
+    // your fix ends here
 
     const rowClassRules = useMemo<RowClassRules>(() => {
       return {
@@ -448,15 +478,12 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       onFirstDataRendered?.(event);
     }, []);
 
-    const getContextMenuItems =(params: any) => {
-
-
-      if(params.column.colId === "model_alias") {
+    const getContextMenuItems = (params: any) => {
+      if (params.column.colId === 'model_alias') {
         return [];
       }
-      return params.defaultItems
-
-  }
+      return params.defaultItems;
+    };
 
     // useDeepEffect(() => {
     //   if (rows.length && initialRowData === undefined) {
