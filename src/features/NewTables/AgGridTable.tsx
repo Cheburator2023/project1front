@@ -116,10 +116,11 @@ const containerStyle = { width: '100%', height: '100%', padding: '10px' };
 const gridStyle = { height: '100%', width: '100%' };
 
 const dateFilterParams: IDateFilterParams = {
-  buttons: ['clear'],
+  buttons: ['clear', 'apply'],
   inRangeInclusive: true,
   maxNumConditions: 1,
   filterOptions: ['equals', 'inRange'],
+  closeOnApply: true,
   comparator: (filterLocalDateAtMidnight: Date, cellValue: string) => {
     if (cellValue == null) return -1;
 
@@ -402,7 +403,6 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     }, [rowList, setTotalRows, templates]);
 
     useDeepEffect(() => {
-      // set filters on data load
       const api: GridApi | undefined = gridRef.current?.api;
       if (api && columnsFilters) {
         const filterModel: any = {};
@@ -420,7 +420,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
                   dateTo: filterValues[1],
                   type: "equals",
                 };
-              } else if (filterValues.length === 2) {
+              } else {
                 // Date range filter
                 filterModel[columnName] = {
                   filterType: 'date',
