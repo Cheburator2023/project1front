@@ -17,6 +17,7 @@ import { useExploitationModeStore } from '@src/shared/stores';
 import { ReactComponent as LogoIcon } from './logo.svg';
 import { ColumnsFilter } from '../shared/types';
 import { ROUTES } from './Routes';
+import { useGlobalStore } from '../shared/stores/globalStore';
 
 const Container = styled.div`
   width: 100%;
@@ -96,26 +97,27 @@ const Header = ({
 }: HeaderProps) => {
   const sumBtnRef = useRef(null);
   const { mutationProtectedFetch } = useFetch({});
+  const { agGridApi } = useGlobalStore();
   const selectedExploitationModes = useExploitationModeStore(
     (state) => state.selectedExploitationModes,
   );
 
-  useEffect(() => {
-    if (columnsFilters && downloadReportStatus) {
-      mutationProtectedFetch<ReportApi, Blob>({
-        body: {
-          filters: columnsFilters,
-          mode: selectedExploitationModes,
-        },
-        fetchApiRoute: API_ROUTES.REPORT,
-        fetchMethod: 'POST',
-        fileName: `Отчёт ${format(new Date(), 'dd.MM.yyyy')}`,
-      })?.then(() => {
-        updateDownloadReportStatus(false);
-        updateColumnsFilters(undefined);
-      });
-    }
-  }, [columnsFilters, downloadReportStatus, selectedExploitationModes]);
+  // useEffect(() => {
+  //   if (columnsFilters && downloadReportStatus) {
+  //     mutationProtectedFetch<ReportApi, Blob>({
+  //       body: {
+  //         filters: columnsFilters,
+  //         mode: selectedExploitationModes,
+  //       },
+  //       fetchApiRoute: API_ROUTES.REPORT,
+  //       fetchMethod: 'POST',
+  //       fileName: `Отчёт ${format(new Date(), 'dd.MM.yyyy')}`,
+  //     })?.then(() => {
+  //       updateDownloadReportStatus(false);
+  //       updateColumnsFilters(undefined);
+  //     });
+  //   }
+  // }, [columnsFilters, downloadReportStatus, selectedExploitationModes]);
 
   const userName =
     user?.family_name && user?.given_name
@@ -136,7 +138,10 @@ const Header = ({
             <Loading text="" spinnerSize="s" />
           </LoadingWrapper>
         ) : (
-          <CustomButton dimension="s" onClick={() => updateDownloadReportStatus(true)}>
+          <CustomButton dimension="s"
+          //  onClick={() => updateDownloadReportStatus(true)}
+          onClick={() => agGridApi?.exportDataAsExcel()}
+           >
             <T font="Button/Button 2">Выгрузить отчет</T>
           </CustomButton>
         )}
