@@ -77,4 +77,3 @@ export const mockedMetricsResponse: MetricsResponseType = {
     deltaPercent: 0,
   },
 };
-

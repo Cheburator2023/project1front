@@ -59,6 +59,7 @@ const Layout = ({ children, user, protectedFetch, goToSum, onLogout }: LayoutPro
         user?.groups?.toString().includes('validator') ||
         user?.groups?.toString().includes('ds_validator') ||
         user?.groups?.toString().includes('validator_lead') ||
+        user?.groups?.toString().includes('business_customer') ||
         user?.groups?.toString().includes('Validator_lead')
       ) {
         setCurrentCustomer(CUSTOMER_MAP.UMRV);

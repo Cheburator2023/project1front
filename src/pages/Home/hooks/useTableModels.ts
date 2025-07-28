@@ -26,6 +26,7 @@ import {
 } from '@shared/helpers';
 import { ArtifactApi, CustomError } from '@src/shared/api/types';
 import { useExploitationModeStore } from '@src/shared/stores';
+import { useDeepEffect } from '../../../shared/hooks/useDeepEffect';
 
 export const getQueryParams = (
   selectedExploitationModes: string[],
@@ -157,6 +158,10 @@ export const useTableModels = () => {
   const selectedExploitationModes = useExploitationModeStore(
     (state) => state.selectedExploitationModes,
   );
+  console.log(
+    '🐸 Pepe said >> useTableModels >> selectedExploitationModes:',
+    selectedExploitationModes,
+  );
 
   const { responseData: templateData, mutationProtectedFetch } = useFetch<Template[]>({
     apiRoute: API_ROUTES.TEMPLATES,
@@ -175,12 +180,14 @@ export const useTableModels = () => {
   };
 
   const fetchModels = useCallback(async (date?: string) => {
+    console.log('🐸 Pepe said >> fetchModels >> date:', date);
+
     const { selectedExploitationModes } = useExploitationModeStore.getState();
 
     setLoadingModels(true);
 
     try {
-      const res: any = await mutationProtectedFetch<ModelsResponseType, ModelsResponseType>({
+      const res = await mutationProtectedFetch<ModelsResponseType, ModelsResponseType>({
         fetchApiRoute: API_ROUTES.MODELS,
         fetchMethod: 'GET',
         mockedResponse: mockedModelsResponse,
@@ -201,12 +208,8 @@ export const useTableModels = () => {
     }
   }, []);
 
-  // Initial models loading
-  useEffect(() => {
-    fetchModels();
-  }, [fetchModels]);
-
-  useEffect(() => {
+  // Initial models loading and on selectedExploitationModes change
+  useDeepEffect(() => {
     fetchModels();
   }, [selectedExploitationModes]);
 

@@ -1,6 +1,7 @@
 import { SELECT_TYPE, SelectStringProps } from '@src/shared/ui/organisms';
 import * as Highcharts from 'highcharts';
 import { MetricsCaption, MetricsEnum } from './types';
+import { width } from '@admiral-ds/react-ui';
 
 const metricLabelMap: Record<MetricsEnum, MetricsCaption> = {
   [MetricsEnum.ImplementedModelsMetric]: MetricsCaption.IMPLEMENTED_MODELS,
@@ -9,12 +10,12 @@ const metricLabelMap: Record<MetricsEnum, MetricsCaption> = {
   // [MetricsEnum.PilotsMetric]: MetricsCaption.PILOTS,
   [MetricsEnum.TasksMetric]: MetricsCaption.DYNAMIC_BY_STREAMS_MODELS,
   [MetricsEnum.TakenOutOfOperationModelsMetric]: MetricsCaption.TAKEN_OUT_OF_OPERATION_MODELS,
-  // [MetricsEnum.StalledModelsByMonthMetric]: MetricsCaption.STALLED_MODLES_BY_MONTH,
+  [MetricsEnum.StalledModelsByMonthMetric]: MetricsCaption.STALLED_MODLES_BY_MONTH,
   // [MetricsEnum.RiskCoverageFinalStatusModelsMetric]: MetricsCaption.RISK_COVERAGE_FINAL_STATUS_MODELS,
   // [MetricsEnum.RegistryCoverageModelsMetric]: MetricsCaption.REGISTRY_COVERAGE_MODELS,
   [MetricsEnum.OnMonitoringModelsMetric]: MetricsCaption.ON_MONITORING_MODELS,
-  // [MetricsEnum.FinalStatusModelsMetric]: MetricsCaption.FINAL_STATUS_MODELS,
-  // [MetricsEnum.FinalStatusByMonthModelsMetric]: MetricsCaption.FINAL_STATUS_BY_MONTH_MODELS,
+  [MetricsEnum.FinalStatusModelsMetric]: MetricsCaption.FINAL_STATUS_MODELS,
+  [MetricsEnum.FinalStatusByMonthModelsMetric]: MetricsCaption.FINAL_STATUS_BY_MONTH_MODELS,
   // [MetricsEnum.DistributionByLifecycleStageModelsMetric]: MetricsCaption.DISTRIBUTION_BY_LIFECYCLE_STAGE_MODELS,
 };
 
@@ -118,7 +119,6 @@ const initialChartModelDynamicsByStreams = () => ({
     type: 'bar',
     height: 280,
     spacingBottom: 30,
-    marginLeft: 80,
   },
   title: { text: undefined },
   credits: {
@@ -137,7 +137,7 @@ const initialChartModelDynamicsByStreams = () => ({
       'Валидатор',
     ],
     labels: {
-      style: { fontSize: '12px' },
+      style: { fontSize: '12px', width: 155 },
     },
     lineWidth: 1,
     gridLineWidth: 1,
@@ -369,24 +369,34 @@ const initialChartPilots = () => ({
     title: {
       text: undefined,
     },
-    tickAmount: 5,
     min: 0,
-    max: 100,
     gridLineWidth: 1,
     lineWidth: 0,
     gridLineDashStyle: 'Dash' as Highcharts.DashStyleValue,
+    labels: {
+      enabled: true,
+      style: {
+        fontSize: '12px',
+      },
+    },
   },
   xAxis: {
     accessibility: {
       enabled: true,
     },
-    categories: ['05A', '05B'],
-    gridLineWidth: 1,
-    lineWidth: 0,
-    gridLineDashStyle: 'Dash' as Highcharts.DashStyleValue,
     title: {
       text: undefined,
     },
+    categories: ['05A', '05B'],
+    labels: {
+      enabled: true,
+      style: {
+        fontSize: '12px',
+      },
+    },
+    gridLineWidth: 1,
+    lineWidth: 0,
+    gridLineDashStyle: 'Dash' as Highcharts.DashStyleValue,
   },
   plotOptions: {
     bar: {
@@ -417,7 +427,7 @@ const initialChartPilots = () => ({
     {
       type: 'bar',
       name: '05A',
-      data: [0, null],
+      data: [150, null], // значения для категорий ['05A', '05B']
       color: {
         linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
         stops: [
@@ -429,7 +439,7 @@ const initialChartPilots = () => ({
     {
       type: 'bar',
       name: '05B',
-      data: [null, 0],
+      data: [null, 200], // значения для категорий ['05A', '05B']
       color: {
         linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
         stops: [

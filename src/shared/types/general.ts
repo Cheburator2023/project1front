@@ -61,6 +61,7 @@ type Row = ArtificialRow & {
   uuid: string | null;
   model_status: string | null;
   model_status_assignee: string | null;
+  business_status: string | null,
   pvr: string | null;
   group_company: string | null;
   update_date: string | null;
@@ -160,8 +161,6 @@ type Row = ArtificialRow & {
   model_epic_05a: string | null;
   data_completion_of_stage_05a: string | null;
   solution_to_implement_model: string | null;
-  model_development_results_approving_flg: string | null;
-  business_status: string | null;
   model_epic_07: string | null;
   model_epic_07_date: string | null;
   custom_model_id: string | null;

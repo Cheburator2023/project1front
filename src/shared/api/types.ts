@@ -245,4 +245,3 @@ export type ModelHistoryChangesResponse = {
 export type ReportApi = {
   filters: Partial<ColumnsFilter>;
 };
-
