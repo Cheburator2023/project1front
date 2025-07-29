@@ -675,6 +675,11 @@ export const initialColumns: Array<Column> = [
     type: COLUMN_TYPE.STRING,
   },
   {
+    name: 'status',
+    title: 'Cтатус',
+    type: COLUMN_TYPE.STRING,
+  },
+  {
     name: 'model_status',
     title: 'Этап ЖЦМ',
     type: COLUMN_TYPE.STRING,
@@ -682,11 +687,6 @@ export const initialColumns: Array<Column> = [
   {
     name: 'model_status_assignee',
     title: 'Исполнитель текущего этапа ЖЦМ',
-    type: COLUMN_TYPE.STRING,
-  },
-  {
-    name: 'business_status',
-    title: 'Статус',
     type: COLUMN_TYPE.STRING,
   },
   {
@@ -843,7 +843,6 @@ export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
   model_epic_12_date: [],
   date_of_introduction_into_operation: [],
   model_status: [],
-  business_status: [],
   model_status_assignee: [],
   pvr: [],
   model_source: [],
@@ -857,6 +856,7 @@ export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
   operational_monitoring: [],
   analytical_monitoring: [],
   artefacts_model_id: [],
+  business_status: [],
   lead_validator_comment_model_delete: [],
   lead_validator_resolution_model_delete: [],
   model_creator: [],

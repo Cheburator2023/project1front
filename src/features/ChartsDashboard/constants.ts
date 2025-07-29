@@ -14,8 +14,8 @@ const metricLabelMap: Record<MetricsEnum, MetricsCaption> = {
   // [MetricsEnum.RiskCoverageFinalStatusModelsMetric]: MetricsCaption.RISK_COVERAGE_FINAL_STATUS_MODELS,
   // [MetricsEnum.RegistryCoverageModelsMetric]: MetricsCaption.REGISTRY_COVERAGE_MODELS,
   [MetricsEnum.OnMonitoringModelsMetric]: MetricsCaption.ON_MONITORING_MODELS,
-  [MetricsEnum.FinalStatusModelsMetric]: MetricsCaption.FINAL_STATUS_MODELS,
-  [MetricsEnum.FinalStatusByMonthModelsMetric]: MetricsCaption.FINAL_STATUS_BY_MONTH_MODELS,
+  // [MetricsEnum.FinalStatusModelsMetric]: MetricsCaption.FINAL_STATUS_MODELS,
+  // [MetricsEnum.FinalStatusByMonthModelsMetric]: MetricsCaption.FINAL_STATUS_BY_MONTH_MODELS,
   // [MetricsEnum.DistributionByLifecycleStageModelsMetric]: MetricsCaption.DISTRIBUTION_BY_LIFECYCLE_STAGE_MODELS,
 };
 
@@ -369,34 +369,24 @@ const initialChartPilots = () => ({
     title: {
       text: undefined,
     },
+    tickAmount: 5,
     min: 0,
+    max: 100,
     gridLineWidth: 1,
     lineWidth: 0,
     gridLineDashStyle: 'Dash' as Highcharts.DashStyleValue,
-    labels: {
-      enabled: true,
-      style: {
-        fontSize: '12px',
-      },
-    },
   },
   xAxis: {
     accessibility: {
       enabled: true,
     },
-    title: {
-      text: undefined,
-    },
     categories: ['05A', '05B'],
-    labels: {
-      enabled: true,
-      style: {
-        fontSize: '12px',
-      },
-    },
     gridLineWidth: 1,
     lineWidth: 0,
     gridLineDashStyle: 'Dash' as Highcharts.DashStyleValue,
+    title: {
+      text: undefined,
+    },
   },
   plotOptions: {
     bar: {
@@ -427,7 +417,7 @@ const initialChartPilots = () => ({
     {
       type: 'bar',
       name: '05A',
-      data: [150, null], // значения для категорий ['05A', '05B']
+      data: [0, null],
       color: {
         linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
         stops: [
@@ -439,7 +429,7 @@ const initialChartPilots = () => ({
     {
       type: 'bar',
       name: '05B',
-      data: [null, 200], // значения для категорий ['05A', '05B']
+      data: [null, 0],
       color: {
         linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
         stops: [
