@@ -200,7 +200,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       templates,
     });
 
-    const { filtersResetCount, setAgGridApi } = useGlobalStore();
+    const { filtersResetCount, setAgGridApi, agGridApi } = useGlobalStore();
 
     const { setRows, handleChangeColumnsFilter, columnsFilters, onChangeTopFilters, topFilters } =
       tableProps;
@@ -403,8 +403,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     }, [rowList, setTotalRows, templates]);
 
     useDeepEffect(() => {
-      const api: GridApi | undefined = gridRef.current?.api;
-      if (api && columnsFilters) {
+      if (agGridApi && columnsFilters) {
         const filterModel: any = {};
 
         Object.entries(columnsFilters).forEach(([columnName, filterValues]) => {
@@ -441,10 +440,10 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
 
         const hasFilters = Object.keys(filterModel).length > 0;
         if (hasFilters || Object.keys(columnsFilters).length === 0) {
-          api.setFilterModel(hasFilters ? filterModel : null);
+          agGridApi.setFilterModel(hasFilters ? filterModel : null);
         }
       }
-    }, [columnsFilters, columnList]);
+    }, [agGridApi, columnsFilters, columnList]);
 
     const rowClassRules = useMemo<RowClassRules>(() => {
       return {
