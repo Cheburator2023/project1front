@@ -116,8 +116,11 @@ const containerStyle = { width: '100%', height: '100%', padding: '10px' };
 const gridStyle = { height: '100%', width: '100%' };
 
 const dateFilterParams: IDateFilterParams = {
-  buttons: ['clear'],
+  buttons: ['clear', 'apply'],
   inRangeInclusive: true,
+  maxNumConditions: 1,
+  filterOptions: ['equals', 'inRange'],
+  closeOnApply: true,
   comparator: (filterLocalDateAtMidnight: Date, cellValue: string) => {
     if (cellValue == null) return -1;
 
@@ -199,14 +202,8 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
 
     const { filtersResetCount, setAgGridApi } = useGlobalStore();
 
-    const {
-      setRows,
-      handleChangeColumnsFilter,
-      columnsFilters,
-      onChangeTopFilters,
-      topFilters,
-      rows,
-    } = tableProps;
+    const { setRows, handleChangeColumnsFilter, columnsFilters, onChangeTopFilters, topFilters } =
+      tableProps;
 
     const { modelsCount, modelSource, isDeleteButtonEnabled, userMatches, updateDeleteModelState } =
       useDeleteRightModelPanelStore();
@@ -223,37 +220,39 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     const gridRefInner = useRef<AgGridReact>(null);
     const gridRef = ref || gridRefInner;
 
-    const columnDefs: ColDef[] = columnList.map((data, colIndex) => ({
-      ...data,
-      headerName: data.title,
-      field: data.name,
-      headerTooltip: data.title,
-      rowDrag: colIndex === 0 && rowDragManaged,
-      // https://www.ag-grid.com/react-data-grid/filter-date/#custom-selection-component
-      filter:
-        data.type === COLUMN_TYPE.DATE
-          ? 'agDateColumnFilter'
-          : data.type === COLUMN_TYPE.NUMBER
-          ? 'agNumberColumnFilter'
-          : 'agSetColumnFilter',
-      filterParams: data.type === COLUMN_TYPE.DATE ? dateFilterParams : { buttons: ['clear'] },
-      cellRenderer: data.cellRenderer,
-      cellClass: (params) => {
-        if (isCompared) {
-          const rowIndex = params.node.rowIndex;
-          const prevRow = params.api.getDisplayedRowAtIndex(Number(rowIndex) - 1);
-          const colId = params.column.getColId();
-          const cellValue = params.data[colId];
-          const prevRowSameCellValue = prevRow?.data[colId];
-          const sameId = params?.data?.id?.split(':')[0] === prevRow?.data?.id?.split(':')[0];
+    const columnDefs: ColDef[] = columnList
+      .map((data, colIndex) => ({
+        ...data,
+        headerName: data.title,
+        field: data.name,
+        headerTooltip: data.title,
+        rowDrag: colIndex === 0 && rowDragManaged,
+        // https://www.ag-grid.com/react-data-grid/filter-date/#custom-selection-component
+        filter:
+          data.type === COLUMN_TYPE.DATE
+            ? 'agDateColumnFilter'
+            : data.type === COLUMN_TYPE.NUMBER
+            ? 'agNumberColumnFilter'
+            : 'agSetColumnFilter',
+        filterParams: data.type === COLUMN_TYPE.DATE ? dateFilterParams : { buttons: ['clear'] },
+        cellRenderer: data.cellRenderer,
+        cellClass: (params) => {
+          if (isCompared) {
+            const rowIndex = params.node.rowIndex;
+            const prevRow = params.api.getDisplayedRowAtIndex(Number(rowIndex) - 1);
+            const colId = params.column.getColId();
+            const cellValue = params.data[colId];
+            const prevRowSameCellValue = prevRow?.data[colId];
+            const sameId = params?.data?.id?.split(':')[0] === prevRow?.data?.id?.split(':')[0];
 
-          if (prevRow && sameId && prevRowSameCellValue !== cellValue) {
-            return 'ag-custom-cell-value-changed';
+            if (prevRow && sameId && prevRowSameCellValue !== cellValue) {
+              return 'ag-custom-cell-value-changed';
+            }
           }
-        }
-      },
-      // pinned: data.name === 'active_model' && currentCustomer === CUSTOMER_MAP.UMRV && 'left',
-    })).filter(col => col.name !== 'relations') as ColDef[];
+        },
+        // pinned: data.name === 'active_model' && currentCustomer === CUSTOMER_MAP.UMRV && 'left',
+      }))
+      .filter((col) => col.name !== 'relations') as ColDef[];
 
     const defaultColDef = useMemo<ColDef>(() => {
       return {
@@ -403,6 +402,50 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       }
     }, [rowList, setTotalRows, templates]);
 
+    useDeepEffect(() => {
+      const api: GridApi | undefined = gridRef.current?.api;
+      if (api && columnsFilters) {
+        const filterModel: any = {};
+
+        Object.entries(columnsFilters).forEach(([columnName, filterValues]) => {
+          if (filterValues && filterValues.length > 0) {
+            const columnType = columnList.find((col) => col.name === columnName)?.type;
+
+            if (columnType === COLUMN_TYPE.DATE) {
+
+              if (filterValues[0] === filterValues[1]) {
+                filterModel[columnName] = {
+                  filterType: 'date',
+                  dateFrom: filterValues[0],
+                  dateTo: filterValues[1],
+                  type: "equals",
+                };
+              } else {
+                // Date range filter
+                filterModel[columnName] = {
+                  filterType: 'date',
+                  dateFrom: filterValues[0],
+                  dateTo: filterValues[1],
+                  type: 'inRange',
+                };
+              }
+            } else {
+              // Set filter for non-date columns
+              filterModel[columnName] = {
+                filterType: 'set',
+                values: filterValues,
+              };
+            }
+          }
+        });
+
+        const hasFilters = Object.keys(filterModel).length > 0;
+        if (hasFilters || Object.keys(columnsFilters).length === 0) {
+          api.setFilterModel(hasFilters ? filterModel : null);
+        }
+      }
+    }, [columnsFilters, columnList]);
+
     const rowClassRules = useMemo<RowClassRules>(() => {
       return {
         // row style function
@@ -421,15 +464,12 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       onFirstDataRendered?.(event);
     }, []);
 
-    const getContextMenuItems =(params: any) => {
-
-
-      if(params.column.colId === "model_alias") {
+    const getContextMenuItems = (params: any) => {
+      if (params.column.colId === 'model_alias') {
         return [];
-      } 
-      return params.defaultItems
-     
-  }
+      }
+      return params.defaultItems;
+    };
 
     // useDeepEffect(() => {
     //   if (rows.length && initialRowData === undefined) {
@@ -501,7 +541,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
               pagination={pagination}
               rowDragManaged={rowDragManaged}
               ref={gridRef || gridRefInner}
-              rowData={rows}
+              rowData={rowList}
               columnDefs={columnDefs as any}
               defaultColDef={defaultColDef}
               rowSelection={rowSelection}
@@ -512,7 +552,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
               rowClassRules={isCompared ? rowClassRules : undefined}
               selectionColumnDef={selectionColumnDef}
               autoGroupColumnDef={autoGroupColumnDefProps}
-              // sideBar={sidePanel ? sideBarProps : undefined}
+              sideBar={sidePanel ? sideBarProps : undefined}
               onSelectionChanged={handleSelectionChange}
               onFilterChanged={handleFilterChange}
               paginationPageSize={pageSize}
