@@ -42,8 +42,8 @@ enum MetricsEnum {
   // RiskCoverageFinalStatusModelsMetric = 'riskCoverageFinalStatusModels',
   // RegistryCoverageModelsMetric = 'registryCoverageModels',
   OnMonitoringModelsMetric = 'onMonitoringModels',
-  FinalStatusModelsMetric = 'finalStatusModels',
-  FinalStatusByMonthModelsMetric = 'finalStatusByMonthModels',
+  // FinalStatusModelsMetric = 'finalStatusModels',
+  // FinalStatusByMonthModelsMetric = 'finalStatusByMonthModels',
   // DistributionByLifecycleStageModelsMetric = 'distributionByLifecycleStageModels',
 }
 
