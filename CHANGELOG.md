@@ -1,5 +1,13 @@
 # Semantic Versioning Changelog
 
+## [1.47.2](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.47.1...v1.47.2) (2025-07-30)
+
+
+### Bug Fixes
+
+* template filter reset via ag grid fix ([b296c9a](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/b296c9a6bfa150237402eb7b05de5fa8074e83ff))
+* template filter reset via ag grid fix ([65cdd22](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/65cdd227274e7517ed538dd0c9256bd6cb6cfafb))
+
 ## [1.47.1](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.47.0...v1.47.1) (2025-07-29)
 
 
