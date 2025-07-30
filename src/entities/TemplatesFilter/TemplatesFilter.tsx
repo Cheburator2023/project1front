@@ -7,6 +7,7 @@ import { initialColumnsFilters, initialTopFilters, RIGHT_PANEL_TYPE } from '@sha
 import { useTemplateFilters } from '@src/shared/hooks';
 
 import { getGroupsOptions } from './helpers';
+import { useGlobalStore } from '../../shared/stores/globalStore';
 
 export interface TemplatesFilterProps {
   templates: Template[];
@@ -26,7 +27,7 @@ export const TemplatesFilter = ({
   const { topFilters, onChangeTopFilters, onChangeColumnsFilters, columnsFilters } =
     useContext(FiltersContext);
 
-  const { isModifiedFilter } = useTemplateFilters(columnsFilters, templates, topFilters.templates);
+  const { isModifiedFilter, resetFilters } = useTemplateFilters(columnsFilters, templates, topFilters.templates);
 
   const groupedOptions = useMemo(() => {
     if (templates) {
@@ -52,9 +53,13 @@ export const TemplatesFilter = ({
     }
   };
 
+  const { setFiltersResetCount } = useGlobalStore();
+
+
   const handleResetFilters = () => {
     onChangeColumnsFilters(initialColumnsFilters);
-    onChangeTopFilters(initialTopFilters);
+    onChangeTopFilters({ ...topFilters, templates: [] });
+    setFiltersResetCount();
   };
 
   const dynamicKeyForRenderSelect = templates[templates.length - 1]?.template_name;

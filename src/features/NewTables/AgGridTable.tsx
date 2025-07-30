@@ -359,6 +359,8 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     };
 
     const handleFilterChange = (event: FilterChangedEvent): void => {
+      console.log('🐸 Pepe said >> handleFilterChange >> event:', event);
+
       const colName: string = event?.columns[0]?.getColId();
       const colDef: any = event.api.getColumnFilterModel(colName);
       const isDate = colDef?.filterType === 'date';
