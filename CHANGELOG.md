@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.47.1](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.47.0...v1.47.1) (2025-07-29)
+
+
+### Bug Fixes
+
+* column filters set fixed ([10ba453](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/10ba45380db8ecd850bde7a9bc69d8b0457b5a24))
+
 ## [1.46.2](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.46.1...v1.46.2) (2025-06-03)
 
 

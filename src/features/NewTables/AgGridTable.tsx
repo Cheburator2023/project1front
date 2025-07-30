@@ -202,14 +202,8 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
 
     const { filtersResetCount, setAgGridApi } = useGlobalStore();
 
-    const {
-      setRows,
-      handleChangeColumnsFilter,
-      columnsFilters,
-      onChangeTopFilters,
-      topFilters,
-      rows,
-    } = tableProps;
+    const { setRows, handleChangeColumnsFilter, columnsFilters, onChangeTopFilters, topFilters } =
+      tableProps;
 
     const { modelsCount, modelSource, isDeleteButtonEnabled, userMatches, updateDeleteModelState } =
       useDeleteRightModelPanelStore();
@@ -547,7 +541,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
               pagination={pagination}
               rowDragManaged={rowDragManaged}
               ref={gridRef || gridRefInner}
-              rowData={rows}
+              rowData={rowList}
               columnDefs={columnDefs as any}
               defaultColDef={defaultColDef}
               rowSelection={rowSelection}
@@ -558,7 +552,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
               rowClassRules={isCompared ? rowClassRules : undefined}
               selectionColumnDef={selectionColumnDef}
               autoGroupColumnDef={autoGroupColumnDefProps}
-              // sideBar={sidePanel ? sideBarProps : undefined}
+              sideBar={sidePanel ? sideBarProps : undefined}
               onSelectionChanged={handleSelectionChange}
               onFilterChanged={handleFilterChange}
               paginationPageSize={pageSize}
