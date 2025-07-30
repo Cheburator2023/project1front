@@ -384,7 +384,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
           const arrayValue = Array.isArray(value) ? value : [value];
           handleChangeColumnsFilter(colName, arrayValue);
 
-          if (shouldResetTemplateOnInitialValueChange(arrayValue, initialTemplateValue, colName)) {
+          if (event.source !== 'api') {
             onChangeTopFilters?.({ ...topFilters, templates: [] });
           }
         }
