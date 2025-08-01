@@ -1,22 +1,26 @@
 import { SELECT_TYPE, SelectStringProps } from '@src/shared/ui/organisms';
 import * as Highcharts from 'highcharts';
 import { MetricsCaption, MetricsEnum } from './types';
-import { width } from '@admiral-ds/react-ui';
 
-const metricLabelMap: Record<MetricsEnum, MetricsCaption> = {
+const metricLabelMap: Record<string, string> = {
+  // Основные метрики (существующие)
   [MetricsEnum.ImplementedModelsMetric]: MetricsCaption.IMPLEMENTED_MODELS,
   [MetricsEnum.DevelopedModelsMetric]: MetricsCaption.DEVELOPED_MODELS,
   [MetricsEnum.MrmModelsMetric]: MetricsCaption.SUM_RM_MODELS,
-  // [MetricsEnum.PilotsMetric]: MetricsCaption.PILOTS,
   [MetricsEnum.TasksMetric]: MetricsCaption.DYNAMIC_BY_STREAMS_MODELS,
   [MetricsEnum.TakenOutOfOperationModelsMetric]: MetricsCaption.TAKEN_OUT_OF_OPERATION_MODELS,
   [MetricsEnum.StalledModelsByMonthMetric]: MetricsCaption.STALLED_MODLES_BY_MONTH,
-  // [MetricsEnum.RiskCoverageFinalStatusModelsMetric]: MetricsCaption.RISK_COVERAGE_FINAL_STATUS_MODELS,
-  // [MetricsEnum.RegistryCoverageModelsMetric]: MetricsCaption.REGISTRY_COVERAGE_MODELS,
   [MetricsEnum.OnMonitoringModelsMetric]: MetricsCaption.ON_MONITORING_MODELS,
   [MetricsEnum.FinalStatusModelsMetric]: MetricsCaption.FINAL_STATUS_MODELS,
   [MetricsEnum.FinalStatusByMonthModelsMetric]: MetricsCaption.FINAL_STATUS_BY_MONTH_MODELS,
-  // [MetricsEnum.DistributionByLifecycleStageModelsMetric]: MetricsCaption.DISTRIBUTION_BY_LIFECYCLE_STAGE_MODELS,
+  
+  // Delta метрики (новые)
+  [`${MetricsEnum.ImplementedModelsMetric}_delta`]: MetricsCaption.IMPLEMENTED_MODELS_DELTA,
+  [`${MetricsEnum.DevelopedModelsMetric}_delta`]: MetricsCaption.DEVELOPED_MODELS_DELTA,
+  [`${MetricsEnum.MrmModelsMetric}_delta`]: MetricsCaption.SUM_RM_MODELS_DELTA,
+  [`${MetricsEnum.OnMonitoringModelsMetric}_delta`]: MetricsCaption.ON_MONITORING_MODELS_DELTA,
+  [`${MetricsEnum.TakenOutOfOperationModelsMetric}_delta`]: MetricsCaption.TAKEN_OUT_OF_OPERATION_MODELS_DELTA,
+  [`${MetricsEnum.FinalStatusModelsMetric}_delta`]: MetricsCaption.FINAL_STATUS_MODELS_DELTA,
 };
 
 const itemsExport = [
@@ -52,11 +56,72 @@ const dsStreamArtifactOptions = {
 
 const metricsOptions = {
   type: SELECT_TYPE.STRING,
-  options: Object.values(MetricsEnum).map((metric) => ({
-    value: metric,
-    text: metricLabelMap[metric],
-  })),
-} as SelectStringProps;
+  options: [
+    // Основные данные
+    {
+      value: MetricsEnum.ImplementedModelsMetric,
+      text: MetricsCaption.IMPLEMENTED_MODELS,
+    },
+    {
+      value: MetricsEnum.DevelopedModelsMetric,
+      text: MetricsCaption.DEVELOPED_MODELS,
+    },
+    {
+      value: MetricsEnum.MrmModelsMetric,
+      text: MetricsCaption.SUM_RM_MODELS,
+    },
+    {
+      value: MetricsEnum.OnMonitoringModelsMetric,
+      text: MetricsCaption.ON_MONITORING_MODELS,
+    },
+    {
+      value: MetricsEnum.TakenOutOfOperationModelsMetric,
+      text: MetricsCaption.TAKEN_OUT_OF_OPERATION_MODELS,
+    },
+    {
+      value: MetricsEnum.FinalStatusModelsMetric,
+      text: MetricsCaption.FINAL_STATUS_MODELS,
+    },
+    {
+      value: MetricsEnum.FinalStatusByMonthModelsMetric,
+      text: MetricsCaption.FINAL_STATUS_BY_MONTH_MODELS,
+    },
+    {
+      value: MetricsEnum.TasksMetric,
+      text: MetricsCaption.DYNAMIC_BY_STREAMS_MODELS,
+    },
+    {
+      value: MetricsEnum.StalledModelsByMonthMetric,
+      text: MetricsCaption.STALLED_MODLES_BY_MONTH,
+    },
+    
+    // Delta данные
+    {
+      value: `${MetricsEnum.ImplementedModelsMetric}_delta`,
+      text: MetricsCaption.IMPLEMENTED_MODELS_DELTA,
+    },
+    {
+      value: `${MetricsEnum.DevelopedModelsMetric}_delta`,
+      text: MetricsCaption.DEVELOPED_MODELS_DELTA,
+    },
+    {
+      value: `${MetricsEnum.MrmModelsMetric}_delta`,
+      text: MetricsCaption.SUM_RM_MODELS_DELTA,
+    },
+    {
+      value: `${MetricsEnum.OnMonitoringModelsMetric}_delta`,
+      text: MetricsCaption.ON_MONITORING_MODELS_DELTA,
+    },
+    {
+      value: `${MetricsEnum.TakenOutOfOperationModelsMetric}_delta`,
+      text: MetricsCaption.TAKEN_OUT_OF_OPERATION_MODELS_DELTA,
+    },
+    {
+      value: `${MetricsEnum.FinalStatusModelsMetric}_delta`,
+      text: MetricsCaption.FINAL_STATUS_MODELS_DELTA,
+    },
+  ],
+} as SelectStringProps; 
 
 const initialKPI_SUM = { caption: MetricsCaption.KPI_SUM, value: 0, delta: 0, relative: true };
 const initialTotalModels = {

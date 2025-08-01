@@ -29,6 +29,14 @@ enum MetricsCaption {
   DISTRIBUTION_BY_LIFECYCLE_STAGE_MODELS = 'Распределение моделей по этапам жцм',
   PILOTS = 'Пилоты',
   DYNAMIC_BY_STREAMS_MODELS = 'Динамика задач по моделям в разрезе ролей',
+  
+  // Delta метрики
+  IMPLEMENTED_MODELS_DELTA = 'Внедренные модели (Delta)',
+  DEVELOPED_MODELS_DELTA = 'Разработанные модели (Delta)',
+  SUM_RM_MODELS_DELTA = 'Модели в MRM СУМ (Delta)',
+  ON_MONITORING_MODELS_DELTA = 'Модели на мониторинге (Delta)',
+  TAKEN_OUT_OF_OPERATION_MODELS_DELTA = 'Выведенные из эксплуатации (Delta)',
+  FINAL_STATUS_MODELS_DELTA = 'Модели с финальным статусом (Delta)',
 }
 
 enum MetricsEnum {

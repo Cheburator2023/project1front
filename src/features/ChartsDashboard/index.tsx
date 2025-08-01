@@ -449,27 +449,33 @@ const ChartsDashboard = () => {
 
   const handleExportSelectedMetric = async () => {
     if (!selectedMetric) return;
-
+  
     setIsExportingMetric(true);
-
+  
+    // Парсим selectedMetric для определения базовой метрики и типа данных
+    const isDelta = selectedMetric.endsWith('_delta');
+    const baseMetric = isDelta ? selectedMetric.replace('_delta', '') : selectedMetric;
+    const dataType = isDelta ? 'delta' : 'current';
+  
     const baseQueryParams = getQueryParams({
       startDate: tempFilters.tempStartDate && switchDateFormat(tempFilters.tempStartDate),
       endDate: tempFilters.tempEndDate && switchDateFormat(tempFilters.tempEndDate),
       selectedStreams: tempFilters.tempSelectedStreams,
     });
-
+  
     const queryParams = {
       ...baseQueryParams,
-      metric: selectedMetric,
+      metric: baseMetric,  // Отправляем базовое имя метрики без _delta
+      dataType: dataType, // Отправляем тип данных отдельно
     };
-
+  
     const today = new Date();
     const dateStr = `${String(today.getDate()).padStart(2, '0')}.${String(
       today.getMonth() + 1,
     ).padStart(2, '0')}.${today.getFullYear()}`;
-
+  
     const readableLabel = metricLabelMap[selectedMetric] || selectedMetric;
-
+  
     try {
       await mutationProtectedFetch<void, Blob>({
         fetchApiRoute: API_ROUTES.METRICS_EXPORT,
