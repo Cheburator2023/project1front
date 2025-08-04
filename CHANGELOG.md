@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.48.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.47.2...v1.48.0) (2025-08-04)
+
+
+### Features
+
+* добавлена выгрузка для прироста ([0f6a0ae](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/0f6a0ae8d7a76ae7e41e077e73102560f5b16cd0))
+
 ## [1.47.2](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.47.1...v1.47.2) (2025-07-30)
 
 
