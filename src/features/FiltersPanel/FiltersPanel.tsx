@@ -61,7 +61,7 @@ export const FiltersPanel = ({
   const handleResetFilters = () => {
     onChangeColumnsFilters(initialColumnsFilters);
     onChangeTopFilters({ ...topFilters, templates: [] });
-    onChangeModelDownloadingDate('');
+    // onChangeModelDownloadingDate('');
     setFiltersResetCount();
   };
 
