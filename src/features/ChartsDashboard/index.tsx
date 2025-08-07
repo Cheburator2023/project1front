@@ -49,8 +49,6 @@ import {
   CustomDateField,
   CustomSearchSelect,
   DisabledMetricWrapper,
-  DisabledOverlay,
-  DisabledText,
 } from './style';
 import { MenuIconSelect } from './MenuIconSelect';
 import { MetricsCaption } from './types';
@@ -792,9 +790,6 @@ const ChartsDashboard = () => {
                         title: { font: 'Additional/S' },
                       }}
                     />
-                    <DisabledOverlay>
-                      <DisabledText>Временно недоступно</DisabledText>
-                    </DisabledOverlay>
                   </DisabledMetricWrapper>
 
                   <DisabledMetricWrapper>
@@ -810,9 +805,6 @@ const ChartsDashboard = () => {
                         title: { font: 'Additional/S' },
                       }}
                     />
-                    <DisabledOverlay>
-                      <DisabledText>Временно недоступно</DisabledText>
-                    </DisabledOverlay>
                   </DisabledMetricWrapper>
                 </Column>
               </Cover>
