@@ -202,3 +202,38 @@ export const CustomSearchSelect = styled(SearchSelect)`
   }
 `;
 
+export const DisabledMetricWrapper = styled.div`
+  position: relative;
+  filter: blur(3px);
+  opacity: 0.6;
+  pointer-events: none;
+  transition: all 0.3s ease;
+
+  &:hover {
+    filter: blur(1px);
+    opacity: 0.8;
+  }
+`;
+
+export const DisabledOverlay = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid #ff6b6b;
+  border-radius: 8px;
+  padding: 8px 16px;
+  z-index: 10;
+  pointer-events: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+`;
+
+export const DisabledText = styled.span`
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: #ff6b6b;
+  white-space: nowrap;
+`;
+
