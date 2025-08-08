@@ -13,7 +13,8 @@ const metricLabelMap: Record<string, string> = {
   [MetricsEnum.OnMonitoringModelsMetric]: MetricsCaption.ON_MONITORING_MODELS,
   [MetricsEnum.FinalStatusModelsMetric]: MetricsCaption.FINAL_STATUS_MODELS,
   [MetricsEnum.FinalStatusByMonthModelsMetric]: MetricsCaption.FINAL_STATUS_BY_MONTH_MODELS,
-  
+  [MetricsEnum.DistributionByLifecycleStageModelsMetric]: MetricsCaption.DISTRIBUTION_BY_LIFECYCLE_STAGE_MODELS,
+
   // Delta метрики (новые)
   [`${MetricsEnum.ImplementedModelsMetric}_delta`]: MetricsCaption.IMPLEMENTED_MODELS_DELTA,
   [`${MetricsEnum.DevelopedModelsMetric}_delta`]: MetricsCaption.DEVELOPED_MODELS_DELTA,
@@ -93,6 +94,10 @@ const metricsOptions = {
     {
       value: MetricsEnum.StalledModelsByMonthMetric,
       text: MetricsCaption.STALLED_MODLES_BY_MONTH,
+    },
+    {
+      value: MetricsEnum.DistributionByLifecycleStageModelsMetric,
+      text: MetricsCaption.DISTRIBUTION_BY_LIFECYCLE_STAGE_MODELS,
     },
     
     // Delta данные
