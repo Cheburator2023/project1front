@@ -202,3 +202,28 @@ export const CustomSearchSelect = styled(SearchSelect)`
   }
 `;
 
+export const DisabledMetricWrapper = styled.div`
+  position: relative;
+  opacity: 0.4;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  
+  /* Полупрозрачный фон */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: ${(p) => smallGroupBorderRadius(p.theme.shape)};
+    z-index: 1;
+  }
+  
+  /* Скрываем содержимое виджета */
+  > * {
+    opacity: 0.3;
+  }
+`;
+

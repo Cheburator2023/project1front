@@ -52,7 +52,7 @@ enum MetricsEnum {
   OnMonitoringModelsMetric = 'onMonitoringModels',
   FinalStatusModelsMetric = 'finalStatusModels',
   FinalStatusByMonthModelsMetric = 'finalStatusByMonthModels',
-  // DistributionByLifecycleStageModelsMetric = 'distributionByLifecycleStageModels',
+  DistributionByLifecycleStageModelsMetric = 'distributionByLifecycleStageModels',
 }
 
 export { MetricsEnum, StatisticDataProps, MetricsCaption, FrameSizeType }

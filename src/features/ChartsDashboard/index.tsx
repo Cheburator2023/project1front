@@ -48,6 +48,7 @@ import {
   GridRow,
   CustomDateField,
   CustomSearchSelect,
+  DisabledMetricWrapper,
 } from './style';
 import { MenuIconSelect } from './MenuIconSelect';
 import { MetricsCaption } from './types';
@@ -190,13 +191,13 @@ const ChartsDashboard = () => {
     setOnMonitoringModels({
       ...onMonitoringModels,
       value: metricsData.onMonitoringModels.count,
-      delta: metricsData.onMonitoringModels.deltaPercent,
+      delta: metricsData.onMonitoringModels.delta,
     });
 
     setTakenOutOfOperationModels({
       ...takenOutOfOperationModels,
       value: metricsData.takenOutOfOperationModels.count,
-      delta: metricsData.takenOutOfOperationModels.deltaPercent,
+      delta: metricsData.takenOutOfOperationModels.delta,
     });
 
     setStalledModelsByMonth({
@@ -730,7 +731,6 @@ const ChartsDashboard = () => {
                         value={onMonitoringModels.value}
                         delta={onMonitoringModels.delta}
                         relative={onMonitoringModels.relative}
-                        isDeltaPercentage
                         size="stat-md"
                         styles={{
                           frame: { withBorder: true },
@@ -748,7 +748,6 @@ const ChartsDashboard = () => {
                         value={takenOutOfOperationModels.value}
                         delta={takenOutOfOperationModels.delta}
                         relative={takenOutOfOperationModels.relative}
-                        isDeltaPercentage
                         size="stat-md"
                         styles={{
                           frame: { withBorder: true },
@@ -778,31 +777,35 @@ const ChartsDashboard = () => {
                     }}
                   />
 
-                  <MetricDisplay
-                    caption={registryCoverageModels.caption}
-                    value={registryCoverageModels.value}
-                    delta={registryCoverageModels.delta}
-                    relative={registryCoverageModels.relative}
-                    isDeltaPercentage
-                    size="stat-lg"
-                    styles={{
-                      frame: { withBorder: true },
-                      title: { font: 'Additional/S' },
-                    }}
-                  />
+                  <DisabledMetricWrapper>
+                    <MetricDisplay
+                      caption={registryCoverageModels.caption}
+                      value={registryCoverageModels.value}
+                      delta={registryCoverageModels.delta}
+                      relative={registryCoverageModels.relative}
+                      isDeltaPercentage
+                      size="stat-lg"
+                      styles={{
+                        frame: { withBorder: true },
+                        title: { font: 'Additional/S' },
+                      }}
+                    />
+                  </DisabledMetricWrapper>
 
-                  <MetricDisplay
-                    caption={riskCoverageFinalStatusModels.caption}
-                    value={riskCoverageFinalStatusModels.value}
-                    delta={riskCoverageFinalStatusModels.delta}
-                    relative={riskCoverageFinalStatusModels.relative}
-                    isDeltaPercentage
-                    size="stat-lg"
-                    styles={{
-                      frame: { withBorder: true },
-                      title: { font: 'Additional/S' },
-                    }}
-                  />
+                  <DisabledMetricWrapper>
+                    <MetricDisplay
+                      caption={riskCoverageFinalStatusModels.caption}
+                      value={riskCoverageFinalStatusModels.value}
+                      delta={riskCoverageFinalStatusModels.delta}
+                      relative={riskCoverageFinalStatusModels.relative}
+                      isDeltaPercentage
+                      size="stat-lg"
+                      styles={{
+                        frame: { withBorder: true },
+                        title: { font: 'Additional/S' },
+                      }}
+                    />
+                  </DisabledMetricWrapper>
                 </Column>
               </Cover>
             </Container>
