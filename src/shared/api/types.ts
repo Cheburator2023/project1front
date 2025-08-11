@@ -141,6 +141,7 @@ export enum ArtifactType {
   TEXT = 'text',
   NUMBER = 'number',
   USER = 'user',
+  RFD = 'rfd',
 }
 
 export type ArtifactTypeUnion = `${ArtifactType}`;
