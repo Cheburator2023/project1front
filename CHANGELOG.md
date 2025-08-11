@@ -1,5 +1,21 @@
 # Semantic Versioning Changelog
 
+# [1.49.0](https://git.sfera.inno.local/sumd/mrms-frontend/compare/v1.48.0...v1.49.0) (2025-08-11)
+
+
+### Bug Fixes
+
+* исправил стили для скрытых дэшбордов ([27d569c](https://git.sfera.inno.local/sumd/mrms-frontend/commit/27d569c3806319a873617c5eb1c97b69feda511e))
+* поменял процентные дельты на обычные у 2-х виджетов и скрыл 2 виджета ([6affeeb](https://git.sfera.inno.local/sumd/mrms-frontend/commit/6affeeb96fdb4af0fbf5a123456607625af87924))
+* убрал выгрузку на определенную дату ([7b8ac50](https://git.sfera.inno.local/sumd/mrms-frontend/commit/7b8ac504a36d931af7fa21578df3c80e54c0776a))
+* фикс поиска шаблона, сброса фильтра и стиля иконки ([888014e](https://git.sfera.inno.local/sumd/mrms-frontend/commit/888014e3b0754b757ef732478ee69f55fae09b5f))
+* фикс проблемы отображения фильтров ([3622fca](https://git.sfera.inno.local/sumd/mrms-frontend/commit/3622fca634b2099b12fa40f9d32daf170e351297))
+
+
+### Features
+
+* выгрузка метрики распределение по этапам ЖЦМ ([9a8f324](https://git.sfera.inno.local/sumd/mrms-frontend/commit/9a8f3246a944e8dd60315c0a372eaa880a479730))
+
 # [1.48.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.47.2...v1.48.0) (2025-08-04)
 
 
