@@ -76,6 +76,14 @@ export const getStringValue = (value?: InputValue): string => {
   return '';
 };
 
+export const getRFDValue = (value?: InputValue): string => {
+  if (value?.type === INPUT_TYPE.RFD) {
+    return value.value ?? '';
+  }
+
+  return '';
+};
+
 export const getDateValue = (value?: InputValue) => {
   if (
     value?.value &&

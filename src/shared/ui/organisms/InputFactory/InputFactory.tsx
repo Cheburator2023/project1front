@@ -10,7 +10,7 @@ import {
   TextField,
 } from '@admiral-ds/react-ui';
 
-import { SearchSelect } from '@shared/ui/organisms';
+import { SearchSelect, RFDInput } from '@shared/ui/organisms';
 
 import { INPUT_TYPE, InputFactoryProps, InputValue } from './types';
 
@@ -22,6 +22,7 @@ import {
   getSelectValue,
   getSelectValues,
   getStringValue,
+  getRFDValue,
 } from './helpers';
 import { Artifact } from '../../../api';
 import { InputFactoryExtraText } from './InputFactoryExtraText';
@@ -622,34 +623,33 @@ function InputFactorySwitcher<T extends string>({
           return extraTextInitialError;
         }
 
+        // If no conditions are set, don't show any extra text
+        if (!requireConditions && !valueConditions) {
+          return null;
+        }
+
+        let conditionText: string;
+
+        // Determine the appropriate condition text based on the combination of flags
         if (requireConditions) {
           if (valueConditions) {
-            return (
-              <InputFactoryExtraText
-                extraTextInitial={extraTextInitial}
-                conditionText="Есть условия для заполнения"
-              />
-            );
+            // Both requireConditions and valueConditions are true
+            conditionText = "Есть условия для заполнения";
+          } else {
+            // Only requireConditions is true
+            conditionText = "Есть условия для обязательного заполнения";
           }
-
-          return (
-            <InputFactoryExtraText
-              extraTextInitial={extraTextInitial}
-              conditionText="Есть условия для обязательного заполнения"
-            />
-          );
+        } else {
+          // Only valueConditions is true
+          conditionText = "Есть условия для обязательного значения";
         }
 
-        if (valueConditions) {
-          return (
-            <InputFactoryExtraText
-              extraTextInitial={extraTextInitial}
-              conditionText="Есть условия для обязательного значения"
-            />
-          );
-        }
-
-        return null;
+        return (
+          <InputFactoryExtraText
+            extraTextInitial={extraTextInitial}
+            conditionText={conditionText}
+          />
+        );
       };
 
       return (
@@ -667,6 +667,58 @@ function InputFactorySwitcher<T extends string>({
           required={required}
           label={label}
           onChange={(e) => onChange?.(name, { type, value: e.target.value })}
+        />
+      );
+    }
+
+    case INPUT_TYPE.RFD: {
+      const formattedValue = getRFDValue(value);
+
+      const getExtraText = () => {
+        if (error) {
+          return extraTextInitialError;
+        }
+
+        // If no conditions are set, don't show any extra text
+        if (!requireConditions && !valueConditions) {
+          return null;
+        }
+
+        let conditionText: string;
+
+        // Determine the appropriate condition text based on the combination of flags
+        if (requireConditions) {
+          if (valueConditions) {
+            // Both requireConditions and valueConditions are true
+            conditionText = "Есть условия для заполнения";
+          } else {
+            // Only requireConditions is true
+            conditionText = "Есть условия для обязательного заполнения";
+          }
+        } else {
+          // Only valueConditions is true
+          conditionText = "Есть условия для обязательного значения";
+        }
+
+        return (
+          <InputFactoryExtraText
+            extraTextInitial={extraTextInitial}
+            conditionText={conditionText}
+          />
+        );
+      };
+
+      return (
+        <RFDInput
+          id={id}
+          label={label}
+          value={formattedValue}
+          onChange={(newValue) => onChange?.(name, { type, value: newValue })}
+          disabled={disabled}
+          required={required}
+          error={error}
+          autoFocus={autoFocus}
+          extraText={getExtraText()}
         />
       );
     }

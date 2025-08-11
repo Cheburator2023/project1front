@@ -20,6 +20,7 @@ enum INPUT_TYPE {
   TEXT_AREA = 'TEXT_AREA',
   SELECT = 'SELECT',
   MULTI_SELECT = 'MULTI_SELECT',
+  RFD = 'RFD',
 }
 
 type SelectInputValue = {
@@ -54,6 +55,11 @@ type NumberInputValue = {
 
 type StringInputValue = {
   type: INPUT_TYPE.STRING | INPUT_TYPE.TEXT_AREA;
+  value: string;
+};
+
+type RFDInputValue = {
+  type: INPUT_TYPE.RFD;
   value: string;
 };
 
@@ -108,6 +114,7 @@ type QuarterlyDropdownGroupInputValue = {
 type InputValue =
   | FlagInputValue
   | StringInputValue
+  | RFDInputValue
   | NumberInputValue
   | MultiSelectInputValue
   | SelectInputValue
@@ -223,6 +230,10 @@ type MultiSelectInput<T extends string> = CommonInputProps<T> & {
   multiple: true;
 };
 
+type RFDInputProps<T extends string> = CommonInputProps<T> & {
+  type: INPUT_TYPE.RFD;
+};
+
 type InputFactoryProps<T extends string> =
   | StringInput<T>
   | DateInput<T>
@@ -237,7 +248,8 @@ type InputFactoryProps<T extends string> =
   | FlagInput<T>
   | TextAreaInput<T>
   | SelectInput<T>
-  | MultiSelectInput<T>;
+  | MultiSelectInput<T>
+  | RFDInputProps<T>;
 
 // TODO: refactor
 type GroupFieldProps<T extends string> = {
@@ -257,6 +269,7 @@ export {
   NumberInputValue,
   DateInputValue,
   StringInputValue,
+  RFDInputValue,
   MultiSelectInputValue,
   FlagInputValue,
   StringInput,
@@ -278,5 +291,6 @@ export {
   TextAreaInput,
   SelectInput,
   MultiSelectInput,
+  RFDInputProps,
   InputFactoryProps,
 };
