@@ -18,7 +18,7 @@ enum MetricsCaption {
   TOTAL_MODELS = 'Всего моделей',
   IMPLEMENTED_MODELS = 'Внедренные модели',
   DEVELOPED_MODELS = 'Разработанные модели',
-  SUM_RM_MODELS = 'Модели в MPM СУМ',
+  SUM_RM_MODELS = 'Всего моделей',
   FINAL_STATUS_MODELS = 'Модели с финальным статусом',
   REGISTRY_COVERAGE_MODELS = 'Доля моделей, покрытых системой управления моделями',
   RISK_COVERAGE_FINAL_STATUS_MODELS = 'Доля моделей, покрытых системой управления моделями, с финальным статусом',
@@ -33,7 +33,7 @@ enum MetricsCaption {
   // Delta метрики
   IMPLEMENTED_MODELS_DELTA = 'Внедренные модели (Delta)',
   DEVELOPED_MODELS_DELTA = 'Разработанные модели (Delta)',
-  SUM_RM_MODELS_DELTA = 'Модели в MRM СУМ (Delta)',
+  SUM_RM_MODELS_DELTA = 'Всего моделей (Delta)',
   ON_MONITORING_MODELS_DELTA = 'Модели на мониторинге (Delta)',
   TAKEN_OUT_OF_OPERATION_MODELS_DELTA = 'Выведенные из эксплуатации (Delta)',
   FINAL_STATUS_MODELS_DELTA = 'Модели с финальным статусом (Delta)',

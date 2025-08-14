@@ -23,11 +23,11 @@ export const mockedMetricsResponse: MetricsResponseType = {
   },
   onMonitoringModels: {
     count: 38,
-    deltaPercent: 0,
+    delta: 0,
   },
   takenOutOfOperationModels: {
     count: 16,
-    deltaPercent: 0,
+    delta: 0,
   },
   tasks: {
     ds_lead: 12,
@@ -41,7 +41,7 @@ export const mockedMetricsResponse: MetricsResponseType = {
     validator: 10,
   },
   stalledModelsByMonth: [13, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  finalStatusByMonthModels: [1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  finalStatusByMonthModels: [1000, 1004, 1025, 1027, 1027, 1050, 1055, 1058, 1060, 1065, 1070, 1075],
   distributionByLifecycleStageModels: [
     ['Инициализация', 235],
     ['Внедрена', 207],
