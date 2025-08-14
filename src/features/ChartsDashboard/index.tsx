@@ -48,6 +48,7 @@ import {
   GridRow,
   CustomDateField,
   CustomSearchSelect,
+  DisabledMetricWrapper,
 } from './style';
 import { MenuIconSelect } from './MenuIconSelect';
 import { MetricsCaption } from './types';
@@ -700,7 +701,7 @@ const ChartsDashboard = () => {
                     <MetricDisplay
                       caption={MetricsCaption.DISTRIBUTION_BY_LIFECYCLE_STAGE_MODELS}
                       showMetrics={false}
-                      size="chart-lg"
+                      size="chart-md"
                       chartOptions={distributionByLifecycleStageModels}
                       styles={{
                         frame: { withBorder: true },
@@ -714,7 +715,7 @@ const ChartsDashboard = () => {
                     <MetricDisplay
                       caption={MetricsCaption.PILOTS}
                       showMetrics={false}
-                      size="chart-lg"
+                      size="chart-md"
                       chartOptions={pilots}
                       styles={{
                         frame: { withBorder: true },
@@ -724,6 +725,41 @@ const ChartsDashboard = () => {
                         },
                       }}
                     />
+                    <div style={{ display: 'grid' }}>
+                      <MetricDisplay
+                        caption={onMonitoringModels.caption}
+                        value={onMonitoringModels.value}
+                        delta={onMonitoringModels.delta}
+                        relative={onMonitoringModels.relative}
+                        size="stat-md"
+                        styles={{
+                          frame: { withBorder: true },
+                          title: {
+                            color: 'Neutral/Neutral 90',
+                            css: { marginBottom: '17px' },
+                          },
+                          width: '100%',
+                          height: 'auto',
+                        }}
+                      />
+
+                      <MetricDisplay
+                        caption={takenOutOfOperationModels.caption}
+                        value={takenOutOfOperationModels.value}
+                        delta={takenOutOfOperationModels.delta}
+                        relative={takenOutOfOperationModels.relative}
+                        size="stat-md"
+                        styles={{
+                          frame: { withBorder: true },
+                          title: {
+                            color: 'Neutral/Neutral 90',
+                            css: { marginBottom: '17px' },
+                          },
+                          width: '100%',
+                          height: 'auto',
+                        }}
+                      />
+                    </div>
                   </div>
                 </Column>
                 <Column>
@@ -741,43 +777,8 @@ const ChartsDashboard = () => {
                     }}
                   />
 
-                  <div style={{ display: 'grid', height: '100%' }}>
+                  <DisabledMetricWrapper>
                     <MetricDisplay
-                      caption={onMonitoringModels.caption}
-                      value={onMonitoringModels.value}
-                      delta={onMonitoringModels.delta}
-                      relative={onMonitoringModels.relative}
-                      size="stat-md"
-                      styles={{
-                        frame: { withBorder: true },
-                        title: {
-                          color: 'Neutral/Neutral 90',
-                          // css: { marginBottom: '17px' },
-                        },
-                        width: '100%',
-                        height: 'auto',
-                      }}
-                    />
-
-                    <MetricDisplay
-                      caption={takenOutOfOperationModels.caption}
-                      value={takenOutOfOperationModels.value}
-                      delta={takenOutOfOperationModels.delta}
-                      relative={takenOutOfOperationModels.relative}
-                      size="stat-md"
-                      styles={{
-                        frame: { withBorder: true },
-                        title: {
-                          color: 'Neutral/Neutral 90',
-                          // css: { marginBottom: '17px' },
-                        },
-                        width: '100%',
-                        height: 'auto',
-                      }}
-                    />
-                  </div>
-
-                  {/* <MetricDisplay
                       caption={registryCoverageModels.caption}
                       value={registryCoverageModels.value}
                       delta={registryCoverageModels.delta}
@@ -788,9 +789,11 @@ const ChartsDashboard = () => {
                         frame: { withBorder: true },
                         title: { font: 'Additional/S' },
                       }}
-                    /> */}
+                    />
+                  </DisabledMetricWrapper>
 
-                  {/* <MetricDisplay
+                  <DisabledMetricWrapper>
+                    <MetricDisplay
                       caption={riskCoverageFinalStatusModels.caption}
                       value={riskCoverageFinalStatusModels.value}
                       delta={riskCoverageFinalStatusModels.delta}
@@ -801,7 +804,8 @@ const ChartsDashboard = () => {
                         frame: { withBorder: true },
                         title: { font: 'Additional/S' },
                       }}
-                    /> */}
+                    />
+                  </DisabledMetricWrapper>
                 </Column>
               </Cover>
             </Container>
