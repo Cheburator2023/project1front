@@ -191,6 +191,12 @@ const initialChartModelDynamicsByStreams = () => ({
     type: 'bar',
     height: 280,
     spacingBottom: 30,
+    zoomType: 'x',
+    panning: {
+      enabled: true,
+      type: 'x' as const,
+    },
+    panKey: 'shift' as const,
   },
   title: { text: undefined },
   credits: {
@@ -218,13 +224,27 @@ const initialChartModelDynamicsByStreams = () => ({
   yAxis: {
     title: { text: null },
     min: 0,
+    startOnTick: false,
+    endOnTick: false,
+    minRange: 10,
+    labels: {
+      formatter: function (this: any) {
+        return this.value.toLocaleString();
+      },
+    },
   },
   legend: { enabled: false },
   tooltip: {
     backgroundColor: '#333',
     borderRadius: 4,
     style: { color: '#fff' },
-    format: '<b>{point.category}</b><br/><span>{point.y} задач</span>',
+    formatter: function (this: any) {
+      const point = this.point;
+      const value = point.y;
+      const formattedValue = value.toLocaleString();
+
+      return `<b>${point.category}</b><br/><span>${formattedValue} задач</span>`;
+    },
   },
   plotOptions: {
     bar: {
@@ -260,13 +280,12 @@ const initialChartFinalStatusByMonthModels = () => ({
     type: 'areaspline',
     height: 170,
     marginTop: 22,
-    // Улучшенное масштабирование
     zoomType: 'x',
     panning: {
       enabled: true,
-      type: 'x' as Highcharts.OptionsChartPanningTypeValue,
+      type: 'x' as const,
     },
-    panKey: 'shift' as Highcharts.OptionsPanKeyValue,
+    panKey: 'shift' as const,
   },
   title: {
     text: undefined,
@@ -284,14 +303,10 @@ const initialChartFinalStatusByMonthModels = () => ({
     gridLineWidth: 1,
     lineWidth: 1,
     gridLineDashStyle: 'Dash' as Highcharts.DashStyleValue,
-    // Автоматическое масштабирование для лучшей видимости изменений
     startOnTick: false,
     endOnTick: false,
-    // Минимальный диапазон для оси Y
     minRange: 10,
-    // Автоматическое определение минимального значения
     min: undefined,
-    // Форматирование подписей оси Y
     labels: {
       formatter: function (this: any) {
         return this.value.toLocaleString();
@@ -327,9 +342,7 @@ const initialChartFinalStatusByMonthModels = () => ({
         lineColor: 'var(--neutral-neutral-50, #0E9CFF)',
         fillColor: 'var(--neutral-neutral-00, #ffffff)',
       },
-      // Улучшенная видимость изменений
       threshold: null,
-      // Минимальная высота для area
       minPointLength: 2,
     },
   },
@@ -345,13 +358,11 @@ const initialChartFinalStatusByMonthModels = () => ({
       color: 'var(--neutral-neutral-00, #ffffff)',
     },
     hideDelay: 500,
-    // Улучшенный формат с выделением изменений
     formatter: function (this: any) {
       const point = this.point;
       const value = point.y;
       const formattedValue = value.toLocaleString();
 
-      // Если значение больше 1000, показываем более детально
       if (value >= 1000) {
         return `<span class="tooltip-key">${point.category}</span><br/>
                 <span class="tooltip-value">${formattedValue} моделей</span>`;
@@ -372,7 +383,6 @@ const initialChartFinalStatusByMonthModels = () => ({
         lineWidth: 2,
         lineColor: 'var(--neutral-neutral-50, #0E9CFF)',
         fillColor: 'var(--neutral-neutral-00, #ffffff)',
-        // Улучшенная видимость маркеров
         states: {
           hover: {
             radius: 6,
@@ -396,6 +406,12 @@ const initialChartStalledModelsByMonth = () => ({
     type: 'areaspline',
     height: 170,
     marginTop: 22,
+    zoomType: 'x',
+    panning: {
+      enabled: true,
+      type: 'x' as const,
+    },
+    panKey: 'shift' as const,
   },
   title: {
     text: undefined,
@@ -413,6 +429,15 @@ const initialChartStalledModelsByMonth = () => ({
     gridLineWidth: 1,
     lineWidth: 1,
     gridLineDashStyle: 'Dash' as Highcharts.DashStyleValue,
+    startOnTick: false,
+    endOnTick: false,
+    minRange: 10,
+    min: undefined,
+    labels: {
+      formatter: function (this: any) {
+        return this.value.toLocaleString();
+      },
+    },
   },
   xAxis: {
     categories: [
@@ -436,6 +461,15 @@ const initialChartStalledModelsByMonth = () => ({
   plotOptions: {
     areaspline: {
       enableMouseTracking: true,
+      marker: {
+        enabled: true,
+        radius: 5,
+        lineWidth: 2,
+        lineColor: 'var(--error-error-70, #FF0D0D)',
+        fillColor: 'var(--neutral-neutral-00, #ffffff)',
+      },
+      threshold: null,
+      minPointLength: 2,
     },
   },
   legend: {
@@ -450,8 +484,14 @@ const initialChartStalledModelsByMonth = () => ({
       color: 'var(--neutral-neutral-00, #ffffff)',
     },
     hideDelay: 500,
-    format:
-      '<span class="tooltip-key">{key}</span><br/><span class="tooltip-value">{point.y} моделей</span>',
+    formatter: function (this: any) {
+      const point = this.point;
+      const value = point.y;
+      const formattedValue = value.toLocaleString();
+
+      return `<span class="tooltip-key">${point.category}</span><br/>
+              <span class="tooltip-value">${formattedValue} моделей</span>`;
+    },
   },
   series: [
     {
@@ -464,6 +504,12 @@ const initialChartStalledModelsByMonth = () => ({
         lineWidth: 2,
         lineColor: 'var(--error-error-70, #FF0D0D)',
         fillColor: 'var(--neutral-neutral-00, #ffffff)',
+        states: {
+          hover: {
+            radius: 6,
+            lineWidth: 3,
+          },
+        },
       },
       fillColor: {
         linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
@@ -480,6 +526,12 @@ const initialChartPilots = () => ({
   chart: {
     height: 180,
     marginTop: 20,
+    zoomType: 'x',
+    panning: {
+      enabled: true,
+      type: 'x' as const,
+    },
+    panKey: 'shift' as const,
   },
   accessibility: {
     enabled: true,
@@ -498,10 +550,16 @@ const initialChartPilots = () => ({
     gridLineWidth: 1,
     lineWidth: 0,
     gridLineDashStyle: 'Dash' as Highcharts.DashStyleValue,
+    startOnTick: false,
+    endOnTick: false,
+    minRange: 10,
     labels: {
       enabled: true,
       style: {
         fontSize: '12px',
+      },
+      formatter: function (this: any) {
+        return this.value.toLocaleString();
       },
     },
   },
@@ -545,8 +603,14 @@ const initialChartPilots = () => ({
       color: 'var(--neutral-neutral-00, #ffffff)',
     },
     hideDelay: 500,
-    format:
-      '<span class="tooltip-key">{series.name}</span><br/><span class="tooltip-value">{y}</span>',
+    formatter: function (this: any) {
+      const point = this.point;
+      const value = point.y;
+      const formattedValue = value ? value.toLocaleString() : '0';
+
+      return `<span class="tooltip-key">${point.series.name}</span><br/>
+              <span class="tooltip-value">${formattedValue}</span>`;
+    },
   },
   series: [
     {
@@ -582,8 +646,6 @@ const initialChartDistributionByLifecycleStageModels = (): Highcharts.Options & 
   chart: {
     height: 185,
     marginTop: 20,
-    marginLeft: -10,
-    marginRight: 200,
     plotBackgroundColor: undefined,
     plotBorderWidth: undefined,
     plotBorderRadius: 0,
@@ -602,16 +664,12 @@ const initialChartDistributionByLifecycleStageModels = (): Highcharts.Options & 
     align: 'right' as Highcharts.AlignValue,
     verticalAlign: 'top' as Highcharts.VerticalAlignValue,
     layout: 'vertical' as Highcharts.OptionsLayoutValue,
-    x: 0,
-    y: 10,
     itemStyle: {
-      width: 180,
-      overflow: 'visible',
-      textOverflow: 'clip',
-      whiteSpace: 'normal',
-      fontSize: '12px',
+      width: 100,
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
     },
-    itemMarginBottom: 8,
   },
   tooltip: {
     shared: false,
@@ -622,8 +680,14 @@ const initialChartDistributionByLifecycleStageModels = (): Highcharts.Options & 
       color: 'var(--neutral-neutral-00, #ffffff)',
     },
     hideDelay: 500,
-    format:
-      '<span class="tooltip-key">{key}</span><br/><span class="tooltip-value">{y} моделей</span>',
+    formatter: function (this: any) {
+      const point = this.point;
+      const value = point.y;
+      const formattedValue = value.toLocaleString();
+
+      return `<span class="tooltip-key">${point.key}</span><br/>
+              <span class="tooltip-value">${formattedValue} моделей</span>`;
+    },
   },
   plotOptions: {
     pie: {
@@ -634,8 +698,6 @@ const initialChartDistributionByLifecycleStageModels = (): Highcharts.Options & 
       },
       showInLegend: true,
       innerSize: '50%',
-      size: '100%',
-      center: ['45%', '50%'],
     },
   },
   colors: ['#ADD5F9', '#FC8D62', '#8DA0CB', '#E78AC3', '#A6D854', '#FFD92F'],
