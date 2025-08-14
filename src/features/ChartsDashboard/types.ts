@@ -1,10 +1,4 @@
-type FrameSizeType =
-  | 'stat-sm'
-  | 'stat-md'
-  | 'stat-lg'
-  | 'chart-sm'
-  | 'chart-md'
-  | 'chart-lg';
+type FrameSizeType = 'stat-sm' | 'stat-md' | 'stat-lg' | 'chart-sm' | 'chart-md' | 'chart-lg';
 
 type StatisticDataProps = {
   caption: string;
@@ -16,7 +10,7 @@ type StatisticDataProps = {
 enum MetricsCaption {
   KPI_SUM = 'КПЭ СУМ',
   TOTAL_MODELS = 'Всего моделей',
-  IMPLEMENTED_MODELS = 'Внедренные модели',
+  IMPLEMENTED_MODELS = 'Внедренные модели в ПИМ',
   DEVELOPED_MODELS = 'Разработанные модели',
   SUM_RM_MODELS = 'Всего моделей',
   FINAL_STATUS_MODELS = 'Модели с финальным статусом',
@@ -29,9 +23,9 @@ enum MetricsCaption {
   DISTRIBUTION_BY_LIFECYCLE_STAGE_MODELS = 'Распределение моделей по этапам жцм',
   PILOTS = 'Пилоты',
   DYNAMIC_BY_STREAMS_MODELS = 'Динамика задач по моделям в разрезе ролей',
-  
+
   // Delta метрики
-  IMPLEMENTED_MODELS_DELTA = 'Внедренные модели (Delta)',
+  IMPLEMENTED_MODELS_DELTA = 'Внедренные модели в ПИМ (Delta)',
   DEVELOPED_MODELS_DELTA = 'Разработанные модели (Delta)',
   SUM_RM_MODELS_DELTA = 'Всего моделей (Delta)',
   ON_MONITORING_MODELS_DELTA = 'Модели на мониторинге (Delta)',
@@ -55,4 +49,4 @@ enum MetricsEnum {
   DistributionByLifecycleStageModelsMetric = 'distributionByLifecycleStageModels',
 }
 
-export { MetricsEnum, StatisticDataProps, MetricsCaption, FrameSizeType }
+export { MetricsEnum, StatisticDataProps, MetricsCaption, FrameSizeType };
