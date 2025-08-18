@@ -61,7 +61,7 @@ type Row = ArtificialRow & {
   uuid: string | null;
   model_status: string | null;
   model_status_assignee: string | null;
-  business_status: string | null,
+  business_status: string | null;
   pvr: string | null;
   group_company: string | null;
   update_date: string | null;
@@ -176,12 +176,12 @@ type Row = ArtificialRow & {
   product_name: string | null;
   developing_model_reason: string | null;
   provides_piloting: string | null;
-  operational_monitoring: string | null;
-  analytical_monitoring: string | null;
   bpmn_key: string | null;
   output_table: string | null;
   allocation_assessment_class: string | null;
   allocation_assessment_parameters: string | null;
+  operational_monitoring: string | null;
+  analytical_monitoring: string | null;
 };
 
 type ColumnsFilter = Record<keyof Row, Array<string>>;
