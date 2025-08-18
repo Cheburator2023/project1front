@@ -35,7 +35,7 @@ export const RFDInput: React.FC<RFDInputProps> = ({
   // Initialize display value
   useEffect(() => {
     if (!value || value === DEFAULT_VALUE) {
-      setDisplayValue('');
+      setDisplayValue(DEFAULT_VALUE);
     } else if (value.startsWith(RFD_PREFIX)) {
       setDisplayValue(value);
     } else {
@@ -54,10 +54,18 @@ export const RFDInput: React.FC<RFDInputProps> = ({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     const cursorPos = e.target.selectionStart || 0;
+    const wasEmptyOrDefault = displayValue === '' || displayValue === DEFAULT_VALUE;
 
     // If user clears the input completely, set to default value
     if (!inputValue.trim()) {
-      setDisplayValue('');
+      setDisplayValue(DEFAULT_VALUE);
+      onChange?.(DEFAULT_VALUE);
+      return;
+    }
+
+    // If input is just the prefix or starts with prefix but has no numbers, treat as empty
+    if (inputValue === RFD_PREFIX || (inputValue.startsWith(RFD_PREFIX) && inputValue.length === RFD_PREFIX.length)) {
+      setDisplayValue(DEFAULT_VALUE);
       onChange?.(DEFAULT_VALUE);
       return;
     }
@@ -73,10 +81,17 @@ export const RFDInput: React.FC<RFDInputProps> = ({
     const afterPrefix = processedValue.slice(prefixLength);
     const numericOnly = afterPrefix.replace(/[^0-9]/g, '');
     
+    // If no numbers after prefix, show default value
+    if (!numericOnly) {
+      setDisplayValue(DEFAULT_VALUE);
+      onChange?.(DEFAULT_VALUE);
+      return;
+    }
+    
     const finalValue = `${RFD_PREFIX}${numericOnly}`;
 
     setDisplayValue(finalValue);
-    setCursorPosition(cursorPos);
+    setCursorPosition(wasEmptyOrDefault ? finalValue.length : cursorPos);
 
     // Call onChange with the processed value
     onChange?.(finalValue);
@@ -94,8 +109,18 @@ export const RFDInput: React.FC<RFDInputProps> = ({
 
     // Allow deletion keys
     if (['Backspace', 'Delete'].includes(e.key)) {
-      // Prevent deleting the RFD- prefix
-      if (e.key === 'Backspace' && cursorPos <= prefixLength) {
+      // Prevent deleting the RFD- prefix when already present
+      if (displayValue.startsWith(RFD_PREFIX)) {
+        if (e.key === 'Backspace' && cursorPos <= prefixLength) {
+          e.preventDefault();
+        }
+      }
+      return;
+    }
+
+    // If field is empty or shows default text, allow typing digits to start fresh
+    if (displayValue === '' || displayValue === DEFAULT_VALUE) {
+      if (!/^[0-9]$/.test(e.key)) {
         e.preventDefault();
       }
       return;
@@ -115,10 +140,9 @@ export const RFDInput: React.FC<RFDInputProps> = ({
 
   const handleFocus = () => {
     setIsFocused(true);
-    // If the field is empty, show the prefix
-    if (!displayValue) {
-      setDisplayValue(RFD_PREFIX);
-      setCursorPosition(RFD_PREFIX.length);
+    // If the field is empty or shows default, keep it as is
+    if (!displayValue || displayValue === DEFAULT_VALUE) {
+      setDisplayValue(DEFAULT_VALUE);
     }
   };
 
@@ -146,7 +170,7 @@ export const RFDInput: React.FC<RFDInputProps> = ({
         autoFocus={autoFocus}
         dimension="s"
         value={displayValue}
-        placeholder={isFocused ? RFD_PREFIX : DEFAULT_VALUE}
+        placeholder={DEFAULT_VALUE}
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}
         onFocus={handleFocus}
