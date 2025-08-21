@@ -1,5 +1,17 @@
 # Semantic Versioning Changelog
 
+# [1.50.0](https://git.sfera.inno.local/sumd/mrms-frontend/compare/v1.49.1...v1.50.0) (2025-08-21)
+
+
+### Bug Fixes
+
+* update RFDInput to handle default value correctly ([60df6fc](https://git.sfera.inno.local/sumd/mrms-frontend/commit/60df6fc9d9f63ac0ef2e4ddfc8a69e55a05ea4af))
+
+
+### Features
+
+* add RFD input type and related functionality ([cc9ff5e](https://git.sfera.inno.local/sumd/mrms-frontend/commit/cc9ff5ec52e160ba87798410dfab1b240f1f66b3))
+
 ## [1.49.1](https://git.sfera.inno.local/sumd/mrms-frontend/compare/v1.49.0...v1.49.1) (2025-08-21)
 
 
