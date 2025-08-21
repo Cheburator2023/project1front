@@ -1,5 +1,15 @@
 # Semantic Versioning Changelog
 
+## [1.49.1](https://git.sfera.inno.local/sumd/mrms-frontend/compare/v1.49.0...v1.49.1) (2025-08-21)
+
+
+### Bug Fixes
+
+* внедренные модели в пим ([8404960](https://git.sfera.inno.local/sumd/mrms-frontend/commit/840496072cc340cd73161bcfab4af0e44bc29e07))
+* внедренные модели в пим v2 ([3292703](https://git.sfera.inno.local/sumd/mrms-frontend/commit/32927035abcf7dcbfd9b6d0b7699abaad77c9982))
+* добавил 2 атрибута ([119b98e](https://git.sfera.inno.local/sumd/mrms-frontend/commit/119b98e3ba07f909c37a6d891ba7565e450d067f))
+* правка стилей по виджетам ([5a449c1](https://git.sfera.inno.local/sumd/mrms-frontend/commit/5a449c183f46af668277cf2b564bc9cd41f4c860))
+
 # [1.49.0](https://git.sfera.inno.local/sumd/mrms-frontend/compare/v1.48.0...v1.49.0) (2025-08-11)
 
 
