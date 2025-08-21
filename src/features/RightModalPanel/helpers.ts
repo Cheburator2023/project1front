@@ -152,6 +152,11 @@ const getInputValue = (artifact: Artifact, rowValue: string) => {
 
       return rowValue ? { type, value: rowValue } : undefined;
     }
+    case ArtifactType.RFD: {
+      const type = INPUT_TYPE.RFD;
+
+      return rowValue ? { type, value: rowValue } : undefined;
+    }
     default: {
       const type = INPUT_TYPE.STRING;
 
@@ -653,6 +658,13 @@ const mapArtifactToField = (
       };
     }
 
+    case ArtifactType.RFD: {
+      return {
+        ...commonAttributes,
+        type: INPUT_TYPE.RFD,
+      };
+    }
+
     default: {
       return {
         ...commonAttributes,
@@ -1055,6 +1067,11 @@ const getProperFormatValueForSubmit = (inputValue: InputValue) => {
         artefact_string_value: text,
         artefact_value_id: Number(id),
       }));
+    case INPUT_TYPE.RFD:
+      return {
+        artefact_string_value: String(value),
+        artefact_value_id: null,
+      };
     default:
       return {
         artefact_string_value: String(value),
