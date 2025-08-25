@@ -1,12 +1,19 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 
-import { Button, TableRow as ATableRow, T, Toggle } from '@admiral-ds/react-ui';
+import { Button, T, Toggle } from '@admiral-ds/react-ui';
 import { ReactComponent as CloseOutline } from '@admiral-ds/icons/build/service/CloseOutline.svg';
+import { AgGridReact } from 'ag-grid-react';
+import {
+  ColDef,
+  GridReadyEvent,
+  RowDragEndEvent,
+  SelectionChangedEvent,
+  ICellRendererParams,
+} from 'ag-grid-community';
 
 import { COLUMN_TYPE, ColumnsFilter, Row } from '@shared/types';
 import { Template } from '@shared/api';
 import { useFiltersStore } from '@shared/stores/filtersStore';
-import { Table } from '@shared/ui';
 import {
   ACTIVE_SCREEN,
   RIGHT_PANEL_TYPE,
@@ -14,6 +21,8 @@ import {
 } from '@shared/constants';
 import { TemplatesFilter, FilterButtonCount } from '@entities';
 import { useTemplateFilters } from '@src/shared/hooks';
+import { useDisplayStore, useTemplatesStore } from '@src/shared/stores';
+import { AG_GRID_LOCALE_RU } from '@src/pages/Playground/locale/agGridLocale.ru';
 
 import {
   ActionPanelLeft,
@@ -23,22 +32,51 @@ import {
   ChipsCustom,
   Wrapper,
 } from './styles';
+import { useDeepEffect } from '../../shared/hooks/useDeepEffect';
 
-export interface TemplateFiltersProps {
-  templates: Template[];
-  updateRightPanelType: (newRightPanelType: RIGHT_PANEL_TYPE | null) => void;
-  updateActiveScreen: (newActiveScreen: ACTIVE_SCREEN) => void;
-}
+export const TemplateFilters = () => {
+  const { templates } = useTemplatesStore();
+  const { setActiveScreen, setRightPanelType } = useDisplayStore();
+  const { topFilters, setTopFilters, filterModel, setFilterModel, resetFilters } = useFiltersStore();
+  const gridRef = useRef<AgGridReact>(null);
 
-export const TemplateFilters = ({
-  templates,
-  updateRightPanelType,
-  updateActiveScreen,
-}: TemplateFiltersProps) => {
-  const { topFilters, setTopFilters, applyFilterToGrid, getColumnsFilters, resetFilters } = useFiltersStore();
-  const columnsFilters = getColumnsFilters();
+  const handleChangeColumnsFilter = useCallback(
+    (rowFieldName: string, selectValue: string[]) => {
+      const columnType = initialColumns.find((col) => col.name === rowFieldName)?.type;
 
-  const [rows, setRows] = useState<ATableRow[]>([]);
+      const newFilterModel = { ...filterModel };
+      if (selectValue.length > 0) {
+        if (columnType === COLUMN_TYPE.DATE) {
+          if (selectValue[0] === selectValue[1]) {
+            newFilterModel[rowFieldName] = {
+              dateFrom: selectValue[0],
+              dateTo: null,
+              type: 'equals',
+            };
+          } else {
+            newFilterModel[rowFieldName] = {
+              dateFrom: selectValue[0],
+              dateTo: selectValue[1],
+              type: 'inRange',
+            };
+          }
+        } else {
+          newFilterModel[rowFieldName] = {
+            values: selectValue,
+          };
+        }
+      } else {
+        delete newFilterModel[rowFieldName];
+      }
+
+      setFilterModel(newFilterModel);
+      setTopFilters({ ...topFilters, templates: topFilters.templates || [] });
+    },
+    [filterModel, setFilterModel, topFilters, setTopFilters],
+  );
+  const columnsFilters = filterModel;
+
+  const [rows, setRows] = useState<any[]>([]);
   const [showFilterTemplate, setShowFilterTemplate] = useState(true);
 
   const {
@@ -59,7 +97,7 @@ export const TemplateFilters = ({
           ? []
           : prevColumnsFilterValues.filter((filterValue) => filterValue !== value);
 
-        applyFilterToGrid(columnFilterName, newFilterValues, type);
+        setFilterModel({ ...filterModel, [columnFilterName]: newFilterValues });
         setTopFilters({ ...topFilters });
       }
 
@@ -67,69 +105,100 @@ export const TemplateFilters = ({
         setTopFilters({ ...topFilters, templates: [] });
       }
     },
-    [columnsFilters, topFilters, applyFilterToGrid, setTopFilters, shouldResetTemplateOnInitialFilterRemove],
+    [columnsFilters, topFilters, filterModel, setFilterModel, setTopFilters, shouldResetTemplateOnInitialFilterRemove],
   );
 
-  const cols = useMemo(
+  const ValueCellRenderer = useCallback((params: ICellRendererParams) => {
+    const filters = params.value || [];
+    const row = params.data;
+    const filterType = initialColumns.find((column) => column.name === row.id)?.type;
+    const hasActiveTemplate = topFilters.templates.length > 0;
+    const isModified = modifiedFilters.has(row.id);
+    const isTemplate = hasActiveTemplate && !isModified;
+
+    if (filterType === COLUMN_TYPE.DATE) {
+      return (
+        <div style={{ display: 'flex', flexDirection: 'row' }}>
+          {filters.length ? (
+            <ChipsCustom
+              isTemplate={isTemplate}
+              dimension="s"
+              appearance="filled"
+              onClose={() => handleRemoveColumnFilterValue(row.id, undefined, filterType)}
+            >
+              {filters[0]} - {filters[1]}
+            </ChipsCustom>
+          ) : null}
+        </div>
+      );
+    }
+
+    return (
+      <div style={{ display: 'flex', flexDirection: 'row' }}>
+        {filters.map((filterValue: string) => (
+          <ChipsCustom
+            isTemplate={isTemplate}
+            style={{ marginRight: '5px' }}
+            key={filterValue}
+            dimension="s"
+            appearance="filled"
+            onClose={() => handleRemoveColumnFilterValue(row.id, filterValue)}
+          >
+            {filterValue}
+          </ChipsCustom>
+        ))}
+      </div>
+    );
+  }, [handleRemoveColumnFilterValue, modifiedFilters, topFilters.templates.length]);
+
+  const columnDefs: ColDef[] = useMemo(
     () => [
       {
-        name: 'name',
-        title: 'Наименование атрибута',
+        headerName: 'Наименование атрибута',
+        field: 'name',
         width: 600,
-        sticky: true,
+        pinned: 'left',
+        rowDrag: true,
       },
       {
-        name: 'value',
-        title: 'Выбор',
-        width: 'calc(100% - 600px)',
-        renderCell(filters: string[], row: ATableRow & { id: keyof Row }): React.ReactNode {
-          const filterType = initialColumns.find((column) => column.name === row.id)?.type;
-
-          const isTemplate = topFilters.templates.length > 0 && !modifiedFilters.has(row.id);
-
-          if (filterType === COLUMN_TYPE.DATE) {
-            return (
-              <div style={{ display: 'flex', flexDirection: 'row' }}>
-                {filters.length ? (
-                  <ChipsCustom
-                    isTemplate={isTemplate}
-                    dimension="s"
-                    appearance="filled"
-                    onClose={() => handleRemoveColumnFilterValue(row.id, undefined, filterType)}
-                  >
-                    {filters[0]} - {filters[1]}
-                  </ChipsCustom>
-                ) : null}
-              </div>
-            );
-          }
-
-          return (
-            <div style={{ display: 'flex', flexDirection: 'row' }}>
-              {filters.map((filterValue) => (
-                <ChipsCustom
-                  isTemplate={isTemplate}
-                  style={{ marginRight: '5px' }}
-                  key={filterValue}
-                  dimension="s"
-                  appearance="filled"
-                  onClose={() => handleRemoveColumnFilterValue(row.id, filterValue)}
-                >
-                  {filterValue}
-                </ChipsCustom>
-              ))}
-            </div>
-          );
-        },
+        headerName: 'Выбор',
+        field: 'value',
+        flex: 1,
+        cellRenderer: ValueCellRenderer,
       },
     ],
-    [handleRemoveColumnFilterValue, modifiedFilters],
+    [ValueCellRenderer],
   );
 
-  useEffect(() => {
+  const onGridReady = useCallback((params: GridReadyEvent) => {
+    const selectedRowIds = rows.filter(row => row.selected).map(row => row.id);
+    params.api.forEachNode(node => {
+      if (selectedRowIds.includes(node.data.id)) {
+        node.setSelected(true);
+      }
+    });
+  }, [rows]);
+
+  const getFilterValues = useCallback((filterValue: any): string[] => {
+    if (!filterValue) return [];
+    if (Array.isArray(filterValue)) return filterValue;
+
+    if (typeof filterValue === 'object') {
+      if ('values' in filterValue) {
+        return filterValue.values;
+      }
+      if ('dateFrom' in filterValue) {
+        return filterValue.dateTo ? [filterValue.dateFrom, filterValue.dateTo] : [filterValue.dateFrom];
+      }
+    }
+
+    return [];
+  }, []);
+
+  useDeepEffect(() => {
     const filters = Object.keys(columnsFilters);
 
-    const newRows: ATableRow[] = getFilteredColumns(initialColumns, showFilterTemplate)
+    const newRows: any[] = getFilteredColumns(initialColumns, showFilterTemplate)
       .sort((prevColumn, nextColumn) => {
         const prevIndex = filters.indexOf(prevColumn.name);
         const nextIndex = filters.indexOf(nextColumn.name);
@@ -153,61 +222,104 @@ export const TemplateFilters = ({
           id: column.name,
           name: column.title,
           selected: !!columnsFilters[column.name],
-          value: columnsFilters[column.name] ?? [],
+          value: getFilterValues(columnsFilters[column.name]),
         };
       });
 
     setRows(newRows);
-  }, [columnsFilters, showFilterTemplate, modifiedFilters]);
+  }, [columnsFilters, showFilterTemplate, modifiedFilters, getFilteredColumns]);
 
-  const handleDragRows = (rowId: string, nextRowId: string | null, _: string | null) => {
-    const currentRow = rows.find((row) => row.id === rowId);
-    const nextRow = rows.find((row) => row.id === nextRowId);
-    if (!currentRow?.selected || !nextRow?.selected) return;
+  const handleRowDragEnd = useCallback((event: RowDragEndEvent) => {
+    if (!event.overNode) return;
+
+    const draggedData = event.node.data;
+    const overData = event.overNode.data;
+
+    if (!draggedData?.selected || !overData?.selected) return;
 
     const keys = Object.keys(columnsFilters);
-    const currentRowIndex = keys.findIndex((key) => key === rowId);
-    const nextRowIndex = keys.findIndex((key) => key === nextRowId);
+    const currentRowIndex = keys.findIndex((key) => key === draggedData.id);
+    const nextRowIndex = keys.findIndex((key) => key === overData.id);
+
+    if (currentRowIndex === -1 || nextRowIndex === -1) return;
+
     const direction = currentRowIndex > nextRowIndex ? 'up' : 'down';
 
     keys.splice(currentRowIndex, 1);
-    const nextRowIndexUpdated = keys.findIndex((key) => key === nextRowId);
+    const nextRowIndexUpdated = keys.findIndex((key) => key === overData.id);
 
     if (direction === 'up') {
-      keys.splice(nextRowIndexUpdated, 0, rowId);
+      keys.splice(nextRowIndexUpdated, 0, draggedData.id);
     } else {
-      keys.splice(nextRowIndexUpdated + 1, 0, rowId);
+      keys.splice(nextRowIndexUpdated + 1, 0, draggedData.id);
     }
 
     keys.forEach((key) => {
       const filterValues = columnsFilters[key as keyof typeof columnsFilters];
       if (filterValues) {
-        const columnType = initialColumns.find((col) => col.name === key)?.type;
-        applyFilterToGrid(key, filterValues, columnType);
+        handleChangeColumnsFilter(key, getFilterValues(filterValues));
       }
     });
     setTopFilters({ ...topFilters, templates: [] });
-  };
+  }, [columnsFilters, handleChangeColumnsFilter, topFilters, setTopFilters, getFilterValues]);
 
-  const handleSelectionChange = (ids: Record<string, boolean>): void => {
-    const updRows = rows.map((row) => ({ ...row, selected: ids[row.id] }));
+  const handleSelectionChange = useCallback((event: SelectionChangedEvent): void => {
+    const selectedNodes = event.api.getSelectedNodes();
+    const selectedIds = selectedNodes.map(node => node.data.id);
 
-    Object.entries(ids).forEach(([columnFilterName, selected]) => {
-      const columnName = columnFilterName as keyof Row;
+    const updatedRows = rows.map(row => ({
+      ...row,
+      selected: selectedIds.includes(row.id)
+    }));
+
+    const newFilterModel = { ...filterModel };
+    let hasChanges = false;
+
+    updatedRows.forEach(row => {
+      const columnName = row.id as keyof Row;
       const columnType = initialColumns.find((col) => col.name === columnName)?.type;
-      
-      if (selected) {
+
+      if (row.selected) {
         const existingValue = columnsFilters[columnName];
-        const filterValues = existingValue || [];
-        applyFilterToGrid(columnName, filterValues, columnType);
+        const filterValues = getFilterValues(existingValue) || [];
+
+        if (filterValues.length > 0) {
+          if (columnType === COLUMN_TYPE.DATE) {
+            if (filterValues[0] === filterValues[1]) {
+              newFilterModel[columnName] = {
+                dateFrom: filterValues[0],
+                dateTo: null,
+                type: 'equals',
+              };
+            } else {
+              newFilterModel[columnName] = {
+                dateFrom: filterValues[0],
+                dateTo: filterValues[1],
+                type: 'inRange',
+              };
+            }
+          } else {
+            newFilterModel[columnName] = {
+              values: filterValues,
+            };
+          }
+          hasChanges = true;
+        }
       } else {
-        applyFilterToGrid(columnName, [], columnType);
+        if (newFilterModel[columnName]) {
+          delete newFilterModel[columnName];
+          hasChanges = true;
+        }
       }
     });
-    setTopFilters({ ...topFilters, templates: [] });
 
-    setRows(updRows);
-  };
+    if (hasChanges) {
+      setFilterModel(newFilterModel);
+      setTopFilters({ ...topFilters, templates: [] });
+    }
+
+    setRows(updatedRows);
+  }, [rows, filterModel, columnsFilters, topFilters, setFilterModel, setTopFilters, getFilterValues]);
 
   const handleResetFilters = () => {
     resetFilters();
@@ -223,7 +335,7 @@ export const TemplateFilters = ({
         <ActionPanelLeft>
           <FilterButtonCount
             topFilters={topFilters}
-            updateActiveScreen={updateActiveScreen}
+            updateActiveScreen={setActiveScreen}
             columnsFilters={columnsFilters}
             activeScreen={ACTIVE_SCREEN.TABLE}
             templates={templates}
@@ -240,7 +352,8 @@ export const TemplateFilters = ({
             <TemplatesFilter
               showLabel={false}
               templates={templates}
-              updateRightPanelType={updateRightPanelType}
+              activeTemplate={activeTemplate}
+              updateRightPanelType={setRightPanelType}
             />
           </ActiveTemplate>
           <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -265,7 +378,7 @@ export const TemplateFilters = ({
               </T>
             </Button>
             <Button
-              onClick={() => updateActiveScreen(ACTIVE_SCREEN.TABLE)}
+              onClick={() => setActiveScreen(ACTIVE_SCREEN.TABLE)}
               appearance="ghost"
               dimension="s"
               icon={<CloseOutline />}
@@ -278,17 +391,21 @@ export const TemplateFilters = ({
           </div>
         </ActionPanelRight>
       </ActionPanelWrapper>
-      <div>
-        <Table
-          rowList={rows}
-          columnList={cols}
-          disableColumnResize
-          rowsDraggable
-          onRowDrag={handleDragRows}
-          displayRowSelectionColumn
-          greyHeader
-          onRowSelectionChange={handleSelectionChange}
-          style={{ maxHeight: 'calc(100vh - 185px)' }}
+      <div className="ag-theme-quartz" style={{ height: 'calc(100vh - 185px)', width: '100%' }}>
+        <AgGridReact
+          ref={gridRef}
+          rowData={rows}
+          columnDefs={columnDefs}
+          rowSelection={{ mode: 'multiRow', checkboxes: true }}
+          rowDragManaged
+          animateRows
+          onGridReady={onGridReady}
+          onSelectionChanged={handleSelectionChange}
+          onRowDragEnd={handleRowDragEnd}
+          localeText={AG_GRID_LOCALE_RU}
+          suppressRowClickSelection
+          headerHeight={40}
+          rowHeight={50}
         />
       </div>
     </Wrapper>

@@ -2,16 +2,15 @@
 import React, { ReactNode, useEffect, useRef, useState } from 'react';
 import { T } from '@admiral-ds/react-ui';
 
-import { Column, COLUMN_TYPE, ColumnsFilter, Row } from '@shared/types';
+import { Column, COLUMN_TYPE, Row } from '@shared/types';
 import {
   API_ROUTES,
   useFetch,
   CompareModelsResponseType,
   mockedModelsCompareResponse,
 } from '@shared/api';
-import { filterColumnsByColumnsFilters } from '@shared/helpers';
 import { CellWrapper, CellContentFactory } from '@entities';
-import { useExploitationModeStore } from '@src/shared/stores';
+import { useExploitationModeStore, useFiltersStore } from '@src/shared/stores';
 
 import { initialColumns } from '@src/shared/constants';
 import { compareValues, prepareFetchParams, processFetchData } from '../helpers';
@@ -34,16 +33,15 @@ export const getQueryParams = (
   return params;
 };
 
-export const useCompareModels = (columnsFilters: Partial<ColumnsFilter>) => {
+export const useCompareModels = () => {
   const cellRef = useRef(null);
   const [compareOnlyChanged, setCompareOnlyChanged] = useState(true);
+  const { filterModel } = useFiltersStore();
 
   // Table data
   const [resData, setResData] = useState<CompareModelsResponseType | undefined>(undefined);
   const [rowList, setRowList] = useState<Array<Partial<Row> & { comparisonKey: string }>>([]);
-  const [columnList, setColumnList] = useState<Column[]>(
-    filterColumnsByColumnsFilters(columnsFilters, initialColumns),
-  );
+  const [columnList, setColumnList] = useState<Column[]>(initialColumns);
 
   const [searchString, setSearchString] = useState<string>('');
 
@@ -128,8 +126,7 @@ export const useCompareModels = (columnsFilters: Partial<ColumnsFilter>) => {
   };
 
   const updateColumnList = () => {
-    const newColumnList = filterColumnsByColumnsFilters(columnsFilters, initialColumns);
-    const renderedColumnList = newColumnList.map((column) => {
+    const renderedColumnList = initialColumns.map((column) => {
       return {
         ...column,
         renderCell: (data: any, row: Row & { comparisonKey: number }) =>
@@ -142,7 +139,7 @@ export const useCompareModels = (columnsFilters: Partial<ColumnsFilter>) => {
 
   useEffect(() => {
     updateColumnList();
-  }, [columnsFilters, resData]);
+  }, [resData]);
 
   const handleChangePage = (result: { page: number; pageSize: number }) => {
     if (result.page !== page) {

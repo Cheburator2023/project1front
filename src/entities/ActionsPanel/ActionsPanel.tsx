@@ -90,11 +90,6 @@ export const ActionsPanel = ({ updateRightPanelType, handleSearch }: ActionsPane
           onClick={() => navigate('charts')}
         />
 
-        <IconButton
-          icon={<ShowTableOutline />}
-          tooltip="Новый интерфейс таблиц"
-          onClick={() => navigate(ROUTES.FUTURE_TABLE)}
-        />
         <IconButton icon={<MenuOutline />} tooltip="Меню" onClick={() => null} />
         <IconButton icon={<SettingsOutline />} tooltip="Настройки" onClick={() => null} />
       </div>

@@ -12,35 +12,26 @@ import {
 } from '@shared/api';
 
 import { Spinner } from '@admiral-ds/react-ui';
-import { useDeleteRightModelPanelStore } from '@src/shared/stores';
+import { 
+  useDeleteRightModelPanelStore,
+  useDisplayStore,
+  useModelsTableStore,
+  useTemplatesStore,
+  useModelsOperationsStore
+} from '@src/shared/stores';
 import { CustomError } from '@src/shared/api/types';
 import { ModelForm } from './ModelForm';
 import { HistoryChanges } from './HistoryChanges';
 import { Templates } from './Templates';
 import { DeleteModelForm } from './DeleteModelForm/DeleteModelForm';
 
-export interface RightModalPanelProps {
-  activeStatus: RIGHT_PANEL_TYPE | null;
-  rows: Partial<Row>[];
-  templates: Template[];
-  activeRowId?: string;
-  activeCellName?: keyof Row;
-  updateTemplates: React.Dispatch<React.SetStateAction<Template[]>>;
-  onSubmit: (newRow?: CustomError | Row | ArtifactApi[], formMode?: MODEL_FORM_MODE) => void;
-  onClose: () => void;
-}
-
 export const RightModalPanel = React.memo(
-  ({
-    templates,
-    activeStatus,
-    activeRowId,
-    activeCellName,
-    rows,
-    updateTemplates,
-    onClose,
-    onSubmit,
-  }: RightModalPanelProps) => {
+  () => {
+    const { templates, setTemplates } = useTemplatesStore();
+    const { rightPanelType: activeStatus, activeRowId, activeCellName } = useDisplayStore();
+    const { rows } = useModelsTableStore();
+    const { handleSubmit: onSubmit, handleOnClose: onClose } = useModelsOperationsStore();
+    
     const { responseData: artifactsData } = useFetch<ArtifactResponse | undefined>({
       apiRoute: API_ROUTES.ARTIFACTS,
       mockedResponse: mockedModelsArtifacts,
@@ -113,7 +104,7 @@ export const RightModalPanel = React.memo(
 
     if (activeStatus === RIGHT_PANEL_TYPE.ADD_TEMPLATE) {
       return (
-        <Templates templates={templates} onClose={onClose} updateTemplates={updateTemplates} />
+        <Templates templates={templates} onClose={onClose} updateTemplates={setTemplates} />
       );
     }
 

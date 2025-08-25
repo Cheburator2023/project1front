@@ -1,5 +1,21 @@
 import { ColumnsFilter, Row } from '@shared/types';
 
+type SetFilter = {
+  values: (string | null)[];
+  filterType: string;
+};
+
+type DateFilter = {
+  dateFrom: string;
+  dateTo: string;
+  filterType: string;
+  type: string;
+};
+
+type FilterModel = {
+  [key: string]: SetFilter | DateFilter;
+};
+
 export type CompareModelsResponseType = {
   data: {
     cards: { [key: string]: [Partial<Row>, Partial<Row>] };
@@ -107,7 +123,13 @@ export type Template = {
   group_id?: number;
   template_name: string;
   group_label?: string;
-  template_value?: Partial<ColumnsFilter>;
+  filterModel?: FilterModel;
+  sortState?: Array<{
+    colId: string;
+    sort: 'asc' | 'desc';
+    sortIndex: number;
+  }>;
+  selectedIds?: string[];
   isOwner?: boolean;
   public?: boolean;
 };
@@ -115,7 +137,13 @@ export type Template = {
 export type TemplateAddApi = {
   template_name: string;
   public: boolean;
-  template_value: Partial<ColumnsFilter>;
+  filterModel?: any;
+  sortState?: Array<{
+    colId: string;
+    sort: 'asc' | 'desc';
+    sortIndex: number;
+  }>;
+  selectedIds?: string[];
 };
 
 export type TemplateUpdateApi = TemplateAddApi & {
@@ -246,3 +274,4 @@ export type ModelHistoryChangesResponse = {
 export type ReportApi = {
   filters: Partial<ColumnsFilter>;
 };
+

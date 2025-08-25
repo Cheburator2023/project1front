@@ -15,10 +15,22 @@ const isFilterDifferentFromTemplate = (
   filters: string[],
   activeTemplate?: Template,
 ) => {
-  if (!activeTemplate) return true;
+  if (!activeTemplate || !activeTemplate.filterModel) return true;
 
-  const templateFilterValue =
-    (activeTemplate.template_value as Record<string, string[]>)[columnName] ?? [];
+  const templateFilter = activeTemplate.filterModel[columnName];
+  if (!templateFilter) return filters.length > 0;
+
+  let templateFilterValue: (string | null)[] = [];
+
+  if ('values' in templateFilter) {
+    templateFilterValue = templateFilter.values;
+  } else if ('dateFrom' in templateFilter) {
+    if (templateFilter.dateTo) {
+      templateFilterValue = [templateFilter.dateFrom, templateFilter.dateTo];
+    } else {
+      templateFilterValue = [templateFilter.dateFrom];
+    }
+  }
 
   return JSON.stringify(filters) !== JSON.stringify(templateFilterValue);
 };

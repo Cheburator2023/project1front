@@ -2,6 +2,9 @@ import React, { useCallback, useEffect, useState } from 'react';
 import styled, { createGlobalStyle, ThemeProvider } from 'styled-components';
 import { DropdownProvider } from '@admiral-ds/react-ui';
 import Keycloak from 'keycloak-js';
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-quartz.css';
+import 'ag-grid-enterprise';
 
 import { ColumnsFilter, Permission, Role } from '@shared/types';
 
@@ -105,18 +108,18 @@ const Layout = ({ children, user, protectedFetch, goToSum, onLogout }: LayoutPro
     <ThemeProvider theme={themes.light}>
       <DropdownProvider>
         <GlobalStyle />
-          <Container>
-            <Header
-              user={user}
-              downloadReportStatus={downloadReportStatus}
-              columnsFilters={columnsFilters}
-              updateColumnsFilters={updateColumnsFilters}
-              updateDownloadReportStatus={setDownloadReportStatus}
-              goToSum={goToSum}
-              onLogout={onLogoutHandler}
-            />
-            <RoutesWrapper>{children}</RoutesWrapper>
-          </Container>
+        <Container>
+          <Header
+            user={user}
+            downloadReportStatus={downloadReportStatus}
+            columnsFilters={columnsFilters}
+            updateColumnsFilters={updateColumnsFilters}
+            updateDownloadReportStatus={setDownloadReportStatus}
+            goToSum={goToSum}
+            onLogout={onLogoutHandler}
+          />
+          <RoutesWrapper>{children}</RoutesWrapper>
+        </Container>
       </DropdownProvider>
     </ThemeProvider>
   );

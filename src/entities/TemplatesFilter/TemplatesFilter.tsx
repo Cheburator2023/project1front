@@ -12,6 +12,7 @@ import { useGlobalStore } from '../../shared/stores/globalStore';
 
 export interface TemplatesFilterProps {
   templates: Template[];
+  activeTemplate?: Template;
   loading?: boolean;
   error?: string;
   showLabel?: boolean;
@@ -20,15 +21,15 @@ export interface TemplatesFilterProps {
 
 export const TemplatesFilter = ({
   templates,
+  activeTemplate,
   showLabel = true,
   loading = false,
   error = '',
   updateRightPanelType,
 }: TemplatesFilterProps) => {
-  const { topFilters, setTopFilters, getColumnsFilters, applyFilterToGrid, resetFilters } = useFiltersStore();
-  const columnsFilters = getColumnsFilters();
+  const { topFilters, setTopFilters, filterModel, setFilterModel, resetFilters } = useFiltersStore();
 
-  const { isModifiedFilter, resetFilters: resetTemplateFilters } = useTemplateFilters(columnsFilters, templates, topFilters.templates);
+  const { isModifiedFilter, resetFilters: resetTemplateFilters } = useTemplateFilters(filterModel, templates, topFilters.templates);
 
   const groupedOptions = useMemo(() => {
     if (templates) {
@@ -38,7 +39,7 @@ export const TemplatesFilter = ({
     return [];
   }, [templates]);
 
-  const handleChange = (name: string, selectValue: string[]) => {
+  const handleChange = (name: string, selectValue: (string | null)[]) => {
     if (!templates) {
       return;
     }
@@ -48,12 +49,8 @@ export const TemplatesFilter = ({
       ({ template_id }) => String(template_id) === selectValue[0],
     );
 
-    if (newSelectedTemplate && newSelectedTemplate.template_value) {
-      Object.entries(newSelectedTemplate.template_value).forEach(([columnName, filterValues]) => {
-        if (Array.isArray(filterValues) && filterValues.length > 0) {
-          applyFilterToGrid(columnName, filterValues);
-        }
-      });
+    if (newSelectedTemplate && newSelectedTemplate.filterModel) {
+      setFilterModel(newSelectedTemplate.filterModel);
       setTopFilters({ ...initialTopFilters, [name]: selectValue });
     }
   };
@@ -68,7 +65,10 @@ export const TemplatesFilter = ({
   };
 
   const dynamicKeyForRenderSelect = templates[templates.length - 1]?.template_name;
-  
+        console.log('🐸 Pepe said >> groupedOptions:', groupedOptions);
+      console.log('🐸 Pepe said >> topFilters:', topFilters);
+      console.log('🐸 Pepe said >> activeTemplate:', activeTemplate);
+
   return (
     <CustomSearchSelect
       key={dynamicKeyForRenderSelect}
@@ -79,16 +79,18 @@ export const TemplatesFilter = ({
       name="templates"
       loading={loading}
       error={!!error}
-      active={!!topFilters.templates.length}
-      selectedValues={topFilters.templates.length ? topFilters.templates : undefined}
+      active={!!activeTemplate}
+      selectedValues={activeTemplate ? [String(activeTemplate.template_id)] : []}
+
       options={{
         type: SELECT_TYPE.TEMPLATES,
         groups: groupedOptions,
+
       }}
       onChange={handleChange}
       modified={isModifiedFilter}
       renderDropDownBottomPanel={() =>
-        topFilters.templates.length ? (
+        activeTemplate ? (
           <Button onClick={handleResetFilters} dimension="s" appearance="secondary">
             Сбросить
           </Button>

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDownloadReportStore } from '@shared/stores/downloadReportStore';
 
-import { Column, ColumnsFilter, Row } from '@shared/types';
+import { Column, Row } from '@shared/types';
 import { initialColumns, MODEL_FORM_MODE, RIGHT_PANEL_TYPE } from '@shared/constants';
 import {
   API_ROUTES,
@@ -10,7 +10,6 @@ import {
   ModelsResponseType,
   mockedModelsResponse,
 } from '@shared/api';
-import { filterColumnsByColumnsFilters } from '@shared/helpers';
 
 export interface ModelsListWidgetData {
   rowList: Array<Partial<Row>>;
@@ -33,7 +32,6 @@ export interface ModelsListWidgetActions {
   setTotalRows: React.Dispatch<React.SetStateAction<number>>;
   setPageSize: React.Dispatch<React.SetStateAction<number>>;
   setPage: React.Dispatch<React.SetStateAction<number>>;
-  updateColumnList: () => void;
   handleClickOnActionCell: (
     action: RIGHT_PANEL_TYPE.EDIT_MODEL | RIGHT_PANEL_TYPE.HISTORY_CHANGES,
     rowId: string,
@@ -44,10 +42,9 @@ export interface ModelsListWidgetActions {
 }
 
 export const useModelsListWidget = (
-  columnsFilters: Partial<ColumnsFilter>,
   setRightPanelType: React.Dispatch<React.SetStateAction<RIGHT_PANEL_TYPE | null>>,
 ) => {
-  const { updateColumnsFilters, downloadReportStatus } = useDownloadReportStore();
+  const { downloadReportStatus } = useDownloadReportStore();
 
   // Cell activities
   const [activeCellName, setActiveCellName] = useState<keyof Row>();
@@ -87,11 +84,7 @@ export const useModelsListWidget = (
     }
   }, [modelsData]);
 
-  useEffect(() => {
-    if (downloadReportStatus) {
-      updateColumnsFilters(columnsFilters);
-    }
-  }, [columnsFilters, downloadReportStatus]);
+
 
   const handleChangePage = (result: { page: number; pageSize: number }) => {
     if (result.page !== page) {
@@ -111,15 +104,7 @@ export const useModelsListWidget = (
     setSearchString(newSearchString);
   };
 
-  const updateColumnList = () => {
-    const newColumnList = filterColumnsByColumnsFilters(columnsFilters, initialColumns);
 
-    setColumnList(newColumnList);
-  };
-
-  useEffect(() => {
-    updateColumnList();
-  }, [columnsFilters]);
 
   const handleClickOnActionCell = useCallback(
     (
@@ -175,7 +160,6 @@ export const useModelsListWidget = (
     setTotalRows,
     setPageSize,
     setPage,
-    updateColumnList,
     handleClickOnActionCell,
     handleSubmit,
     handleOnClose,

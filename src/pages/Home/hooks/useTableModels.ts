@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Column, ColumnsFilter, Row, TopFilters } from '@shared/types';
+import { Column, Row, TopFilters } from '@shared/types';
 import {
   initialColumns,
-  initialColumnsFilters,
   initialTopFilters,
   ACTIVE_SCREEN,
   RIGHT_PANEL_TYPE,
@@ -20,12 +19,10 @@ import {
 import { useDownloadReportStore } from '@shared/stores/downloadReportStore';
 
 import {
-  checkColumnsFiltersForEqual,
-  filterColumnsByColumnsFilters,
   getISODateFormat,
 } from '@shared/helpers';
 import { ArtifactApi, CustomError } from '@src/shared/api/types';
-import { useExploitationModeStore } from '@src/shared/stores';
+import { useExploitationModeStore, useFiltersStore, useDisplayStore } from '@src/shared/stores';
 import { useDeepEffect } from '../../../shared/hooks/useDeepEffect';
 
 export const getQueryParams = (
@@ -47,13 +44,6 @@ export const getQueryParams = (
 
 export type TDisplayTableModels = {
   activeScreen: ACTIVE_SCREEN;
-  setActiveScreen: (newActiveScreen: ACTIVE_SCREEN) => void;
-  compareMode: boolean;
-  setCompareMode: (newCompareMode: boolean) => void;
-  rightPanelType: RIGHT_PANEL_TYPE | null;
-  setRightPanelType: (newRightPanelType: RIGHT_PANEL_TYPE | null) => void;
-  handleChangeCompare: (checked: boolean) => void;
-  handleSearch: (newSearchString: string) => void;
 };
 
 export type TModelsTable = {
@@ -66,7 +56,7 @@ export type TModelsTable = {
     rowId: string,
     cellName: keyof Row,
   ) => void;
-  updateColumnList: (newColumnFilters: Partial<ColumnsFilter>) => void;
+  updateColumnList: () => void;
   handleSearch: (newSearchString: string) => void;
   handleChangePage: (result: { page: number; pageSize: number }) => void;
   loading: boolean;
@@ -84,65 +74,27 @@ export type TModelsTable = {
 
 export type TFilters = {
   templates: Template[];
-  setTemplates: React.Dispatch<React.SetStateAction<Template[]>>;
-  columnsFilters: Partial<ColumnsFilter>;
-  topFilters: TopFilters;
-  setTopFilters: React.Dispatch<React.SetStateAction<TopFilters>>;
-  setColumnsFilters: React.Dispatch<React.SetStateAction<Partial<ColumnsFilter>>>;
-  handleChangeColumnFilters: (newColumnFilters: Partial<ColumnsFilter>) => void;
   firstDate: string | null;
   secondDate: string | null;
-  setFirstDate: React.Dispatch<React.SetStateAction<string | null>>;
-  setSecondDate: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
-export type TContext = {
-  updateColumnsFilters: (newColumnsFilters: Partial<ColumnsFilter>) => void;
-  downloadReportStatus: boolean;
-  handleSubmit: (newRow?: Row | CustomError | ArtifactApi[], formMode?: MODEL_FORM_MODE) => void;
-  handleOnClose: () => void;
-  contextValue: {
-    firstDate: string | null;
-    secondDate: string | null;
-    modelsDownloadingDate: string | undefined;
-    topFilters: TopFilters;
-    columnsFilters: Partial<ColumnsFilter>;
-    onChangeModelDownloadingDate: (date: string) => void;
-    onChangeColumnsFilters: (newColumnFilters: Partial<ColumnsFilter>) => void;
-    onChangeTopFilters: (newTopFilters: TopFilters) => void;
-    onChangeFirstDate: (newFirstDate: string | null) => void;
-    onChangeSecondDate: (newSecondDate: string | null) => void;
-  };
-};
+
 
 export interface IUseTableModels {
   display: TDisplayTableModels;
   modelsTable: TModelsTable;
   filters: TFilters;
-  context: TContext;
 }
 
 export const useTableModels = () => {
-  const { updateColumnsFilters, downloadReportStatus } = useDownloadReportStore();
-  const [activeScreen, setActiveScreen] = useState(ACTIVE_SCREEN.TABLE);
-  const [compareMode, setCompareMode] = useState(false);
-  const [rightPanelType, setRightPanelType] = useState<RIGHT_PANEL_TYPE | null>(null);
-
-  // Cell activities
-  const [activeCellName, setActiveCellName] = useState<keyof Row>();
-  const [activeRowId, setActiveRowId] = useState<string>();
+  const { downloadReportStatus } = useDownloadReportStore();
+  const { topFilters, setTopFilters, firstDate, setFirstDate, secondDate, setSecondDate, modelsDownloadingDate, setModelsDownloadingDate } = useFiltersStore();
+  const { activeScreen, setActiveScreen, compareMode, setCompareMode, rightPanelType, setRightPanelType, activeCellName, setActiveCellName, activeRowId, setActiveRowId, handleChangeCompare, handleOnClose } = useDisplayStore();
 
   // Table data
   const [rowList, setRowList] = useState<Array<Partial<Row>>>([]);
   const [columnList, setColumnList] = useState<Column[]>(initialColumns);
 
-  // Filters
-  const [topFilters, setTopFilters] = useState<TopFilters>(initialTopFilters);
-  const [columnsFilters, setColumnsFilters] =
-    useState<Partial<ColumnsFilter>>(initialColumnsFilters);
-
-  const [firstDate, setFirstDate] = useState<string | null>(null);
-  const [secondDate, setSecondDate] = useState<string | null>(null);
   const [searchString, setSearchString] = useState<string>('');
 
   // Pagination
@@ -151,7 +103,6 @@ export const useTableModels = () => {
   const [totalRows, setTotalRows] = useState<number>(0);
   const [templates, setTemplates] = useState<Template[]>([]);
 
-  const [modelsDownloadingDate, setModelsDownloadingDate] = useState<string | undefined>();
   const [loadingModels, setLoadingModels] = useState(true);
   const [errorModels, setErrorModels] = useState<string>('');
 
@@ -213,25 +164,10 @@ export const useTableModels = () => {
     }
   }, [templateData]);
 
-  useEffect(() => {
-    if (downloadReportStatus) {
-      updateColumnsFilters(columnsFilters);
-    }
-  }, [columnsFilters, downloadReportStatus]);
-
   const handleChangeModelDownloadingDate = useCallback((date: string) => {
     fetchModels(date);
     setModelsDownloadingDate(date);
   }, []);
-
-  const handleChangeCompare = (checked: boolean) => {
-    if (checked) {
-      setActiveScreen(ACTIVE_SCREEN.COMPARE);
-    } else {
-      setActiveScreen(ACTIVE_SCREEN.TABLE);
-    }
-    setCompareMode(checked);
-  };
 
   const handleChangePage = (result: { page: number; pageSize: number }) => {
     if (result.page !== page) {
@@ -249,24 +185,9 @@ export const useTableModels = () => {
     setSearchString(newSearchString);
   };
 
-  const updateColumnList = useCallback(
-    (newColumnFilters: Partial<ColumnsFilter>) => {
-      const columnsFiltersChanged = !checkColumnsFiltersForEqual(columnsFilters, newColumnFilters);
-      if (columnsFiltersChanged) {
-        const newColumnList = filterColumnsByColumnsFilters(newColumnFilters, initialColumns);
-        setColumnList(newColumnList);
-      }
-    },
-    [columnsFilters],
-  );
-
-  const handleChangeColumnFilters = useCallback(
-    (newColumnFilters: Partial<ColumnsFilter>) => {
-      updateColumnList(newColumnFilters);
-      setColumnsFilters(newColumnFilters);
-    },
-    [updateColumnList],
-  );
+  const updateColumnList = useCallback(() => {
+    setColumnList(initialColumns);
+  }, []);
 
   const contextValue = useMemo(
     () => ({
@@ -274,20 +195,17 @@ export const useTableModels = () => {
       secondDate,
       modelsDownloadingDate,
       topFilters,
-      columnsFilters,
-      onChangeColumnsFilters: handleChangeColumnFilters,
       onChangeTopFilters: (newTopFilters: TopFilters) => setTopFilters(newTopFilters),
       onChangeFirstDate: (newFirstDate: string | null) => setFirstDate(newFirstDate),
       onChangeSecondDate: (newSecondDate: string | null) => setSecondDate(newSecondDate),
       onChangeModelDownloadingDate: handleChangeModelDownloadingDate,
     }),
     [
-      columnsFilters,
       topFilters,
-      handleChangeColumnFilters,
       firstDate,
       secondDate,
       modelsDownloadingDate,
+      handleChangeModelDownloadingDate,
     ],
   );
 
@@ -301,7 +219,7 @@ export const useTableModels = () => {
       setActiveCellName(cellName);
       setActiveRowId(rowId);
     },
-    [rowList],
+    [rowList, setRightPanelType, setActiveCellName, setActiveRowId],
   );
 
   const handleSubmit = useCallback((newRow?: any, formMode?: MODEL_FORM_MODE) => {
@@ -324,22 +242,11 @@ export const useTableModels = () => {
     fetchModels();
   }, []);
 
-  const handleOnClose = useCallback(() => {
-    setRightPanelType(null);
-    setActiveCellName(undefined);
-    setActiveRowId(undefined);
-  }, []);
+
 
   const result: IUseTableModels = {
     display: {
       activeScreen,
-      setActiveScreen,
-      compareMode,
-      setCompareMode,
-      rightPanelType,
-      setRightPanelType,
-      handleChangeCompare,
-      handleSearch,
     },
     modelsTable: {
       rowList,
@@ -364,23 +271,8 @@ export const useTableModels = () => {
     },
     filters: {
       templates,
-      setTemplates,
-      columnsFilters,
-      topFilters,
-      setTopFilters,
-      setColumnsFilters,
-      handleChangeColumnFilters,
       firstDate,
       secondDate,
-      setFirstDate,
-      setSecondDate,
-    },
-    context: {
-      updateColumnsFilters,
-      downloadReportStatus,
-      contextValue,
-      handleSubmit,
-      handleOnClose,
     },
   };
 

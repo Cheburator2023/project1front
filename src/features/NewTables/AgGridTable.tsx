@@ -1,9 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import { forwardRef, useCallback, useState, useEffect, useMemo, useRef } from 'react';
 import { AgGridReact } from 'ag-grid-react';
-import 'ag-grid-community/styles/ag-grid.css';
-import 'ag-grid-community/styles/ag-theme-quartz.css';
-import 'ag-grid-enterprise';
 
 import {
   ColDef,
@@ -51,15 +48,15 @@ import styled from 'styled-components';
 import { AgGridTableCustomCell } from './AgGridTableCustomCell';
 import { AG_GRID_LOCALE_RU } from '../../pages/Playground/locale/agGridLocale.ru';
 import { ROUTES } from '../../app/Routes';
-import { useDeleteRightModelPanelStore } from '../../shared/stores';
+import { useDeleteRightModelPanelStore, useDisplayStore } from '../../shared/stores';
 import { usePermissions, useRoles, useTemplateFilters } from '../../shared/hooks';
 import { isInBusinessCustomers, isModelCreator } from '../../shared/helpers';
 import { useDeepEffect } from '../../shared/hooks/useDeepEffect';
 import { useGlobalStore } from '../../shared/stores/globalStore';
+import { useFiltersStore } from '../../shared/stores/filtersStore';
 
 interface IAgGridTableProps {
   templates?: Template[];
-  display?: TDisplayTableModels;
   isCompared?: boolean;
   columnList: Column[];
   rowList: Partial<Row>[];
@@ -143,25 +140,25 @@ const dateFilterParams: IDateFilterParams = {
 
 const setFilterParams: ISetFilterParams = {
   buttons: ['clear'],
-  excelMode: 'windows',
-  comparator: (a: any, b: any) => {
-    if (a == null && b == null) return 0;
-    if (a == null) return -1;
-    if (b == null) return 1;
-    return a.toString().localeCompare(b.toString());
-  },
-  valueFormatter: (params: any) => {
-    if (params.value == null || params.value === '') {
-      return '(Пусто)';
-    }
-    const cleanValue = params.value
-      .toString()
-      .replace(/<br\s*\/?>/gi, ' ')
-      .replace(/<[^>]*>/g, '')
-      .replace(/\s+/g, ' ')
-      .trim();
-    return cleanValue;
-  },
+  // excelMode: 'windows',
+  // comparator: (a: any, b: any) => {
+  //   if (a == null && b == null) return 0;
+  //   if (a == null) return -1;
+  //   if (b == null) return 1;
+  //   return a.toString().localeCompare(b.toString());
+  // },
+  // valueFormatter: (params: any) => {
+  //   // if (params.value == null || params.value === '') {
+  //   //   return '(Пусто)';
+  //   // }
+  //   const cleanValue = params.value
+  //     .toString()
+  //     .replace(/<br\s*\/?>/gi, ' ')
+  //     .replace(/<[^>]*>/g, '')
+  //     .replace(/\s+/g, ' ')
+  //     .trim();
+  //   return cleanValue;
+  // },
 };
 
 const autoGroupColumnDefProps: ColDef = {
@@ -181,7 +178,6 @@ const selectionColumnDef: SelectionColumnDef = {
 export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
   (
     {
-      display,
       templates,
       isCompared = false,
       columnList,
@@ -212,6 +208,8 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     }: IAgGridTableProps,
     ref: any,
   ) => {
+    const { setRightPanelType } = useDisplayStore();
+
     const tableProps = useTableChange({
       rowList,
       setCurrentPage: setPage,
@@ -225,14 +223,15 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
 
     const { filtersResetCount, setAgGridApi, agGridApi } = useGlobalStore();
 
-    const { setRows, handleChangeColumnsFilter, columnsFilters, onChangeTopFilters, topFilters } =
-      tableProps;
+    const { setRows, handleChangeColumnsFilter, onChangeTopFilters, topFilters } = tableProps;
+
+    const { filterModel } = useFiltersStore();
 
     const { modelsCount, modelSource, isDeleteButtonEnabled, userMatches, updateDeleteModelState } =
       useDeleteRightModelPanelStore();
 
     const { shouldResetTemplateOnInitialValueChange } = useTemplateFilters(
-      columnsFilters,
+      filterModel,
       templates,
       topFilters?.templates,
     );
@@ -363,7 +362,13 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       }
     };
 
-    const onDisplayedColumnsChanged = () => {
+    const { setSortState, setFilterModel } = useFiltersStore();
+
+    const handleSortChanged = (event: SortChangedEvent) => {
+      onSortChanged?.(event);
+
+      if (event.source === 'api') return;
+
       const colState = gridRef.current!.api.getColumnState();
       const sortState = colState
         .filter((s) => {
@@ -372,14 +377,16 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
         .map((s) => {
           return { colId: s.colId, sort: s.sort, sortIndex: s.sortIndex };
         });
-      console.log('saved sort', sortState);
+      setSortState(sortState);
     };
 
     const handleFilterChange = (event: FilterChangedEvent): void => {
-      console.log(
-        '🐸 Pepe said >> handleFilterChange >> getFilterModel:',
-        event.api.getFilterModel(),
-      );
+      if (event.source === 'api') return;
+
+      const filterModel = event.api.getFilterModel();
+      setFilterModel(filterModel);
+
+      console.log('🐸 Pepe said >> handleFilterChange >> getFilterModel:', filterModel);
 
       const colName: string = event?.columns[0]?.getColId();
       const colDef: any = event.api.getColumnFilterModel(colName);
@@ -400,15 +407,12 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       } else {
         // @ts-ignore
         const value = colDef?.filterModels?.[1]?.values || colDef?.values;
-        const initialTemplateValue = columnsFilters?.[colName] || [];
+        const initialTemplateValue = filterModel?.[colName]?.values || [];
 
         if (value) {
           const arrayValue = Array.isArray(value) ? value : [value];
           handleChangeColumnsFilter(colName, arrayValue);
-
-          if (event.source !== 'api') {
-            onChangeTopFilters?.({ ...topFilters, templates: [] });
-          }
+          onChangeTopFilters?.({ ...topFilters, templates: [] });
         }
       }
     };
@@ -436,56 +440,10 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     }, [rowList, setTotalRows, templates]);
 
     useDeepEffect(() => {
-      if (agGridApi && columnsFilters) {
-        const filterModel: any = {};
-
-        Object.entries(columnsFilters).forEach(([columnName, filterValues]) => {
-          if (filterValues && filterValues.length > 0) {
-            const columnType = columnList.find((col) => col.name === columnName)?.type;
-
-            if (columnType === COLUMN_TYPE.DATE) {
-              if (filterValues[0] === filterValues[1]) {
-                filterModel[columnName] = {
-                  dateFrom: filterValues[0],
-                  dateTo: null,
-                  type: 'equals',
-                };
-              } else {
-                filterModel[columnName] = {
-                  dateFrom: filterValues[0],
-                  dateTo: filterValues[1],
-                  type: 'inRange',
-                };
-              }
-            } else {
-              const colValues = rowList.map((row) => row[columnName]);
-
-              if (filterValues[0] === 'not-null') {
-                const nonNullValues = colValues.filter(
-                  (val) => val !== null && val !== undefined && val !== '',
-                );
-                const uniqueValues = [...new Set(nonNullValues)];
-
-                filterModel[columnName] = {
-                  values: uniqueValues,
-                };
-              } else {
-                filterModel[columnName] = {
-                  values: filterValues,
-                };
-              }
-            }
-          }
-        });
-
-        const hasFilters = Object.keys(filterModel).length > 0;
-        if (hasFilters || Object.keys(columnsFilters).length === 0) {
-          setTimeout(() => {
-            agGridApi.setFilterModel(filterModel);
-          }, 0);
-        }
+      if (agGridApi && filterModel) {
+          agGridApi.setFilterModel(filterModel);
       }
-    }, [agGridApi, columnsFilters, columnList, rowList]);
+    }, [agGridApi, filterModel]);
 
     const rowClassRules = useMemo<RowClassRules>(() => {
       return {
@@ -548,14 +506,14 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
                       icon={<PlusCircleSolid />}
                       tooltip="Добавить модель"
                       color="#0062FF"
-                      onClick={() => display?.setRightPanelType(RIGHT_PANEL_TYPE.ADD_MODEL)}
+                      onClick={() => setRightPanelType(RIGHT_PANEL_TYPE.ADD_MODEL)}
                     />
                   )}
                   <IconButton
                     icon={<DeleteSolid />}
                     tooltip={deleteTooltipMessage}
                     color="#0062FF"
-                    onClick={() => display?.setRightPanelType(RIGHT_PANEL_TYPE.DELETE_MODEL)}
+                    onClick={() => setRightPanelType(RIGHT_PANEL_TYPE.DELETE_MODEL)}
                     disabled={!isDeleteButtonEnabled}
                   />
                   <IconButton
@@ -604,12 +562,11 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
               tooltipShowDelay={500}
               getContextMenuItems={getContextMenuItems}
               onRowDragMove={onRowDragMove}
-              onDisplayedColumnsChanged={onDisplayedColumnsChanged}
+              onSortChanged={handleSortChanged}
               onRowSelected={onRowSelected}
               onFirstDataRendered={_onFirstDataRendered}
               onRowDataUpdated={onRowDataUpdated}
               onRowDragEnd={onRowDragEnd}
-              onSortChanged={onSortChanged}
               loading={loading}
               overlayNoRowsTemplate={overlayNoRowsTemplate}
             />

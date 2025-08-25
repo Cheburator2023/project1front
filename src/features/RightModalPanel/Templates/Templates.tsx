@@ -58,9 +58,7 @@ export interface TemplatesProps {
 }
 
 export const Templates = ({ templates, onClose, updateTemplates }: TemplatesProps) => {
-  const { getColumnsFilters } = useFiltersStore();
-  const columnsFilters = getColumnsFilters();
-  console.log('🐸 Pepe said >> Templates >> columnsFilters:', columnsFilters);
+  const { filterModel, sortState, selectedIds } = useFiltersStore();
 
 
   const { isAddPublicTemplateEnabled } = usePermissions();
@@ -142,7 +140,9 @@ export const Templates = ({ templates, onClose, updateTemplates }: TemplatesProp
         body: {
           template_name: value,
           public: id === 'public',
-          template_value: getColumnsFilters(),
+          filterModel,
+          sortState,
+          selectedIds,
         },
         fetchApiRoute: API_ROUTES.TEMPLATE_ADD,
         fetchMethod: 'POST',
@@ -163,7 +163,9 @@ export const Templates = ({ templates, onClose, updateTemplates }: TemplatesProp
           template_id: templateId,
           template_name: newValue,
           public: !!isPublic,
-          template_value: getColumnsFilters(),
+          filterModel,
+          sortState,
+          selectedIds,
         },
         fetchApiRoute: API_ROUTES.TEMPLATE_EDIT,
         fetchMethod: 'PUT',

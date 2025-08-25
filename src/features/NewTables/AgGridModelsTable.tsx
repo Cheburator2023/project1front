@@ -1,27 +1,24 @@
 import React from 'react';
-import { TDisplayTableModels, TFilters, TModelsTable } from '@pages/Home/hooks';
+import { TFilters, TModelsTable, useTableModels } from '@pages/Home/hooks';
 import { Template } from '@src/shared/api';
 import { Column, Row } from '@src/shared/types';
 import { AgGridTable } from './AgGridTable';
 
 export const AgGridModelsTable = (props: {
-  display: TDisplayTableModels;
-  modelsTable: TModelsTable;
-  templates: Template[];
   isCompared?: boolean;
   overrideColumnList?: Column[];
   overrideRowList?: Partial<Row>[];
-  error: string | null;
-  loading: boolean;
   overlayNoRowsTemplate?: string;
 }) => {
-  const { rowList, setPage, page, setTotalRows, pageSize, searchString, columnList } =
-    props.modelsTable;
+  const { display, modelsTable, filters } = useTableModels();
+  const templates = filters?.templates;
+  const { error, loading } = modelsTable;
+
+  const { rowList, setPage, page, setTotalRows, pageSize, searchString, columnList } = modelsTable;
 
   return (
     <AgGridTable
-      display={props.display}
-      templates={props.templates}
+      templates={templates}
       rowList={props.overrideRowList || rowList}
       columnList={props.overrideColumnList || columnList}
       setPage={setPage}
@@ -30,9 +27,9 @@ export const AgGridModelsTable = (props: {
       pageSize={pageSize}
       searchString={searchString}
       isCompared={props.isCompared}
-      handleClickOnActionCell={props.modelsTable.handleClickOnActionCell}
-      error={props.error}
-      loading={props.loading}
+      handleClickOnActionCell={modelsTable.handleClickOnActionCell}
+      error={error}
+      loading={loading}
       overlayNoRowsTemplate={props.overlayNoRowsTemplate}
     />
   );

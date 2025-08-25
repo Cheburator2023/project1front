@@ -4,8 +4,13 @@ import { TopFilters, COLUMN_TYPE } from '@shared/types';
 import { useGlobalStore } from './globalStore';
 
 interface FiltersState {
-  agGridFilterModel: any;
-  agGridSortModel: any[];
+  filterModel: any;
+  sortState: Array<{
+    colId: string;
+    sort: 'asc' | 'desc';
+    sortIndex: number;
+  }>;
+  selectedIds: string[];
   firstDate: string | null;
   secondDate: string | null;
   modelsDownloadingDate?: string;
@@ -13,135 +18,54 @@ interface FiltersState {
 }
 
 interface FiltersActions {
-  setAgGridFilterModel: (filterModel: any) => void;
-  setAgGridSortModel: (sortModel: any[]) => void;
+  setFilterModel: (filterModel: any) => void;
+  setSortState: (sortState: Array<{ colId: string; sort: 'asc' | 'desc'; sortIndex: number; }>) => void;
+  setSelectedIds: (selectedIds: string[]) => void;
   setFirstDate: (date: string | null) => void;
   setSecondDate: (date: string | null) => void;
   setModelsDownloadingDate: (date: string) => void;
   setTopFilters: (filters: TopFilters) => void;
   resetFilters: () => void;
-  applyFilterToGrid: (columnName: string, filterValues: string[], columnType?: COLUMN_TYPE) => void;
-  applySortToGrid: (columnName: string, sortDirection: 'asc' | 'desc' | null) => void;
-  getColumnsFilters: () => Record<string, string[]>;
 }
 
 export type FiltersStore = FiltersState & FiltersActions;
 
 export const useFiltersStore = create<FiltersStore>((set, get) => ({
-  agGridFilterModel: {},
-  agGridSortModel: [],
+  filterModel: {},
+  sortState: [],
+  selectedIds: [],
   firstDate: null,
   secondDate: null,
   modelsDownloadingDate: undefined,
   topFilters: initialTopFilters,
 
-  setAgGridFilterModel: (filterModel) => {
-    set({ agGridFilterModel: filterModel });
-    const { agGridApi } = useGlobalStore.getState();
-    if (agGridApi) {
-      agGridApi.setFilterModel(filterModel);
-    }
+  setFilterModel: (filterModel) => {
+    set({ filterModel });
   },
 
-  setAgGridSortModel: (sortModel) => {
-    set({ agGridSortModel: sortModel });
-    const { agGridApi } = useGlobalStore.getState();
-    if (agGridApi) {
-      agGridApi.applyColumnState({
-        state: sortModel.map(sort => ({
-          colId: sort.colId,
-          sort: sort.sort,
-        })),
-        defaultState: { sort: null },
-      });
-    }
+  setSortState: (sortState) => {
+    set({ sortState });
   },
 
+  setSelectedIds: (selectedIds) => set({ selectedIds }),
   setFirstDate: (date) => set({ firstDate: date }),
   setSecondDate: (date) => set({ secondDate: date }),
   setModelsDownloadingDate: (date) => set({ modelsDownloadingDate: date }),
   setTopFilters: (filters) => set({ topFilters: filters }),
 
-  applyFilterToGrid: (columnName, filterValues, columnType) => {
-    const { agGridFilterModel } = get();
-    const { agGridApi } = useGlobalStore.getState();
-    
-    if (!agGridApi) return;
 
-    const newFilterModel = { ...agGridFilterModel };
 
-    if (filterValues.length === 0) {
-      delete newFilterModel[columnName];
-    } else {
-      if (columnType === COLUMN_TYPE.DATE) {
-        if (filterValues.length === 2) {
-          if (filterValues[0] === filterValues[1]) {
-            newFilterModel[columnName] = {
-              dateFrom: filterValues[0],
-              dateTo: null,
-              type: 'equals',
-            };
-          } else {
-            newFilterModel[columnName] = {
-              dateFrom: filterValues[0],
-              dateTo: filterValues[1],
-              type: 'inRange',
-            };
-          }
-        }
-      } else {
-        newFilterModel[columnName] = {
-          values: filterValues,
-        };
-      }
-    }
 
-    set({ agGridFilterModel: newFilterModel });
-    agGridApi.setFilterModel(newFilterModel);
-  },
 
-  applySortToGrid: (columnName, sortDirection) => {
-    const { agGridApi } = useGlobalStore.getState();
-    
-    if (!agGridApi) return;
 
-    const newSortModel = sortDirection ? [{ colId: columnName, sort: sortDirection }] : [];
-    
-    set({ agGridSortModel: newSortModel });
-    agGridApi.applyColumnState({
-      state: newSortModel.map(sort => ({
-        colId: sort.colId,
-        sort: sort.sort,
-      })),
-      defaultState: { sort: null },
-    });
-  },
-
-  getColumnsFilters: () => {
-    const { agGridFilterModel } = get();
-    const columnsFilters: Record<string, string[]> = {};
-
-    Object.entries(agGridFilterModel).forEach(([columnName, filterData]: [string, any]) => {
-      if (filterData?.values) {
-        columnsFilters[columnName] = filterData.values;
-      } else if (filterData?.dateFrom) {
-        if (filterData.dateTo) {
-          columnsFilters[columnName] = [filterData.dateFrom, filterData.dateTo];
-        } else {
-          columnsFilters[columnName] = [filterData.dateFrom, filterData.dateFrom];
-        }
-      }
-    });
-
-    return columnsFilters;
-  },
 
   resetFilters: () => {
     const { agGridApi } = useGlobalStore.getState();
     
     set({
-      agGridFilterModel: {},
-      agGridSortModel: [],
+      filterModel: {},
+      sortState: [],
+      selectedIds: [],
       topFilters: initialTopFilters,
       firstDate: null,
       secondDate: null,

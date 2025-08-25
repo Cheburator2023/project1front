@@ -46,7 +46,11 @@ export const SelectValue = React.memo(
                 textOverflow: 'ellipsis',
               }}
             >
-              {active ? selectedValueText : 'Не активен'}
+              {active && selectedValueText
+                ? selectedValueText
+                : active
+                ? 'Активный шаблон'
+                : 'Не активен'}
             </div>
             {active && modified ? (
               <IconButton

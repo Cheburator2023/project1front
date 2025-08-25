@@ -23,8 +23,7 @@ export const useTableChange = ({
   searchString,
   columnList,
 }: TableChangeProps) => {
-  const { topFilters, setTopFilters, applyFilterToGrid, applySortToGrid, getColumnsFilters } = useFiltersStore();
-  const columnsFilters = getColumnsFilters();
+  const { topFilters, setTopFilters, filterModel, setFilterModel, setSortState } = useFiltersStore();
 
   const { updateDeleteModelState } = useDeleteRightModelPanelStore();
   const { isModelCreator, isInBusinessCustomers } = useModelUserMatch();
@@ -45,7 +44,7 @@ export const useTableChange = ({
 
     if (sort === 'initial') {
       setCols(initialCols);
-      applySortToGrid(name, null);
+      setSortState([]);
     } else {
       const newSortCols = initialCols.map((col) => {
         if (col.name === name) {
@@ -60,7 +59,7 @@ export const useTableChange = ({
       });
 
       setCols(newSortCols);
-      applySortToGrid(name, sort);
+      setSortState([{ colId: name, sort, sortIndex: 0 }]);
     }
   };
 
@@ -96,10 +95,36 @@ export const useTableChange = ({
       setCurrentPage(1);
       
       const columnType = columnList.find((col) => col.name === rowFieldName)?.type;
-      applyFilterToGrid(rowFieldName, selectValue, columnType);
+      
+      const newFilterModel = { ...filterModel };
+      if (selectValue.length > 0) {
+        if (columnType === COLUMN_TYPE.DATE) {
+          if (selectValue[0] === selectValue[1]) {
+            newFilterModel[rowFieldName] = {
+              dateFrom: selectValue[0],
+              dateTo: null,
+              type: 'equals',
+            };
+          } else {
+            newFilterModel[rowFieldName] = {
+              dateFrom: selectValue[0],
+              dateTo: selectValue[1],
+              type: 'inRange',
+            };
+          }
+        } else {
+          newFilterModel[rowFieldName] = {
+            values: selectValue,
+          };
+        }
+      } else {
+        delete newFilterModel[rowFieldName];
+      }
+      
+      setFilterModel(newFilterModel);
       setTopFilters({ ...topFilters, templates: topFilters.templates || [] });
     },
-    [columnList, topFilters, applyFilterToGrid, setTopFilters],
+    [columnList, topFilters, filterModel, setFilterModel, setTopFilters],
   );
 
   const onChangeTopFilters = useCallback(
@@ -119,12 +144,14 @@ export const useTableChange = ({
       : columns.length;
     columns.splice(beforeIndex, 0, movedColumn);
 
+    const newFilterModel = { ...filterModel };
     columns.forEach((col) => {
-      const filterValues = columnsFilters[col.name as keyof typeof columnsFilters];
-      if (filterValues) {
-        applyFilterToGrid(col.name, filterValues, col.type);
+      const filterData = filterModel[col.name];
+      if (filterData) {
+        newFilterModel[col.name] = filterData;
       }
     });
+    setFilterModel(newFilterModel);
     setTopFilters({ ...topFilters, templates: [] });
   };
 
@@ -150,7 +177,7 @@ export const useTableChange = ({
     handleUpdate({
       withRows: false,
     });
-  }, [columnsFilters, rowList, cols, pageSize, page, searchString, columnList]);
+  }, [filterModel, rowList, cols, pageSize, page, searchString, columnList]);
 
   useDeepEffect(() => {
     handleUpdate({
@@ -168,7 +195,7 @@ export const useTableChange = ({
     handleSelectionChange,
     handleChangeColumnsFilter,
     onChangeTopFilters,
-    columnsFilters,
+    filterModel,
     topFilters,
     setTopFilters,
     handleColumnDragEnd,

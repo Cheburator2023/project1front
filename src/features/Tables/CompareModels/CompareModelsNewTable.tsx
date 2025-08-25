@@ -9,107 +9,73 @@ import { ActionsPanel, ColumnFilter } from '@entities';
 import { AgGridModelsTable } from '@src/features/NewTables/AgGridModelsTable';
 import { useTableChange } from '../hooks';
 import { useTableModels } from '../../../pages/Home/hooks';
+import { useCompareModels } from '../../../widgets/CompareModelsWidget/hooks';
 
 interface TableModelsProps {
-  rowList: Array<Partial<Row>>;
-  columnList: Column[];
-  page: number;
-  pageSize: number;
-  totalRows: number;
-  error: string | null;
-  loading: boolean;
-  searchString: string;
   firstDate: string | null;
   secondDate: string | null;
-  updateRowsCount: (newRowsCount: number) => void;
-  setCurrentPage: (newPage: number) => void;
-  onChangePage: (result: { page: number; pageSize: number }) => void;
-  handleSearch: (newSearchString: string) => void;
-  updateRightPanelType: (newRightPanelType: RIGHT_PANEL_TYPE | null) => void;
 }
 
-export const CompareModelsNewTable = React.memo(
-  ({
+export const CompareModelsNewTable = React.memo(({ firstDate, secondDate }: TableModelsProps) => {
+  const { compareModelsTable } = useCompareModels();
+
+  const rowList = compareModelsTable.rowList;
+  const columnList = compareModelsTable.columnList;
+  const page = compareModelsTable.page;
+  const pageSize = compareModelsTable.pageSize;
+  const searchString = compareModelsTable.searchString;
+  const totalRows = compareModelsTable.totalRows;
+  const setTotalRows = compareModelsTable.setTotalRows;
+  const setPage = compareModelsTable.setPage;
+
+  const { rows, setCols, setRows, handleChangeColumnsFilter, filterModel } = useTableChange({
     rowList,
-    columnList,
+    setCurrentPage: setPage,
     page,
+    updateRowsCount: setTotalRows,
     pageSize,
     searchString,
-    updateRowsCount,
-    setCurrentPage,
-    error,
-    loading,
-    totalRows,
-    firstDate,
-    secondDate,
-  }: TableModelsProps) => {
-    const {
-      rows,
-      setCols,
-      setRows,
-      handleChangeColumnsFilter,
-      columnsFilters,
-    } = useTableChange({
-      rowList,
-      setCurrentPage,
-      page,
-      updateRowsCount,
-      pageSize,
-      searchString,
-      columnList,
-    });
-    const { display, modelsTable, filters } = useTableModels();
+    columnList,
+  });
 
-    useEffect(() => {
-      if (rowList?.length) {
-        setRows(rowList);
-        updateRowsCount(rowList.length);
+  useEffect(() => {
+    if (rowList?.length) {
+      setRows(rowList);
+      setTotalRows(rowList.length);
 
-        const newCols: Array<AdmiralColumn & Column> = columnList.map((column) => ({
-          ...column,
-          width: '200px',
-          sortable: true,
-          sticky: column.name === 'system_model_id',
-          cellAlign: column.type === COLUMN_TYPE.NUMBER ? 'right' : 'left',
-          extraText: (
-            <ColumnFilter
-              column={column}
-              rowList={rowList}
-              columnsFilters={columnsFilters}
-              onChangeColumnsFilter={handleChangeColumnsFilter}
-            />
-          ),
-        }));
+      const newCols: Array<AdmiralColumn & Column> = columnList.map((column) => ({
+        ...column,
+        width: '200px',
+        sortable: true,
+        sticky: column.name === 'system_model_id',
+        cellAlign: column.type === COLUMN_TYPE.NUMBER ? 'right' : 'left',
+        extraText: (
+          <ColumnFilter
+            column={column}
+            rowList={rowList}
+            columnsFilters={filterModel}
+            onChangeColumnsFilter={handleChangeColumnsFilter}
+          />
+        ),
+      }));
 
-        setCols(newCols);
+      setCols(newCols);
+    }
+  }, [rowList, columnList, filterModel, handleChangeColumnsFilter]);
+
+  return (
+    <AgGridModelsTable
+      isCompared
+      overrideColumnList={columnList}
+      overrideRowList={rows}
+      overlayNoRowsTemplate={
+        totalRows > 0 && firstDate && secondDate
+          ? 'Нет данных'
+          : 'Для сравнения выберите две даты состояния реестра'
       }
-    }, [
-      rowList,
-      columnList,
-      columnsFilters,
-      handleChangeColumnsFilter,
-      updateRowsCount,
-    ]);
-
-    return (
-      <AgGridModelsTable
-        display={display}
-        modelsTable={modelsTable}
-        templates={filters.templates}
-        isCompared
-        overrideColumnList={columnList}
-        overrideRowList={rows}
-        error={error}
-        loading={loading}
-        overlayNoRowsTemplate={
-          totalRows > 0 && firstDate && secondDate
-            ? 'Нет данных'
-            : 'Для сравнения выберите две даты состояния реестра'
-        }
-      />
-    );
-  },
-);
+    />
+  );
+});
 
 CompareModelsNewTable.displayName = 'CompareModelsNewTable';
 

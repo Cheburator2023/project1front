@@ -129,7 +129,7 @@ export const TemplateItem = ({
             <T font="Body/Body 2 Short">{template.template_name}</T>
             <T font="Caption/Caption 1" color="Neutral/Neutral 50">
               Фильтров:{' '}
-              {template.template_value ? Object.values(template.template_value).length : 0}
+              {template.filterModel ? Object.values(template.filterModel).length : 0}
             </T>
           </Content>
           {editable && (

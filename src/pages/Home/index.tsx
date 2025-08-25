@@ -11,43 +11,16 @@ import { CompareModelsWidget } from '../../widgets';
 import { TemplateFilters } from '../../features/TemplateFilters/TemplateFilters';
 
 export const Home = () => {
-  const { display, modelsTable, filters, context } = useTableModels();
+  const { display, modelsTable, filters } = useTableModels();
 
   return (
     <>
-      <RightModalPanel
-        rows={modelsTable?.rowList}
-        templates={filters?.templates}
-        activeRowId={modelsTable?.activeRowId}
-        activeStatus={display?.rightPanelType}
-        activeCellName={modelsTable?.activeCellName}
-        updateTemplates={filters?.setTemplates}
-        onSubmit={context?.handleSubmit}
-        onClose={context?.handleOnClose}
-      />
-      {display?.activeScreen === ACTIVE_SCREEN.TEMPLATE_FILTERS && (
-        <TemplateFilters
-          templates={filters?.templates}
-          updateActiveScreen={display?.setActiveScreen}
-          updateRightPanelType={display?.setRightPanelType}
-        />
-      )}
+      <RightModalPanel />
+      {display?.activeScreen === ACTIVE_SCREEN.TEMPLATE_FILTERS && <TemplateFilters />}
       {display?.activeScreen === ACTIVE_SCREEN.TABLE && (
         <>
-          <FiltersPanel
-            compareMode={display?.compareMode}
-            handleChangeCompare={display?.handleChangeCompare}
-            templates={filters?.templates}
-            updateActiveScreen={display?.setActiveScreen}
-            updateRightPanelType={display?.setRightPanelType}
-          />
-          <AgGridModelsTable
-            display={display}
-            modelsTable={modelsTable}
-            templates={filters.templates}
-            error={modelsTable.error}
-            loading={modelsTable.loading}
-          />
+          <FiltersPanel />
+          <AgGridModelsTable />
           {/* <Row>
             <Checkbox
               dimension="s"
@@ -63,14 +36,7 @@ export const Home = () => {
       )}
       {display?.activeScreen === ACTIVE_SCREEN.COMPARE && (
         <CompareModelsWidget
-          columnsFilters={filters?.columnsFilters}
-          firstDate={filters?.firstDate}
-          secondDate={filters?.secondDate}
-          setRightPanelType={display?.setRightPanelType}
-          updateActiveScreen={display?.setActiveScreen}
-          compareMode={display?.compareMode}
-          templates={filters?.templates}
-          handleChangeCompare={display?.handleChangeCompare}
+
         />
       )}
     </>

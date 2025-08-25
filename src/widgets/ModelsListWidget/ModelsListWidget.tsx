@@ -5,14 +5,13 @@ import { ErrorStatus, Loading, Pagination } from '@shared/ui/atoms';
 import { ACTIVE_SCREEN, MODEL_FORM_MODE, RIGHT_PANEL_TYPE } from '@shared/constants';
 import { Template } from '@shared/api';
 import { ActionsPanel } from '@entities';
-import { ColumnsFilter, Row } from '@shared/types';
+import { Row } from '@shared/types';
 import { FiltersPanel, RightModalPanel } from '@features';
 
 import { AgGridModelsListWidget } from '@src/features/NewTables/AgGridModelsListWidget';
 import { useModelsListWidget } from './hooks';
 
 interface ModelsListWidgetProps {
-  columnsFilters: Partial<ColumnsFilter>;
   templates: Template[];
   compareMode: boolean;
   handleChangeCompare: (checked: boolean) => void;
@@ -23,7 +22,6 @@ interface ModelsListWidgetProps {
 }
 
 export const ModelsListWidget = ({
-  columnsFilters,
   compareMode,
   handleChangeCompare,
   rightPanelType,
@@ -32,27 +30,12 @@ export const ModelsListWidget = ({
   setRightPanelType,
   updateTemplates,
 }: ModelsListWidgetProps) => {
-  const { data, actions } = useModelsListWidget(columnsFilters, setRightPanelType);
+  const { data, actions } = useModelsListWidget(setRightPanelType);
 
   return (
     <>
-      <RightModalPanel
-        rows={data.rowList}
-        templates={templates}
-        activeRowId={data.activeRowId}
-        activeStatus={rightPanelType}
-        activeCellName={data.activeCellName}
-        updateTemplates={updateTemplates}
-        onSubmit={actions.handleSubmit}
-        onClose={actions.handleOnClose}
-      />
-      <FiltersPanel
-        compareMode={compareMode}
-        handleChangeCompare={handleChangeCompare}
-        templates={templates}
-        updateActiveScreen={updateActiveScreen}
-        updateRightPanelType={setRightPanelType}
-      />
+      <RightModalPanel />
+      <FiltersPanel />
       <ActionsPanel handleSearch={actions.handleSearch} updateRightPanelType={setRightPanelType} />
       <AgGridModelsListWidget data={data} templates={templates} actions={actions} />
     </>

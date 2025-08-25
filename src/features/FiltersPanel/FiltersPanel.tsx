@@ -3,42 +3,35 @@ import { Button, Checkbox, T, Toggle } from '@admiral-ds/react-ui';
 import { Template } from '@shared/api';
 import { useFiltersStore } from '@shared/stores/filtersStore';
 import { CustomSearchSelect } from '@shared/ui/organisms';
-import { useExploitationModeStore } from '@src/shared/stores';
-import {
-  ACTIVE_SCREEN,
-  RIGHT_PANEL_TYPE,
-  modelsSelectOptions,
-} from '@shared/constants';
+import { useExploitationModeStore, useDisplayStore } from '@src/shared/stores';
+import { ACTIVE_SCREEN, RIGHT_PANEL_TYPE, modelsSelectOptions } from '@shared/constants';
 import { TemplatesFilter, FilterButtonCount } from '@entities';
 
 import { Container, CustomDateField, FiltersDivider, FilterButton, FiltersBox } from './styles';
 import { useGlobalStore } from '../../shared/stores/globalStore';
+import { useTableModels } from '../../pages/Home/hooks';
 
 export interface FiltersPanelProps {
-  compareMode?: boolean;
   compareOnlyChanged?: boolean;
   disabledCompare?: boolean;
-  handleChangeCompare: (checked: boolean) => void;
   handleCompareOnlyChanged?: (checked: boolean) => void;
   compareModelsTableLoading?: boolean;
   handleUpdateCompareList?: () => void;
-  templates: Template[];
-  updateActiveScreen: (newActiveScreen: ACTIVE_SCREEN) => void;
-  updateRightPanelType: (newRightPanelType: RIGHT_PANEL_TYPE | null) => void;
 }
 
 export const FiltersPanel = ({
-  compareMode = false,
   compareOnlyChanged = false,
   disabledCompare = true,
   compareModelsTableLoading = false,
-  handleChangeCompare,
   handleUpdateCompareList = () => null,
   handleCompareOnlyChanged = () => null,
-  templates,
-  updateActiveScreen,
-  updateRightPanelType,
 }: FiltersPanelProps) => {
+  const { filters } = useTableModels();
+
+  const templates = filters?.templates;
+
+  const { compareMode, setActiveScreen, setRightPanelType, handleChangeCompare } =
+    useDisplayStore();
   const {
     topFilters,
     modelsDownloadingDate,
@@ -47,9 +40,8 @@ export const FiltersPanel = ({
     setFirstDate,
     setSecondDate,
     resetFilters,
-    getColumnsFilters,
+    filterModel,
   } = useFiltersStore();
-  const columnsFilters = getColumnsFilters();
   const { setFiltersResetCount } = useGlobalStore();
 
   const { exploitationModeOptions, selectedExploitationModes, updateSelectedExploitationModes } =
@@ -75,8 +67,8 @@ export const FiltersPanel = ({
         <div style={{ marginTop: '24px', marginRight: '20px' }}>
           <FilterButtonCount
             topFilters={topFilters}
-            updateActiveScreen={updateActiveScreen}
-            columnsFilters={columnsFilters}
+            updateActiveScreen={setActiveScreen}
+            columnsFilters={filterModel}
             activeScreen={ACTIVE_SCREEN.TEMPLATE_FILTERS}
             templates={templates}
           />
@@ -91,7 +83,7 @@ export const FiltersPanel = ({
           selectedValues={topFilters.objectTypeRegistry}
           onChange={handleChange}
         />
-        <TemplatesFilter templates={templates} updateRightPanelType={updateRightPanelType} />
+        <TemplatesFilter templates={templates} updateRightPanelType={setRightPanelType} />
         {compareMode ? (
           <>
             <CustomDateField

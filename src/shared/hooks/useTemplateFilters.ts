@@ -35,7 +35,7 @@ export const useTemplateFilters = (
 
   const isTemplateFilter = useCallback(
     (filterId: string): boolean => {
-      return activeTemplate?.template_value ? filterId in activeTemplate.template_value : false;
+      return activeTemplate?.filterModel ? filterId in activeTemplate.filterModel : false;
     },
     [activeTemplate]
   );
