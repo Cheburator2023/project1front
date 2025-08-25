@@ -1,10 +1,11 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useDownloadReportStore } from '@shared/stores/downloadReportStore';
 
 import { Column, ColumnsFilter, Row } from '@shared/types';
 import { initialColumns, MODEL_FORM_MODE, RIGHT_PANEL_TYPE } from '@shared/constants';
 import {
   API_ROUTES,
-  DownloadReportContext,
+
   useFetch,
   ModelsResponseType,
   mockedModelsResponse,
@@ -46,7 +47,7 @@ export const useModelsListWidget = (
   columnsFilters: Partial<ColumnsFilter>,
   setRightPanelType: React.Dispatch<React.SetStateAction<RIGHT_PANEL_TYPE | null>>,
 ) => {
-  const { updateColumnsFilters, downloadReportStatus } = useContext(DownloadReportContext);
+  const { updateColumnsFilters, downloadReportStatus } = useDownloadReportStore();
 
   // Cell activities
   const [activeCellName, setActiveCellName] = useState<keyof Row>();

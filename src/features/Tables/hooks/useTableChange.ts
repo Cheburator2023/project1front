@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback, useContext } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Column as AdmiralColumn } from '@admiral-ds/react-ui';
 
-import { FiltersContext } from '@shared/api';
+import { useFiltersStore } from '@shared/stores/filtersStore';
 import { Column, Row } from '@shared/types';
 import {
   compare,
@@ -26,8 +26,7 @@ export const useTableChange = ({
   searchString,
   columnList,
 }: TableChangeProps) => {
-  const { columnsFilters, topFilters, onChangeColumnsFilters, onChangeTopFilters } =
-    useContext(FiltersContext);
+  const { columnsFilters, topFilters, setColumnsFilters, setTopFilters } = useFiltersStore();
 
   const { updateDeleteModelState } = useDeleteRightModelPanelStore();
   const { isModelCreator, isInBusinessCustomers } = useModelUserMatch();
@@ -102,11 +101,19 @@ export const useTableChange = ({
           [rowFieldName]: selectValue,
         };
 
-        onChangeColumnsFilters(newColumnsFilters);
-        onChangeTopFilters({ ...topFilters, templates: topFilters.templates || [] });
+        setColumnsFilters(newColumnsFilters);
+      setTopFilters({ ...topFilters, templates: topFilters.templates || [] });
       }
     },
-    [columnsFilters, topFilters, onChangeColumnsFilters, onChangeTopFilters],
+    [columnsFilters, topFilters, setColumnsFilters, setTopFilters],
+  );
+
+  const onChangeTopFilters = useCallback(
+    (newTopFilters: typeof topFilters) => {
+      setCurrentPage(1);
+      setTopFilters(newTopFilters);
+    },
+    [setCurrentPage, setTopFilters],
   );
 
   const handleColumnDragEnd = (columnName: string, nextColumnName: string | null) => {
@@ -119,8 +126,8 @@ export const useTableChange = ({
     columns.splice(beforeIndex, 0, movedColumn);
 
     const newColumnsFilters = filterColumnsFiltersByColumns(columns, columnsFilters);
-    onChangeColumnsFilters(newColumnsFilters);
-    onChangeTopFilters({ ...topFilters, templates: [] });
+    setColumnsFilters(newColumnsFilters);
+      setTopFilters({ ...topFilters, templates: [] });
   };
 
   const handleUpdate = ({ withRows = false }) => {
@@ -181,10 +188,11 @@ export const useTableChange = ({
     handleResize,
     handleSelectionChange,
     handleChangeColumnsFilter,
+    onChangeTopFilters,
     columnsFilters,
     topFilters,
-    onChangeColumnsFilters,
-    onChangeTopFilters,
+    setColumnsFilters,
+    setTopFilters,
     handleColumnDragEnd,
   };
 };

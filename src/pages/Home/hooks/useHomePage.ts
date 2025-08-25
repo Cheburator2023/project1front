@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { ColumnsFilter, TopFilters } from '@shared/types';
 import {
@@ -9,14 +9,14 @@ import {
 } from '@shared/constants';
 import {
   API_ROUTES,
-  DownloadReportContext,
   useFetch,
   Template,
   mockedTemplatesResponse,
 } from '@shared/api';
+import { useDownloadReportStore } from '@shared/stores/downloadReportStore';
 
 export const useHomePage = () => {
-  const { updateColumnsFilters, downloadReportStatus } = useContext(DownloadReportContext);
+  const { updateColumnsFilters, downloadReportStatus } = useDownloadReportStore();
 
   const { responseData: templateData } = useFetch<Template[]>({
     apiRoute: API_ROUTES.TEMPLATES,

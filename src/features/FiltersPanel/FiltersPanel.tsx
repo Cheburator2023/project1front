@@ -1,6 +1,7 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Button, Checkbox, T, Toggle } from '@admiral-ds/react-ui';
-import { Template, FiltersContext } from '@shared/api';
+import { Template } from '@shared/api';
+import { useFiltersStore } from '@shared/stores/filtersStore';
 import { CustomSearchSelect } from '@shared/ui/organisms';
 import { useExploitationModeStore } from '@src/shared/stores';
 import {
@@ -42,25 +43,25 @@ export const FiltersPanel = ({
   const {
     topFilters,
     modelsDownloadingDate,
-    onChangeModelDownloadingDate,
-    onChangeColumnsFilters,
-    onChangeTopFilters,
-    onChangeFirstDate,
-    onChangeSecondDate,
+    setModelsDownloadingDate,
+    setColumnsFilters,
+    setTopFilters,
+    setFirstDate,
+    setSecondDate,
     columnsFilters,
-  } = useContext(FiltersContext);
+  } = useFiltersStore();
   const { setFiltersResetCount } = useGlobalStore();
 
   const { exploitationModeOptions, selectedExploitationModes, updateSelectedExploitationModes } =
     useExploitationModeStore();
 
   const handleChange = (name: string, value: string[]) => {
-    onChangeTopFilters({ ...topFilters, templates: [], [name]: value });
+    setTopFilters({ ...topFilters, templates: [], [name]: value });
   };
 
   const handleResetFilters = () => {
-    onChangeColumnsFilters(initialColumnsFilters);
-    onChangeTopFilters({ ...topFilters, templates: [] });
+    setColumnsFilters(initialColumnsFilters);
+    setTopFilters({ ...topFilters, templates: [] });
     setFiltersResetCount();
   };
 
@@ -100,7 +101,7 @@ export const FiltersPanel = ({
               label="Дата состояния реестра 1:"
               placeholder="Введите дату"
               dropContainerClassName="dropContainerClass"
-              onChange={(e) => onChangeFirstDate(e.target.value)}
+              onChange={(e) => setFirstDate(e.target.value)}
             />
             <CustomDateField
               type="date"
@@ -109,7 +110,7 @@ export const FiltersPanel = ({
               label="Дата состояния реестра 2:"
               placeholder="Введите дату"
               dropContainerClassName="dropContainerClass"
-              onChange={(e) => onChangeSecondDate(e.target.value)}
+              onChange={(e) => setSecondDate(e.target.value)}
             />
             <FilterButton
               onClick={handleUpdateCompareList}
@@ -137,7 +138,7 @@ export const FiltersPanel = ({
               label="Выгрузка на определенную дату:"
               placeholder="Введите дату"
               dropContainerClassName="dropContainerClass"
-              onChange={(e) => onChangeModelDownloadingDate(e.target.value)}
+              onChange={(e) => setModelsDownloadingDate(e.target.value)}
             />
           </>
         )}

@@ -1,21 +1,19 @@
 import React from 'react';
 import { ErrorStatus, Flexbox, Loading, Spacer } from '@shared/ui/atoms';
 import { ACTIVE_SCREEN } from '@shared/constants';
-import { FiltersContext } from '@shared/api';
 import { FiltersPanel, RightModalPanel } from '@features';
 import { useTableModels } from '@pages/Home/hooks';
 
 import { AgGridModelsTable } from '@src/features/NewTables/AgGridModelsTable';
-import { TemplateFiltersNew } from '@src/features/TemplateFilters/TemplateFiltersNew';
+import { TemplateFilters } from '@src/features/TemplateFilters/TemplateFilters';
 import { AgGridTable } from '../../features/NewTables/AgGridTable';
 import { CompareModelsWidgetNewTable } from '../../widgets/CompareModelsWidget/CompareModelsWidgetNewTable';
-import { TemplateFilters } from '../../features/TemplateFilters/TemplateFilters';
 
 export const FutureTableHomePage = () => {
   const { display, modelsTable, filters, context } = useTableModels();
 
   return (
-    <FiltersContext.Provider value={context.contextValue}>
+    <>
       <RightModalPanel
         rows={modelsTable.rowList}
         templates={filters.templates}
@@ -63,7 +61,7 @@ export const FutureTableHomePage = () => {
           handleChangeCompare={display.handleChangeCompare}
         />
       )}
-    </FiltersContext.Provider>
+    </>
   );
 };
 

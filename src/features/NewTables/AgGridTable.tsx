@@ -44,7 +44,6 @@ import { IconButton } from '@shared/ui/molecules';
 import { RIGHT_PANEL_TYPE } from '@shared/constants';
 import { useNavigate } from 'react-router-dom';
 import { Column, COLUMN_TYPE, Row } from '@src/shared/types';
-import { useAppInjectStore } from '@src/shared/stores/appInjectStore';
 import { useTableChange } from '@src/features/Tables/hooks';
 import { format } from 'date-fns';
 import { Template } from '@src/shared/api/types';

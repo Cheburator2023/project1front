@@ -57,7 +57,7 @@ export const ModelForm = ({
 }: ModelFormProps) => {
   const { mutationProtectedFetch } = useFetch({});
   const formMode = getFormMode(mode);
-  const { setCurrentCustomer, currentCustomer } = useAppInjectStore();
+  const { currentCustomer } = useAppInjectStore();
   const { isEditAllocationEnabled } = usePermissions();
 
   const [values, setValues] = useState<FormValues | undefined>();

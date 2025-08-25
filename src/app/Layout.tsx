@@ -3,10 +3,9 @@ import styled, { createGlobalStyle, ThemeProvider } from 'styled-components';
 import { DropdownProvider } from '@admiral-ds/react-ui';
 import Keycloak from 'keycloak-js';
 
-import { FetchContext, DownloadReportContext } from '@shared/api';
 import { ColumnsFilter, Permission, Role } from '@shared/types';
 
-import { useUserStore, useAppInjectStore } from '@src/shared/stores';
+import { useUserStore, useAppInjectStore, useFetchStore } from '@src/shared/stores';
 import { Header } from './Header';
 import { themes } from './theme/theme';
 
@@ -43,10 +42,17 @@ const Layout = ({ children, user, protectedFetch, goToSum, onLogout }: LayoutPro
   const [columnsFilters, setColumnsFilters] = useState<Partial<ColumnsFilter>>();
   const { setCurrentCustomer } = useAppInjectStore();
   const { setUsername, setGroups, setRoles, setPermissions } = useUserStore();
+  const { setProtectedFetch } = useFetchStore();
 
   const updateColumnsFilters = useCallback((newColumnsFilters?: Partial<ColumnsFilter>) => {
     setColumnsFilters(newColumnsFilters);
   }, []);
+
+  useEffect(() => {
+    if (protectedFetch) {
+      setProtectedFetch(protectedFetch);
+    }
+  }, [protectedFetch, setProtectedFetch]);
 
   useEffect(() => {
     // DEV
@@ -96,28 +102,23 @@ const Layout = ({ children, user, protectedFetch, goToSum, onLogout }: LayoutPro
   };
 
   return (
-    // eslint-disable-next-line react/jsx-no-constructed-context-values
-    <FetchContext.Provider value={{ protectedFetch }}>
-      <ThemeProvider theme={themes.light}>
-        <DropdownProvider>
-          <GlobalStyle />
-          <DownloadReportContext.Provider value={{ updateColumnsFilters, downloadReportStatus }}>
-            <Container>
-              <Header
-                user={user}
-                downloadReportStatus={downloadReportStatus}
-                columnsFilters={columnsFilters}
-                updateColumnsFilters={updateColumnsFilters}
-                updateDownloadReportStatus={setDownloadReportStatus}
-                goToSum={goToSum}
-                onLogout={onLogoutHandler}
-              />
-              <RoutesWrapper>{children}</RoutesWrapper>
-            </Container>
-          </DownloadReportContext.Provider>
-        </DropdownProvider>
-      </ThemeProvider>
-    </FetchContext.Provider>
+    <ThemeProvider theme={themes.light}>
+      <DropdownProvider>
+        <GlobalStyle />
+          <Container>
+            <Header
+              user={user}
+              downloadReportStatus={downloadReportStatus}
+              columnsFilters={columnsFilters}
+              updateColumnsFilters={updateColumnsFilters}
+              updateDownloadReportStatus={setDownloadReportStatus}
+              goToSum={goToSum}
+              onLogout={onLogoutHandler}
+            />
+            <RoutesWrapper>{children}</RoutesWrapper>
+          </Container>
+      </DropdownProvider>
+    </ThemeProvider>
   );
 };
 

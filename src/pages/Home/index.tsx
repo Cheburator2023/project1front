@@ -2,12 +2,10 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { ErrorStatus, Loading, Pagination } from '@shared/ui/atoms';
 import { ACTIVE_SCREEN } from '@shared/constants';
-import { FiltersContext } from '@shared/api';
 import { ActionsPanel } from '@entities';
 import { FiltersPanel, RightModalPanel } from '@features';
 
 import { AgGridModelsTable } from '@src/features/NewTables/AgGridModelsTable';
-import { TemplateFiltersNew } from '@src/features/TemplateFilters/TemplateFiltersNew';
 import { useTableModels } from './hooks';
 import { CompareModelsWidget } from '../../widgets';
 import { TemplateFilters } from '../../features/TemplateFilters/TemplateFilters';
@@ -17,7 +15,7 @@ export const Home = () => {
   const [checked, setChecked] = useState<boolean>(false);
 
   return (
-    <FiltersContext.Provider value={context.contextValue}>
+    <>
       <RightModalPanel
         rows={modelsTable.rowList}
         templates={filters.templates}
@@ -75,8 +73,8 @@ export const Home = () => {
           templates={filters.templates}
           handleChangeCompare={display.handleChangeCompare}
         />
-      )}
-    </FiltersContext.Provider>
+    )}
+    </>
   );
 };
 

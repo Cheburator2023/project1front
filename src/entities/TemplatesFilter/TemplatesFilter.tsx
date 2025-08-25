@@ -1,7 +1,8 @@
-import React, { useContext, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { Button } from '@admiral-ds/react-ui';
 
-import { Template, FiltersContext } from '@shared/api';
+import { Template } from '@shared/api';
+import { useFiltersStore } from '@shared/stores/filtersStore';
 import { SELECT_TYPE, CustomSearchSelect } from '@shared/ui/organisms';
 import { initialColumnsFilters, initialTopFilters, RIGHT_PANEL_TYPE } from '@shared/constants';
 import { useTemplateFilters } from '@src/shared/hooks';
@@ -24,8 +25,7 @@ export const TemplatesFilter = ({
   error = '',
   updateRightPanelType,
 }: TemplatesFilterProps) => {
-  const { topFilters, onChangeTopFilters, onChangeColumnsFilters, columnsFilters } =
-    useContext(FiltersContext);
+  const { topFilters, setTopFilters, setColumnsFilters, columnsFilters } = useFiltersStore();
 
   const { isModifiedFilter, resetFilters } = useTemplateFilters(columnsFilters, templates, topFilters.templates);
 
@@ -48,8 +48,8 @@ export const TemplatesFilter = ({
     );
 
     if (newSelectedTemplate && newSelectedTemplate.template_value) {
-      onChangeColumnsFilters({ ...newSelectedTemplate.template_value });
-      onChangeTopFilters({ ...initialTopFilters, [name]: selectValue });
+      setColumnsFilters({ ...newSelectedTemplate.template_value });
+      setTopFilters({ ...initialTopFilters, [name]: selectValue });
     }
   };
 
@@ -57,8 +57,8 @@ export const TemplatesFilter = ({
 
 
   const handleResetFilters = () => {
-    onChangeColumnsFilters(initialColumnsFilters);
-    onChangeTopFilters({ ...topFilters, templates: [] });
+    setColumnsFilters(initialColumnsFilters);
+    setTopFilters({ ...topFilters, templates: [] });
     setFiltersResetCount();
   };
 

@@ -1,10 +1,11 @@
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Button, TableRow as ATableRow, T, Toggle } from '@admiral-ds/react-ui';
 import { ReactComponent as CloseOutline } from '@admiral-ds/icons/build/service/CloseOutline.svg';
 
 import { COLUMN_TYPE, ColumnsFilter, Row } from '@shared/types';
-import { FiltersContext, Template } from '@shared/api';
+import { Template } from '@shared/api';
+import { useFiltersStore } from '@shared/stores/filtersStore';
 import { Table } from '@shared/ui';
 import {
   ACTIVE_SCREEN,
@@ -35,8 +36,7 @@ export const TemplateFilters = ({
   updateRightPanelType,
   updateActiveScreen,
 }: TemplateFiltersProps) => {
-  const { topFilters, columnsFilters, onChangeColumnsFilters, onChangeTopFilters } =
-    useContext(FiltersContext);
+  const { topFilters, columnsFilters, setColumnsFilters, setTopFilters } = useFiltersStore();
 
   const [rows, setRows] = useState<ATableRow[]>([]);
   const [showFilterTemplate, setShowFilterTemplate] = useState(true);
@@ -63,15 +63,15 @@ export const TemplateFilters = ({
               : prevColumnsFilterValues.filter((filterValue) => filterValue !== value),
         };
 
-        onChangeColumnsFilters(newColumnsFilters);
-        onChangeTopFilters({ ...topFilters });
+        setColumnsFilters(newColumnsFilters);
+        setTopFilters({ ...topFilters });
       }
 
       if (shouldResetTemplateOnInitialFilterRemove(columnFilterName)) {
-        onChangeTopFilters({ ...topFilters, templates: [] });
+        setTopFilters({ ...topFilters, templates: [] });
       }
     },
-    [columnsFilters, topFilters, modifiedFilters, onChangeColumnsFilters, onChangeTopFilters],
+    [columnsFilters, topFilters, modifiedFilters, setColumnsFilters, setTopFilters],
   );
 
   const cols = useMemo(
@@ -183,7 +183,7 @@ export const TemplateFilters = ({
       keys.splice(nextRowIndexUpdated + 1, 0, rowId);
     }
 
-    onChangeColumnsFilters(
+    setColumnsFilters(
       keys.reduce((acc, cur) => {
         if (columnsFilters[cur as keyof typeof columnsFilters]) {
           acc[cur as keyof typeof columnsFilters] =
@@ -193,7 +193,7 @@ export const TemplateFilters = ({
         return acc;
       }, {} as Partial<ColumnsFilter>),
     );
-    onChangeTopFilters({ ...topFilters, templates: [] });
+    setTopFilters({ ...topFilters, templates: [] });
   };
 
   const handleSelectionChange = (ids: Record<string, boolean>): void => {
@@ -221,16 +221,16 @@ export const TemplateFilters = ({
       return newColumnFilters;
     }, {} as Partial<ColumnsFilter>);
 
-    onChangeColumnsFilters(newColumnFilters);
-    onChangeTopFilters({ ...topFilters, templates: [] });
+    setColumnsFilters(newColumnFilters);
+    setTopFilters({ ...topFilters, templates: [] });
 
     setRows(updRows);
   };
 
   const handleResetFilters = () => {
     resetFilters();
-    onChangeColumnsFilters(initialColumnsFilters);
-    onChangeTopFilters({ ...topFilters, templates: [] });
+    setColumnsFilters(initialColumnsFilters);
+    setTopFilters({ ...topFilters, templates: [] });
   };
 
   const handleToggleChange = () => {

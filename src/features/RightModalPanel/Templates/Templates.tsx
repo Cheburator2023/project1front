@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   T,
   TextInput,
@@ -21,10 +21,11 @@ import {
   Template,
   TemplateAddApi,
   TemplateUpdateApi,
-  FiltersContext,
+
 } from '@shared/api';
 import { StatusScreen } from '@shared/ui/molecules';
 import { RightPanel } from '@shared/ui/organisms';
+import { useFiltersStore } from '@shared/stores/filtersStore';
 
 import { TemplateItem } from './TemplateItem';
 import {
@@ -57,7 +58,7 @@ export interface TemplatesProps {
 }
 
 export const Templates = ({ templates, onClose, updateTemplates }: TemplatesProps) => {
-  const { columnsFilters } = useContext(FiltersContext);
+  const { columnsFilters } = useFiltersStore();
 
   const { isAddPublicTemplateEnabled } = usePermissions();
 

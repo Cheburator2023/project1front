@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Column, ColumnsFilter, Row, TopFilters } from '@shared/types';
 import {
   initialColumns,
@@ -11,13 +11,13 @@ import {
 
 import {
   API_ROUTES,
-  DownloadReportContext,
   useFetch,
   ModelsResponseType,
   Template,
   mockedModelsResponse,
   mockedTemplatesResponse,
 } from '@shared/api';
+import { useDownloadReportStore } from '@shared/stores/downloadReportStore';
 
 import {
   checkColumnsFiltersForEqual,
@@ -123,7 +123,7 @@ export interface IUseTableModels {
 }
 
 export const useTableModels = () => {
-  const { updateColumnsFilters, downloadReportStatus } = useContext(DownloadReportContext);
+  const { updateColumnsFilters, downloadReportStatus } = useDownloadReportStore();
   const [activeScreen, setActiveScreen] = useState(ACTIVE_SCREEN.TABLE);
   const [compareMode, setCompareMode] = useState(false);
   const [rightPanelType, setRightPanelType] = useState<RIGHT_PANEL_TYPE | null>(null);

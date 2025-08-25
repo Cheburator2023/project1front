@@ -1,7 +1,7 @@
 /* eslint-disable no-use-before-define */
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
-import { FetchContext } from './FetchContext';
+import { useFetchStore } from '@shared/stores/fetchStore';
 import { API_ROUTES } from './constants';
 import { stringToBoolean } from '../helpers/typeops';
 
@@ -45,7 +45,7 @@ export const useFetch = <T>({
 
   const [refetchStatus, setRefetchStatus] = useState(false);
 
-  const { protectedFetch } = useContext(FetchContext);
+  const { protectedFetch } = useFetchStore();
 
   useEffect(() => {
     if (method !== 'GET' || !apiRoute) {
