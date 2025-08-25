@@ -154,7 +154,13 @@ const setFilterParams: ISetFilterParams = {
     if (params.value == null || params.value === '') {
       return '(Пусто)';
     }
-    return params.value;
+    const cleanValue = params.value
+      .toString()
+      .replace(/<br\s*\/?>/gi, ' ')
+      .replace(/<[^>]*>/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+    return cleanValue;
   },
 };
 
@@ -250,7 +256,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
             : data.type === COLUMN_TYPE.NUMBER
             ? 'agNumberColumnFilter'
             : 'agSetColumnFilter',
-        filterParams: data.type === COLUMN_TYPE.DATE ? dateFilterParams : { buttons: ['clear'] },
+        filterParams: data.type === COLUMN_TYPE.DATE ? dateFilterParams : setFilterParams,
         cellRenderer: data.cellRenderer,
         cellClass: (params) => {
           if (isCompared) {
@@ -278,7 +284,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
           );
         },
         cellDataType: false,
-        filterParams: { buttons: ['clear'] },
+        filterParams: setFilterParams,
         floatingFilter: true,
         initialWidth: 400,
         minWidth: 250,

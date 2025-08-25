@@ -1,22 +1,29 @@
 import { SELECT_TYPE, SelectStringProps } from '@src/shared/ui/organisms';
 import * as Highcharts from 'highcharts';
 import { MetricsCaption, MetricsEnum } from './types';
-import { width } from '@admiral-ds/react-ui';
 
-const metricLabelMap: Record<MetricsEnum, MetricsCaption> = {
+const metricLabelMap: Record<string, string> = {
+  // Основные метрики (существующие)
   [MetricsEnum.ImplementedModelsMetric]: MetricsCaption.IMPLEMENTED_MODELS,
   [MetricsEnum.DevelopedModelsMetric]: MetricsCaption.DEVELOPED_MODELS,
   [MetricsEnum.MrmModelsMetric]: MetricsCaption.SUM_RM_MODELS,
-  // [MetricsEnum.PilotsMetric]: MetricsCaption.PILOTS,
   [MetricsEnum.TasksMetric]: MetricsCaption.DYNAMIC_BY_STREAMS_MODELS,
   [MetricsEnum.TakenOutOfOperationModelsMetric]: MetricsCaption.TAKEN_OUT_OF_OPERATION_MODELS,
   [MetricsEnum.StalledModelsByMonthMetric]: MetricsCaption.STALLED_MODLES_BY_MONTH,
-  // [MetricsEnum.RiskCoverageFinalStatusModelsMetric]: MetricsCaption.RISK_COVERAGE_FINAL_STATUS_MODELS,
-  // [MetricsEnum.RegistryCoverageModelsMetric]: MetricsCaption.REGISTRY_COVERAGE_MODELS,
   [MetricsEnum.OnMonitoringModelsMetric]: MetricsCaption.ON_MONITORING_MODELS,
-  // [MetricsEnum.FinalStatusModelsMetric]: MetricsCaption.FINAL_STATUS_MODELS,
-  // [MetricsEnum.FinalStatusByMonthModelsMetric]: MetricsCaption.FINAL_STATUS_BY_MONTH_MODELS,
-  // [MetricsEnum.DistributionByLifecycleStageModelsMetric]: MetricsCaption.DISTRIBUTION_BY_LIFECYCLE_STAGE_MODELS,
+  [MetricsEnum.FinalStatusModelsMetric]: MetricsCaption.FINAL_STATUS_MODELS,
+  [MetricsEnum.FinalStatusByMonthModelsMetric]: MetricsCaption.FINAL_STATUS_BY_MONTH_MODELS,
+  [MetricsEnum.DistributionByLifecycleStageModelsMetric]:
+    MetricsCaption.DISTRIBUTION_BY_LIFECYCLE_STAGE_MODELS,
+
+  // Delta метрики (новые)
+  [`${MetricsEnum.ImplementedModelsMetric}_delta`]: MetricsCaption.IMPLEMENTED_MODELS_DELTA,
+  [`${MetricsEnum.DevelopedModelsMetric}_delta`]: MetricsCaption.DEVELOPED_MODELS_DELTA,
+  [`${MetricsEnum.MrmModelsMetric}_delta`]: MetricsCaption.SUM_RM_MODELS_DELTA,
+  [`${MetricsEnum.OnMonitoringModelsMetric}_delta`]: MetricsCaption.ON_MONITORING_MODELS_DELTA,
+  [`${MetricsEnum.TakenOutOfOperationModelsMetric}_delta`]:
+    MetricsCaption.TAKEN_OUT_OF_OPERATION_MODELS_DELTA,
+  [`${MetricsEnum.FinalStatusModelsMetric}_delta`]: MetricsCaption.FINAL_STATUS_MODELS_DELTA,
 };
 
 const itemsExport = [
@@ -52,10 +59,75 @@ const dsStreamArtifactOptions = {
 
 const metricsOptions = {
   type: SELECT_TYPE.STRING,
-  options: Object.values(MetricsEnum).map((metric) => ({
-    value: metric,
-    text: metricLabelMap[metric],
-  })),
+  options: [
+    // Основные данные
+    {
+      value: MetricsEnum.ImplementedModelsMetric,
+      text: MetricsCaption.IMPLEMENTED_MODELS,
+    },
+    {
+      value: MetricsEnum.DevelopedModelsMetric,
+      text: MetricsCaption.DEVELOPED_MODELS,
+    },
+    {
+      value: MetricsEnum.MrmModelsMetric,
+      text: MetricsCaption.SUM_RM_MODELS,
+    },
+    {
+      value: MetricsEnum.OnMonitoringModelsMetric,
+      text: MetricsCaption.ON_MONITORING_MODELS,
+    },
+    {
+      value: MetricsEnum.TakenOutOfOperationModelsMetric,
+      text: MetricsCaption.TAKEN_OUT_OF_OPERATION_MODELS,
+    },
+    {
+      value: MetricsEnum.FinalStatusModelsMetric,
+      text: MetricsCaption.FINAL_STATUS_MODELS,
+    },
+    {
+      value: MetricsEnum.FinalStatusByMonthModelsMetric,
+      text: MetricsCaption.FINAL_STATUS_BY_MONTH_MODELS,
+    },
+    {
+      value: MetricsEnum.TasksMetric,
+      text: MetricsCaption.DYNAMIC_BY_STREAMS_MODELS,
+    },
+    {
+      value: MetricsEnum.StalledModelsByMonthMetric,
+      text: MetricsCaption.STALLED_MODLES_BY_MONTH,
+    },
+    {
+      value: MetricsEnum.DistributionByLifecycleStageModelsMetric,
+      text: MetricsCaption.DISTRIBUTION_BY_LIFECYCLE_STAGE_MODELS,
+    },
+
+    // Delta данные
+    {
+      value: `${MetricsEnum.ImplementedModelsMetric}_delta`,
+      text: MetricsCaption.IMPLEMENTED_MODELS_DELTA,
+    },
+    {
+      value: `${MetricsEnum.DevelopedModelsMetric}_delta`,
+      text: MetricsCaption.DEVELOPED_MODELS_DELTA,
+    },
+    {
+      value: `${MetricsEnum.MrmModelsMetric}_delta`,
+      text: MetricsCaption.SUM_RM_MODELS_DELTA,
+    },
+    {
+      value: `${MetricsEnum.OnMonitoringModelsMetric}_delta`,
+      text: MetricsCaption.ON_MONITORING_MODELS_DELTA,
+    },
+    {
+      value: `${MetricsEnum.TakenOutOfOperationModelsMetric}_delta`,
+      text: MetricsCaption.TAKEN_OUT_OF_OPERATION_MODELS_DELTA,
+    },
+    {
+      value: `${MetricsEnum.FinalStatusModelsMetric}_delta`,
+      text: MetricsCaption.FINAL_STATUS_MODELS_DELTA,
+    },
+  ],
 } as SelectStringProps;
 
 const initialKPI_SUM = { caption: MetricsCaption.KPI_SUM, value: 0, delta: 0, relative: true };
@@ -119,6 +191,12 @@ const initialChartModelDynamicsByStreams = () => ({
     type: 'bar',
     height: 280,
     spacingBottom: 30,
+    zoomType: 'x',
+    panning: {
+      enabled: true,
+      type: 'x' as const,
+    },
+    panKey: 'shift' as const,
   },
   title: { text: undefined },
   credits: {
@@ -146,13 +224,27 @@ const initialChartModelDynamicsByStreams = () => ({
   yAxis: {
     title: { text: null },
     min: 0,
+    startOnTick: false,
+    endOnTick: false,
+    minRange: 10,
+    labels: {
+      formatter: function (this: any) {
+        return this.value.toLocaleString();
+      },
+    },
   },
   legend: { enabled: false },
   tooltip: {
     backgroundColor: '#333',
     borderRadius: 4,
     style: { color: '#fff' },
-    format: '<b>{point.category}</b><br/><span>{point.y} задач</span>',
+    formatter: function (this: any) {
+      const point = this.point;
+      const value = point.y;
+      const formattedValue = value.toLocaleString();
+
+      return `<b>${point.category}</b><br/><span>${formattedValue} задач</span>`;
+    },
   },
   plotOptions: {
     bar: {
@@ -162,7 +254,17 @@ const initialChartModelDynamicsByStreams = () => ({
       dataLabels: { enabled: true },
     },
   },
-  colors: ['#8DA0CB', '#E78AC3', '#FC8D62', '#A6D854', '#FFD92F', '#66C2A5', '#B3B3B3', '#FFB347', '#B39EB5'],
+  colors: [
+    '#8DA0CB',
+    '#E78AC3',
+    '#FC8D62',
+    '#A6D854',
+    '#FFD92F',
+    '#66C2A5',
+    '#B3B3B3',
+    '#FFB347',
+    '#B39EB5',
+  ],
   series: [
     {
       name: 'Количество задач',
@@ -173,12 +275,17 @@ const initialChartModelDynamicsByStreams = () => ({
   ] as Highcharts.SeriesBarOptions[],
 });
 
-
 const initialChartFinalStatusByMonthModels = () => ({
   chart: {
     type: 'areaspline',
     height: 170,
     marginTop: 22,
+    zoomType: 'x',
+    panning: {
+      enabled: true,
+      type: 'x' as const,
+    },
+    panKey: 'shift' as const,
   },
   title: {
     text: undefined,
@@ -196,6 +303,15 @@ const initialChartFinalStatusByMonthModels = () => ({
     gridLineWidth: 1,
     lineWidth: 1,
     gridLineDashStyle: 'Dash' as Highcharts.DashStyleValue,
+    startOnTick: false,
+    endOnTick: false,
+    minRange: 10,
+    min: undefined,
+    labels: {
+      formatter: function (this: any) {
+        return this.value.toLocaleString();
+      },
+    },
   },
   xAxis: {
     categories: [
@@ -221,11 +337,13 @@ const initialChartFinalStatusByMonthModels = () => ({
       enableMouseTracking: true,
       marker: {
         enabled: true,
-        radios: 5,
+        radius: 5,
         lineWidth: 2,
         lineColor: 'var(--neutral-neutral-50, #0E9CFF)',
         fillColor: 'var(--neutral-neutral-00, #ffffff)',
       },
+      threshold: null,
+      minPointLength: 2,
     },
   },
   legend: {
@@ -240,8 +358,19 @@ const initialChartFinalStatusByMonthModels = () => ({
       color: 'var(--neutral-neutral-00, #ffffff)',
     },
     hideDelay: 500,
-    format:
-      '<span class="tooltip-key">{key}</span><br/><span class="tooltip-value">{point.y} моделей</span>',
+    formatter: function (this: any) {
+      const point = this.point;
+      const value = point.y;
+      const formattedValue = value.toLocaleString();
+
+      if (value >= 1000) {
+        return `<span class="tooltip-key">${point.category}</span><br/>
+                <span class="tooltip-value">${formattedValue} моделей</span>`;
+      }
+
+      return `<span class="tooltip-key">${point.category}</span><br/>
+              <span class="tooltip-value">${formattedValue} моделей</span>`;
+    },
   },
   series: [
     {
@@ -254,6 +383,12 @@ const initialChartFinalStatusByMonthModels = () => ({
         lineWidth: 2,
         lineColor: 'var(--neutral-neutral-50, #0E9CFF)',
         fillColor: 'var(--neutral-neutral-00, #ffffff)',
+        states: {
+          hover: {
+            radius: 6,
+            lineWidth: 3,
+          },
+        },
       },
       fillColor: {
         linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
@@ -271,6 +406,12 @@ const initialChartStalledModelsByMonth = () => ({
     type: 'areaspline',
     height: 170,
     marginTop: 22,
+    zoomType: 'x',
+    panning: {
+      enabled: true,
+      type: 'x' as const,
+    },
+    panKey: 'shift' as const,
   },
   title: {
     text: undefined,
@@ -288,6 +429,15 @@ const initialChartStalledModelsByMonth = () => ({
     gridLineWidth: 1,
     lineWidth: 1,
     gridLineDashStyle: 'Dash' as Highcharts.DashStyleValue,
+    startOnTick: false,
+    endOnTick: false,
+    minRange: 10,
+    min: undefined,
+    labels: {
+      formatter: function (this: any) {
+        return this.value.toLocaleString();
+      },
+    },
   },
   xAxis: {
     categories: [
@@ -311,6 +461,15 @@ const initialChartStalledModelsByMonth = () => ({
   plotOptions: {
     areaspline: {
       enableMouseTracking: true,
+      marker: {
+        enabled: true,
+        radius: 5,
+        lineWidth: 2,
+        lineColor: 'var(--error-error-70, #FF0D0D)',
+        fillColor: 'var(--neutral-neutral-00, #ffffff)',
+      },
+      threshold: null,
+      minPointLength: 2,
     },
   },
   legend: {
@@ -325,8 +484,14 @@ const initialChartStalledModelsByMonth = () => ({
       color: 'var(--neutral-neutral-00, #ffffff)',
     },
     hideDelay: 500,
-    format:
-      '<span class="tooltip-key">{key}</span><br/><span class="tooltip-value">{point.y} моделей</span>',
+    formatter: function (this: any) {
+      const point = this.point;
+      const value = point.y;
+      const formattedValue = value.toLocaleString();
+
+      return `<span class="tooltip-key">${point.category}</span><br/>
+              <span class="tooltip-value">${formattedValue} моделей</span>`;
+    },
   },
   series: [
     {
@@ -339,6 +504,12 @@ const initialChartStalledModelsByMonth = () => ({
         lineWidth: 2,
         lineColor: 'var(--error-error-70, #FF0D0D)',
         fillColor: 'var(--neutral-neutral-00, #ffffff)',
+        states: {
+          hover: {
+            radius: 6,
+            lineWidth: 3,
+          },
+        },
       },
       fillColor: {
         linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
@@ -355,6 +526,12 @@ const initialChartPilots = () => ({
   chart: {
     height: 180,
     marginTop: 20,
+    zoomType: 'x',
+    panning: {
+      enabled: true,
+      type: 'x' as const,
+    },
+    panKey: 'shift' as const,
   },
   accessibility: {
     enabled: true,
@@ -369,24 +546,40 @@ const initialChartPilots = () => ({
     title: {
       text: undefined,
     },
-    tickAmount: 5,
     min: 0,
-    max: 100,
     gridLineWidth: 1,
     lineWidth: 0,
     gridLineDashStyle: 'Dash' as Highcharts.DashStyleValue,
+    startOnTick: false,
+    endOnTick: false,
+    minRange: 10,
+    labels: {
+      enabled: true,
+      style: {
+        fontSize: '12px',
+      },
+      formatter: function (this: any) {
+        return this.value.toLocaleString();
+      },
+    },
   },
   xAxis: {
     accessibility: {
       enabled: true,
     },
-    categories: ['05A', '05B'],
-    gridLineWidth: 1,
-    lineWidth: 0,
-    gridLineDashStyle: 'Dash' as Highcharts.DashStyleValue,
     title: {
       text: undefined,
     },
+    categories: ['05A', '05B'],
+    labels: {
+      enabled: true,
+      style: {
+        fontSize: '12px',
+      },
+    },
+    gridLineWidth: 1,
+    lineWidth: 0,
+    gridLineDashStyle: 'Dash' as Highcharts.DashStyleValue,
   },
   plotOptions: {
     bar: {
@@ -410,14 +603,20 @@ const initialChartPilots = () => ({
       color: 'var(--neutral-neutral-00, #ffffff)',
     },
     hideDelay: 500,
-    format:
-      '<span class="tooltip-key">{series.name}</span><br/><span class="tooltip-value">{y}</span>',
+    formatter: function (this: any) {
+      const point = this.point;
+      const value = point.y;
+      const formattedValue = value ? value.toLocaleString() : '0';
+
+      return `<span class="tooltip-key">${point.series.name}</span><br/>
+              <span class="tooltip-value">${formattedValue}</span>`;
+    },
   },
   series: [
     {
       type: 'bar',
       name: '05A',
-      data: [0, null],
+      data: [150, null], // значения для категорий ['05A', '05B']
       color: {
         linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
         stops: [
@@ -429,7 +628,7 @@ const initialChartPilots = () => ({
     {
       type: 'bar',
       name: '05B',
-      data: [null, 0],
+      data: [null, 200], // значения для категорий ['05A', '05B']
       color: {
         linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
         stops: [
@@ -481,8 +680,14 @@ const initialChartDistributionByLifecycleStageModels = (): Highcharts.Options & 
       color: 'var(--neutral-neutral-00, #ffffff)',
     },
     hideDelay: 500,
-    format:
-      '<span class="tooltip-key">{key}</span><br/><span class="tooltip-value">{y} моделей</span>',
+    formatter: function (this: any) {
+      const point = this.point;
+      const value = point.y;
+      const formattedValue = value.toLocaleString();
+
+      return `<span class="tooltip-key">${point.key}</span><br/>
+              <span class="tooltip-value">${formattedValue} моделей</span>`;
+    },
   },
   plotOptions: {
     pie: {
@@ -538,6 +743,6 @@ export {
   dsStreamArtifactOptions,
   itemsExport,
   metricLabelMap,
-  metricsOptions
+  metricsOptions,
 };
 

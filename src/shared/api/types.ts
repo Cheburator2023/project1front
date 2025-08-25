@@ -80,11 +80,11 @@ export type MetricsResponseType = {
   };
   takenOutOfOperationModels: {
     count: number;
-    deltaPercent: number;
+    delta: number;
   };
   onMonitoringModels: {
     count: number;
-    deltaPercent: number;
+    delta: number;
   };
   stalledModelsByMonth: number[];
   finalStatusByMonthModels: number[];
@@ -141,6 +141,7 @@ export enum ArtifactType {
   TEXT = 'text',
   NUMBER = 'number',
   USER = 'user',
+  RFD = 'rfd',
 }
 
 export type ArtifactTypeUnion = `${ArtifactType}`;
