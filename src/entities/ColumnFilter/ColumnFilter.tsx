@@ -5,7 +5,7 @@ import { Button } from '@admiral-ds/react-ui';
 
 import { COLUMN_TYPE, Column, ColumnsFilter, Row, TopFilters } from '@shared/types';
 import { SELECT_TYPE } from '@shared/ui/organisms';
-import { getColumnFilterOptions, getFilteredRowsByColumnsFilter } from '@shared/helpers';
+import { getColumnFilterOptions } from '@shared/helpers';
 
 import { useTemplateFilters } from '@src/shared/hooks';
 import { Template } from '@src/shared/api/types';
@@ -105,28 +105,14 @@ export const ColumnFilter = React.memo(
           return null;
         }
 
-        const filteredRowsIds = getFilteredRowsByColumnsFilter(
-          rowList,
-          columnsFilters,
-          initialColumns,
-        ).reduce((filteredRowsIds, filteredRow) => {
-          if (filteredRow && filteredRow?.id) {
-            return [...filteredRowsIds, filteredRow.id];
-          }
-
-          return filteredRowsIds;
-        }, [] as string[]);
-
         const options = getColumnFilterOptions(
           rowList,
           column.name,
-          columnsFilters,
-          filteredRowsIds,
         );
 
         return (
           <CustomSearchSelect
-            key={`${filteredRowsIds.length}`}
+key={`${column.name}-filter`}
             name={column.name}
             selectedValues={value}
             onChange={(_, newValue) => {

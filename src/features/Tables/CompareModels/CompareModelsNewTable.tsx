@@ -39,25 +39,16 @@ export const CompareModelsNewTable = React.memo(
     setCurrentPage,
     error,
     loading,
-    onChangePage,
-    handleSearch,
     totalRows,
-    updateRightPanelType,
     firstDate,
     secondDate,
   }: TableModelsProps) => {
     const {
-      cols,
       rows,
       setCols,
       setRows,
-      handleSelectionChange,
-      handleResize,
-      handleSort,
       handleChangeColumnsFilter,
-      handleColumnDragEnd,
       columnsFilters,
-      onChangeColumnsFilters,
     } = useTableChange({
       rowList,
       setCurrentPage,
@@ -67,7 +58,7 @@ export const CompareModelsNewTable = React.memo(
       searchString,
       columnList,
     });
-    const { display, modelsTable, filters, context } = useTableModels();
+    const { display, modelsTable, filters } = useTableModels();
 
     useEffect(() => {
       if (rowList?.length) {
@@ -96,7 +87,6 @@ export const CompareModelsNewTable = React.memo(
       rowList,
       columnList,
       columnsFilters,
-      onChangeColumnsFilters,
       handleChangeColumnsFilter,
       updateRowsCount,
     ]);

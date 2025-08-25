@@ -4,7 +4,7 @@ import { Button } from '@admiral-ds/react-ui';
 import { Template } from '@shared/api';
 import { useFiltersStore } from '@shared/stores/filtersStore';
 import { SELECT_TYPE, CustomSearchSelect } from '@shared/ui/organisms';
-import { initialColumnsFilters, initialTopFilters, RIGHT_PANEL_TYPE } from '@shared/constants';
+import { initialTopFilters, RIGHT_PANEL_TYPE } from '@shared/constants';
 import { useTemplateFilters } from '@src/shared/hooks';
 
 import { getGroupsOptions } from './helpers';
@@ -25,9 +25,10 @@ export const TemplatesFilter = ({
   error = '',
   updateRightPanelType,
 }: TemplatesFilterProps) => {
-  const { topFilters, setTopFilters, setColumnsFilters, columnsFilters } = useFiltersStore();
+  const { topFilters, setTopFilters, getColumnsFilters, applyFilterToGrid, resetFilters } = useFiltersStore();
+  const columnsFilters = getColumnsFilters();
 
-  const { isModifiedFilter, resetFilters } = useTemplateFilters(columnsFilters, templates, topFilters.templates);
+  const { isModifiedFilter, resetFilters: resetTemplateFilters } = useTemplateFilters(columnsFilters, templates, topFilters.templates);
 
   const groupedOptions = useMemo(() => {
     if (templates) {
@@ -48,7 +49,11 @@ export const TemplatesFilter = ({
     );
 
     if (newSelectedTemplate && newSelectedTemplate.template_value) {
-      setColumnsFilters({ ...newSelectedTemplate.template_value });
+      Object.entries(newSelectedTemplate.template_value).forEach(([columnName, filterValues]) => {
+        if (Array.isArray(filterValues) && filterValues.length > 0) {
+          applyFilterToGrid(columnName, filterValues);
+        }
+      });
       setTopFilters({ ...initialTopFilters, [name]: selectValue });
     }
   };
@@ -57,12 +62,13 @@ export const TemplatesFilter = ({
 
 
   const handleResetFilters = () => {
-    setColumnsFilters(initialColumnsFilters);
+    resetFilters();
     setTopFilters({ ...topFilters, templates: [] });
     setFiltersResetCount();
   };
 
   const dynamicKeyForRenderSelect = templates[templates.length - 1]?.template_name;
+  
   return (
     <CustomSearchSelect
       key={dynamicKeyForRenderSelect}

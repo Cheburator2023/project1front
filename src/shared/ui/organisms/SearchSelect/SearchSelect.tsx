@@ -22,6 +22,7 @@ import {
 import { CustomOption } from './CustomOption';
 import { EMPTY_OPTION, NOT_NULL_OPTION } from './constants';
 import { INPUT_TYPE } from '../InputFactory';
+import { useDeepEffect } from '../../../hooks/useDeepEffect';
 
 export interface SearchSelectProps {
   name: string;
@@ -112,16 +113,16 @@ export const SearchSelect = ({
 
   const [forcedOpen, setForcedOpen] = useState(false);
 
-  useEffect(() => {
+  useDeepEffect(() => {
     let newOptions = options;
 
     if (searchValue) {
       newOptions = getFilteredOptionsBySearch(options, searchValue);
     }
     setSelectOptions(newOptions);
-  }, [options]);
+  }, [options, searchValue]);
 
-  useEffect(() => {
+  useDeepEffect(() => {
     if (selectedValues?.length) {
       const isSelectAll = unionOptionsValues.length === selectedValues.length;
 

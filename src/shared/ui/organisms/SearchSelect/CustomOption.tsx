@@ -41,7 +41,7 @@ interface OptionProps {
   style?: React.CSSProperties;
 }
 
-export const CustomOption = ({ text, checked, onChange, style }: OptionProps) => {
+export const CustomOption = React.memo(({ text, checked, onChange, style }: OptionProps) => {
   const textRef = useRef(null);
 
   return (
@@ -54,5 +54,5 @@ export const CustomOption = ({ text, checked, onChange, style }: OptionProps) =>
       <Tooltip showOnOverflowOnly targetRef={textRef} title={text} />
     </Container>
   );
-};
+});
 

@@ -2,13 +2,10 @@ import { useState, useEffect, useCallback } from 'react';
 import { Column as AdmiralColumn } from '@admiral-ds/react-ui';
 
 import { useFiltersStore } from '@shared/stores/filtersStore';
-import { Column, Row } from '@shared/types';
+import { Column, Row, COLUMN_TYPE } from '@shared/types';
 import {
-  compare,
-  getFilteredRowsByColumnsFilter,
   getFilteredRowsBySearch,
   getPageRows,
-  filterColumnsFiltersByColumns,
 } from '@shared/helpers';
 
 import { initialColumns } from '@src/shared/constants';
@@ -26,7 +23,8 @@ export const useTableChange = ({
   searchString,
   columnList,
 }: TableChangeProps) => {
-  const { columnsFilters, topFilters, setColumnsFilters, setTopFilters } = useFiltersStore();
+  const { topFilters, setTopFilters, applyFilterToGrid, applySortToGrid, getColumnsFilters } = useFiltersStore();
+  const columnsFilters = getColumnsFilters();
 
   const { updateDeleteModelState } = useDeleteRightModelPanelStore();
   const { isModelCreator, isInBusinessCustomers } = useModelUserMatch();
@@ -47,6 +45,7 @@ export const useTableChange = ({
 
     if (sort === 'initial') {
       setCols(initialCols);
+      applySortToGrid(name, null);
     } else {
       const newSortCols = initialCols.map((col) => {
         if (col.name === name) {
@@ -61,6 +60,7 @@ export const useTableChange = ({
       });
 
       setCols(newSortCols);
+      applySortToGrid(name, sort);
     }
   };
 
@@ -94,18 +94,12 @@ export const useTableChange = ({
   const handleChangeColumnsFilter = useCallback(
     (rowFieldName: string, selectValue: string[]) => {
       setCurrentPage(1);
-
-      if (columnsFilters) {
-        const newColumnsFilters = {
-          ...columnsFilters,
-          [rowFieldName]: selectValue,
-        };
-
-        setColumnsFilters(newColumnsFilters);
+      
+      const columnType = columnList.find((col) => col.name === rowFieldName)?.type;
+      applyFilterToGrid(rowFieldName, selectValue, columnType);
       setTopFilters({ ...topFilters, templates: topFilters.templates || [] });
-      }
     },
-    [columnsFilters, topFilters, setColumnsFilters, setTopFilters],
+    [columnList, topFilters, applyFilterToGrid, setTopFilters],
   );
 
   const onChangeTopFilters = useCallback(
@@ -125,9 +119,13 @@ export const useTableChange = ({
       : columns.length;
     columns.splice(beforeIndex, 0, movedColumn);
 
-    const newColumnsFilters = filterColumnsFiltersByColumns(columns, columnsFilters);
-    setColumnsFilters(newColumnsFilters);
-      setTopFilters({ ...topFilters, templates: [] });
+    columns.forEach((col) => {
+      const filterValues = columnsFilters[col.name as keyof typeof columnsFilters];
+      if (filterValues) {
+        applyFilterToGrid(col.name, filterValues, col.type);
+      }
+    });
+    setTopFilters({ ...topFilters, templates: [] });
   };
 
   const handleUpdate = ({ withRows = false }) => {
@@ -136,26 +134,7 @@ export const useTableChange = ({
 
       if (searchString) {
         const colNames = columnList.map(({ name }) => name);
-
         newFilteredRows = getFilteredRowsBySearch(newFilteredRows, colNames, searchString);
-      }
-
-      if (columnsFilters) {
-        newFilteredRows = getFilteredRowsByColumnsFilter(
-          newFilteredRows,
-          columnsFilters,
-          initialColumns,
-        );
-      }
-
-      const sortedColumn = cols.find((col) => col.sort);
-
-      if (sortedColumn && sortedColumn.sort) {
-        const { name, type, sort } = sortedColumn;
-
-        newFilteredRows = newFilteredRows.sort((a: Partial<Row>, b: Partial<Row>) =>
-          compare(a, b, name, type, sort),
-        );
       }
 
       if (withRows) {
@@ -191,7 +170,6 @@ export const useTableChange = ({
     onChangeTopFilters,
     columnsFilters,
     topFilters,
-    setColumnsFilters,
     setTopFilters,
     handleColumnDragEnd,
   };

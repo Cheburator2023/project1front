@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Column, ColumnsFilter } from '@src/shared/types';
 import { getActiveTemplate, getModifiedFilters, isSystemSpecificFilter } from '@src/shared/helpers';
 import { Template } from '@shared/api';
+import { useDeepEffect } from './useDeepEffect';
 
 export const useTemplateFilters = (
   columnsFilters: Partial<ColumnsFilter>,
@@ -19,7 +20,7 @@ export const useTemplateFilters = (
     return getModifiedFilters(columnsFilters, activeTemplate).length > 0;
   }, [columnsFilters, activeTemplate]);
 
-  useEffect(() => {
+  useDeepEffect(() => {
     const newModifiedFilters = new Set<string>();
 
     if (activeTemplate) {
@@ -32,43 +33,55 @@ export const useTemplateFilters = (
     setModifiedFilters(newModifiedFilters);
   }, [columnsFilters, activeTemplate]);
 
-  const isTemplateFilter = (filterId: string): boolean => {
-    return activeTemplate?.template_value ? filterId in activeTemplate.template_value : false;
-  };
+  const isTemplateFilter = useCallback(
+    (filterId: string): boolean => {
+      return activeTemplate?.template_value ? filterId in activeTemplate.template_value : false;
+    },
+    [activeTemplate]
+  );
 
-  const getFilteredColumns = (initialColumns: Column[], showFilterTemplate: boolean): Column[] => {
-    return initialColumns.filter((column) => {
-      const isTemplate = isTemplateFilter(column.name);
-      const isModified = modifiedFilters.has(column.name);
+  const getFilteredColumns = useMemo(
+    () => (initialColumns: Column[], showFilterTemplate: boolean): Column[] => {
+      return initialColumns.filter((column) => {
+        const isTemplate = isTemplateFilter(column.name);
+        const isModified = modifiedFilters.has(column.name);
 
-      if (isSystemSpecificFilter(column.name)) {
-        return false;
-      }
+        if (isSystemSpecificFilter(column.name)) {
+          return false;
+        }
 
-      return !showFilterTemplate ? isModified || !isTemplate : true;
-    });
-  };
+        return !showFilterTemplate ? isModified || !isTemplate : true;
+      });
+    },
+    [activeTemplate, modifiedFilters, isTemplateFilter]
+  );
 
   const resetFilters = () => {
     setModifiedFilters(new Set());
   };
 
-  const shouldResetTemplateOnInitialFilterRemove = (columnFilterName: string): boolean => {
-    return isTemplateFilter(columnFilterName) && !modifiedFilters.has(columnFilterName);
-  };
+  const shouldResetTemplateOnInitialFilterRemove = useCallback(
+    (columnFilterName: string): boolean => {
+      return isTemplateFilter(columnFilterName) && !modifiedFilters.has(columnFilterName);
+    },
+    [isTemplateFilter, modifiedFilters]
+  );
 
-  const shouldResetTemplateOnInitialValueChange = (
-    value: string | string[] | undefined,
-    initialTemplateValue: string[],
-    columnName: string,
-  ): boolean => {
-    return (
-      Array.isArray(initialTemplateValue) &&
-      initialTemplateValue.length > 0 &&
-      shouldResetTemplateOnInitialFilterRemove(columnName) &&
-      (!value?.length || JSON.stringify(value) !== JSON.stringify(initialTemplateValue))
-    );
-  };
+  const shouldResetTemplateOnInitialValueChange = useCallback(
+    (
+      value: string | string[] | undefined,
+      initialTemplateValue: string[],
+      columnName: string,
+    ): boolean => {
+      return (
+        Array.isArray(initialTemplateValue) &&
+        initialTemplateValue.length > 0 &&
+        shouldResetTemplateOnInitialFilterRemove(columnName) &&
+        (!value?.length || JSON.stringify(value) !== JSON.stringify(initialTemplateValue))
+      );
+    },
+    [shouldResetTemplateOnInitialFilterRemove]
+  );
 
   return {
     modifiedFilters,

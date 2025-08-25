@@ -11,7 +11,6 @@ import {
   ACTIVE_SCREEN,
   RIGHT_PANEL_TYPE,
   initialColumns,
-  initialColumnsFilters,
 } from '@shared/constants';
 import { TemplatesFilter, FilterButtonCount } from '@entities';
 import { useTemplateFilters } from '@src/shared/hooks';
@@ -36,7 +35,8 @@ export const TemplateFilters = ({
   updateRightPanelType,
   updateActiveScreen,
 }: TemplateFiltersProps) => {
-  const { topFilters, columnsFilters, setColumnsFilters, setTopFilters } = useFiltersStore();
+  const { topFilters, setTopFilters, applyFilterToGrid, getColumnsFilters, resetFilters } = useFiltersStore();
+  const columnsFilters = getColumnsFilters();
 
   const [rows, setRows] = useState<ATableRow[]>([]);
   const [showFilterTemplate, setShowFilterTemplate] = useState(true);
@@ -45,7 +45,7 @@ export const TemplateFilters = ({
     modifiedFilters,
     activeTemplate,
     getFilteredColumns,
-    resetFilters,
+    resetFilters: resetTemplateFilters,
     shouldResetTemplateOnInitialFilterRemove,
   } = useTemplateFilters(columnsFilters, templates, topFilters.templates);
 
@@ -55,15 +55,11 @@ export const TemplateFilters = ({
       const prevColumnsFilterValues = columnsFilters[columnFilterName];
 
       if (prevColumnsFilterValues) {
-        const newColumnsFilters = {
-          ...columnsFilters,
-          [columnFilterName]:
-            type === COLUMN_TYPE.DATE
-              ? []
-              : prevColumnsFilterValues.filter((filterValue) => filterValue !== value),
-        };
+        const newFilterValues = type === COLUMN_TYPE.DATE
+          ? []
+          : prevColumnsFilterValues.filter((filterValue) => filterValue !== value);
 
-        setColumnsFilters(newColumnsFilters);
+        applyFilterToGrid(columnFilterName, newFilterValues, type);
         setTopFilters({ ...topFilters });
       }
 
@@ -71,7 +67,7 @@ export const TemplateFilters = ({
         setTopFilters({ ...topFilters, templates: [] });
       }
     },
-    [columnsFilters, topFilters, modifiedFilters, setColumnsFilters, setTopFilters],
+    [columnsFilters, topFilters, applyFilterToGrid, setTopFilters, shouldResetTemplateOnInitialFilterRemove],
   );
 
   const cols = useMemo(
@@ -183,45 +179,31 @@ export const TemplateFilters = ({
       keys.splice(nextRowIndexUpdated + 1, 0, rowId);
     }
 
-    setColumnsFilters(
-      keys.reduce((acc, cur) => {
-        if (columnsFilters[cur as keyof typeof columnsFilters]) {
-          acc[cur as keyof typeof columnsFilters] =
-            columnsFilters[cur as keyof typeof columnsFilters];
-        }
-
-        return acc;
-      }, {} as Partial<ColumnsFilter>),
-    );
+    keys.forEach((key) => {
+      const filterValues = columnsFilters[key as keyof typeof columnsFilters];
+      if (filterValues) {
+        const columnType = initialColumns.find((col) => col.name === key)?.type;
+        applyFilterToGrid(key, filterValues, columnType);
+      }
+    });
     setTopFilters({ ...topFilters, templates: [] });
   };
 
   const handleSelectionChange = (ids: Record<string, boolean>): void => {
     const updRows = rows.map((row) => ({ ...row, selected: ids[row.id] }));
 
-    const newColumnFilters = Object.entries(ids).reduce((newColumnFilters, currentFilter) => {
-      const [columnFilterName, selected] = currentFilter as [keyof Row, boolean];
-
+    Object.entries(ids).forEach(([columnFilterName, selected]) => {
+      const columnName = columnFilterName as keyof Row;
+      const columnType = initialColumns.find((col) => col.name === columnName)?.type;
+      
       if (selected) {
-        const value = columnsFilters[columnFilterName];
-
-        if (value) {
-          return {
-            ...newColumnFilters,
-            [columnFilterName]: value,
-          };
-        }
-
-        return {
-          ...newColumnFilters,
-          [columnFilterName]: [],
-        };
+        const existingValue = columnsFilters[columnName];
+        const filterValues = existingValue || [];
+        applyFilterToGrid(columnName, filterValues, columnType);
+      } else {
+        applyFilterToGrid(columnName, [], columnType);
       }
-
-      return newColumnFilters;
-    }, {} as Partial<ColumnsFilter>);
-
-    setColumnsFilters(newColumnFilters);
+    });
     setTopFilters({ ...topFilters, templates: [] });
 
     setRows(updRows);
@@ -229,8 +211,6 @@ export const TemplateFilters = ({
 
   const handleResetFilters = () => {
     resetFilters();
-    setColumnsFilters(initialColumnsFilters);
-    setTopFilters({ ...topFilters, templates: [] });
   };
 
   const handleToggleChange = () => {

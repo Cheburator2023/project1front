@@ -12,35 +12,34 @@ import { TemplateFilters } from '../../features/TemplateFilters/TemplateFilters'
 
 export const Home = () => {
   const { display, modelsTable, filters, context } = useTableModels();
-  const [checked, setChecked] = useState<boolean>(false);
 
   return (
     <>
       <RightModalPanel
-        rows={modelsTable.rowList}
-        templates={filters.templates}
-        activeRowId={modelsTable.activeRowId}
-        activeStatus={display.rightPanelType}
-        activeCellName={modelsTable.activeCellName}
-        updateTemplates={filters.setTemplates}
-        onSubmit={context.handleSubmit}
-        onClose={context.handleOnClose}
+        rows={modelsTable?.rowList}
+        templates={filters?.templates}
+        activeRowId={modelsTable?.activeRowId}
+        activeStatus={display?.rightPanelType}
+        activeCellName={modelsTable?.activeCellName}
+        updateTemplates={filters?.setTemplates}
+        onSubmit={context?.handleSubmit}
+        onClose={context?.handleOnClose}
       />
-      {display.activeScreen === ACTIVE_SCREEN.TEMPLATE_FILTERS && (
+      {display?.activeScreen === ACTIVE_SCREEN.TEMPLATE_FILTERS && (
         <TemplateFilters
-          templates={filters.templates}
-          updateActiveScreen={display.setActiveScreen}
-          updateRightPanelType={display.setRightPanelType}
+          templates={filters?.templates}
+          updateActiveScreen={display?.setActiveScreen}
+          updateRightPanelType={display?.setRightPanelType}
         />
       )}
-      {display.activeScreen === ACTIVE_SCREEN.TABLE && (
+      {display?.activeScreen === ACTIVE_SCREEN.TABLE && (
         <>
           <FiltersPanel
-            compareMode={display.compareMode}
-            handleChangeCompare={display.handleChangeCompare}
-            templates={filters.templates}
-            updateActiveScreen={display.setActiveScreen}
-            updateRightPanelType={display.setRightPanelType}
+            compareMode={display?.compareMode}
+            handleChangeCompare={display?.handleChangeCompare}
+            templates={filters?.templates}
+            updateActiveScreen={display?.setActiveScreen}
+            updateRightPanelType={display?.setRightPanelType}
           />
           <AgGridModelsTable
             display={display}
@@ -62,18 +61,18 @@ export const Home = () => {
           </Row> */}
         </>
       )}
-      {display.activeScreen === ACTIVE_SCREEN.COMPARE && (
+      {display?.activeScreen === ACTIVE_SCREEN.COMPARE && (
         <CompareModelsWidget
-          columnsFilters={filters.columnsFilters}
-          firstDate={filters.firstDate}
-          secondDate={filters.secondDate}
-          setRightPanelType={display.setRightPanelType}
-          updateActiveScreen={display.setActiveScreen}
-          compareMode={display.compareMode}
-          templates={filters.templates}
-          handleChangeCompare={display.handleChangeCompare}
+          columnsFilters={filters?.columnsFilters}
+          firstDate={filters?.firstDate}
+          secondDate={filters?.secondDate}
+          setRightPanelType={display?.setRightPanelType}
+          updateActiveScreen={display?.setActiveScreen}
+          compareMode={display?.compareMode}
+          templates={filters?.templates}
+          handleChangeCompare={display?.handleChangeCompare}
         />
-    )}
+      )}
     </>
   );
 };

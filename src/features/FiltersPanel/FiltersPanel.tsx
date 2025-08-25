@@ -7,7 +7,6 @@ import { useExploitationModeStore } from '@src/shared/stores';
 import {
   ACTIVE_SCREEN,
   RIGHT_PANEL_TYPE,
-  initialColumnsFilters,
   modelsSelectOptions,
 } from '@shared/constants';
 import { TemplatesFilter, FilterButtonCount } from '@entities';
@@ -44,12 +43,13 @@ export const FiltersPanel = ({
     topFilters,
     modelsDownloadingDate,
     setModelsDownloadingDate,
-    setColumnsFilters,
     setTopFilters,
     setFirstDate,
     setSecondDate,
-    columnsFilters,
+    resetFilters,
+    getColumnsFilters,
   } = useFiltersStore();
+  const columnsFilters = getColumnsFilters();
   const { setFiltersResetCount } = useGlobalStore();
 
   const { exploitationModeOptions, selectedExploitationModes, updateSelectedExploitationModes } =
@@ -60,7 +60,7 @@ export const FiltersPanel = ({
   };
 
   const handleResetFilters = () => {
-    setColumnsFilters(initialColumnsFilters);
+    resetFilters();
     setTopFilters({ ...topFilters, templates: [] });
     setFiltersResetCount();
   };

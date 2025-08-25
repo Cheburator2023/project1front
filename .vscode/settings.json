@@ -58,5 +58,8 @@
     ".cache/**": true,
     "**/logs/**": true,
     "**/lib/**": true
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   }
 }

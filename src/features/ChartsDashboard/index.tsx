@@ -467,7 +467,7 @@ const ChartsDashboard = () => {
     const queryParams = {
       ...baseQueryParams,
       metric: baseMetric, // Отправляем базовое имя метрики без _delta
-      dataType: dataType, // Отправляем тип данных отдельно
+      dataType, // Отправляем тип данных отдельно
     };
 
     const today = new Date();

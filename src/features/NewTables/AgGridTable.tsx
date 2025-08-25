@@ -363,8 +363,23 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       }
     };
 
+    const onDisplayedColumnsChanged = () => {
+      const colState = gridRef.current!.api.getColumnState();
+      const sortState = colState
+        .filter((s) => {
+          return s.sort != null;
+        })
+        .map((s) => {
+          return { colId: s.colId, sort: s.sort, sortIndex: s.sortIndex };
+        });
+      console.log('saved sort', sortState);
+    };
+
     const handleFilterChange = (event: FilterChangedEvent): void => {
-      console.log('🐸 Pepe said >> handleFilterChange >> event:', event);
+      console.log(
+        '🐸 Pepe said >> handleFilterChange >> getFilterModel:',
+        event.api.getFilterModel(),
+      );
 
       const colName: string = event?.columns[0]?.getColId();
       const colDef: any = event.api.getColumnFilterModel(colName);
@@ -589,6 +604,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
               tooltipShowDelay={500}
               getContextMenuItems={getContextMenuItems}
               onRowDragMove={onRowDragMove}
+              onDisplayedColumnsChanged={onDisplayedColumnsChanged}
               onRowSelected={onRowSelected}
               onFirstDataRendered={_onFirstDataRendered}
               onRowDataUpdated={onRowDataUpdated}

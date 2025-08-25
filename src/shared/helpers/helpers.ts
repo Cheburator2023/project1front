@@ -22,69 +22,7 @@ const getTime = (value: unknown) => {
   return 0;
 };
 
-const compare = (
-  a: Partial<Row>,
-  b: Partial<Row>,
-  colName: keyof Row,
-  colType: COLUMN_TYPE,
-  sort: 'asc' | 'desc',
-) => {
-  const aValue = a[colName];
-  const bValue = b[colName];
 
-  if (aValue == null && bValue == null) {
-    return 0;
-  }
-
-  if (sort === 'asc') {
-    if (aValue == null) {
-      return 1;
-    }
-
-    if (bValue == null) {
-      return -1;
-    }
-
-    switch (colType) {
-      case COLUMN_TYPE.DATE: {
-        return getTime(aValue) - getTime(bValue);
-      }
-      case COLUMN_TYPE.NUMBER:
-        return Number(aValue) - Number(bValue);
-      default:
-        if (aValue < bValue) {
-          return -1;
-        }
-        if (aValue > bValue) {
-          return 1;
-        }
-        return 0;
-    }
-  } else {
-    if (aValue == null) {
-      return -1;
-    }
-
-    if (bValue == null) {
-      return 1;
-    }
-
-    switch (colType) {
-      case COLUMN_TYPE.DATE:
-        return getTime(bValue) - getTime(aValue);
-      case COLUMN_TYPE.NUMBER:
-        return Number(bValue) - Number(aValue);
-      default:
-        if (aValue < bValue) {
-          return 1;
-        }
-        if (aValue > bValue) {
-          return -1;
-        }
-        return 0;
-    }
-  }
-};
 
 const getPageRows = ({
   rows,
@@ -113,46 +51,18 @@ const getFilteredRowsBySearch = (
   );
 };
 
-const getColumnFilterOptionVisibilityStatus = (
-  columnValue: string,
-  rowId?: string,
-  filteredRowsIds?: string[],
-  activeColumnFilters?: string[],
-) => {
-  // Check for filtered row
-  const isCurrentRowPassedFilters = !!(rowId && filteredRowsIds?.includes(rowId));
 
-  // Check for active filters
-  const isCurrentFilterActive = !!(
-    activeColumnFilters &&
-    activeColumnFilters.length &&
-    activeColumnFilters.includes(columnValue)
-  );
-
-  return isCurrentFilterActive || isCurrentRowPassedFilters;
-};
 
 const getColumnFilterOptions = (
   rowList: Array<Partial<Row>>,
   columnName: keyof Row,
-  columnsFilters?: Partial<ColumnsFilter>,
-  filteredRowsIds?: Array<string>,
 ) =>
   rowList?.reduce(
     (columnValues, row) => {
       const columnValue = row[columnName];
-      // const activeColumnFilters = columnsFilters?.[columnName];
 
       if (columnValue) {
-        // Check for unique value
         const isUniqueValue = !columnValues.find((item) => item.value === columnValue);
-
-        // const isVisibleValue = getColumnFilterOptionVisibilityStatus(
-        //   columnValue,
-        //   row.id,
-        //   filteredRowsIds,
-        //   activeColumnFilters,
-        // );
 
         if (!isUniqueValue) {
           return columnValues;
@@ -200,92 +110,7 @@ const getValuesColumnsFilterOptions = (
     {} as ColumnsFilter,
   );
 
-const getFilteredRowsByColumnsFilter = (
-  tableRows: Array<Partial<Row>>,
-  columnsFilter: Partial<ColumnsFilter>,
-  initialColumns: Column[],
-) => {
-  const rowFields = Object.keys(columnsFilter) as Array<keyof Row>;
 
-  return tableRows.filter((row) => {
-    // Check each row field for passing filters
-    const rowPassedFields = rowFields.filter((fieldName) => {
-      const fieldFilters = columnsFilter[fieldName];
-
-      // Check if column doesn't have filters
-      if (!fieldFilters?.length) {
-        return true;
-      }
-
-      const fieldValue = row[fieldName];
-
-      // Check for column type
-      const columnType = initialColumns.find((column) => column.name === fieldName)?.type;
-
-      if (!columnType) {
-        return false;
-      }
-
-      if (columnType === COLUMN_TYPE.DATE) {
-        if (!fieldValue || fieldValue === 'invalid date') {
-          return false;
-        }
-
-        const fieldValueDateString = new Date(fieldValue.split(' ')[0]);
-
-        if (!fieldValueDateString) {
-          return false;
-        }
-
-        const [start, end] = [new Date(fieldFilters[0]), new Date(fieldFilters[1])];
-
-        if (!fieldValueDateString || !start || !end) {
-          return false;
-        }
-
-        return isWithinInterval(fieldValueDateString, {
-          start,
-          end,
-        });
-      }
-
-      // Check for not-null and empty filter
-      if (
-        fieldFilters?.includes(NOT_NULL_OPTION.value) &&
-        fieldFilters?.includes(EMPTY_OPTION.value)
-      ) {
-        return true;
-      }
-
-      // Check for not-null filter
-      if (fieldFilters?.includes(NOT_NULL_OPTION.value)) {
-        if (!fieldValue) {
-          return false;
-        }
-
-        if (fieldFilters?.length === 1) {
-          return true;
-        }
-      }
-
-      // Check for empty filter
-      if (fieldFilters?.includes(EMPTY_OPTION.value)) {
-        if (!fieldValue) {
-          return true;
-        }
-
-        if (fieldFilters?.length === 1) {
-          return false;
-        }
-      }
-
-      return fieldValue && fieldFilters.includes(fieldValue);
-    });
-
-    // Compare passed fields with initial fields to make decision
-    return rowFields.length === rowPassedFields.length;
-  });
-};
 
 const checkColumnsFiltersForEqual = (
   columnsFilters: Partial<ColumnsFilter>,
@@ -309,27 +134,15 @@ const filterColumnsByColumnsFilters = (
   }, [] as typeof initialColumns);
 };
 
-const filterColumnsFiltersByColumns = (
-  columns: Column[],
-  columnsFilters: Partial<ColumnsFilter>,
-): Partial<ColumnsFilter> =>
-  columns.reduce((acc, column) => {
-    if (column.name in columnsFilters) {
-      acc[column.name] = columnsFilters[column.name];
-    }
-    return acc;
-  }, {} as Partial<ColumnsFilter>);
+
 
 export {
   getTime,
-  compare,
   getPageRows,
   getFilteredRowsBySearch,
-  getFilteredRowsByColumnsFilter,
   getValuesColumnsFilterOptions,
   getColumnFilterOptions,
   checkColumnsFiltersForEqual,
   filterColumnsByColumnsFilters,
-  filterColumnsFiltersByColumns,
   getISODateFormat,
 };

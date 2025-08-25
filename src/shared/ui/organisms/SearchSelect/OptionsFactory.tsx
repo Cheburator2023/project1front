@@ -47,7 +47,7 @@ interface OptionsFactoryI {
   onClickItem?: (v: SelectOption, selectedValues?: string[]) => void;
 }
 
-export const OptionsFactory = ({
+export const OptionsFactory = React.memo(({
   optionsProps,
   selectedValues,
   selectEmptyEnabled,
@@ -161,5 +161,5 @@ export const OptionsFactory = ({
       );
     }
   }
-};
+});
 
