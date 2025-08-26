@@ -6,7 +6,7 @@ export type GlobalStoreState = {
   agGridApi?: GridApi;
 };
 
-export type AppInjectStoreActions = {
+export type GlobalStoreActions = {
   setFiltersResetCount: () => void;
   setAgGridApi: (agGridApi: GridApi) => void;
 };
@@ -15,8 +15,8 @@ const initialState: GlobalStoreState = {
   filtersResetCount: 0,
 };
 
-export const useGlobalStore = create<GlobalStoreState & AppInjectStoreActions>((set) => ({
-  filtersResetCount: initialState.filtersResetCount,
+export const useGlobalStore = create<GlobalStoreState & GlobalStoreActions>((set) => ({
+  ...initialState,
   agGridApi: undefined,
   setAgGridApi: (agGridApi: GridApi) => {
     return set({ agGridApi });

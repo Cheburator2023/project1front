@@ -1,10 +1,9 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable react/button-has-type */
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { ColDef, GridApi } from 'ag-grid-community';
-import { create } from 'zustand';
-import { Button, Modal, Select, Option, IconButton, ModalTitle } from '@admiral-ds/react-ui';
-import { ReactComponent as FilterOutline } from '@admiral-ds/icons/build/system/FilterOutline.svg';
+import { Button, Modal, Select, Option, ModalTitle } from '@admiral-ds/react-ui';
 import { ReactComponent as CheckOutline } from '@admiral-ds/icons/build/service/CheckOutline.svg';
 
 import { ReactComponent as DeleteOutline } from '@admiral-ds/icons/build/system/DeleteOutline.svg';
@@ -14,11 +13,16 @@ import {
   CheckSolidCustom,
   FilterOutlineCustom,
 } from '../../entities/FilterButtonCount/style';
-import { useFiltersStore } from '../../shared/stores';
+import { useFiltersStore, useTemplatesStore } from '../../shared/stores';
+import { useGlobalStore } from '../../shared/stores/globalStore';
 import { getActiveFiltersCount } from '../../shared/helpers';
 import { useTableModels } from '../Home/hooks';
 import { useTemplateFilters } from '../../shared/hooks';
 import { Spacer } from '../../shared/ui/atoms';
+import { initialColumns } from '../../shared/constants';
+import { Template } from '../../shared/api';
+import { COLUMN_TYPE } from '../../shared/types';
+import { AG_GRID_LOCALE_RU } from './locale/agGridLocale.ru';
 
 type SetFilter = {
   values: (string | null)[];
@@ -49,64 +53,6 @@ interface TemplateConfig {
   sortState: SortState;
 }
 
-interface TemplateStore {
-  templates: TemplateConfig[];
-  activeTemplate: TemplateConfig | null;
-  addTemplate: (template: TemplateConfig) => void;
-  updateTemplate: (template: TemplateConfig) => void;
-  setActiveTemplate: (template: TemplateConfig | null) => void;
-  clearActiveTemplate: () => void;
-}
-
-const useTemplateStore = create<TemplateStore>((set) => ({
-  templates: [
-    {
-      id: '1',
-      name: 'Шаблон 1',
-      filterModel: {
-        'Фильтр по статусу': {
-          values: ['Активный', 'Неактивный'],
-          filterType: 'set',
-        },
-      },
-      sortState: [
-        {
-          colId: 'Фильтр по статусу',
-          sort: 'asc',
-          sortIndex: 0,
-        },
-      ],
-    },
-    {
-      id: '2',
-      name: 'Шаблон 2',
-      filterModel: {
-        date: {
-          dateFrom: '2024-01-01',
-          dateTo: '2024-12-31',
-          filterType: 'date',
-          type: 'inRange',
-        },
-      },
-      sortState: [
-        {
-          colId: 'date',
-          sort: 'desc',
-          sortIndex: 0,
-        },
-      ],
-    },
-  ],
-  activeTemplate: null,
-  addTemplate: (template) => set((state) => ({ templates: [...state.templates, template] })),
-  updateTemplate: (template) =>
-    set((state) => ({
-      templates: state.templates.map((t) => (t.id === template.id ? template : t)),
-    })),
-  setActiveTemplate: (template) => set({ activeTemplate: template }),
-  clearActiveTemplate: () => set({ activeTemplate: null }),
-}));
-
 interface FilterItem {
   id: string;
   name: string;
@@ -116,11 +62,8 @@ interface FilterItem {
 }
 
 interface TemplateFilterGridProps {
-  isOpen: boolean;
   onClose: () => void;
   onSave: (template: TemplateConfig) => void;
-  defaultActiveTemplateId?: string;
-  staticFilters?: FilterItem[];
 }
 
 const DragHandleRenderer = React.memo(() => (
@@ -162,77 +105,105 @@ const CheckboxRenderer = React.memo((params: any) => {
 
 CheckboxRenderer.displayName = 'CheckboxRenderer';
 
-export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({
-  isOpen,
-  onClose,
-  onSave,
-  defaultActiveTemplateId,
-  staticFilters,
-}) => {
-  const {
-    templates,
-    activeTemplate,
-    addTemplate,
-    updateTemplate,
-    setActiveTemplate,
-    clearActiveTemplate,
-  } = useTemplateStore();
-  const {
-    topFilters,
-    modelsDownloadingDate,
-    setModelsDownloadingDate,
-    setTopFilters,
-    setFirstDate,
-    setSecondDate,
-    resetFilters,
-    filterModel,
-  } = useFiltersStore();
+const ValueRenderer = React.memo((params: any) => {
+  const { data, value, api } = params;
+  const isDateType = data.type === 'Дата';
 
-  const [selectedTemplate, setSelectedTemplate] = useState<TemplateConfig | null>(null);
+  const handleValueChange = (newValue: string) => {
+    const updatedData = { ...data, value: newValue };
+    const rowNode = api.getRowNode(data.id);
+    if (rowNode) {
+      rowNode.setData(updatedData);
+    }
+  };
+
+  if (isDateType) {
+    return (
+      <input
+        type="date"
+        value={value ? value.split(' - ')[0] : ''}
+        onChange={(e) => {
+          const dateValue = e.target.value;
+          handleValueChange(dateValue ? `${dateValue} - ${dateValue}` : '');
+        }}
+        style={{
+          width: '100%',
+          padding: '4px',
+          border: '1px solid #ccc',
+          borderRadius: '4px',
+        }}
+      />
+    );
+  }
+
+  return (
+    <input
+      type="text"
+      value={value || ''}
+      onChange={(e) => handleValueChange(e.target.value)}
+      placeholder="Введите значения через запятую"
+      style={{
+        width: '100%',
+        padding: '4px',
+        border: '1px solid #ccc',
+        borderRadius: '4px',
+      }}
+    />
+  );
+});
+
+ValueRenderer.displayName = 'ValueRenderer';
+
+export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({ onClose, onSave }) => {
+  const { templates, setTemplates } = useTemplatesStore();
+  console.log('🐸 Pepe said >> TemplateFilterGrid >> templates:', templates);
+
+  const { topFilters, setFilterModel, setSortState } = useFiltersStore();
+
+  const defaultActiveTemplateId = topFilters.templates?.[0];
+
+  const { agGridApi: agGridApiGlobal } = useGlobalStore();
+
+  const [activeTemplate, setActiveTemplate] = useState<Template | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [isCustomTemplate, setIsCustomTemplate] = useState(false);
 
-  const defaultFilters: FilterItem[] = [
-    {
-      id: '1',
-      name: 'Фильтр по статусу',
-      type: 'Список',
-      value: 'Активный, Неактивный',
-      active: false,
-    },
-    {
-      id: '2',
-      name: 'Фильтр по дате создания',
-      type: 'Дата',
-      value: '2024-01-01 - 2024-12-31',
-      active: false,
-    },
-    { id: '3', name: 'Фильтр по названию', type: 'Текст', value: 'содержит "тест"', active: false },
-    {
-      id: '4',
-      name: 'Фильтр по категории',
-      type: 'Список',
-      value: 'Категория А, Категория Б',
-      active: false,
-    },
-    { id: '5', name: 'Фильтр по приоритету', type: 'Число', value: '> 5', active: false },
-    {
-      id: '6',
-      name: 'Фильтр по автору',
-      type: 'Список',
-      value: 'Иванов, Петров, Сидоров',
-      active: false,
-    },
-    {
-      id: '7',
-      name: 'Фильтр по региону',
-      type: 'Список',
-      value: 'Москва, СПб, Екатеринбург',
-      active: false,
-    },
-    { id: '8', name: 'Фильтр по сумме', type: 'Число', value: '1000 - 50000', active: false },
-  ];
+  const defaultFilters: FilterItem[] = useMemo(() => {
+    return initialColumns.map((column, index) => {
+      // Получаем значения из selectedTemplate.filterModel если они есть
+      const templateFilter = selectedTemplate?.filterModel?.[column.name];
+      let value = '';
 
-  const [rowData, setRowData] = useState<FilterItem[]>(staticFilters || defaultFilters);
+      if (templateFilter) {
+        if ('values' in templateFilter && templateFilter.values) {
+          // Для set фильтров - объединяем values через запятую
+          value = templateFilter.values.filter((v) => v !== null).join(', ');
+        } else if ('dateFrom' in templateFilter && 'dateTo' in templateFilter) {
+          // Для date фильтров - формируем диапазон дат
+          if (templateFilter.dateTo) {
+            value = `${templateFilter.dateFrom} - ${templateFilter.dateTo}`;
+          } else {
+            value = templateFilter.dateFrom;
+          }
+        }
+      }
+
+      return {
+        id: String(index + 1),
+        name: column.title,
+        type: column.type === COLUMN_TYPE.DATE ? 'Дата' : 'Список',
+        value,
+        active: !!templateFilter,
+      };
+    });
+  }, [selectedTemplate]);
+
+  const [rowData, setRowData] = useState<FilterItem[]>(defaultFilters);
+
+  // Обновляем rowData когда изменяется defaultFilters
+  useEffect(() => {
+    setRowData(defaultFilters);
+  }, [defaultFilters]);
 
   const [isInitialized, setIsInitialized] = useState(false);
   const gridRef = useRef<AgGridReact>(null);
@@ -244,7 +215,11 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({
 
   useEffect(() => {
     if (defaultActiveTemplateId && !isInitialized) {
-      const defaultTemplate = templates.find((t) => t.id === defaultActiveTemplateId);
+      const defaultTemplate = templates.find(
+        (t) => String(t.template_id) === defaultActiveTemplateId,
+      );
+      console.log('🐸 Pepe said >> TemplateFilterGrid >> defaultTemplate:', defaultTemplate);
+
       if (defaultTemplate) {
         setSelectedTemplate(defaultTemplate);
         setActiveTemplate(defaultTemplate);
@@ -257,16 +232,10 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({
   }, [activeTemplate, isInitialized, defaultActiveTemplateId, templates, setActiveTemplate]);
 
   useEffect(() => {
-    if (staticFilters) {
-      setRowData(staticFilters);
-    }
-  }, [staticFilters]);
-
-  useEffect(() => {
     if (gridApi && selectedTemplate) {
-      gridApi.setFilterModel(selectedTemplate.filterModel);
+      gridApi.setFilterModel(selectedTemplate.filterModel || null);
 
-      if (selectedTemplate.sortState.length > 0) {
+      if (selectedTemplate.sortState && selectedTemplate.sortState.length > 0) {
         gridApi.applyColumnState({
           state: selectedTemplate.sortState,
           defaultState: { sort: null },
@@ -277,88 +246,97 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({
         });
       }
 
+      // Применяем фильтры к глобальной AG Grid так же, как в TemplatesFilter
+      if (selectedTemplate.filterModel) {
+        setFilterModel(selectedTemplate.filterModel);
+      }
+
       // Применяем активные фильтры из шаблона к rowData
       setRowData((currentRowData) =>
         currentRowData.map((row) => {
-          const isActiveInTemplate = Object.keys(selectedTemplate.filterModel).some((filterKey) => {
-            const filter = selectedTemplate.filterModel[filterKey];
-            // Сопоставляем по типу фильтра
-            if (filter.filterType === 'set' && row.type === 'Список') {
-              return true;
-            }
-            if (filter.filterType === 'date' && row.type === 'Дата') {
-              return true;
-            }
-            if (filter.filterType === 'text' && row.type === 'Текст') {
-              return true;
-            }
-            if (filter.filterType === 'number' && row.type === 'Число') {
-              return true;
-            }
-            return false;
-          });
+          const isActiveInTemplate = selectedTemplate.filterModel
+            ? Object.keys(selectedTemplate.filterModel).some((filterKey) => {
+                // Находим соответствующую колонку в initialColumns по имени фильтра
+                const matchingColumn = initialColumns.find((col) => col.name === filterKey);
+                if (!matchingColumn) return false;
+
+                // Проверяем соответствие имени фильтра с именем строки (row.name)
+                return matchingColumn.title === row.name;
+              })
+            : false;
           return { ...row, active: isActiveInTemplate };
         }),
       );
     }
   }, [gridApi, selectedTemplate]);
 
-  const columnDefs: ColDef[] = [
-    {
-      headerName: '',
-      field: 'drag',
-      width: 50,
-      rowDrag: true,
-      suppressMenu: true,
-      sortable: false,
-      filter: false,
-      cellRenderer: DragHandleRenderer,
-    },
-    {
-      headerName: 'Выбран',
-      field: 'active',
-      width: 100,
-      filter: 'agSetColumnFilter',
-      sortable: true,
-      cellRenderer: CheckboxRenderer,
-    },
-    {
-      headerName: 'Название фильтра',
-      field: 'name',
-      flex: 1,
-      filter: 'agTextColumnFilter',
-      sortable: true,
-    },
-    {
-      headerName: 'Значение',
-      field: 'value',
-      flex: 1,
-      filter: 'agTextColumnFilter',
-      sortable: true,
-    },
-  ];
+  const columnDefs: ColDef[] = useMemo(
+    () => [
+      {
+        headerName: '',
+        field: 'drag',
+        width: 50,
+        rowDrag: true,
+        suppressMenu: true,
+        sortable: false,
+        filter: false,
+        cellRenderer: DragHandleRenderer,
+      },
+      {
+        headerName: 'Выбран',
+        field: 'active',
+        width: 100,
+        filter: 'agSetColumnFilter',
+        sortable: false,
+        cellRenderer: CheckboxRenderer,
+      },
+      {
+        headerName: 'Название фильтра',
+        field: 'name',
+        flex: 1,
+        filter: 'agTextColumnFilter',
+        sortable: false,
+      },
+      {
+        headerName: 'Значение',
+        field: 'value',
+        flex: 1,
+        filter: 'agTextColumnFilter',
+        sortable: false,
+        cellRenderer: ValueRenderer,
+        editable: true,
+      },
+    ],
+    [],
+  );
 
   const handleTemplateChange = useCallback(
-    (templateId: string) => {
-      if (templateId === '') {
+    (value: string) => {
+      if (value === '') {
         setSelectedTemplate(null);
-        clearActiveTemplate();
+        setActiveTemplate(null);
         setIsInitialized(false);
         setIsCustomTemplate(false);
+        // Сбрасываем фильтры при очистке шаблона
+        setFilterModel({});
         // Сбрасываем все чекбоксы при очистке шаблона
         setRowData((currentRowData) => currentRowData.map((row) => ({ ...row, active: false })));
         return;
       }
 
-      const template = templates.find((t) => t.id === templateId);
+      const template = templates.find((t) => String(t.template_id) === value);
       if (template) {
         setSelectedTemplate(template);
         setActiveTemplate(template);
         setIsInitialized(false);
         setIsCustomTemplate(false);
+        // Применяем фильтры шаблона сразу при выборе
+        if (template.filterModel) {
+          setFilterModel(template.filterModel);
+        }
       }
     },
-    [templates, setActiveTemplate, clearActiveTemplate],
+    [templates, setActiveTemplate, setFilterModel],
   );
 
   const handleFilterChange = useCallback(() => {
@@ -368,20 +346,17 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({
     }
   }, [selectedTemplate, isCustomTemplate]);
 
-  const handleRowDragEnd = useCallback(
-    (event: any) => {
-      const newRowData: any[] = [];
-      gridApi?.forEachNode((node) => {
-        if (node.data) {
-          newRowData.push(node.data);
-        }
-      });
-      setRowData(newRowData);
-      handleFilterChange();
-      console.log('Новый порядок строк:', newRowData);
-    },
-    [gridApi, handleFilterChange],
-  );
+  const handleRowDragEnd = useCallback(() => {
+    const newRowData: any[] = [];
+    gridApi?.forEachNode((node) => {
+      if (node.data) {
+        newRowData.push(node.data);
+      }
+    });
+    setRowData(newRowData);
+    handleFilterChange();
+    console.log('Новый порядок строк:', newRowData);
+  }, [gridApi, handleFilterChange]);
 
   const handleSave = useCallback(() => {
     if (gridApi) {
@@ -389,29 +364,25 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({
 
       const filterModel: FilterModel = {};
       activeFilters.forEach((filter) => {
-        if (filter.type === 'Список') {
-          filterModel[filter.name] = {
-            values: filter.value.split(', '),
-            filterType: 'set',
-          };
-        } else if (filter.type === 'Дата') {
+        // Находим соответствующую колонку в initialColumns по имени фильтра
+        const matchingColumn = initialColumns.find((col) => col.title === filter.name);
+        if (!matchingColumn) return;
+
+        const columnId = matchingColumn.name;
+
+        if (filter.type === 'Дата') {
           const dates = filter.value.split(' - ');
-          filterModel[filter.name] = {
+          filterModel[columnId] = {
             dateFrom: dates[0],
             dateTo: dates[1],
             filterType: 'date',
             type: 'inRange',
           };
-        } else if (filter.type === 'Текст') {
-          filterModel[filter.name] = {
-            filter: filter.value,
-            filterType: 'text',
-            type: 'contains',
-          };
-        } else if (filter.type === 'Число') {
-          filterModel[filter.name] = {
-            filter: filter.value,
-            filterType: 'number',
+        } else {
+          // Все остальные типы используют set фильтр
+          filterModel[columnId] = {
+            values: filter.value.split(', '),
+            filterType: 'set',
           };
         }
       });
@@ -419,11 +390,15 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({
       const sortState: SortState = [];
       gridApi.forEachNode((node, index) => {
         if (node.data) {
-          sortState.push({
-            colId: node.data.name,
-            sort: 'asc',
-            sortIndex: index,
-          });
+          // Находим соответствующую колонку в initialColumns по имени фильтра
+          const matchingColumn = initialColumns.find((col) => col.title === node.data.name);
+          if (matchingColumn) {
+            sortState.push({
+              colId: matchingColumn.name,
+              sort: 'asc',
+              sortIndex: index,
+            });
+          }
         }
       });
 
@@ -434,17 +409,32 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({
           filterModel,
           sortState,
         };
-        updateTemplate(templateToSave);
+        setTemplates((prev) =>
+          prev.map((t) => (t.template_id === selectedTemplate.template_id ? templateToSave : t)),
+        );
       } else {
         templateToSave = {
-          id: `custom-${Date.now()}`,
-          name: `Новый шаблон ${new Date().toLocaleString()}`,
+          template_id: Date.now(),
+          template_name: `Новый шаблон ${new Date().toLocaleString()}`,
           filterModel,
           sortState,
         };
-        // addTemplate(templateToSave);
-        // setSelectedTemplate(templateToSave);
+        setTemplates((prev) => [...prev, templateToSave]);
       }
+
+      // Применяем фильтры и сортировку к глобальной AG Grid через agGridApi
+      if (agGridApiGlobal) {
+        console.log('🐸 Pepe said >> TemplateFilterGrid >> filterModel:', filterModel);
+        agGridApiGlobal.setFilterModel(filterModel);
+
+        if (sortState.length > 0) {
+          agGridApiGlobal.applyColumnState({ state: sortState, defaultState: { sort: null } });
+        }
+      }
+
+      // Обновляем состояние в filtersStore
+      setFilterModel(filterModel);
+      setSortState(sortState);
 
       setActiveTemplate(templateToSave);
       setIsCustomTemplate(false);
@@ -457,12 +447,14 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({
     selectedTemplate,
     gridApi,
     rowData,
-    updateTemplate,
-    addTemplate,
+    setTemplates,
     setActiveTemplate,
     setIsCustomTemplate,
     onSave,
     onClose,
+    agGridApiGlobal,
+    setFilterModel,
+    setSortState,
   ]);
 
   const handleCancel = useCallback(() => {
@@ -477,11 +469,8 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({
       });
     }
     handleFilterChange();
-    setRowData(staticFilters || defaultFilters);
-    // setRowData((currentRowData) => currentRowData.map((row) => ({ ...row, active: false })));
-  }, [gridApi]);
-
-  if (!isOpen) return null;
+    setRowData(defaultFilters);
+  }, [gridApi, setFilterModel]);
 
   return (
     <Modal
@@ -506,14 +495,14 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({
       >
         <div style={{ marginBottom: '20px' }}>
           <Select
-            value={selectedTemplate?.id || ''}
+            value={selectedTemplate ? String(selectedTemplate.template_id) : ''}
             onChange={(e) => handleTemplateChange(e.target.value)}
             placeholder=""
           >
             <Option value="">Новый шаблон</Option>
             {templates.map((template) => (
-              <Option key={template.id} value={template.id}>
-                {template.name}
+              <Option key={template.template_id} value={String(template.template_id)}>
+                {template.template_name}
               </Option>
             ))}
           </Select>
@@ -527,6 +516,7 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({
           <div className="ag-theme-quartz" style={{ height: '100%', width: '100%' }}>
             <AgGridReact
               ref={gridRef}
+              localeText={AG_GRID_LOCALE_RU}
               rowData={rowData}
               columnDefs={columnDefs}
               onGridReady={onGridReady}
@@ -585,29 +575,24 @@ const getBadgeApperance = (hasTemplates: boolean, hasActiveFilters: boolean) => 
 };
 
 export const TFiltersTest2 = () => {
-  const {
-    topFilters,
-    modelsDownloadingDate,
-    setModelsDownloadingDate,
-    setTopFilters,
-    setFirstDate,
-    setSecondDate,
-    resetFilters,
-    filterModel,
-  } = useFiltersStore();
+  const { topFilters, filterModel } = useFiltersStore();
 
   const { filters } = useTableModels();
 
-  const templates = filters?.templates;
+  const filterTemplates = filters?.templates;
 
-  const { isModifiedFilter } = useTemplateFilters(filterModel, templates, topFilters.templates);
+  const { isModifiedFilter } = useTemplateFilters(
+    filterModel,
+    filterTemplates,
+    topFilters.templates,
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleSave = useCallback((template: TemplateConfig) => {}, []);
+  const handleSave = useCallback(() => {}, []);
 
   const activeFiltersCount = useMemo(
-    () => getActiveFiltersCount(filterModel, templates, topFilters.templates[0]),
-    [filterModel, templates, topFilters.templates],
+    () => getActiveFiltersCount(filterModel, filterTemplates, topFilters.templates[0]),
+    [filterModel, filterTemplates, topFilters.templates],
   );
 
   const hasTemplates = topFilters.templates.length > 0;
@@ -634,13 +619,9 @@ export const TFiltersTest2 = () => {
           {activeFiltersCount}
         </BadgeCount>
       )}
-      <TemplateFilterGrid
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSave={handleSave}
-        defaultActiveTemplateId={undefined}
-        staticFilters={undefined}
-      />
+      {isModalOpen && (
+        <TemplateFilterGrid onClose={() => setIsModalOpen(false)} onSave={handleSave} />
+      )}
     </div>
   );
 };

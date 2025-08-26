@@ -1,17 +1,15 @@
 /* eslint-disable no-nested-ternary */
-import { forwardRef, useCallback, useState, useEffect, useMemo, useRef } from 'react';
+import { forwardRef, useCallback, useEffect, useMemo, useRef } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 
 import {
   ColDef,
   FilterChangedEvent,
   FirstDataRenderedEvent,
-  GetContextMenuItems,
   GetMainMenuItemsParams,
   GridApi,
   GridReadyEvent,
   IDateFilterParams,
-  IRowNode,
   ISetFilterParams,
   ITooltipParams,
   RowClassRules,
@@ -24,19 +22,16 @@ import {
   SelectionColumnDef,
   SideBarDef,
   SortChangedEvent,
-  themeQuartz,
 } from 'ag-grid-community';
 import { ReactComponent as BrokerOutlineIcon } from '@admiral-ds/icons/build/finance/BrokerOutline.svg';
 import { ReactComponent as MenuOutline } from '@admiral-ds/icons/build/service/MenuOutline.svg';
 import { ReactComponent as PlusCircleSolid } from '@admiral-ds/icons/build/service/PlusCircleSolid.svg';
 import { ReactComponent as SettingsOutline } from '@admiral-ds/icons/build/system/SettingsOutline.svg';
 import { ReactComponent as SearchOutline } from '@admiral-ds/icons/build/system/SearchOutline.svg';
-import { ReactComponent as ShowTableOutline } from '@admiral-ds/icons/build/category/ShowTableOutline.svg';
 import { ReactComponent as DeleteSolid } from '@admiral-ds/icons/build/system/DeleteSolid.svg';
-import { Checkbox, T, InputField } from '@admiral-ds/react-ui';
+import { InputField } from '@admiral-ds/react-ui';
 
-import { ErrorStatus, Flexbox, Loading, Spacer } from '@src/shared/ui/atoms';
-import { TDisplayTableModels, TFilters, TModelsTable } from '@pages/Home/hooks';
+import { ErrorStatus, Flexbox, Spacer } from '@src/shared/ui/atoms';
 import { IconButton } from '@shared/ui/molecules';
 import { RIGHT_PANEL_TYPE } from '@shared/constants';
 import { useNavigate } from 'react-router-dom';
@@ -47,7 +42,6 @@ import { Template } from '@src/shared/api/types';
 import styled from 'styled-components';
 import { AgGridTableCustomCell } from './AgGridTableCustomCell';
 import { AG_GRID_LOCALE_RU } from '../../pages/Playground/locale/agGridLocale.ru';
-import { ROUTES } from '../../app/Routes';
 import { useDeleteRightModelPanelStore, useDisplayStore } from '../../shared/stores';
 import { usePermissions, useRoles, useTemplateFilters } from '../../shared/hooks';
 import { isInBusinessCustomers, isModelCreator } from '../../shared/helpers';
@@ -383,8 +377,9 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     const handleFilterChange = (event: FilterChangedEvent): void => {
       if (event.source === 'api') return;
 
-      const filterModel = event.api.getFilterModel();
-      setFilterModel(filterModel);
+      const _filterModel = event.api.getFilterModel();
+
+      setFilterModel(_filterModel);
 
       const colName: string = event?.columns[0]?.getColId();
       const colDef: any = event.api.getColumnFilterModel(colName);
@@ -405,7 +400,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       } else {
         // @ts-ignore
         const value = colDef?.filterModels?.[1]?.values || colDef?.values;
-        const initialTemplateValue = filterModel?.[colName]?.values || [];
+        const initialTemplateValue = _filterModel?.[colName]?.values || [];
 
         if (value) {
           const arrayValue = Array.isArray(value) ? value : [value];
@@ -439,7 +434,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
 
     useDeepEffect(() => {
       if (agGridApi && filterModel) {
-          agGridApi.setFilterModel(filterModel);
+        agGridApi.setFilterModel(filterModel);
       }
     }, [agGridApi, filterModel]);
 
