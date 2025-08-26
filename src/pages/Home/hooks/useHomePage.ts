@@ -7,13 +7,10 @@ import {
   ACTIVE_SCREEN,
   RIGHT_PANEL_TYPE,
 } from '@shared/constants';
-import {
-  API_ROUTES,
-  useFetch,
-  Template,
-  mockedTemplatesResponse,
-} from '@shared/api';
+import { API_ROUTES, useFetch, Template, mockedTemplatesResponse } from '@shared/api';
 import { useDownloadReportStore } from '@shared/stores/downloadReportStore';
+import { useTemplatesStore } from '../../../shared/stores';
+import { useDeepEffect } from '../../../shared/hooks/useDeepEffect';
 
 export const useHomePage = () => {
   const { updateColumnsFilters, downloadReportStatus } = useDownloadReportStore();
@@ -35,9 +32,9 @@ export const useHomePage = () => {
   const [firstDate, setFirstDate] = useState<string | null>(null);
   const [secondDate, setSecondDate] = useState<string | null>(null);
 
-  const [templates, setTemplates] = useState<Template[]>([]);
+  const { templates, setTemplates } = useTemplatesStore();
 
-  useEffect(() => {
+  useDeepEffect(() => {
     if (templateData) {
       setTemplates(templateData);
     }
@@ -106,3 +103,4 @@ export const useHomePage = () => {
     },
   };
 };
+

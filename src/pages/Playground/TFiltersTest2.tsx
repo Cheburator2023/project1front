@@ -1,12 +1,24 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+/* eslint-disable react/button-has-type */
+import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { ColDef, GridApi } from 'ag-grid-community';
 import { create } from 'zustand';
-import { Button, Modal, Select, Option } from '@admiral-ds/react-ui';
+import { Button, Modal, Select, Option, IconButton, ModalTitle } from '@admiral-ds/react-ui';
 import { ReactComponent as FilterOutline } from '@admiral-ds/icons/build/system/FilterOutline.svg';
 import { ReactComponent as CheckOutline } from '@admiral-ds/icons/build/service/CheckOutline.svg';
 
 import { ReactComponent as DeleteOutline } from '@admiral-ds/icons/build/system/DeleteOutline.svg';
+import {
+  BadgeCount,
+  ButtonCustom,
+  CheckSolidCustom,
+  FilterOutlineCustom,
+} from '../../entities/FilterButtonCount/style';
+import { useFiltersStore } from '../../shared/stores';
+import { getActiveFiltersCount } from '../../shared/helpers';
+import { useTableModels } from '../Home/hooks';
+import { useTemplateFilters } from '../../shared/hooks';
+import { Spacer } from '../../shared/ui/atoms';
 
 type SetFilter = {
   values: (string | null)[];
@@ -138,11 +150,9 @@ const CheckboxRenderer = React.memo((params: any) => {
         params.setValue(e.target.checked);
 
         setRowData((prevData: any[]) =>
-          prevData.map(row =>
-            row.id === params.data.id
-              ? { ...row, active: e.target.checked }
-              : row
-          )
+          prevData.map((row) =>
+            row.id === params.data.id ? { ...row, active: e.target.checked } : row,
+          ),
         );
         handleFilterChange();
       }}
@@ -167,7 +177,16 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({
     setActiveTemplate,
     clearActiveTemplate,
   } = useTemplateStore();
-
+  const {
+    topFilters,
+    modelsDownloadingDate,
+    setModelsDownloadingDate,
+    setTopFilters,
+    setFirstDate,
+    setSecondDate,
+    resetFilters,
+    filterModel,
+  } = useFiltersStore();
 
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateConfig | null>(null);
   const [isCustomTemplate, setIsCustomTemplate] = useState(false);
@@ -225,7 +244,7 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({
 
   useEffect(() => {
     if (defaultActiveTemplateId && !isInitialized) {
-      const defaultTemplate = templates.find(t => t.id === defaultActiveTemplateId);
+      const defaultTemplate = templates.find((t) => t.id === defaultActiveTemplateId);
       if (defaultTemplate) {
         setSelectedTemplate(defaultTemplate);
         setActiveTemplate(defaultTemplate);
@@ -279,7 +298,7 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({
             return false;
           });
           return { ...row, active: isActiveInTemplate };
-        })
+        }),
       );
     }
   }, [gridApi, selectedTemplate]);
@@ -296,6 +315,14 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({
       cellRenderer: DragHandleRenderer,
     },
     {
+      headerName: 'Выбран',
+      field: 'active',
+      width: 100,
+      filter: 'agSetColumnFilter',
+      sortable: true,
+      cellRenderer: CheckboxRenderer,
+    },
+    {
       headerName: 'Название фильтра',
       field: 'name',
       flex: 1,
@@ -309,17 +336,7 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({
       filter: 'agTextColumnFilter',
       sortable: true,
     },
-    {
-      headerName: 'Активен',
-      field: 'active',
-      width: 100,
-      filter: 'agSetColumnFilter',
-      sortable: true,
-      cellRenderer: CheckboxRenderer,
-    },
   ];
-
-
 
   const handleTemplateChange = useCallback(
     (templateId: string) => {
@@ -351,29 +368,31 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({
     }
   }, [selectedTemplate, isCustomTemplate]);
 
-  const handleRowDragEnd = useCallback((event: any) => {
-    const newRowData: any[] = [];
-    gridApi?.forEachNode((node) => {
-      if (node.data) {
-        newRowData.push(node.data);
-      }
-    });
-    setRowData(newRowData);
-    handleFilterChange();
-    console.log('Новый порядок строк:', newRowData);
-  }, [gridApi, handleFilterChange]);
+  const handleRowDragEnd = useCallback(
+    (event: any) => {
+      const newRowData: any[] = [];
+      gridApi?.forEachNode((node) => {
+        if (node.data) {
+          newRowData.push(node.data);
+        }
+      });
+      setRowData(newRowData);
+      handleFilterChange();
+      console.log('Новый порядок строк:', newRowData);
+    },
+    [gridApi, handleFilterChange],
+  );
 
   const handleSave = useCallback(() => {
     if (gridApi) {
-      const activeFilters = rowData.filter(row => row.active);
+      const activeFilters = rowData.filter((row) => row.active);
 
       const filterModel: FilterModel = {};
-      activeFilters.forEach(filter => {
-
+      activeFilters.forEach((filter) => {
         if (filter.type === 'Список') {
           filterModel[filter.name] = {
             values: filter.value.split(', '),
-            filterType: 'set'
+            filterType: 'set',
           };
         } else if (filter.type === 'Дата') {
           const dates = filter.value.split(' - ');
@@ -381,18 +400,18 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({
             dateFrom: dates[0],
             dateTo: dates[1],
             filterType: 'date',
-            type: 'inRange'
+            type: 'inRange',
           };
         } else if (filter.type === 'Текст') {
           filterModel[filter.name] = {
             filter: filter.value,
             filterType: 'text',
-            type: 'contains'
+            type: 'contains',
           };
         } else if (filter.type === 'Число') {
           filterModel[filter.name] = {
             filter: filter.value,
-            filterType: 'number'
+            filterType: 'number',
           };
         }
       });
@@ -403,7 +422,7 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({
           sortState.push({
             colId: node.data.name,
             sort: 'asc',
-            sortIndex: index
+            sortIndex: index,
           });
         }
       });
@@ -434,7 +453,17 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({
 
       onClose();
     }
-  }, [selectedTemplate, gridApi, rowData, updateTemplate, addTemplate, setActiveTemplate, setIsCustomTemplate, onSave, onClose]);
+  }, [
+    selectedTemplate,
+    gridApi,
+    rowData,
+    updateTemplate,
+    addTemplate,
+    setActiveTemplate,
+    setIsCustomTemplate,
+    onSave,
+    onClose,
+  ]);
 
   const handleCancel = useCallback(() => {
     onClose();
@@ -448,7 +477,8 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({
       });
     }
     handleFilterChange();
-    setRowData((currentRowData) => currentRowData.map((row) => ({ ...row, active: false })));
+    setRowData(staticFilters || defaultFilters);
+    // setRowData((currentRowData) => currentRowData.map((row) => ({ ...row, active: false })));
   }, [gridApi]);
 
   if (!isOpen) return null;
@@ -457,38 +487,30 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({
     <Modal
       onClose={onClose}
       style={{
-        width: '800px',
-        height: '600px',
+        width: '90%',
+        height: '90%',
       }}
+      closeOnEscapeKeyDown
+      closeOnOutsideClick
+      title="Настройка фильтров и сортировки"
     >
+      <ModalTitle>Настройка шаблона фильтров и сортировки</ModalTitle>
       <div
         style={{
           padding: '24px',
+          paddingBottom: 0,
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
         }}
       >
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: '20px',
-          }}
-        >
-          <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 600 }}>
-            Настройка фильтров и сортировки
-          </h2>
-        </div>
-
         <div style={{ marginBottom: '20px' }}>
           <Select
             value={selectedTemplate?.id || ''}
             onChange={(e) => handleTemplateChange(e.target.value)}
-            placeholder="Выберите шаблон"
+            placeholder=""
           >
-            <Option value="">Без шаблона</Option>
+            <Option value="">Новый шаблон</Option>
             {templates.map((template) => (
               <Option key={template.id} value={template.id}>
                 {template.name}
@@ -500,9 +522,6 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({
         <div
           style={{
             flex: 1,
-            border: '1px solid #e0e0e0',
-            borderRadius: '4px',
-            overflow: 'hidden',
           }}
         >
           <div className="ag-theme-quartz" style={{ height: '100%', width: '100%' }}>
@@ -529,25 +548,24 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({
           </div>
         </div>
 
+        <Spacer />
+
         <div
           style={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            marginTop: '20px',
-            paddingTop: '16px',
-            borderTop: '1px solid #e0e0e0',
           }}
         >
-          <Button onClick={handleClearFilters} appearance="ghost">
+          <Button onClick={handleClearFilters} appearance="ghost" dimension="s">
             <DeleteOutline />
             Очистить фильтры
           </Button>
           <div style={{ display: 'flex', gap: '12px' }}>
-            <Button onClick={handleCancel} appearance="secondary">
+            <Button onClick={handleCancel} appearance="secondary" dimension="s">
               Отмена
             </Button>
-            <Button onClick={handleSave} appearance="primary">
+            <Button onClick={handleSave} appearance="primary" dimension="s">
               <CheckOutline />
               Сохранить
             </Button>
@@ -558,17 +576,64 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({
   );
 };
 
+const getButtonApperance = (hasTemplates: boolean) => {
+  return hasTemplates ? 'primary' : 'white';
+};
+
+const getBadgeApperance = (hasTemplates: boolean, hasActiveFilters: boolean) => {
+  return hasTemplates && hasActiveFilters ? 'info' : 'white';
+};
+
 export const TFiltersTest2 = () => {
+  const {
+    topFilters,
+    modelsDownloadingDate,
+    setModelsDownloadingDate,
+    setTopFilters,
+    setFirstDate,
+    setSecondDate,
+    resetFilters,
+    filterModel,
+  } = useFiltersStore();
+
+  const { filters } = useTableModels();
+
+  const templates = filters?.templates;
+
+  const { isModifiedFilter } = useTemplateFilters(filterModel, templates, topFilters.templates);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleSave = useCallback((template: TemplateConfig) => {}, []);
 
+  const activeFiltersCount = useMemo(
+    () => getActiveFiltersCount(filterModel, templates, topFilters.templates[0]),
+    [filterModel, templates, topFilters.templates],
+  );
+
+  const hasTemplates = topFilters.templates.length > 0;
+  const hasActiveFilters = activeFiltersCount > 0;
+  const hasNoActiveFilters = activeFiltersCount === 0;
+
+  const buttonAppearance = getButtonApperance(hasTemplates);
+  const badgeAppearance = getBadgeApperance(hasTemplates, hasActiveFilters);
+
   return (
-    <div style={{ padding: '20px' }}>
-      <Button onClick={() => setIsModalOpen(true)} appearance="primary">
-        <FilterOutline />
-        Настроить фильтры
-      </Button>
+    <div style={{ position: 'relative' }}>
+      <ButtonCustom
+        appearance={buttonAppearance}
+        dimension="s"
+        icon={<FilterOutlineCustom appearance={buttonAppearance} />}
+        displayAsSquare
+        onClick={() => setIsModalOpen(true)}
+      />
+
+      {hasTemplates && hasNoActiveFilters ? (
+        <CheckSolidCustom />
+      ) : (
+        <BadgeCount appearance={badgeAppearance} dimension="s">
+          {activeFiltersCount}
+        </BadgeCount>
+      )}
       <TemplateFilterGrid
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

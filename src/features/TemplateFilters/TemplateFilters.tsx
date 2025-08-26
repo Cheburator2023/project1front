@@ -36,6 +36,8 @@ import { useDeepEffect } from '../../shared/hooks/useDeepEffect';
 
 export const TemplateFilters = () => {
   const { templates } = useTemplatesStore();
+  console.log('🐸 Pepe said >> TemplateFilters >> templates:', templates);
+
   const { setActiveScreen, setRightPanelType } = useDisplayStore();
   const { topFilters, setTopFilters, filterModel, setFilterModel, resetFilters } = useFiltersStore();
   const gridRef = useRef<AgGridReact>(null);
@@ -70,6 +72,8 @@ export const TemplateFilters = () => {
       }
 
       setFilterModel(newFilterModel);
+      console.log('🐸 Pepe said >> TemplateFilters >> RESET 1:');
+
       setTopFilters({ ...topFilters, templates: topFilters.templates || [] });
     },
     [filterModel, setFilterModel, topFilters, setTopFilters],
@@ -86,6 +90,10 @@ export const TemplateFilters = () => {
     resetFilters: resetTemplateFilters,
     shouldResetTemplateOnInitialFilterRemove,
   } = useTemplateFilters(columnsFilters, templates, topFilters.templates);
+    console.log('🐸 Pepe said >> TemplateFilters >> topFilters:', topFilters.templates);
+
+    console.log('🐸 Pepe said >> TemplateFilters >> activeTemplate:', activeTemplate);
+
 
   // refactor
   const handleRemoveColumnFilterValue = useCallback(
@@ -98,10 +106,12 @@ export const TemplateFilters = () => {
           : prevColumnsFilterValues.filter((filterValue) => filterValue !== value);
 
         setFilterModel({ ...filterModel, [columnFilterName]: newFilterValues });
+      console.log('🐸 Pepe said >> TemplateFilters >> RESET 2:');
         setTopFilters({ ...topFilters });
       }
 
       if (shouldResetTemplateOnInitialFilterRemove(columnFilterName)) {
+      console.log('🐸 Pepe said >> TemplateFilters >> RESET 3:');
         setTopFilters({ ...topFilters, templates: [] });
       }
     },
@@ -260,6 +270,7 @@ export const TemplateFilters = () => {
         handleChangeColumnsFilter(key, getFilterValues(filterValues));
       }
     });
+      console.log('🐸 Pepe said >> TemplateFilters >> RESET 4:');
     setTopFilters({ ...topFilters, templates: [] });
   }, [columnsFilters, handleChangeColumnsFilter, topFilters, setTopFilters, getFilterValues]);
 
@@ -315,6 +326,7 @@ export const TemplateFilters = () => {
 
     if (hasChanges) {
       setFilterModel(newFilterModel);
+      console.log('🐸 Pepe said >> TemplateFilters >> RESET 5:');
       setTopFilters({ ...topFilters, templates: [] });
     }
 

@@ -9,6 +9,7 @@ import { AgGridModelsTable } from '@src/features/NewTables/AgGridModelsTable';
 import { useTableModels } from './hooks';
 import { CompareModelsWidget } from '../../widgets';
 import { TemplateFilters } from '../../features/TemplateFilters/TemplateFilters';
+import { TFiltersTest2 } from '../Playground/TFiltersTest2';
 
 export const Home = () => {
   const { display, modelsTable, filters } = useTableModels();
@@ -16,28 +17,15 @@ export const Home = () => {
   return (
     <>
       <RightModalPanel />
-      {display?.activeScreen === ACTIVE_SCREEN.TEMPLATE_FILTERS && <TemplateFilters />}
-      {display?.activeScreen === ACTIVE_SCREEN.TABLE && (
+      {/* {display?.activeScreen === ACTIVE_SCREEN.TEMPLATE_FILTERS && <TemplateFilters />} */}
+
+      {display?.activeScreen === ACTIVE_SCREEN.COMPARE ? (
+        <CompareModelsWidget />
+      ) : (
         <>
           <FiltersPanel />
           <AgGridModelsTable />
-          {/* <Row>
-            <Checkbox
-              dimension="s"
-              onChange={(e) => {
-                setChecked(e.target.checked);
-              }}
-            />
-            <T font="Caption/Caption 1" as="div">
-              Не включать модели со статусом ошибка заведения
-            </T>
-          </Row> */}
         </>
-      )}
-      {display?.activeScreen === ACTIVE_SCREEN.COMPARE && (
-        <CompareModelsWidget
-
-        />
       )}
     </>
   );

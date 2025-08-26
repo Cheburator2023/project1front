@@ -27,9 +27,15 @@ export const TemplatesFilter = ({
   error = '',
   updateRightPanelType,
 }: TemplatesFilterProps) => {
-  const { topFilters, setTopFilters, filterModel, setFilterModel, resetFilters } = useFiltersStore();
+  const { topFilters, setTopFilters, filterModel, setFilterModel, resetFilters } =
+    useFiltersStore();
 
-  const { isModifiedFilter, resetFilters: resetTemplateFilters } = useTemplateFilters(filterModel, templates, topFilters.templates);
+
+  const { isModifiedFilter, resetFilters: resetTemplateFilters } = useTemplateFilters(
+    filterModel,
+    templates,
+    topFilters.templates,
+  );
 
   const groupedOptions = useMemo(() => {
     if (templates) {
@@ -57,7 +63,6 @@ export const TemplatesFilter = ({
 
   const { setFiltersResetCount } = useGlobalStore();
 
-
   const handleResetFilters = () => {
     resetFilters();
     setTopFilters({ ...topFilters, templates: [] });
@@ -65,9 +70,6 @@ export const TemplatesFilter = ({
   };
 
   const dynamicKeyForRenderSelect = templates[templates.length - 1]?.template_name;
-        console.log('🐸 Pepe said >> groupedOptions:', groupedOptions);
-      console.log('🐸 Pepe said >> topFilters:', topFilters);
-      console.log('🐸 Pepe said >> activeTemplate:', activeTemplate);
 
   return (
     <CustomSearchSelect
@@ -79,9 +81,8 @@ export const TemplatesFilter = ({
       name="templates"
       loading={loading}
       error={!!error}
-      active={!!activeTemplate}
-      selectedValues={activeTemplate ? [String(activeTemplate.template_id)] : []}
-
+      active={!!topFilters.templates.length}
+      selectedValues={topFilters.templates.length ? topFilters.templates : []}
       options={{
         type: SELECT_TYPE.TEMPLATES,
         groups: groupedOptions,

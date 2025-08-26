@@ -22,7 +22,7 @@ import {
   getISODateFormat,
 } from '@shared/helpers';
 import { ArtifactApi, CustomError } from '@src/shared/api/types';
-import { useExploitationModeStore, useFiltersStore, useDisplayStore } from '@src/shared/stores';
+import { useExploitationModeStore, useFiltersStore, useDisplayStore, useTemplatesStore } from '@src/shared/stores';
 import { useDeepEffect } from '../../../shared/hooks/useDeepEffect';
 
 export const getQueryParams = (
@@ -101,7 +101,7 @@ export const useTableModels = () => {
   const [pageSize, setPageSize] = useState(100);
   const [page, setPage] = useState(1);
   const [totalRows, setTotalRows] = useState<number>(0);
-  const [templates, setTemplates] = useState<Template[]>([]);
+  const { templates, setTemplates } = useTemplatesStore();
 
   const [loadingModels, setLoadingModels] = useState(true);
   const [errorModels, setErrorModels] = useState<string>('');
@@ -158,7 +158,7 @@ export const useTableModels = () => {
     fetchModels();
   }, [selectedExploitationModes]);
 
-  useEffect(() => {
+  useDeepEffect(() => {
     if (templateData) {
       setTemplates(templateData);
     }
