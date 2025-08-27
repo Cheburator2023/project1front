@@ -129,6 +129,9 @@ const GlobalStyle = createGlobalStyle`
   body {
     margin: 0;
   }
+  * {
+    font-family: sans-serif;
+  }
   .ag-watermark,
   .ag-watermark-text,
   .ag-watermark.ag-opacity-zero,

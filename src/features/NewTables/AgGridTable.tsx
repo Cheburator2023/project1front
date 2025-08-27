@@ -378,6 +378,8 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       if (event.source === 'api') return;
 
       const _filterModel = event.api.getFilterModel();
+      console.log('🐸 Pepe said >> handleFilterChange >> _filterModel:', _filterModel);
+
 
       setFilterModel(_filterModel);
 

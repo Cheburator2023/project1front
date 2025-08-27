@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+
 import { Flexbox } from '../../shared/ui/atoms';
 import { TFiltersTest2 } from './TFiltersTest2';
+import { DateSelectExample } from './DateSelectExample';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -105,6 +107,10 @@ const componentMapping = {
     label: 'Тест фильтров шаблонов 2',
     component: TFiltersTest2,
   },
+  DateSelectExample: {
+    label: 'Пример DateSelect',
+    component: DateSelectExample,
+  },
 };
 
 export const Playground = () => {
@@ -117,7 +123,7 @@ export const Playground = () => {
   const componentEntries = Object.entries(componentMapping);
 
   return (
-    <Flexbox flexDirection='column' style={{ height: '100vh' }}>
+    <Flexbox flexDirection="column" style={{ height: '100vh' }}>
       <Flexbox>
         <Tabs value={activeTab} onChange={handleTabChange}>
           {componentEntries.map(([key, config], index) => (
