@@ -1,11 +1,8 @@
-/* eslint-disable no-nested-ternary */
-/* eslint-disable react/button-has-type */
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { ColDef, GridApi } from 'ag-grid-community';
 import { Button, Modal, Select, Option, ModalTitle } from '@admiral-ds/react-ui';
 import { ReactComponent as CheckOutline } from '@admiral-ds/icons/build/service/CheckOutline.svg';
-
 import { ReactComponent as DeleteOutline } from '@admiral-ds/icons/build/system/DeleteOutline.svg';
 import { isEmpty } from 'lodash';
 import {
@@ -18,7 +15,6 @@ import { useFiltersStore, useTemplatesStore } from '../../shared/stores';
 import { useGlobalStore } from '../../shared/stores/globalStore';
 import { getActiveFiltersCount } from '../../shared/helpers';
 import { useTableModels } from '../Home/hooks';
-import { useTemplateFilters } from '../../shared/hooks';
 import { Spacer } from '../../shared/ui/atoms';
 import { initialColumns } from '../../shared/constants';
 import { Template } from '../../shared/api';
@@ -27,7 +23,6 @@ import { AG_GRID_LOCALE_RU } from './locale/agGridLocale.ru';
 import { DateSelect } from '../../shared/ui/organisms/DateSelect';
 import { SearchSelect } from '../../shared/ui/organisms/SearchSelect/SearchSelect';
 import { SELECT_TYPE } from '../../shared/ui/organisms/SearchSelect/types';
-import { INPUT_TYPE } from '../../shared/ui/organisms';
 
 type SetFilter = {
   values: (string | null)[];
@@ -51,13 +46,6 @@ type SortState = Array<{
   sortIndex: number;
 }>;
 
-interface TemplateConfig {
-  id: string;
-  name: string;
-  filterModel: FilterModel;
-  sortState: SortState;
-}
-
 interface FilterItem {
   id: string;
   name: string;
@@ -68,7 +56,7 @@ interface FilterItem {
 
 interface TemplateFilterGridProps {
   onClose: () => void;
-  onSave: (template: TemplateConfig) => void;
+  onSave: (template: any) => void;
 }
 
 const DragHandleRenderer = React.memo(() => (
@@ -88,7 +76,7 @@ const DragHandleRenderer = React.memo(() => (
 DragHandleRenderer.displayName = 'DragHandleRenderer';
 
 const CheckboxRenderer = React.memo((params: any) => {
-  const { setRowData, handleFilterChange, setIsManualChange } = params.context;
+  const { setRowData, handleFilterChange } = params.context;
 
   return (
     <input
@@ -96,19 +84,11 @@ const CheckboxRenderer = React.memo((params: any) => {
       checked={params.value}
       onChange={(e) => {
         params.setValue(e.target.checked);
-
-        if (setIsManualChange) {
-          setIsManualChange(true);
-        }
-
         setRowData((prevData: any[]) => {
           const updatedData = prevData.map((row) =>
             row.id === params.data.id ? { ...row, active: e.target.checked } : row,
           );
-          
-          // Передаем обновленные данные в handleFilterChange
           handleFilterChange(updatedData);
-          
           return updatedData;
         });
       }}
@@ -125,14 +105,9 @@ const ValueRenderer = React.memo((params: any) => {
   const { rowList } = context || {};
 
   const handleValueChange = (newValue: string[] | string) => {
-    console.log('🐸 Pepe said >> handleValueChange >> newValue:', newValue);
-
     const isActive = !isEmpty(newValue) && !newValue.includes('_') && newValue !== ' - ';
-
     const updatedData = { ...data, value: newValue, active: isActive };
-
     const rowNode = api.getRowNode(data.id);
-
     if (rowNode) {
       rowNode.setData(updatedData);
     }
@@ -201,17 +176,13 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({ onClose,
   const { templates, setTemplates } = useTemplatesStore();
   const { modelsTable } = useTableModels();
   const { rowList } = modelsTable;
-
   const { topFilters, setFilterModel, setSortState } = useFiltersStore();
-
   const defaultActiveTemplateId = topFilters.templates?.[0];
-
   const { agGridApi: agGridApiGlobal } = useGlobalStore();
 
   const [activeTemplate, setActiveTemplate] = useState<Template | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [isCustomTemplate, setIsCustomTemplate] = useState(false);
-  const [isManualChange, setIsManualChange] = useState(false);
 
   const defaultFilters: FilterItem[] = useMemo(() => {
     return initialColumns.map((column, index) => {
@@ -360,10 +331,6 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({ onClose,
         setActiveTemplate(null);
         setIsInitialized(false);
         setIsCustomTemplate(false);
-        setIsManualChange(false);
-        // Сбрасываем фильтры при очистке шаблона
-        setFilterModel({});
-        // Сбрасываем все чекбоксы при очистке шаблона
         setRowData((currentRowData) => currentRowData.map((row) => ({ ...row, active: false })));
         return;
       }
@@ -374,11 +341,6 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({ onClose,
         setActiveTemplate(template);
         setIsInitialized(false);
         setIsCustomTemplate(false);
-        setIsManualChange(false);
-        // Применяем фильтры шаблона сразу при выборе
-        if (template.filterModel) {
-          setFilterModel(template.filterModel);
-        }
       }
     },
     [templates, setActiveTemplate, setFilterModel],
@@ -419,13 +381,11 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({ onClose,
     });
     setRowData(newRowData);
     handleFilterChange();
-    console.log('Новый порядок строк:', newRowData);
   }, [gridApi, handleFilterChange]);
 
   const handleSave = useCallback(() => {
     if (gridApi) {
       const activeFilters = rowData.filter((row) => row.active);
-      console.log('🐸 Pepe said >> TemplateFilterGrid >> activeFilters:', activeFilters);
 
       const filterModel: FilterModel = {};
       activeFilters.forEach((filter) => {
@@ -487,24 +447,18 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({ onClose,
         setTemplates((prev) => [...prev, templateToSave]);
       }
 
-      // Применяем фильтры и сортировку к глобальной AG Grid через agGridApi
       if (agGridApiGlobal) {
-        console.log('🐸 Pepe said >> TemplateFilterGrid >> filterModel:', filterModel);
         agGridApiGlobal.setFilterModel(filterModel);
-
         if (sortState.length > 0) {
           agGridApiGlobal.applyColumnState({ state: sortState, defaultState: { sort: null } });
         }
       }
 
-      // Обновляем состояние в filtersStore
       setFilterModel(filterModel);
       setSortState(sortState);
-
       setActiveTemplate(templateToSave);
       setIsCustomTemplate(false);
       onSave(templateToSave);
-      console.log('Сохранен шаблон:', templateToSave);
 
       onClose();
     }
@@ -535,7 +489,7 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({ onClose,
     }
     handleFilterChange();
     setRowData(defaultFilters);
-  }, [gridApi, setFilterModel]);
+  }, [gridApi, handleFilterChange, defaultFilters]);
 
   return (
     <Modal
@@ -585,7 +539,7 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({ onClose,
               rowData={rowData}
               columnDefs={columnDefs}
               onGridReady={onGridReady}
-              context={{ setRowData, handleFilterChange, rowList, setIsManualChange }}
+              context={{ setRowData, handleFilterChange, rowList }}
               onRowDragEnd={handleRowDragEnd}
               getRowId={(params) => params.data.id}
               rowDragManaged
@@ -632,26 +586,10 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({ onClose,
   );
 };
 
-const getButtonApperance = (hasTemplates: boolean) => {
-  return hasTemplates ? 'primary' : 'white';
-};
-
-const getBadgeApperance = (hasTemplates: boolean, hasActiveFilters: boolean) => {
-  return hasTemplates && hasActiveFilters ? 'info' : 'white';
-};
-
 export const TFiltersTest2 = () => {
   const { topFilters, filterModel } = useFiltersStore();
-
   const { filters } = useTableModels();
-
   const filterTemplates = filters?.templates;
-
-  const { isModifiedFilter } = useTemplateFilters(
-    filterModel,
-    filterTemplates,
-    topFilters.templates,
-  );
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleSave = useCallback(() => {}, []);
@@ -665,8 +603,8 @@ export const TFiltersTest2 = () => {
   const hasActiveFilters = activeFiltersCount > 0;
   const hasNoActiveFilters = activeFiltersCount === 0;
 
-  const buttonAppearance = getButtonApperance(hasTemplates);
-  const badgeAppearance = getBadgeApperance(hasTemplates, hasActiveFilters);
+  const buttonAppearance = hasTemplates ? 'primary' : 'white';
+  const badgeAppearance = hasTemplates && hasActiveFilters ? 'info' : 'white';
 
   return (
     <div style={{ position: 'relative' }}>
