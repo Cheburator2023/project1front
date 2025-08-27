@@ -1,5 +1,65 @@
 # Semantic Versioning Changelog
 
+# [1.50.0](https://git.sfera.inno.local/sumd/mrms-frontend/compare/v1.49.1...v1.50.0) (2025-08-21)
+
+
+### Bug Fixes
+
+* update RFDInput to handle default value correctly ([60df6fc](https://git.sfera.inno.local/sumd/mrms-frontend/commit/60df6fc9d9f63ac0ef2e4ddfc8a69e55a05ea4af))
+
+
+### Features
+
+* add RFD input type and related functionality ([cc9ff5e](https://git.sfera.inno.local/sumd/mrms-frontend/commit/cc9ff5ec52e160ba87798410dfab1b240f1f66b3))
+
+## [1.49.1](https://git.sfera.inno.local/sumd/mrms-frontend/compare/v1.49.0...v1.49.1) (2025-08-21)
+
+
+### Bug Fixes
+
+* внедренные модели в пим ([8404960](https://git.sfera.inno.local/sumd/mrms-frontend/commit/840496072cc340cd73161bcfab4af0e44bc29e07))
+* внедренные модели в пим v2 ([3292703](https://git.sfera.inno.local/sumd/mrms-frontend/commit/32927035abcf7dcbfd9b6d0b7699abaad77c9982))
+* добавил 2 атрибута ([119b98e](https://git.sfera.inno.local/sumd/mrms-frontend/commit/119b98e3ba07f909c37a6d891ba7565e450d067f))
+* правка стилей по виджетам ([5a449c1](https://git.sfera.inno.local/sumd/mrms-frontend/commit/5a449c183f46af668277cf2b564bc9cd41f4c860))
+
+# [1.49.0](https://git.sfera.inno.local/sumd/mrms-frontend/compare/v1.48.0...v1.49.0) (2025-08-11)
+
+
+### Bug Fixes
+
+* исправил стили для скрытых дэшбордов ([27d569c](https://git.sfera.inno.local/sumd/mrms-frontend/commit/27d569c3806319a873617c5eb1c97b69feda511e))
+* поменял процентные дельты на обычные у 2-х виджетов и скрыл 2 виджета ([6affeeb](https://git.sfera.inno.local/sumd/mrms-frontend/commit/6affeeb96fdb4af0fbf5a123456607625af87924))
+* убрал выгрузку на определенную дату ([7b8ac50](https://git.sfera.inno.local/sumd/mrms-frontend/commit/7b8ac504a36d931af7fa21578df3c80e54c0776a))
+* фикс поиска шаблона, сброса фильтра и стиля иконки ([888014e](https://git.sfera.inno.local/sumd/mrms-frontend/commit/888014e3b0754b757ef732478ee69f55fae09b5f))
+* фикс проблемы отображения фильтров ([3622fca](https://git.sfera.inno.local/sumd/mrms-frontend/commit/3622fca634b2099b12fa40f9d32daf170e351297))
+
+
+### Features
+
+* выгрузка метрики распределение по этапам ЖЦМ ([9a8f324](https://git.sfera.inno.local/sumd/mrms-frontend/commit/9a8f3246a944e8dd60315c0a372eaa880a479730))
+
+# [1.48.0](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.47.2...v1.48.0) (2025-08-04)
+
+
+### Features
+
+* добавлена выгрузка для прироста ([0f6a0ae](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/0f6a0ae8d7a76ae7e41e077e73102560f5b16cd0))
+
+## [1.47.2](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.47.1...v1.47.2) (2025-07-30)
+
+
+### Bug Fixes
+
+* template filter reset via ag grid fix ([b296c9a](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/b296c9a6bfa150237402eb7b05de5fa8074e83ff))
+* template filter reset via ag grid fix ([65cdd22](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/65cdd227274e7517ed538dd0c9256bd6cb6cfafb))
+
+## [1.47.1](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.47.0...v1.47.1) (2025-07-29)
+
+
+### Bug Fixes
+
+* column filters set fixed ([10ba453](https://git.sfera.inno.local/SUMD/mrms-frontend/commit/10ba45380db8ecd850bde7a9bc69d8b0457b5a24))
+
 ## [1.46.2](https://git.sfera.inno.local/SUMD/mrms-frontend/compare/v1.46.1...v1.46.2) (2025-06-03)
 
 

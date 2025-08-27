@@ -49,6 +49,7 @@ import {
   GridRow,
   CustomDateField,
   CustomSearchSelect,
+  DisabledMetricWrapper,
 } from './style';
 import { MenuIconSelect } from './MenuIconSelect';
 import { MetricsCaption } from './types';
@@ -191,13 +192,13 @@ const ChartsDashboard = () => {
     setOnMonitoringModels({
       ...onMonitoringModels,
       value: metricsData.onMonitoringModels.count,
-      delta: metricsData.onMonitoringModels.deltaPercent,
+      delta: metricsData.onMonitoringModels.delta,
     });
 
     setTakenOutOfOperationModels({
       ...takenOutOfOperationModels,
       value: metricsData.takenOutOfOperationModels.count,
-      delta: metricsData.takenOutOfOperationModels.deltaPercent,
+      delta: metricsData.takenOutOfOperationModels.delta,
     });
 
     setStalledModelsByMonth({
@@ -453,6 +454,11 @@ const ChartsDashboard = () => {
 
     setIsExportingMetric(true);
 
+    // Парсим selectedMetric для определения базовой метрики и типа данных
+    const isDelta = selectedMetric.endsWith('_delta');
+    const baseMetric = isDelta ? selectedMetric.replace('_delta', '') : selectedMetric;
+    const dataType = isDelta ? 'delta' : 'current';
+
     const baseQueryParams = getQueryParams({
       startDate: tempFilters.tempStartDate && switchDateFormat(tempFilters.tempStartDate),
       endDate: tempFilters.tempEndDate && switchDateFormat(tempFilters.tempEndDate),
@@ -461,7 +467,8 @@ const ChartsDashboard = () => {
 
     const queryParams = {
       ...baseQueryParams,
-      metric: selectedMetric,
+      metric: baseMetric, // Отправляем базовое имя метрики без _delta
+      dataType: dataType, // Отправляем тип данных отдельно
     };
 
     const today = new Date();
@@ -607,11 +614,21 @@ const ChartsDashboard = () => {
                     relative={kpiSum.relative}
                     size="stat-sm"
                   /> */}
-                    <MetricDisplay
+                    {/* <MetricDisplay
                       caption={totalModels.caption}
                       value={totalModels.value}
                       delta={totalModels.delta}
                       relative={totalModels.relative}
+                      size="stat-sm"
+                      styles={{
+                        width: '100%',
+                      }}
+                    /> */}
+                    <MetricDisplay
+                      caption={sumRmModels.caption}
+                      value={sumRmModels.value}
+                      delta={sumRmModels.delta}
+                      relative={sumRmModels.relative}
                       size="stat-sm"
                       styles={{
                         width: '100%',
@@ -632,16 +649,6 @@ const ChartsDashboard = () => {
                       value={developedModels.value}
                       delta={developedModels.delta}
                       relative={developedModels.relative}
-                      size="stat-sm"
-                      styles={{
-                        width: '100%',
-                      }}
-                    />
-                    <MetricDisplay
-                      caption={sumRmModels.caption}
-                      value={sumRmModels.value}
-                      delta={sumRmModels.delta}
-                      relative={sumRmModels.relative}
                       size="stat-sm"
                       styles={{
                         width: '100%',
@@ -725,7 +732,6 @@ const ChartsDashboard = () => {
                         value={onMonitoringModels.value}
                         delta={onMonitoringModels.delta}
                         relative={onMonitoringModels.relative}
-                        isDeltaPercentage
                         size="stat-md"
                         styles={{
                           frame: { withBorder: true },
@@ -743,7 +749,6 @@ const ChartsDashboard = () => {
                         value={takenOutOfOperationModels.value}
                         delta={takenOutOfOperationModels.delta}
                         relative={takenOutOfOperationModels.relative}
-                        isDeltaPercentage
                         size="stat-md"
                         styles={{
                           frame: { withBorder: true },
@@ -773,31 +778,35 @@ const ChartsDashboard = () => {
                     }}
                   />
 
-                  <MetricDisplay
-                    caption={registryCoverageModels.caption}
-                    value={registryCoverageModels.value}
-                    delta={registryCoverageModels.delta}
-                    relative={registryCoverageModels.relative}
-                    isDeltaPercentage
-                    size="stat-lg"
-                    styles={{
-                      frame: { withBorder: true },
-                      title: { font: 'Additional/S' },
-                    }}
-                  />
+                  <DisabledMetricWrapper>
+                    <MetricDisplay
+                      caption={registryCoverageModels.caption}
+                      value={registryCoverageModels.value}
+                      delta={registryCoverageModels.delta}
+                      relative={registryCoverageModels.relative}
+                      isDeltaPercentage
+                      size="stat-lg"
+                      styles={{
+                        frame: { withBorder: true },
+                        title: { font: 'Additional/S' },
+                      }}
+                    />
+                  </DisabledMetricWrapper>
 
-                  <MetricDisplay
-                    caption={riskCoverageFinalStatusModels.caption}
-                    value={riskCoverageFinalStatusModels.value}
-                    delta={riskCoverageFinalStatusModels.delta}
-                    relative={riskCoverageFinalStatusModels.relative}
-                    isDeltaPercentage
-                    size="stat-lg"
-                    styles={{
-                      frame: { withBorder: true },
-                      title: { font: 'Additional/S' },
-                    }}
-                  />
+                  <DisabledMetricWrapper>
+                    <MetricDisplay
+                      caption={riskCoverageFinalStatusModels.caption}
+                      value={riskCoverageFinalStatusModels.value}
+                      delta={riskCoverageFinalStatusModels.delta}
+                      relative={riskCoverageFinalStatusModels.relative}
+                      isDeltaPercentage
+                      size="stat-lg"
+                      styles={{
+                        frame: { withBorder: true },
+                        title: { font: 'Additional/S' },
+                      }}
+                    />
+                  </DisabledMetricWrapper>
                 </Column>
               </Cover>
             </Container>
@@ -809,3 +818,4 @@ const ChartsDashboard = () => {
 };
 
 export { ChartsDashboard };
+

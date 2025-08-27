@@ -709,6 +709,16 @@ export const initialColumns: Array<Column> = [
     title: 'Параметры оценки аллокаций',
     type: COLUMN_TYPE.STRING,
   },
+  {
+    name: 'operational_monitoring',
+    title: 'Оперативный мониторинг',
+    type: COLUMN_TYPE.STRING,
+  },
+  {
+    name: 'analytical_monitoring',
+    title: 'Аналитический мониторинг',
+    type: COLUMN_TYPE.STRING,
+  },
 ];
 
 export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
@@ -855,8 +865,6 @@ export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
   product_name: [],
   developing_model_reason: [],
   provides_piloting: [],
-  operational_monitoring: [],
-  analytical_monitoring: [],
   artefacts_model_id: [],
   lead_validator_comment_model_delete: [],
   lead_validator_resolution_model_delete: [],
@@ -870,5 +878,7 @@ export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
   custom_model_id: [],
   custom_model_type: [],
   bpmn_key: [],
+  operational_monitoring: [],
+  analytical_monitoring: [],
 };
 

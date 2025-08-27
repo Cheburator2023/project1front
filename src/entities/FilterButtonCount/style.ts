@@ -48,12 +48,12 @@ const CheckSolidCustom = styled.div`
   &::after {
     content: '';
     position: absolute;
-    width: 5px;
-    height: 8px;
+    width: 3px;
+    height: 7px;
     border: solid ${({ theme }) => theme.color['Neutral/Neutral 00']};
-    border-width: 0 2px 2px 0;
-    top: 2px;
-    left: 5px;
+    border-width: 0 1.5px 1.5px 0;
+    top: 1px;
+    left: 4px;
     transform: rotate(45deg);
   }
 `;

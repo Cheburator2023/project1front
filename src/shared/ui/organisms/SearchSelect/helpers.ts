@@ -63,7 +63,7 @@ export const getFilteredOptionsBySearch = (
       );
 
       if (filteredGroupOptions.length) {
-        return [...prevValue, { ...groupOptions, items: filteredGroupOptions }];
+        return [...prevValue, { ...groupOptions, options: filteredGroupOptions }];
       }
 
       return prevValue;

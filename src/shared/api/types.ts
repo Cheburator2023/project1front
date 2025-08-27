@@ -80,11 +80,11 @@ export type MetricsResponseType = {
   };
   takenOutOfOperationModels: {
     count: number;
-    deltaPercent: number;
+    delta: number;
   };
   onMonitoringModels: {
     count: number;
-    deltaPercent: number;
+    delta: number;
   };
   stalledModelsByMonth: number[];
   finalStatusByMonthModels: number[];

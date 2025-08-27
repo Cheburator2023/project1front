@@ -158,10 +158,6 @@ export const useTableModels = () => {
   const selectedExploitationModes = useExploitationModeStore(
     (state) => state.selectedExploitationModes,
   );
-  console.log(
-    '🐸 Pepe said >> useTableModels >> selectedExploitationModes:',
-    selectedExploitationModes,
-  );
 
   const { responseData: templateData, mutationProtectedFetch } = useFetch<Template[]>({
     apiRoute: API_ROUTES.TEMPLATES,
@@ -180,8 +176,6 @@ export const useTableModels = () => {
   };
 
   const fetchModels = useCallback(async (date?: string) => {
-    console.log('🐸 Pepe said >> fetchModels >> date:', date);
-
     const { selectedExploitationModes } = useExploitationModeStore.getState();
 
     setLoadingModels(true);
