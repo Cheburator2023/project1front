@@ -97,6 +97,69 @@ const CheckboxRenderer = React.memo((params: any) => {
   );
 });
 
+const SelectAllHeaderRenderer = React.memo((params: any) => {
+  const { setRowData, handleFilterChange } = params.context;
+  const [allSelected, setAllSelected] = useState(false);
+  const [indeterminate, setIndeterminate] = useState(false);
+
+  useEffect(() => {
+    const updateSelectAllState = () => {
+      const allRows: any[] = [];
+      params.api.forEachNode((node: any) => allRows.push(node.data));
+      
+      const selectedCount = allRows.filter((row: any) => row.active).length;
+      const totalCount = allRows.length;
+      
+      setAllSelected(selectedCount === totalCount && totalCount > 0);
+      setIndeterminate(selectedCount > 0 && selectedCount < totalCount);
+    };
+
+    updateSelectAllState();
+    
+    const listener = () => updateSelectAllState();
+    params.api.addEventListener('cellValueChanged', listener);
+    params.api.addEventListener('rowDataUpdated', listener);
+    
+    return () => {
+      params.api.removeEventListener('cellValueChanged', listener);
+      params.api.removeEventListener('rowDataUpdated', listener);
+    };
+  }, [params.api]);
+
+  const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = event.target.checked;
+    
+    setRowData((currentRowData: any[]) =>
+      currentRowData.map((row: any) => ({ ...row, active: newValue }))
+    );
+    
+    params.api.forEachNode((node: any) => {
+      node.data.active = newValue;
+    });
+    
+    params.api.refreshCells({ force: true });
+    handleFilterChange();
+  };
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <input
+        type="checkbox"
+        checked={allSelected}
+        ref={(input) => {
+          if (input) input.indeterminate = indeterminate;
+        }}
+        onChange={handleSelectAll}
+        style={{
+          accentColor: '#0062FF',
+          cursor: 'pointer'
+        }}
+      />
+      <span>Выбран</span>
+    </div>
+  );
+});
+
 CheckboxRenderer.displayName = 'CheckboxRenderer';
 
 const ValueRenderer = React.memo((params: any) => {
@@ -360,6 +423,7 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({ onClose,
         filter: 'agSetColumnFilter',
         sortable: false,
         cellRenderer: CheckboxRenderer,
+        headerComponent: SelectAllHeaderRenderer,
       },
       {
         headerName: 'Название фильтра',
