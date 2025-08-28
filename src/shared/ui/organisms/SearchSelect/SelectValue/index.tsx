@@ -49,7 +49,7 @@ export const SelectValue = React.memo(
               {active && selectedValueText
                 ? selectedValueText
                 : active
-                ? 'Активный шаблон'
+                ? 'Новый шаблон (не сохранен)'
                 : 'Не активен'}
             </div>
             {active && modified ? (

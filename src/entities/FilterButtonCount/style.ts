@@ -8,7 +8,7 @@ const BadgeCount = styled(Badge)<{ appearance: string }>`
   top: -9px;
   right: -11px;
   box-sizing: content-box;
-  border-radius: 100%;
+  border-radius: 100px;
   ${({ appearance }) =>
     appearance === 'white' &&
     css`

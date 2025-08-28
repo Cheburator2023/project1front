@@ -358,21 +358,23 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
 
     const { setSortState, setFilterModel } = useFiltersStore();
 
-    const handleSortChanged = (event: SortChangedEvent) => {
-      onSortChanged?.(event);
+    // const handleSortChanged = (event: SortChangedEvent) => {
+    //   onSortChanged?.(event);
 
-      if (event.source === 'api') return;
+    //   if (event.source === 'api') return;
 
-      const colState = gridRef.current!.api.getColumnState();
-      const sortState = colState
-        .filter((s) => {
-          return s.sort != null;
-        })
-        .map((s) => {
-          return { colId: s.colId, sort: s.sort, sortIndex: s.sortIndex };
-        });
-      setSortState(sortState);
-    };
+    //   const colState = gridRef.current!.api.getColumnState();
+    //   const sortState = colState
+    //     .filter((s) => {
+    //       return s.sort != null;
+    //     })
+    //     .map((s) => {
+    //       return { colId: s.colId, sort: s.sort, sortIndex: s.sortIndex };
+    //     });
+    //   console.log('🐸 Pepe said >> handleSortChanged >> sortState:', sortState);
+
+    //   setSortState(sortState);
+    // };
 
     const handleFilterChange = (event: FilterChangedEvent): void => {
       if (event.source === 'api') return;
@@ -439,6 +441,15 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
         agGridApi.setFilterModel(filterModel);
       }
     }, [agGridApi, filterModel]);
+
+    useDeepEffect(() => {
+      if (agGridApi && templates && topFilters?.templates?.[0]) {
+        const activeTemplate = templates.find(t => String(t.template_id) === topFilters.templates[0]);
+        if (activeTemplate?.columnState) {
+          agGridApi.applyColumnState({ state: activeTemplate.columnState });
+        }
+      }
+    }, [agGridApi, templates, topFilters]);
 
     const rowClassRules = useMemo<RowClassRules>(() => {
       return {
@@ -557,7 +568,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
               tooltipShowDelay={500}
               getContextMenuItems={getContextMenuItems}
               onRowDragMove={onRowDragMove}
-              onSortChanged={handleSortChanged}
+              // onSortChanged={handleSortChanged}
               onRowSelected={onRowSelected}
               onFirstDataRendered={_onFirstDataRendered}
               onRowDataUpdated={onRowDataUpdated}

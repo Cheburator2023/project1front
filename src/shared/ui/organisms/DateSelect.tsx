@@ -34,6 +34,7 @@ export const DateSelect = ({ value, initType, onChange }: DateSelectProps) => {
 
       return [`${startDate}`, `${endDate}`];
     }
+
     return [`${dateValue}`];
   };
 

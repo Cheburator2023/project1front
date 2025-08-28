@@ -129,6 +129,10 @@ export type Template = {
     sort: 'asc' | 'desc';
     sortIndex: number;
   }>;
+  columnState?: Array<{
+    colId: string;
+    hide?: boolean;
+  }>;
   selectedIds?: string[];
   isOwner?: boolean;
   public?: boolean;
