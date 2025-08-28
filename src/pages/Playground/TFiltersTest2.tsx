@@ -101,6 +101,8 @@ CheckboxRenderer.displayName = 'CheckboxRenderer';
 
 const ValueRenderer = React.memo((params: any) => {
   const { data, value, api, context } = params;
+  console.log('🐸 Pepe said >> params:', params);
+
 
   const isDateType = data.type === 'date';
   const { rowList } = context || {};
@@ -115,7 +117,6 @@ const ValueRenderer = React.memo((params: any) => {
   };
 
   if (isDateType) {
-    console.log('🐸 Pepe said >> value:', value);
     const dateRange =
       value
         ?.replaceAll(' 00:00:00', '')
@@ -153,6 +154,7 @@ const ValueRenderer = React.memo((params: any) => {
   };
 
   const currentValues = value ? value.map((v: string) => v.trim()).filter(Boolean) : [];
+
   const uniqueValues = getOptionsForColumn();
   const options = {
     type: SELECT_TYPE.STRING as any,
@@ -218,11 +220,6 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({ onClose,
 
   const [rowData, setRowData] = useState<FilterItem[]>(defaultFilters);
 
-  // Обновляем rowData когда изменяется defaultFilters
-  useEffect(() => {
-    setRowData(defaultFilters);
-  }, [defaultFilters]);
-
   const [isInitialized, setIsInitialized] = useState(false);
   const gridRef = useRef<AgGridReact>(null);
   const [gridApi, setGridApi] = useState<GridApi | null>(null);
@@ -238,15 +235,76 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({ onClose,
       );
 
       if (defaultTemplate) {
+        const updatedRowData = initialColumns.map((column, index) => {
+          const templateFilter = defaultTemplate.filterModel?.[column.name] as any;
+          let value = '';
+
+          if (templateFilter) {
+            if (column.type === COLUMN_TYPE.STRING) {
+              value = templateFilter.values || [];
+            } else if (column.type === COLUMN_TYPE.DATE) {
+              if (templateFilter.dateTo) {
+                value = `${templateFilter.dateFrom} - ${templateFilter.dateTo}`;
+              } else {
+                value = templateFilter.dateFrom;
+              }
+            }
+          }
+
+          return {
+            id: String(index + 1),
+            colId: column.name,
+            name: column.title,
+            type: column.type === COLUMN_TYPE.DATE ? 'date' : 'set',
+            value,
+            active: !!templateFilter,
+          };
+        });
+
+        setRowData(updatedRowData);
         setSelectedTemplate(defaultTemplate);
         setActiveTemplate(defaultTemplate);
         setIsInitialized(true);
       }
     } else if (activeTemplate && !isInitialized && !defaultActiveTemplateId) {
+      const updatedRowData = initialColumns.map((column, index) => {
+        const templateFilter = activeTemplate.filterModel?.[column.name] as any;
+        let value = '';
+
+        if (templateFilter) {
+          if (column.type === COLUMN_TYPE.STRING) {
+            value = templateFilter.values || [];
+          } else if (column.type === COLUMN_TYPE.DATE) {
+            if (templateFilter.dateTo) {
+              value = `${templateFilter.dateFrom} - ${templateFilter.dateTo}`;
+            } else {
+              value = templateFilter.dateFrom;
+            }
+          }
+        }
+
+        return {
+          id: String(index + 1),
+          colId: column.name,
+          name: column.title,
+          type: column.type === COLUMN_TYPE.DATE ? 'date' : 'set',
+          value,
+          active: !!templateFilter,
+        };
+      });
+
+      setRowData(updatedRowData);
       setSelectedTemplate(activeTemplate);
       setIsInitialized(true);
     }
-  }, [activeTemplate, isInitialized, defaultActiveTemplateId, templates, setActiveTemplate]);
+  }, [
+    activeTemplate,
+    isInitialized,
+    defaultActiveTemplateId,
+    templates,
+    setActiveTemplate,
+    initialColumns,
+  ]);
 
   const prevTemplateRef = useRef<Template | null>(null);
 
@@ -331,20 +389,47 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({ onClose,
         setActiveTemplate(null);
         setIsInitialized(false);
         setIsCustomTemplate(false);
-        setRowData((currentRowData) => currentRowData.map((row) => ({ ...row, active: false })));
+        setRowData((currentRowData) => currentRowData.map((row) => ({ ...row, active: true })));
         return;
       }
 
       const template = templates.find((t) => String(t.template_id) === value);
 
       if (template) {
+        const updatedRowData = initialColumns.map((column, index) => {
+          const templateFilter = template.filterModel?.[column.name] as any;
+          let value = '';
+
+          if (templateFilter) {
+            if (column.type === COLUMN_TYPE.STRING) {
+              value = templateFilter.values || [];
+            } else if (column.type === COLUMN_TYPE.DATE) {
+              if (templateFilter.dateTo) {
+                value = `${templateFilter.dateFrom} - ${templateFilter.dateTo}`;
+              } else {
+                value = templateFilter.dateFrom;
+              }
+            }
+          }
+
+          return {
+            id: String(index + 1),
+            colId: column.name,
+            name: column.title,
+            type: column.type === COLUMN_TYPE.DATE ? 'date' : 'set',
+            value,
+            active: !!templateFilter,
+          };
+        });
+
+        setRowData(updatedRowData);
         setSelectedTemplate(template);
         setActiveTemplate(template);
         setIsInitialized(false);
         setIsCustomTemplate(false);
       }
     },
-    [templates, setActiveTemplate],
+    [templates, setActiveTemplate, initialColumns],
   );
 
   const handleFilterChange = useCallback(
