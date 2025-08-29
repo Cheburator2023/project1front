@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Flexbox } from '../../shared/ui/atoms';
 import { TFiltersTest2 } from './TFiltersTest2';
 import { DateSelectExample } from './DateSelectExample';
+import { TFiltersTest3 } from './TFiltersTest3';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -106,6 +107,10 @@ const componentMapping = {
   TFiltersTest2: {
     label: 'Тест фильтров шаблонов 2',
     component: TFiltersTest2,
+  },
+  TFiltersTest3: {
+    label: 'Тест фильтров шаблонов 3',
+    component: TFiltersTest3,
   },
   DateSelectExample: {
     label: 'Пример DateSelect',

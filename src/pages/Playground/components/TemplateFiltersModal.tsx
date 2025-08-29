@@ -1,0 +1,196 @@
+import { useEffect } from 'react';
+import { Modal, ModalTitle, Button, Select, Option } from '@admiral-ds/react-ui';
+import { Template } from '@shared/api/types';
+import { initialColumns } from '@shared/constants/InitialCollumns';
+import { useTemplatesStore } from '@shared/stores/templatesStore';
+import { useFiltersStore } from '@shared/stores/filtersStore';
+import { useGlobalStore } from '@shared/stores/globalStore';
+import { useTemplateFiltersModalStore } from '../stores/templateFiltersModalStore';
+import { TemplateFiltersGrid } from './TemplateFiltersGrid';
+import { Spacer } from '../../../shared/ui/atoms';
+
+export const TemplateFiltersModal = () => {
+  const {
+    isOpen,
+    closeModal,
+    selectedTemplateId,
+    setSelectedTemplate,
+    columnFilters,
+    setColumnFilters,
+    isDirty,
+    resetState,
+    initializeFromTemplate,
+  } = useTemplateFiltersModalStore();
+
+  const { templates, pendingTemplate, setPendingTemplate } = useTemplatesStore();
+  const { filterModel, setFilterModel, resetFilters } = useFiltersStore();
+  const { agGridApi } = useGlobalStore();
+
+  useEffect(() => {
+    if (isOpen && agGridApi) {
+      const currentFilterModel = agGridApi.getFilterModel();
+
+      const mappedFilters = initialColumns.map((column, index) => {
+        const filter = currentFilterModel[column.name];
+        let filterValues: string[] = [];
+
+        if (filter) {
+          if ('values' in filter && filter.values) {
+            filterValues = filter.values.filter((value): value is string => Boolean(value));
+          } else if ('dateFrom' in filter || 'dateTo' in filter) {
+            const dateRange: string[] = [];
+            if ('dateFrom' in filter && filter.dateFrom) dateRange.push(`От: ${filter.dateFrom}`);
+            if ('dateTo' in filter && filter.dateTo) dateRange.push(`До: ${filter.dateTo}`);
+            filterValues = dateRange;
+          }
+        }
+
+        return {
+          colId: column.name,
+          name: column.name,
+          title: column.title,
+          type: column.type,
+          isActive: true,
+          filterValues,
+          order: index,
+        };
+      });
+
+      setColumnFilters(mappedFilters);
+    }
+  }, [isOpen, agGridApi, setColumnFilters]);
+
+  const handleTemplateChange = (templateId: string) => {
+    const id = templateId === 'new' ? null : parseInt(templateId);
+
+    if (id) {
+      const template = templates.find((t) => t.template_id === id);
+      initializeFromTemplate(template);
+    } else {
+      initializeFromTemplate();
+    }
+  };
+
+  const handleSave = () => {
+    if (agGridApi) {
+      const newFilterModel: any = {};
+
+      columnFilters.forEach((column) => {
+        if (column.isActive && column.filterValues.length > 0) {
+          if (column.type === 'DATE') {
+            const dateFrom = column.filterValues
+              .find((v) => v.startsWith('От:'))
+              ?.replace('От: ', '');
+            const dateTo = column.filterValues
+              .find((v) => v.startsWith('До:'))
+              ?.replace('До: ', '');
+
+            if (dateFrom || dateTo) {
+              newFilterModel[column.colId] = {
+                filterType: 'date',
+                type: 'inRange',
+                dateFrom: dateFrom || null,
+                dateTo: dateTo || null,
+              };
+            }
+          } else {
+            newFilterModel[column.colId] = {
+              filterType: 'set',
+              values: column.filterValues,
+            };
+          }
+        }
+      });
+
+      agGridApi.setFilterModel(newFilterModel);
+      setFilterModel(newFilterModel);
+
+      if (selectedTemplateId) {
+        const template = templates.find((t) => t.template_id === selectedTemplateId);
+        if (template) {
+          const updatedTemplate: Template = {
+            ...template,
+            filterModel: newFilterModel,
+          };
+          setPendingTemplate(updatedTemplate);
+        }
+      } else {
+        const newTemplate: Template = {
+          template_id: Date.now(),
+          template_name: 'Новый шаблон',
+          user_id: null,
+          filterModel: newFilterModel,
+          isPending: true,
+        };
+        setPendingTemplate(newTemplate);
+      }
+    }
+
+    closeModal();
+  };
+
+  const handleReset = () => {
+    if (agGridApi) {
+      agGridApi.setFilterModel({});
+      resetFilters();
+    }
+    initializeFromTemplate();
+  };
+
+  const handleCancel = () => {
+    resetState();
+    closeModal();
+  };
+
+  const templateOptions = [
+    { value: 'new', label: 'Создать новый шаблон' },
+    ...templates.map((template) => ({
+      value: template.template_id.toString(),
+      label: template.template_name,
+    })),
+  ];
+
+  return (
+    isOpen && (
+      <Modal onClose={handleCancel} dimension="xl" style={{ width: '90%', maxWidth: '90%' }}>
+        <ModalTitle>Управление шаблонами фильтрации</ModalTitle>
+        <Spacer />
+        <div style={{ padding: '0 24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+            <label style={{ fontWeight: 500 }}>Шаблон:</label>
+            <Select
+              id="TemplateFiltersModal_select_template_input"
+              placeholder="Выберите шаблон"
+              value={selectedTemplateId?.toString() || 'new'}
+              onChange={(e) => handleTemplateChange(e.target.value)}
+              style={{ minWidth: '300px' }}
+            >
+              {templateOptions.map((option) => (
+                <Option key={option.value} value={option.value}>
+                  {option.label}
+                </Option>
+              ))}
+            </Select>
+          </div>
+
+          <div style={{ height: '500px' }}>
+            <TemplateFiltersGrid />
+          </div>
+
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+            <Button appearance="secondary" dimension="s" onClick={handleReset}>
+              Сбросить
+            </Button>
+            <Button appearance="secondary" dimension="s" onClick={handleCancel}>
+              Отмена
+            </Button>
+            <Button appearance="primary" dimension="s" onClick={handleSave} disabled={!isDirty}>
+              Сохранить
+            </Button>
+          </div>
+        </div>
+      </Modal>
+    )
+  );
+};
+

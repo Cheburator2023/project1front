@@ -136,6 +136,7 @@ export type Template = {
   selectedIds?: string[];
   isOwner?: boolean;
   public?: boolean;
+  isPending?: boolean;
 };
 
 export type TemplateAddApi = {

@@ -24,6 +24,7 @@ import { AG_GRID_LOCALE_RU } from './locale/agGridLocale.ru';
 import { DateSelect } from '../../shared/ui/organisms/DateSelect';
 import { SearchSelect } from '../../shared/ui/organisms/SearchSelect/SearchSelect';
 import { SELECT_TYPE } from '../../shared/ui/organisms/SearchSelect/types';
+import { useDeepEffect } from '../../shared/hooks/useDeepEffect';
 
 type SetFilter = {
   values: (string | null)[];
@@ -106,20 +107,20 @@ const SelectAllHeaderRenderer = React.memo((params: any) => {
     const updateSelectAllState = () => {
       const allRows: any[] = [];
       params.api.forEachNode((node: any) => allRows.push(node.data));
-      
+
       const selectedCount = allRows.filter((row: any) => row.active).length;
       const totalCount = allRows.length;
-      
+
       setAllSelected(selectedCount === totalCount && totalCount > 0);
       setIndeterminate(selectedCount > 0 && selectedCount < totalCount);
     };
 
     updateSelectAllState();
-    
+
     const listener = () => updateSelectAllState();
     params.api.addEventListener('cellValueChanged', listener);
     params.api.addEventListener('rowDataUpdated', listener);
-    
+
     return () => {
       params.api.removeEventListener('cellValueChanged', listener);
       params.api.removeEventListener('rowDataUpdated', listener);
@@ -128,15 +129,15 @@ const SelectAllHeaderRenderer = React.memo((params: any) => {
 
   const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = event.target.checked;
-    
+
     setRowData((currentRowData: any[]) =>
-      currentRowData.map((row: any) => ({ ...row, active: newValue }))
+      currentRowData.map((row: any) => ({ ...row, active: newValue })),
     );
-    
+
     params.api.forEachNode((node: any) => {
       node.data.active = newValue;
     });
-    
+
     params.api.refreshCells({ force: true });
     handleFilterChange();
   };
@@ -152,7 +153,7 @@ const SelectAllHeaderRenderer = React.memo((params: any) => {
         onChange={handleSelectAll}
         style={{
           accentColor: '#0062FF',
-          cursor: 'pointer'
+          cursor: 'pointer',
         }}
       />
       <span>Выбран</span>
@@ -164,8 +165,6 @@ CheckboxRenderer.displayName = 'CheckboxRenderer';
 
 const ValueRenderer = React.memo((params: any) => {
   const { data, value, api, context } = params;
-  console.log('🐸 Pepe said >> params:', params);
-
 
   const isDateType = data.type === 'date';
   const { rowList } = context || {};
@@ -239,7 +238,7 @@ const ValueRenderer = React.memo((params: any) => {
 ValueRenderer.displayName = 'ValueRenderer';
 
 export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({ onClose, onSave }) => {
-  const { templates, setTemplates } = useTemplatesStore();
+  const { templates, setTemplates, pendingTemplate, setPendingTemplate } = useTemplatesStore();
   const { modelsTable } = useTableModels();
   const { rowList } = modelsTable;
   const { topFilters, setFilterModel, setSortState } = useFiltersStore();
@@ -291,8 +290,41 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({ onClose,
     setGridApi(params.api);
   }, []);
 
-  useEffect(() => {
-    if (defaultActiveTemplateId && !isInitialized) {
+  useDeepEffect(() => {
+    if (pendingTemplate && !isInitialized) {
+      console.log('🐸 Pepe said >> TemplateFilterGrid >> pendingTemplate:', pendingTemplate);
+
+      const updatedRowData = initialColumns.map((column, index) => {
+        const templateFilter = pendingTemplate?.filterModel?.[column.name] as any;
+        let value = '';
+
+        if (templateFilter) {
+          if (column.type === COLUMN_TYPE.STRING) {
+            value = templateFilter.values || [];
+          } else if (column.type === COLUMN_TYPE.DATE) {
+            if (templateFilter.dateTo) {
+              value = `${templateFilter.dateFrom} - ${templateFilter.dateTo}`;
+            } else {
+              value = templateFilter.dateFrom;
+            }
+          }
+        }
+
+        return {
+          id: String(index + 1),
+          colId: column.name,
+          name: column.title,
+          type: column.type === COLUMN_TYPE.DATE ? 'date' : 'set',
+          value,
+          active: !!templateFilter,
+        };
+      });
+
+      setRowData(updatedRowData);
+      setSelectedTemplate(pendingTemplate);
+      setActiveTemplate(pendingTemplate);
+      setIsInitialized(true);
+    } else if (defaultActiveTemplateId && !isInitialized) {
       const defaultTemplate = templates.find(
         (t) => String(t.template_id) === defaultActiveTemplateId,
       );
@@ -329,7 +361,7 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({ onClose,
         setActiveTemplate(defaultTemplate);
         setIsInitialized(true);
       }
-    } else if (activeTemplate && !isInitialized && !defaultActiveTemplateId) {
+    } else if (activeTemplate && !isInitialized && !defaultActiveTemplateId && !pendingTemplate) {
       const updatedRowData = initialColumns.map((column, index) => {
         const templateFilter = activeTemplate.filterModel?.[column.name] as any;
         let value = '';
@@ -366,7 +398,7 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({ onClose,
     defaultActiveTemplateId,
     templates,
     setActiveTemplate,
-    initialColumns,
+    pendingTemplate,
   ]);
 
   const prevTemplateRef = useRef<Template | null>(null);
@@ -457,7 +489,11 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({ onClose,
         return;
       }
 
-      const template = templates.find((t) => String(t.template_id) === value);
+      let template = templates.find((t) => String(t.template_id) === value);
+
+      if (!template && pendingTemplate && String(pendingTemplate?.template_id) === value) {
+        template = pendingTemplate;
+      }
 
       if (template) {
         const updatedRowData = initialColumns.map((column, index) => {
@@ -493,36 +529,45 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({ onClose,
         setIsCustomTemplate(false);
       }
     },
-    [templates, setActiveTemplate, initialColumns],
+    [templates, setActiveTemplate, initialColumns, pendingTemplate],
   );
 
   const handleFilterChange = useCallback(
     (currentRowData?: any[]) => {
       if (selectedTemplate && !isCustomTemplate) {
-        // Сохраняем текущие активные состояния перед сбросом шаблона
-        if (currentRowData) {
-          const activeStates = currentRowData.reduce((acc, row) => {
-            acc[row.id] = row.active;
-            return acc;
-          }, {} as Record<string, boolean>);
+        // Если это pending шаблон, обновляем его данные
+        if (
+          selectedTemplate.isPending ||
+          (pendingTemplate && selectedTemplate.template_id === pendingTemplate.template_id)
+        ) {
+          // Для pending шаблона просто помечаем как кастомный, но не сбрасываем selectedTemplate
+          setIsCustomTemplate(true);
+        } else {
+          // Сохраняем текущие активные состояния перед сбросом шаблона
+          if (currentRowData) {
+            const activeStates = currentRowData.reduce((acc, row) => {
+              acc[row.id] = row.active;
+              return acc;
+            }, {} as Record<string, boolean>);
 
-          // Применяем сохраненные состояния после сброса шаблона
-          setTimeout(() => {
-            setRowData((prevData) =>
-              prevData.map((row) => ({
-                ...row,
-                active: activeStates[row.id] ?? row.active,
-              })),
-            );
-          }, 0);
+            // Применяем сохраненные состояния после сброса шаблона
+            setTimeout(() => {
+              setRowData((prevData) =>
+                prevData.map((row) => ({
+                  ...row,
+                  active: activeStates[row.id] ?? row.active,
+                })),
+              );
+            }, 0);
+          }
+
+          setSelectedTemplate(null);
+          prevTemplateRef.current = null;
+          setIsCustomTemplate(true);
         }
-
-        setSelectedTemplate(null);
-        prevTemplateRef.current = null;
-        setIsCustomTemplate(true);
       }
     },
-    [selectedTemplate, isCustomTemplate, setRowData],
+    [selectedTemplate, isCustomTemplate, setRowData, pendingTemplate],
   );
 
   const handleRowDragEnd = useCallback(() => {
@@ -544,7 +589,6 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({ onClose,
       });
 
       const activeFilters = _rowData.filter((row) => row.active);
-      console.log('🐸 Pepe said >> handleSave >> activeFilters:', activeFilters);
 
       const filterModel: FilterModel = {};
       activeFilters.forEach((filter) => {
@@ -572,12 +616,21 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({ onClose,
         const columnId = matchingColumn.name;
 
         if (filter.type === 'date') {
+          console.log('🐸 Pepe said >> handleSave >> filter.value:', filter.value);
+
           if (filter.value) {
             filterModel[columnId] = {
               dateFrom: convertRuDateToISO(filter.value[0]),
               dateTo: convertRuDateToISO(filter.value[1]),
               filterType: 'date',
               type: filter.value[1] ? 'inRange' : 'equals',
+            };
+          } else {
+            filterModel[columnId] = {
+              dateFrom: null,
+              dateTo: null,
+              filterType: 'date',
+              type: 'inRange',
             };
           }
         } else {
@@ -615,7 +668,10 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({ onClose,
       });
 
       let templateToSave;
-      if (selectedTemplate) {
+      if (
+        selectedTemplate &&
+        templates.some((t) => t.template_id === selectedTemplate.template_id)
+      ) {
         templateToSave = {
           ...selectedTemplate,
           filterModel,
@@ -632,8 +688,9 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({ onClose,
           filterModel,
           sortState,
           columnState,
+          isPending: true,
         };
-        // setTemplates((prev) => [...prev, templateToSave]);
+        setPendingTemplate(templateToSave);
       }
 
       if (agGridApiGlobal) {
@@ -645,7 +702,9 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({ onClose,
 
       setFilterModel(filterModel);
       setSortState(sortState);
+      console.log('🐸 Pepe said >> handleSave >> templateToSave:', templateToSave);
       setActiveTemplate(templateToSave);
+
       setIsCustomTemplate(false);
 
       // Обновляем topFilters с новым активным шаблоном
@@ -671,7 +730,11 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({ onClose,
     }
     handleFilterChange();
     setRowData(defaultFilters);
-  }, [gridApi, handleFilterChange, defaultFilters]);
+    setSelectedTemplate(null);
+    setActiveTemplate(null);
+    setPendingTemplate(undefined);
+    setIsCustomTemplate(false);
+  }, [gridApi, handleFilterChange, defaultFilters, setPendingTemplate]);
 
   return (
     <Modal
@@ -700,6 +763,12 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({ onClose,
           placeholder=""
         >
           <Option value="">Новый шаблон</Option>
+
+          {pendingTemplate && (
+            <Option key={pendingTemplate.template_id} value={String(pendingTemplate.template_id)}>
+              {pendingTemplate.template_name} (не сохранен)
+            </Option>
+          )}
 
           {templates.map((template) => (
             <Option key={template.template_id} value={String(template.template_id)}>
