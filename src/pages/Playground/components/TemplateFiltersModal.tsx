@@ -46,6 +46,8 @@ export const TemplateFiltersModal = () => {
 
       // Получаем активный шаблон из topFilters
       const activeTemplateId = topFilters.templates?.[0];
+      console.log('🐸 Pepe said >> TemplateFiltersModal >> activeTemplateId:', activeTemplateId);
+
       const activeTemplate = activeTemplateId
         ? templates.find((t) => t.template_id.toString() === activeTemplateId)
         : undefined;
@@ -53,6 +55,10 @@ export const TemplateFiltersModal = () => {
       if (activeTemplate) {
         // Инициализируем модальное окно с активным шаблоном
         initializeFromTemplate(activeTemplate);
+      } else if (pendingTemplate) {
+        // Инициализируем модальное окно с pending шаблоном
+        console.log('🐸 Pepe said >> TemplateFiltersModal >> pendingTemplate:', pendingTemplate);
+        initializeFromTemplate(pendingTemplate);
       } else {
         // Если нет активного шаблона, инициализируем с текущими фильтрами
         const mappedFilters = initialColumns.map((column, index) => {
@@ -152,8 +158,8 @@ export const TemplateFiltersModal = () => {
       });
 
       setTimeout(() => {
-        agGridApiGlobal.setFilterModel(newFilterModel);
         setFilterModel(newFilterModel);
+        agGridApiGlobal.setFilterModel(newFilterModel);
         agGridApiGlobal.applyColumnState({ state: columnState, applyOrder: true });
       }, 300);
 
