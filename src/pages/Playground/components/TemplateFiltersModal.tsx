@@ -43,6 +43,11 @@ export const TemplateFiltersModal = () => {
   useEffect(() => {
     if (isOpen && agGridApiGlobal) {
       const currentFilterModel = agGridApiGlobal.getFilterModel();
+      console.log(
+        '🐸 Pepe said >> TemplateFiltersModal >> currentFilterModel:',
+        currentFilterModel,
+      );
+
       const currentColumnState = agGridApiGlobal
         .getColumnState()
         .filter((col) => col.colId !== 'ag-Grid-ControlsColumn');
@@ -61,16 +66,16 @@ export const TemplateFiltersModal = () => {
 
       if (activeTemplate) {
         // Инициализируем модальное окно с активным шаблоном
-        initializeFromTemplate(activeTemplate, currentColumnState);
+        initializeFromTemplate(activeTemplate, currentColumnState, currentFilterModel);
       } else if (pendingTemplate) {
         // Инициализируем модальное окно с pending шаблоном
         console.log('🐸 Pepe said >> TemplateFiltersModal >> pendingTemplate:', pendingTemplate);
-        initializeFromTemplate(pendingTemplate, currentColumnState);
+        initializeFromTemplate(pendingTemplate, currentColumnState, currentFilterModel);
       } else {
         // Если нет активного шаблона, инициализируем с текущими фильтрами
         const mappedFilters = initialColumns.map((column, index) => {
           const filter = currentFilterModel[column.name];
-          const columnState = currentColumnState.find(col => col.colId === column.name);
+          const columnState = currentColumnState.find((col) => col.colId === column.name);
           let filterValues: string[] = [];
 
           if (filter) {
@@ -86,7 +91,7 @@ export const TemplateFiltersModal = () => {
 
           const isColumnVisible = columnState ? !columnState.hide : true;
           const hasFilter = !!filter;
-          
+
           return {
             colId: column.name,
             name: column.name,
@@ -115,12 +120,13 @@ export const TemplateFiltersModal = () => {
     const currentColumnState = agGridApiGlobal
       ?.getColumnState()
       .filter((col) => col.colId !== 'ag-Grid-ControlsColumn');
+    const currentFilterModel = agGridApiGlobal?.getFilterModel();
 
     if (id) {
       const template = templates.find((t) => t.template_id === id);
-      initializeFromTemplate(template, currentColumnState);
+      initializeFromTemplate(template, currentColumnState, currentFilterModel);
     } else {
-      initializeFromTemplate(undefined, currentColumnState);
+      initializeFromTemplate(undefined, currentColumnState, currentFilterModel);
     }
   };
 
@@ -214,7 +220,8 @@ export const TemplateFiltersModal = () => {
     const currentColumnState = agGridApiGlobal
       ?.getColumnState()
       .filter((col) => col.colId !== 'ag-Grid-ControlsColumn');
-    initializeFromTemplate(undefined, currentColumnState);
+    const currentFilterModel = agGridApiGlobal?.getFilterModel();
+    initializeFromTemplate(undefined, currentColumnState, currentFilterModel);
   };
 
   const handleCancel = () => {
@@ -282,11 +289,7 @@ export const TemplateFiltersModal = () => {
             <Button appearance="secondary" dimension="s" onClick={handleCancel}>
               Отмена
             </Button>
-            <Button
-              appearance="primary"
-              dimension="s"
-              onClick={handleSave}
-            >
+            <Button appearance="primary" dimension="s" onClick={handleSave}>
               Сохранить
             </Button>
           </div>
