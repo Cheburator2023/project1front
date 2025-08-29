@@ -26,6 +26,10 @@ const mockedTemplates: Template[] = [
       },
     },
     sortState: [],
+    columnState: [
+      { colId: 'system_model_id', hide: false },
+      { colId: 'update_date', hide: false },
+    ],
     selectedIds: [],
   },
   {
@@ -41,6 +45,7 @@ const mockedTemplates: Template[] = [
       },
     },
     sortState: [],
+    columnState: [{ colId: 'active_model', hide: false }],
     selectedIds: [],
   },
   {
@@ -56,6 +61,7 @@ const mockedTemplates: Template[] = [
       },
     },
     sortState: [],
+    columnState: [{ colId: 'pvr', hide: false }],
     selectedIds: [],
   },
   {
@@ -71,6 +77,7 @@ const mockedTemplates: Template[] = [
       },
     },
     sortState: [],
+    columnState: [{ colId: 'ds_stream', hide: false }],
     selectedIds: [],
   },
   {
@@ -81,6 +88,7 @@ const mockedTemplates: Template[] = [
     template_name: 'Тестовый шаблон',
     filterModel: {},
     sortState: [],
+    columnState: [],
     selectedIds: [],
   },
   {
@@ -96,6 +104,7 @@ const mockedTemplates: Template[] = [
       },
     },
     sortState: [],
+    columnState: [{ colId: 'ds_stream', hide: false }],
     selectedIds: [],
   },
   {
@@ -106,6 +115,7 @@ const mockedTemplates: Template[] = [
     template_name: 'Тест шаблон 0904',
     filterModel: {},
     sortState: [],
+    columnState: [],
     selectedIds: [],
   },
   {
@@ -123,6 +133,7 @@ const mockedTemplates: Template[] = [
       },
     },
     sortState: [],
+    columnState: [{ colId: 'developing_end_date', hide: false }],
     selectedIds: [],
   },
   {
@@ -140,6 +151,7 @@ const mockedTemplates: Template[] = [
       },
     },
     sortState: [],
+    columnState: [{ colId: 'developing_end_date', hide: false }],
     selectedIds: [],
   },
   {
@@ -157,6 +169,7 @@ const mockedTemplates: Template[] = [
       },
     },
     sortState: [],
+    columnState: [{ colId: 'developing_end_date', hide: false }],
     selectedIds: [],
   },
   {
@@ -174,6 +187,7 @@ const mockedTemplates: Template[] = [
       },
     },
     sortState: [],
+    columnState: [{ colId: 'developing_end_date', hide: false }],
     selectedIds: [],
   },
 ];

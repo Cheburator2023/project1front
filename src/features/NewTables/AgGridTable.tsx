@@ -356,32 +356,15 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       }
     };
 
-    const { setSortState, setFilterModel } = useFiltersStore();
-
-    // const handleSortChanged = (event: SortChangedEvent) => {
-    //   onSortChanged?.(event);
-
-    //   if (event.source === 'api') return;
-
-    //   const colState = gridRef.current!.api.getColumnState();
-    //   const sortState = colState
-    //     .filter((s) => {
-    //       return s.sort != null;
-    //     })
-    //     .map((s) => {
-    //       return { colId: s.colId, sort: s.sort, sortIndex: s.sortIndex };
-    //     });
-    //   console.log('🐸 Pepe said >> handleSortChanged >> sortState:', sortState);
-
-    //   setSortState(sortState);
-    // };
+    const { setFilterModel } = useFiltersStore();
 
     const handleFilterChange = (event: FilterChangedEvent): void => {
+      console.log('🐸 Pepe said >> handleFilterChange >> event:', event);
+
       if (event.source === 'api') return;
 
       const _filterModel = event.api.getFilterModel();
       console.log('🐸 Pepe said >> handleFilterChange >> _filterModel:', _filterModel);
-
 
       setFilterModel(_filterModel);
 
@@ -418,7 +401,6 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       const api: GridApi | undefined = gridRef.current.api;
       if (api) {
         api?.setFilterModel(null);
-        api?.setFilterModel(null);
         api?.setGridOption('quickFilterText', '');
       }
     };
@@ -444,9 +426,18 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
 
     useDeepEffect(() => {
       if (agGridApi && templates && topFilters?.templates?.[0]) {
-        const activeTemplate = templates.find(t => String(t.template_id) === topFilters.templates[0]);
+        const activeTemplate = templates.find(
+          (t) => String(t.template_id) === topFilters.templates[0],
+        );
+        
+
         if (activeTemplate?.columnState) {
-          agGridApi.applyColumnState({ state: activeTemplate.columnState });
+
+
+          agGridApi.applyColumnState({
+            state: activeTemplate.columnState,
+            defaultState: { hide: true },
+          });
         }
       }
     }, [agGridApi, templates, topFilters]);

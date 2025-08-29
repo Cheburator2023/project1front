@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { Template } from '@shared/api/types';
 import { initialColumns } from '@shared/constants/InitialCollumns';
 import { GridApi } from 'ag-grid-community';
+import { useGlobalStore } from '@shared/stores/globalStore';
 
 export type ColumnFilterData = {
   colId: string;
@@ -35,11 +36,7 @@ type TemplateFiltersModalActions = {
   reorderColumns: (startIndex: number, endIndex: number) => void;
   setIsDirty: (dirty: boolean) => void;
   resetState: () => void;
-  initializeFromTemplate: (
-    template?: Template,
-    currentColumnState?: any[],
-    currentFilterModel?: any,
-  ) => void;
+  initializeFromTemplate: (template?: Template) => void;
   hasChanges: () => boolean;
   setQuickFilterText: (text: string) => void;
   setLocalGridApi: (api: GridApi | null) => void;
@@ -154,45 +151,100 @@ export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((s
 
   resetState: () => set(initialState),
 
-  initializeFromTemplate: (
-    template?: Template,
-    currentColumnState?: any[],
-    currentFilterModel?: any,
-  ) => {
+  initializeFromTemplate: (template?: Template) => {
+    const agGridApi = useGlobalStore.getState().agGridApi;
+    const currentColumnState = agGridApi?.getColumnState()?.filter((col) => col.colId !== 'ag-Grid-ControlsColumn');
+    const currentFilterModel = agGridApi?.getFilterModel();
     const baseColumns = createColumnFiltersFromInitialColumns();
 
-    if (template && template.filterModel) {
-      const mergedColumns = baseColumns.map((baseColumn) => {
-        const templateFilter = template.filterModel?.[baseColumn.colId];
-        const columnState = currentColumnState?.find((col) => col.colId === baseColumn.colId);
-
-        if (templateFilter) {
+    if (template) {
+      let mergedColumns: ColumnFilterData[];
+      
+      if (template.columnState && template.columnState.length > 0) {
+        mergedColumns = template.columnState.map((templateCol, index) => {
+          const baseColumn = baseColumns.find(col => col.colId === templateCol.colId);
+          if (!baseColumn) return null;
+          
+          const templateFilter = template.filterModel?.[templateCol.colId];
+          
           let filterValues: string[] = [];
-
-          if ('values' in templateFilter && templateFilter.values) {
-            filterValues = templateFilter.values.filter((v): v is string => v !== null);
-          } else if ('dateFrom' in templateFilter && 'dateTo' in templateFilter) {
-            const dateFilter = templateFilter as { dateFrom: string; dateTo: string };
-            const dateRange: string[] = [];
-            if (dateFilter.dateFrom) dateRange.push(dateFilter.dateFrom);
-            if (dateFilter.dateTo) dateRange.push(dateFilter.dateTo);
-            filterValues = dateRange;
+          if (templateFilter) {
+            if ('values' in templateFilter && templateFilter.values) {
+              filterValues = templateFilter.values.filter((v): v is string => v !== null);
+            } else if ('dateFrom' in templateFilter && 'dateTo' in templateFilter) {
+              const dateFilter = templateFilter as { dateFrom: string; dateTo: string };
+              const dateRange: string[] = [];
+              if (dateFilter.dateFrom) dateRange.push(dateFilter.dateFrom);
+              if (dateFilter.dateTo) dateRange.push(dateFilter.dateTo);
+              filterValues = dateRange;
+            }
           }
-
+          
+          let isActive = !templateCol.hide;
+          if (filterValues.length > 0) {
+            isActive = true;
+          }
+          
           return {
             ...baseColumn,
-            isActive: true,
+            isActive,
+            filterValues,
+            order: index,
+          };
+        }).filter((col): col is ColumnFilterData => col !== null);
+        
+        const missingColumns = baseColumns.filter(baseCol => 
+          !template.columnState?.some(templateCol => templateCol.colId === baseCol.colId)
+        );
+        
+        missingColumns.forEach((missingCol, index) => {
+          const templateFilter = template.filterModel?.[missingCol.colId];
+          
+          let filterValues: string[] = [];
+          if (templateFilter) {
+            if ('values' in templateFilter && templateFilter.values) {
+              filterValues = templateFilter.values.filter((v): v is string => v !== null);
+            } else if ('dateFrom' in templateFilter && 'dateTo' in templateFilter) {
+              const dateFilter = templateFilter as { dateFrom: string; dateTo: string };
+              const dateRange: string[] = [];
+              if (dateFilter.dateFrom) dateRange.push(dateFilter.dateFrom);
+              if (dateFilter.dateTo) dateRange.push(dateFilter.dateTo);
+              filterValues = dateRange;
+            }
+          }
+          
+          mergedColumns.push({
+            ...missingCol,
+            isActive: filterValues.length > 0,
+            filterValues,
+            order: mergedColumns.length + index,
+          });
+        });
+      } else {
+        mergedColumns = baseColumns.map((baseColumn) => {
+          const templateFilter = template.filterModel?.[baseColumn.colId];
+          
+          let filterValues: string[] = [];
+          if (templateFilter) {
+            if ('values' in templateFilter && templateFilter.values) {
+              filterValues = templateFilter.values.filter((v): v is string => v !== null);
+            } else if ('dateFrom' in templateFilter && 'dateTo' in templateFilter) {
+              const dateFilter = templateFilter as { dateFrom: string; dateTo: string };
+              const dateRange: string[] = [];
+              if (dateFilter.dateFrom) dateRange.push(dateFilter.dateFrom);
+              if (dateFilter.dateTo) dateRange.push(dateFilter.dateTo);
+              filterValues = dateRange;
+            }
+          }
+          
+          return {
+            ...baseColumn,
+            isActive: filterValues.length > 0,
             filterValues,
             order: baseColumn.order,
           };
-        }
-
-        const isColumnVisible = columnState ? !columnState.hide : true;
-        return {
-          ...baseColumn,
-          isActive: isColumnVisible,
-        };
-      });
+        });
+      }
 
       const isAllSelected = mergedColumns.every((f) => f.isActive);
       set({
@@ -204,28 +256,10 @@ export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((s
       });
     } else {
       const defaultColumns = baseColumns.map((column) => {
-        const columnState = currentColumnState?.find((col) => col.colId === column.colId);
-        const currentFilter = currentFilterModel?.[column.colId];
-        const isColumnVisible = columnState ? !columnState.hide : true;
-
-        let filterValues: string[] = [];
-        if (currentFilter) {
-          if ('values' in currentFilter && currentFilter.values) {
-            filterValues = currentFilter.values.filter((value): value is string => Boolean(value));
-          } else if ('dateFrom' in currentFilter || 'dateTo' in currentFilter) {
-            const dateRange: string[] = [];
-            if ('dateFrom' in currentFilter && currentFilter.dateFrom)
-              dateRange.push(`От: ${currentFilter.dateFrom}`);
-            if ('dateTo' in currentFilter && currentFilter.dateTo)
-              dateRange.push(`До: ${currentFilter.dateTo}`);
-            filterValues = dateRange;
-          }
-        }
-
         return {
           ...column,
-          isActive: isColumnVisible || !!currentFilter,
-          filterValues,
+          isActive: true,
+          filterValues: [],
         };
       });
       const isAllSelected = defaultColumns.every((f) => f.isActive);

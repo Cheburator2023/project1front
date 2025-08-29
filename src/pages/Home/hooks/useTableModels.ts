@@ -160,6 +160,8 @@ export const useTableModels = () => {
 
   useDeepEffect(() => {
     if (templateData) {
+      console.log('🐸 Pepe said >> useTableModels >> templateData:', templateData);
+      console.log('🐸 Pepe said >> useTableModels >> первый шаблон columnState:', templateData[0]?.columnState);
       setTemplates(templateData);
     }
   }, [templateData]);

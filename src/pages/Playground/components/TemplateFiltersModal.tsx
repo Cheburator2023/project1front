@@ -41,21 +41,7 @@ export const TemplateFiltersModal = () => {
   const { agGridApi: agGridApiGlobal } = useGlobalStore();
 
   useEffect(() => {
-    if (isOpen && agGridApiGlobal) {
-      const currentFilterModel = agGridApiGlobal.getFilterModel();
-      console.log(
-        '🐸 Pepe said >> TemplateFiltersModal >> currentFilterModel:',
-        currentFilterModel,
-      );
-
-      const currentColumnState = agGridApiGlobal
-        .getColumnState()
-        .filter((col) => col.colId !== 'ag-Grid-ControlsColumn');
-      console.log(
-        '🐸 Pepe said >> TemplateFiltersModal >> currentColumnState:',
-        currentColumnState,
-      );
-
+    if (isOpen) {
       // Получаем активный шаблон из topFilters
       const activeTemplateId = topFilters.templates?.[0];
       console.log('🐸 Pepe said >> TemplateFiltersModal >> activeTemplateId:', activeTemplateId);
@@ -65,68 +51,26 @@ export const TemplateFiltersModal = () => {
         : undefined;
 
       if (activeTemplate) {
-        // Инициализируем модальное окно с активным шаблоном
-        initializeFromTemplate(activeTemplate, currentColumnState, currentFilterModel);
+        initializeFromTemplate(activeTemplate);
       } else if (pendingTemplate) {
-        // Инициализируем модальное окно с pending шаблоном
         console.log('🐸 Pepe said >> TemplateFiltersModal >> pendingTemplate:', pendingTemplate);
-        initializeFromTemplate(pendingTemplate, currentColumnState, currentFilterModel);
+        initializeFromTemplate(pendingTemplate);
       } else {
-        // Если нет активного шаблона, инициализируем с текущими фильтрами
-        const mappedFilters = initialColumns.map((column, index) => {
-          const filter = currentFilterModel[column.name];
-          const columnState = currentColumnState.find((col) => col.colId === column.name);
-          let filterValues: string[] = [];
-
-          if (filter) {
-            if ('values' in filter && filter.values) {
-              filterValues = filter.values.filter((value): value is string => Boolean(value));
-            } else if ('dateFrom' in filter || 'dateTo' in filter) {
-              const dateRange: string[] = [];
-              if ('dateFrom' in filter && filter.dateFrom) dateRange.push(`От: ${filter.dateFrom}`);
-              if ('dateTo' in filter && filter.dateTo) dateRange.push(`До: ${filter.dateTo}`);
-              filterValues = dateRange;
-            }
-          }
-
-          const isColumnVisible = columnState ? !columnState.hide : true;
-          const hasFilter = !!filter;
-
-          return {
-            colId: column.name,
-            name: column.name,
-            title: column.title,
-            type: column.type,
-            isActive: isColumnVisible || hasFilter,
-            filterValues,
-            order: index,
-          };
-        });
-
-        setColumnFilters(mappedFilters);
+        initializeFromTemplate(undefined);
       }
     }
-  }, [
-    isOpen,
-    agGridApiGlobal,
-    setColumnFilters,
-    topFilters.templates,
-    templates,
-    initializeFromTemplate,
-  ]);
+  }, [isOpen, templates, topFilters, pendingTemplate, initializeFromTemplate]);
 
   const handleTemplateChange = (templateId: string) => {
     const id = templateId === 'new' ? null : parseInt(templateId);
-    const currentColumnState = agGridApiGlobal
-      ?.getColumnState()
-      .filter((col) => col.colId !== 'ag-Grid-ControlsColumn');
-    const currentFilterModel = agGridApiGlobal?.getFilterModel();
 
     if (id) {
       const template = templates.find((t) => t.template_id === id);
-      initializeFromTemplate(template, currentColumnState, currentFilterModel);
+      if (template) {
+        initializeFromTemplate(template);
+      }
     } else {
-      initializeFromTemplate(undefined, currentColumnState, currentFilterModel);
+      initializeFromTemplate(undefined);
     }
   };
 
@@ -135,18 +79,24 @@ export const TemplateFiltersModal = () => {
       const newFilterModel: any = {};
       const columnState: any[] = [];
 
-      localGridApi.forEachNode((node, index) => {
-        if (node.data) {
-          const matchingColumn = initialColumns.find((col) => col.title === node.data.title);
-
-          if (matchingColumn) {
-            columnState.push({
-              colId: matchingColumn.name,
-              hide: !node.data.isActive,
-              sort: null,
-              sortIndex: null,
-            });
-          }
+      columnFilters.forEach((column, index) => {
+        const matchingColumn = initialColumns.find((col) => col.name === column.colId);
+        
+        if (matchingColumn) {
+          columnState.push({
+            colId: column.colId,
+            hide: !column.isActive,
+            sort: null,
+            sortIndex: null,
+            aggFunc: null,
+            width: null,
+            flex: null,
+            pinned: null,
+            rowGroupIndex: null,
+            pivotIndex: null,
+            rowGroup: false,
+            pivot: false,
+          });
         }
       });
 
@@ -177,12 +127,6 @@ export const TemplateFiltersModal = () => {
         }
       });
 
-      setTimeout(() => {
-        setFilterModel(newFilterModel);
-        agGridApiGlobal.setFilterModel(newFilterModel);
-        agGridApiGlobal.applyColumnState({ state: columnState, applyOrder: true });
-      }, 300);
-
       let savedTemplate: Template;
       if (selectedTemplateId) {
         const template = templates.find((t) => t.template_id === selectedTemplateId);
@@ -190,24 +134,34 @@ export const TemplateFiltersModal = () => {
           savedTemplate = {
             ...template,
             filterModel: newFilterModel,
+            columnState,
           };
           setPendingTemplate(savedTemplate);
+          agGridApiGlobal.setFilterModel(newFilterModel);
+          agGridApiGlobal.applyColumnState({ state: columnState, applyOrder: true });
+          setTopFilters({ ...topFilters, templates: [selectedTemplateId.toString()] });
         }
       } else {
         savedTemplate = {
-          template_id: Date.now(),
+          template_id: 666,
+          // template_id: 'Новый шаблон для сохранения',
           template_name: 'Новый шаблон',
           user_id: null,
           filterModel: newFilterModel,
+          columnState,
           isPending: true,
         };
         setPendingTemplate(savedTemplate);
-      }
-
-      // Сбрасываем активный шаблон в topFilters при сохранении нового
-      if (!selectedTemplateId) {
+        agGridApiGlobal.setFilterModel(newFilterModel);
+        agGridApiGlobal.applyColumnState({ state: columnState, applyOrder: true });
         setTopFilters({ ...topFilters, templates: [] });
       }
+
+      setTimeout(() => {
+        setFilterModel(newFilterModel);
+        agGridApiGlobal.setFilterModel(newFilterModel);
+        agGridApiGlobal.applyColumnState({ state: columnState, applyOrder: true });
+      }, 0);
     }
 
     closeModal();
@@ -216,12 +170,9 @@ export const TemplateFiltersModal = () => {
   const handleReset = () => {
     if (agGridApiGlobal) {
       agGridApiGlobal.setFilterModel({});
+      agGridApiGlobal.applyColumnState({ state: [], applyOrder: true });
     }
-    const currentColumnState = agGridApiGlobal
-      ?.getColumnState()
-      .filter((col) => col.colId !== 'ag-Grid-ControlsColumn');
-    const currentFilterModel = agGridApiGlobal?.getFilterModel();
-    initializeFromTemplate(undefined, currentColumnState, currentFilterModel);
+    initializeFromTemplate(undefined);
   };
 
   const handleCancel = () => {
@@ -230,11 +181,13 @@ export const TemplateFiltersModal = () => {
   };
 
   const templateOptions = [
-    { value: 'new', label: 'Создать новый шаблон' },
-    ...templates.map((template) => ({
-      value: template.template_id.toString(),
-      label: template.template_name,
-    })),
+    { value: 'new', label: 'Новый шаблон для сохранения' },
+    ...templates
+      .filter((template) => template.template_id > 0)
+      .map((template) => ({
+        value: template.template_id.toString(),
+        label: template.template_name,
+      })),
   ];
 
   return (
