@@ -43,7 +43,7 @@ const ChipsCellRenderer = ({ data }: any) => {
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
       {data.filterValues.map((value: string, index: number) => (
-        <Chips key={index} appearance="filled" disabled>
+        <Chips dimension="s" key={index} appearance="filled" color="secondary">
           {value}
         </Chips>
       ))}
@@ -52,7 +52,7 @@ const ChipsCellRenderer = ({ data }: any) => {
 };
 
 export const TemplateFiltersGrid = () => {
-  const { columnFilters, reorderColumns } = useTemplateFiltersModalStore();
+  const { columnFilters, reorderColumns, quickFilterText } = useTemplateFiltersModalStore();
 
   const rowData = useMemo(() => {
     return columnFilters.sort((a, b) => a.order - b.order);
@@ -65,6 +65,7 @@ export const TemplateFiltersGrid = () => {
         field: 'drag',
         rowDrag: true,
         width: 50,
+        maxWidth: 55,
         suppressMenu: true,
         suppressSorting: true,
         suppressFilter: true,
@@ -95,6 +96,7 @@ export const TemplateFiltersGrid = () => {
         suppressMenu: true,
         suppressSorting: true,
         suppressFilter: true,
+        autoHeight: true,
         cellRenderer: ChipsCellRenderer,
       },
     ],
@@ -103,20 +105,20 @@ export const TemplateFiltersGrid = () => {
 
   const onRowDragEnd = useCallback(
     (event: RowDragEndEvent) => {
-      const { node, overNode } = event;
+      const { node, overNode, overIndex } = event;
 
-      if (!node || !overNode) {
+      if (!node || overIndex === undefined) {
         return;
       }
 
-      const startIndex = columnFilters.findIndex((f) => f.colId === node.data.colId);
-      const endIndex = columnFilters.findIndex((f) => f.colId === overNode.data.colId);
+      const startIndex = rowData.findIndex((f) => f.colId === node.data.colId);
+      const endIndex = overIndex;
 
-      if (startIndex !== -1 && endIndex !== -1) {
+      if (startIndex !== -1 && endIndex !== -1 && startIndex !== endIndex) {
         reorderColumns(startIndex, endIndex);
       }
     },
-    [columnFilters, reorderColumns],
+    [rowData, reorderColumns],
   );
 
   const onGridReady = useCallback((params: GridReadyEvent) => {
@@ -137,6 +139,7 @@ export const TemplateFiltersGrid = () => {
         headerHeight={40}
         rowHeight={50}
         animateRows
+        quickFilterText={quickFilterText}
       />
     </div>
   );

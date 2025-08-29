@@ -292,8 +292,6 @@ export const TemplateFilterGrid: React.FC<TemplateFilterGridProps> = ({ onClose,
 
   useDeepEffect(() => {
     if (pendingTemplate && !isInitialized) {
-      console.log('🐸 Pepe said >> TemplateFilterGrid >> pendingTemplate:', pendingTemplate);
-
       const updatedRowData = initialColumns.map((column, index) => {
         const templateFilter = pendingTemplate?.filterModel?.[column.name] as any;
         let value = '';

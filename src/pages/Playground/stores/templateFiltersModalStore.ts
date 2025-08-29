@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { Template } from '@shared/api/types';
-import { Column } from '@shared/types';
 import { initialColumns } from '@shared/constants/InitialCollumns';
 
 export type ColumnFilterData = {
@@ -19,6 +18,8 @@ type TemplateFiltersModalState = {
   columnFilters: ColumnFilterData[];
   isAllSelected: boolean;
   isDirty: boolean;
+  originalTemplateFilters: ColumnFilterData[] | null;
+  quickFilterText: string;
 };
 
 type TemplateFiltersModalActions = {
@@ -33,6 +34,8 @@ type TemplateFiltersModalActions = {
   setIsDirty: (dirty: boolean) => void;
   resetState: () => void;
   initializeFromTemplate: (template?: Template) => void;
+  hasChanges: () => boolean;
+  setQuickFilterText: (text: string) => void;
 };
 
 type TemplateFiltersModalStore = TemplateFiltersModalState & TemplateFiltersModalActions;
@@ -43,7 +46,7 @@ const createColumnFiltersFromInitialColumns = (): ColumnFilterData[] => {
     name: column.name,
     title: column.title,
     type: column.type,
-    isActive: false,
+    isActive: true,
     filterValues: [],
     order: index
   }));
@@ -55,6 +58,8 @@ const initialState: TemplateFiltersModalState = {
   columnFilters: createColumnFiltersFromInitialColumns(),
   isAllSelected: false,
   isDirty: false,
+  originalTemplateFilters: null,
+  quickFilterText: '',
 };
 
 export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((set, get) => ({
@@ -81,26 +86,36 @@ export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((s
   },
 
   toggleColumnActive: (colId) => {
-    const { columnFilters } = get();
+    const { columnFilters, selectedTemplateId } = get();
     const updatedFilters = columnFilters.map(filter =>
       filter.colId === colId ? { ...filter, isActive: !filter.isActive } : filter
     );
     const isAllSelected = updatedFilters.every(f => f.isActive);
-    set({ columnFilters: updatedFilters, isAllSelected, isDirty: true });
+
+    if (selectedTemplateId !== null) {
+      set({ columnFilters: updatedFilters, isAllSelected, selectedTemplateId: null, isDirty: true });
+    } else {
+      set({ columnFilters: updatedFilters, isAllSelected, isDirty: true });
+    }
   },
 
   toggleAllColumns: () => {
-    const { columnFilters, isAllSelected } = get();
+    const { columnFilters, isAllSelected, selectedTemplateId } = get();
     const newActiveState = !isAllSelected;
     const updatedFilters = columnFilters.map(filter => ({
       ...filter,
       isActive: newActiveState
     }));
-    set({ columnFilters: updatedFilters, isAllSelected: newActiveState, isDirty: true });
+
+    if (selectedTemplateId !== null) {
+      set({ columnFilters: updatedFilters, isAllSelected: newActiveState, selectedTemplateId: null, isDirty: true });
+    } else {
+      set({ columnFilters: updatedFilters, isAllSelected: newActiveState, isDirty: true });
+    }
   },
 
   reorderColumns: (startIndex, endIndex) => {
-    const { columnFilters } = get();
+    const { columnFilters, selectedTemplateId } = get();
     const result = Array.from(columnFilters);
     const [removed] = result.splice(startIndex, 1);
     result.splice(endIndex, 0, removed);
@@ -110,7 +125,11 @@ export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((s
       order: index
     }));
 
-    set({ columnFilters: reorderedFilters, isDirty: true });
+    if (selectedTemplateId !== null) {
+      set({ columnFilters: reorderedFilters, selectedTemplateId: null, isDirty: true });
+    } else {
+      set({ columnFilters: reorderedFilters, isDirty: true });
+    }
   },
 
   setIsDirty: (dirty) => set({ isDirty: dirty }),
@@ -150,14 +169,53 @@ export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((s
       });
 
       const isAllSelected = mergedColumns.every(f => f.isActive);
-      set({ columnFilters: mergedColumns, isAllSelected, selectedTemplateId: template.template_id });
+      set({ 
+        columnFilters: mergedColumns, 
+        isAllSelected, 
+        selectedTemplateId: template.template_id,
+        originalTemplateFilters: JSON.parse(JSON.stringify(mergedColumns)),
+        isDirty: false
+      });
     } else {
       const defaultColumns = baseColumns.map(column => ({
         ...column,
         isActive: true
       }));
       const isAllSelected = defaultColumns.every(f => f.isActive);
-      set({ columnFilters: defaultColumns, isAllSelected, selectedTemplateId: null });
+      set({ 
+        columnFilters: defaultColumns, 
+        isAllSelected, 
+        selectedTemplateId: null,
+        originalTemplateFilters: null,
+        isDirty: false
+      });
     }
-  }
+  },
+
+  hasChanges: () => {
+    const { columnFilters, originalTemplateFilters, selectedTemplateId } = get();
+    
+    if (selectedTemplateId === null) {
+      return true;
+    }
+    
+    if (!originalTemplateFilters) {
+      return true;
+    }
+    
+    if (columnFilters.length !== originalTemplateFilters.length) {
+      return true;
+    }
+    
+    return columnFilters.some((current, index) => {
+      const original = originalTemplateFilters[index];
+      return (
+        current.isActive !== original.isActive ||
+        current.order !== original.order ||
+        current.colId !== original.colId
+      );
+    });
+  },
+
+  setQuickFilterText: (text) => set({ quickFilterText: text }),
 }));

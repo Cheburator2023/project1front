@@ -10,7 +10,7 @@ import { TemplatesFilter, FilterButtonCount } from '@entities';
 import { Container, CustomDateField, FiltersDivider, FilterButton, FiltersBox } from './styles';
 import { useGlobalStore } from '../../shared/stores/globalStore';
 import { useTableModels } from '../../pages/Home/hooks';
-import { TFiltersTest2 } from '../../pages/Playground/TFiltersTest2';
+import { TFiltersTest3 } from '../../pages/Playground/TFiltersTest3';
 import { useTemplateFilters } from '../../shared/hooks';
 
 export interface FiltersPanelProps {
@@ -77,7 +77,7 @@ export const FiltersPanel = ({
             activeScreen={ACTIVE_SCREEN.TEMPLATE_FILTERS}
             templates={templates}
           /> */}
-          <TFiltersTest2 />
+          <TFiltersTest3 />
         </div>
 
         <CustomSearchSelect

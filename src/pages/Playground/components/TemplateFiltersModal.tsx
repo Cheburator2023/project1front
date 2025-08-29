@@ -1,10 +1,19 @@
 import { useEffect } from 'react';
-import { Modal, ModalTitle, Button, Select, Option } from '@admiral-ds/react-ui';
+import {
+  Modal,
+  ModalTitle,
+  Button,
+  Select,
+  Option,
+  TextField,
+  InputField,
+} from '@admiral-ds/react-ui';
 import { Template } from '@shared/api/types';
 import { initialColumns } from '@shared/constants/InitialCollumns';
 import { useTemplatesStore } from '@shared/stores/templatesStore';
 import { useFiltersStore } from '@shared/stores/filtersStore';
 import { useGlobalStore } from '@shared/stores/globalStore';
+import { ReactComponent as SearchOutline } from '@admiral-ds/icons/build/system/SearchOutline.svg';
 import { useTemplateFiltersModalStore } from '../stores/templateFiltersModalStore';
 import { TemplateFiltersGrid } from './TemplateFiltersGrid';
 import { Spacer } from '../../../shared/ui/atoms';
@@ -20,15 +29,22 @@ export const TemplateFiltersModal = () => {
     isDirty,
     resetState,
     initializeFromTemplate,
+    hasChanges,
+    quickFilterText,
+    setQuickFilterText,
   } = useTemplateFiltersModalStore();
 
   const { templates, pendingTemplate, setPendingTemplate } = useTemplatesStore();
   const { filterModel, setFilterModel, resetFilters } = useFiltersStore();
-  const { agGridApi } = useGlobalStore();
+  const { agGridApi: agGridApiGlobal } = useGlobalStore();
 
   useEffect(() => {
-    if (isOpen && agGridApi) {
-      const currentFilterModel = agGridApi.getFilterModel();
+    if (isOpen && agGridApiGlobal) {
+      const currentFilterModel = agGridApiGlobal.getFilterModel();
+      console.log(
+        '🐸 Pepe said >> TemplateFiltersModal >> currentFilterModel:',
+        currentFilterModel,
+      );
 
       const mappedFilters = initialColumns.map((column, index) => {
         const filter = currentFilterModel[column.name];
@@ -58,7 +74,7 @@ export const TemplateFiltersModal = () => {
 
       setColumnFilters(mappedFilters);
     }
-  }, [isOpen, agGridApi, setColumnFilters]);
+  }, [isOpen, agGridApiGlobal, setColumnFilters]);
 
   const handleTemplateChange = (templateId: string) => {
     const id = templateId === 'new' ? null : parseInt(templateId);
@@ -72,7 +88,7 @@ export const TemplateFiltersModal = () => {
   };
 
   const handleSave = () => {
-    if (agGridApi) {
+    if (agGridApiGlobal) {
       const newFilterModel: any = {};
 
       columnFilters.forEach((column) => {
@@ -102,7 +118,7 @@ export const TemplateFiltersModal = () => {
         }
       });
 
-      agGridApi.setFilterModel(newFilterModel);
+      agGridApiGlobal.setFilterModel(newFilterModel);
       setFilterModel(newFilterModel);
 
       if (selectedTemplateId) {
@@ -130,10 +146,10 @@ export const TemplateFiltersModal = () => {
   };
 
   const handleReset = () => {
-    if (agGridApi) {
-      agGridApi.setFilterModel({});
-      resetFilters();
-    }
+    // if (agGridApiGlobal) {
+    //   agGridApiGlobal.setFilterModel({});
+    //   resetFilters();
+    // }
     initializeFromTemplate();
   };
 
@@ -156,21 +172,39 @@ export const TemplateFiltersModal = () => {
         <ModalTitle>Управление шаблонами фильтрации</ModalTitle>
         <Spacer />
         <div style={{ padding: '0 24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-            <label style={{ fontWeight: 500 }}>Шаблон:</label>
-            <Select
-              id="TemplateFiltersModal_select_template_input"
-              placeholder="Выберите шаблон"
-              value={selectedTemplateId?.toString() || 'new'}
-              onChange={(e) => handleTemplateChange(e.target.value)}
-              style={{ minWidth: '300px' }}
-            >
-              {templateOptions.map((option) => (
-                <Option key={option.value} value={option.value}>
-                  {option.label}
-                </Option>
-              ))}
-            </Select>
+          <div
+            style={{
+              display: 'flex',
+              gap: '16px',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+              <label style={{ fontWeight: 500 }}>Шаблон:</label>
+              <Select
+                id="TemplateFiltersModal_select_template_input"
+                placeholder="Выберите шаблон"
+                value={selectedTemplateId?.toString() || 'new'}
+                onChange={(e) => handleTemplateChange(e.target.value)}
+                style={{ minWidth: '300px' }}
+              >
+                {templateOptions.map((option) => (
+                  <Option key={option.value} value={option.value}>
+                    {option.label}
+                  </Option>
+                ))}
+              </Select>
+            </div>
+            <div style={{ minWidth: '300px' }}>
+              <InputField
+                id="filter-text-box"
+                value={quickFilterText}
+                onChange={(e) => setQuickFilterText(e.target.value)}
+                placeholder="Поиск"
+                icons={<SearchOutline />}
+              />
+            </div>
           </div>
 
           <div style={{ height: '500px' }}>
@@ -184,7 +218,12 @@ export const TemplateFiltersModal = () => {
             <Button appearance="secondary" dimension="s" onClick={handleCancel}>
               Отмена
             </Button>
-            <Button appearance="primary" dimension="s" onClick={handleSave} disabled={!isDirty}>
+            <Button
+              appearance="primary"
+              dimension="s"
+              onClick={handleSave}
+              disabled={!hasChanges()}
+            >
               Сохранить
             </Button>
           </div>
