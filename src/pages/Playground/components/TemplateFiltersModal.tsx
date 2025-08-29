@@ -32,49 +32,66 @@ export const TemplateFiltersModal = () => {
     hasChanges,
     quickFilterText,
     setQuickFilterText,
+    localGridApi,
   } = useTemplateFiltersModalStore();
 
   const { templates, pendingTemplate, setPendingTemplate } = useTemplatesStore();
-  const { filterModel, setFilterModel, resetFilters } = useFiltersStore();
+  const { filterModel, setFilterModel, resetFilters, topFilters, setTopFilters } =
+    useFiltersStore();
   const { agGridApi: agGridApiGlobal } = useGlobalStore();
 
   useEffect(() => {
     if (isOpen && agGridApiGlobal) {
       const currentFilterModel = agGridApiGlobal.getFilterModel();
-      console.log(
-        '🐸 Pepe said >> TemplateFiltersModal >> currentFilterModel:',
-        currentFilterModel,
-      );
 
-      const mappedFilters = initialColumns.map((column, index) => {
-        const filter = currentFilterModel[column.name];
-        let filterValues: string[] = [];
+      // Получаем активный шаблон из topFilters
+      const activeTemplateId = topFilters.templates?.[0];
+      const activeTemplate = activeTemplateId
+        ? templates.find((t) => t.template_id.toString() === activeTemplateId)
+        : undefined;
 
-        if (filter) {
-          if ('values' in filter && filter.values) {
-            filterValues = filter.values.filter((value): value is string => Boolean(value));
-          } else if ('dateFrom' in filter || 'dateTo' in filter) {
-            const dateRange: string[] = [];
-            if ('dateFrom' in filter && filter.dateFrom) dateRange.push(`От: ${filter.dateFrom}`);
-            if ('dateTo' in filter && filter.dateTo) dateRange.push(`До: ${filter.dateTo}`);
-            filterValues = dateRange;
+      if (activeTemplate) {
+        // Инициализируем модальное окно с активным шаблоном
+        initializeFromTemplate(activeTemplate);
+      } else {
+        // Если нет активного шаблона, инициализируем с текущими фильтрами
+        const mappedFilters = initialColumns.map((column, index) => {
+          const filter = currentFilterModel[column.name];
+          let filterValues: string[] = [];
+
+          if (filter) {
+            if ('values' in filter && filter.values) {
+              filterValues = filter.values.filter((value): value is string => Boolean(value));
+            } else if ('dateFrom' in filter || 'dateTo' in filter) {
+              const dateRange: string[] = [];
+              if ('dateFrom' in filter && filter.dateFrom) dateRange.push(`От: ${filter.dateFrom}`);
+              if ('dateTo' in filter && filter.dateTo) dateRange.push(`До: ${filter.dateTo}`);
+              filterValues = dateRange;
+            }
           }
-        }
 
-        return {
-          colId: column.name,
-          name: column.name,
-          title: column.title,
-          type: column.type,
-          isActive: true,
-          filterValues,
-          order: index,
-        };
-      });
+          return {
+            colId: column.name,
+            name: column.name,
+            title: column.title,
+            type: column.type,
+            isActive: !!filter,
+            filterValues,
+            order: index,
+          };
+        });
 
-      setColumnFilters(mappedFilters);
+        setColumnFilters(mappedFilters);
+      }
     }
-  }, [isOpen, agGridApiGlobal, setColumnFilters]);
+  }, [
+    isOpen,
+    agGridApiGlobal,
+    setColumnFilters,
+    topFilters.templates,
+    templates,
+    initializeFromTemplate,
+  ]);
 
   const handleTemplateChange = (templateId: string) => {
     const id = templateId === 'new' ? null : parseInt(templateId);
@@ -88,8 +105,24 @@ export const TemplateFiltersModal = () => {
   };
 
   const handleSave = () => {
-    if (agGridApiGlobal) {
+    if (agGridApiGlobal && localGridApi) {
       const newFilterModel: any = {};
+      const columnState: any[] = [];
+
+      localGridApi.forEachNode((node, index) => {
+        if (node.data) {
+          const matchingColumn = initialColumns.find((col) => col.title === node.data.title);
+
+          if (matchingColumn) {
+            columnState.push({
+              colId: matchingColumn.name,
+              hide: !node.data.isActive,
+              sort: null,
+              sortIndex: null,
+            });
+          }
+        }
+      });
 
       columnFilters.forEach((column) => {
         if (column.isActive && column.filterValues.length > 0) {
@@ -118,27 +151,36 @@ export const TemplateFiltersModal = () => {
         }
       });
 
-      agGridApiGlobal.setFilterModel(newFilterModel);
-      setFilterModel(newFilterModel);
+      setTimeout(() => {
+        agGridApiGlobal.setFilterModel(newFilterModel);
+        setFilterModel(newFilterModel);
+        agGridApiGlobal.applyColumnState({ state: columnState, applyOrder: true });
+      }, 300);
 
+      let savedTemplate: Template;
       if (selectedTemplateId) {
         const template = templates.find((t) => t.template_id === selectedTemplateId);
         if (template) {
-          const updatedTemplate: Template = {
+          savedTemplate = {
             ...template,
             filterModel: newFilterModel,
           };
-          setPendingTemplate(updatedTemplate);
+          setPendingTemplate(savedTemplate);
         }
       } else {
-        const newTemplate: Template = {
+        savedTemplate = {
           template_id: Date.now(),
           template_name: 'Новый шаблон',
           user_id: null,
           filterModel: newFilterModel,
           isPending: true,
         };
-        setPendingTemplate(newTemplate);
+        setPendingTemplate(savedTemplate);
+      }
+
+      // Сбрасываем активный шаблон в topFilters при сохранении нового
+      if (!selectedTemplateId) {
+        setTopFilters({ ...topFilters, templates: [] });
       }
     }
 
@@ -146,10 +188,9 @@ export const TemplateFiltersModal = () => {
   };
 
   const handleReset = () => {
-    // if (agGridApiGlobal) {
-    //   agGridApiGlobal.setFilterModel({});
-    //   resetFilters();
-    // }
+    if (agGridApiGlobal) {
+      agGridApiGlobal.setFilterModel({});
+    }
     initializeFromTemplate();
   };
 

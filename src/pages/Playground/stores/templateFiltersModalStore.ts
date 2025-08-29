@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { Template } from '@shared/api/types';
 import { initialColumns } from '@shared/constants/InitialCollumns';
+import { GridApi } from 'ag-grid-community';
 
 export type ColumnFilterData = {
   colId: string;
@@ -20,6 +21,7 @@ type TemplateFiltersModalState = {
   isDirty: boolean;
   originalTemplateFilters: ColumnFilterData[] | null;
   quickFilterText: string;
+  localGridApi: GridApi | null;
 };
 
 type TemplateFiltersModalActions = {
@@ -36,6 +38,7 @@ type TemplateFiltersModalActions = {
   initializeFromTemplate: (template?: Template) => void;
   hasChanges: () => boolean;
   setQuickFilterText: (text: string) => void;
+  setLocalGridApi: (api: GridApi | null) => void;
 };
 
 type TemplateFiltersModalStore = TemplateFiltersModalState & TemplateFiltersModalActions;
@@ -60,6 +63,7 @@ const initialState: TemplateFiltersModalState = {
   isDirty: false,
   originalTemplateFilters: null,
   quickFilterText: '',
+  localGridApi: null,
 };
 
 export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((set, get) => ({
@@ -218,4 +222,6 @@ export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((s
   },
 
   setQuickFilterText: (text) => set({ quickFilterText: text }),
+
+  setLocalGridApi: (api) => set({ localGridApi: api }),
 }));

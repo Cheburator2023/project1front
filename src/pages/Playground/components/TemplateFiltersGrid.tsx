@@ -52,7 +52,7 @@ const ChipsCellRenderer = ({ data }: any) => {
 };
 
 export const TemplateFiltersGrid = () => {
-  const { columnFilters, reorderColumns, quickFilterText } = useTemplateFiltersModalStore();
+  const { columnFilters, reorderColumns, quickFilterText, setLocalGridApi } = useTemplateFiltersModalStore();
 
   const rowData = useMemo(() => {
     return columnFilters.sort((a, b) => a.order - b.order);
@@ -123,7 +123,8 @@ export const TemplateFiltersGrid = () => {
 
   const onGridReady = useCallback((params: GridReadyEvent) => {
     params.api.sizeColumnsToFit();
-  }, []);
+    setLocalGridApi(params.api);
+  }, [setLocalGridApi]);
 
   return (
     <div className="ag-theme-quartz" style={{ height: '100%', width: '100%' }}>
