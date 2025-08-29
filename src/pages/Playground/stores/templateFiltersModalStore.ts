@@ -35,7 +35,7 @@ type TemplateFiltersModalActions = {
   reorderColumns: (startIndex: number, endIndex: number) => void;
   setIsDirty: (dirty: boolean) => void;
   resetState: () => void;
-  initializeFromTemplate: (template?: Template) => void;
+  initializeFromTemplate: (template?: Template, currentColumnState?: any[]) => void;
   hasChanges: () => boolean;
   setQuickFilterText: (text: string) => void;
   setLocalGridApi: (api: GridApi | null) => void;
@@ -140,36 +140,40 @@ export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((s
 
   resetState: () => set(initialState),
 
-  initializeFromTemplate: (template?: Template) => {
+  initializeFromTemplate: (template?: Template, currentColumnState?: any[]) => {
     const baseColumns = createColumnFiltersFromInitialColumns();
 
     if (template && template.filterModel) {
       const mergedColumns = baseColumns.map(baseColumn => {
         const templateFilter = template.filterModel?.[baseColumn.colId];
-         if (templateFilter) {
-           let filterValues: string[] = [];
+        const columnState = currentColumnState?.find(col => col.colId === baseColumn.colId);
+        
+        if (templateFilter) {
+          let filterValues: string[] = [];
 
-           if ('values' in templateFilter && templateFilter.values) {
-              filterValues = templateFilter.values.filter((v): v is string => v !== null);
-            } else if ('dateFrom' in templateFilter && 'dateTo' in templateFilter) {
-              const dateFilter = templateFilter as { dateFrom: string; dateTo: string };
-              const dateRange: string[] = [];
-              if (dateFilter.dateFrom) dateRange.push(dateFilter.dateFrom);
-              if (dateFilter.dateTo) dateRange.push(dateFilter.dateTo);
-              filterValues = dateRange;
-            }
+          if ('values' in templateFilter && templateFilter.values) {
+             filterValues = templateFilter.values.filter((v): v is string => v !== null);
+           } else if ('dateFrom' in templateFilter && 'dateTo' in templateFilter) {
+             const dateFilter = templateFilter as { dateFrom: string; dateTo: string };
+             const dateRange: string[] = [];
+             if (dateFilter.dateFrom) dateRange.push(dateFilter.dateFrom);
+             if (dateFilter.dateTo) dateRange.push(dateFilter.dateTo);
+             filterValues = dateRange;
+           }
 
-          return {
-            ...baseColumn,
-            isActive: true,
-            filterValues,
-            order: baseColumn.order
-          };
-        }
-        return {
-          ...baseColumn,
-          isActive: false
-        };
+         return {
+           ...baseColumn,
+           isActive: true,
+           filterValues,
+           order: baseColumn.order
+         };
+       }
+       
+       const isColumnVisible = columnState ? !columnState.hide : true;
+       return {
+         ...baseColumn,
+         isActive: isColumnVisible
+       };
       });
 
       const isAllSelected = mergedColumns.every(f => f.isActive);
@@ -181,10 +185,15 @@ export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((s
         isDirty: false
       });
     } else {
-      const defaultColumns = baseColumns.map(column => ({
-        ...column,
-        isActive: true
-      }));
+      const defaultColumns = baseColumns.map(column => {
+        const columnState = currentColumnState?.find(col => col.colId === column.colId);
+        const isColumnVisible = columnState ? !columnState.hide : true;
+        
+        return {
+          ...column,
+          isActive: isColumnVisible
+        };
+      });
       const isAllSelected = defaultColumns.every(f => f.isActive);
       set({ 
         columnFilters: defaultColumns, 
