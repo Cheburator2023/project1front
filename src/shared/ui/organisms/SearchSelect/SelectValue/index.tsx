@@ -12,17 +12,21 @@ import { OptionsFactoryProps, SELECT_TYPE } from '../types';
 
 import { SingleSelectContainer, TagsContainer, CustomTags, MultiSelectContainer } from './styles';
 import { getSelectedValuesString } from './helpers';
+import { Template } from '../../../../api';
 
 interface SelectValueProps {
   options: OptionsFactoryProps;
   selectedAllValues: boolean;
+  pendingTemplate?: Template;
   active?: boolean;
   value?: string | string[];
   modified?: boolean;
 }
 
 export const SelectValue = React.memo(
-  ({ value, selectedAllValues, active, options, modified }: SelectValueProps) => {
+  ({ value, selectedAllValues, active, options, modified, pendingTemplate }: SelectValueProps) => {
+    console.log('🐸 Pepe said >> pendingTemplate:', pendingTemplate);
+
     const isValueArray = Array.isArray(value);
 
     if (!isValueArray) {
@@ -48,17 +52,11 @@ export const SelectValue = React.memo(
             >
               {active && selectedValueText
                 ? selectedValueText
-                : active
+                : active || pendingTemplate
                 ? 'Новый шаблон (не сохранен)'
                 : 'Не активен'}
             </div>
-            {active && modified ? (
-              <IconButton
-                tooltip="Фильтры шаблона были изменены"
-                color="#0062FF"
-                icon={<InfoSolid />}
-              />
-            ) : active ? (
+            {active ? (
               <IconButton tooltip="Шаблон активен" color="#0062FF" icon={<CheckSolid />} />
             ) : (
               <IconButton tooltip="Шаблон не активен" color="#0062FF" icon={<InfoSolid />} />

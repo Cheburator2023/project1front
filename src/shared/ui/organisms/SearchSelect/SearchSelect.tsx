@@ -23,6 +23,7 @@ import { CustomOption } from './CustomOption';
 import { EMPTY_OPTION, NOT_NULL_OPTION } from './constants';
 import { INPUT_TYPE } from '../InputFactory';
 import { useDeepEffect } from '../../../hooks/useDeepEffect';
+import { Template } from '../../../api';
 
 export interface SearchSelectProps {
   name: string;
@@ -52,6 +53,7 @@ export interface SearchSelectProps {
   onAddNewOption?: (newOptionValue: string) => void;
   modified?: boolean;
   selectType?: INPUT_TYPE;
+  pendingTemplate?: Template;
 }
 
 export const SearchSelect = ({
@@ -81,9 +83,9 @@ export const SearchSelect = ({
   selectType,
   renderDropDownBottomPanel,
   onAddNewOption,
+  pendingTemplate,
 }: SearchSelectProps) => {
   const [addedOptions, setAddedOptions] = useState<SelectOption[]>([]);
-
   const options = useMemo(() => {
     return initialOptions.type === SELECT_TYPE.STRING ||
       initialOptions.type === SELECT_TYPE.STRING_WITH_PARENTS
@@ -304,6 +306,7 @@ export const SearchSelect = ({
               !loading && (
                 <SelectValue
                   options={options}
+                  pendingTemplate={pendingTemplate}
                   active={active}
                   selectedAllValues={selectedAllValues}
                   value={value}

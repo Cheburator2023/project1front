@@ -36,6 +36,7 @@ export const TemplateFiltersModal = () => {
   } = useTemplateFiltersModalStore();
 
   const { templates, pendingTemplate, setPendingTemplate } = useTemplatesStore();
+
   const { filterModel, setFilterModel, resetFilters, topFilters, setTopFilters } =
     useFiltersStore();
   const { agGridApi: agGridApiGlobal } = useGlobalStore();
@@ -81,7 +82,7 @@ export const TemplateFiltersModal = () => {
 
       columnFilters.forEach((column, index) => {
         const matchingColumn = initialColumns.find((col) => col.name === column.colId);
-        
+
         if (matchingColumn) {
           columnState.push({
             colId: column.colId,
@@ -143,8 +144,9 @@ export const TemplateFiltersModal = () => {
         }
       } else {
         savedTemplate = {
-          template_id: 666,
-          // template_id: 'Новый шаблон для сохранения',
+          // template_id: 666,
+          // @ts-ignore
+          template_id: 'Новый шаблон для сохранения',
           template_name: 'Новый шаблон',
           user_id: null,
           filterModel: newFilterModel,

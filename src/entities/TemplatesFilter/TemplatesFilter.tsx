@@ -9,6 +9,7 @@ import { useTemplateFilters } from '@src/shared/hooks';
 
 import { getGroupsOptions } from './helpers';
 import { useGlobalStore } from '../../shared/stores/globalStore';
+import { useTemplatesStore } from '../../shared/stores';
 
 export interface TemplatesFilterProps {
   templates: Template[];
@@ -62,6 +63,8 @@ export const TemplatesFilter = ({
   };
 
   const { setFiltersResetCount } = useGlobalStore();
+    const { pendingTemplate, setPendingTemplate } = useTemplatesStore();
+
 
   const handleResetFilters = () => {
     resetFilters();
@@ -81,7 +84,7 @@ export const TemplatesFilter = ({
       name="templates"
       loading={loading}
       error={!!error}
-      active={!!topFilters.templates.length}
+      active={!!topFilters.templates.length || !!pendingTemplate}
       selectedValues={topFilters.templates.length ? topFilters.templates : []}
       options={{
         type: SELECT_TYPE.TEMPLATES,
@@ -90,6 +93,7 @@ export const TemplatesFilter = ({
       }}
       onChange={handleChange}
       modified={isModifiedFilter}
+      pendingTemplate={pendingTemplate}
       renderDropDownBottomPanel={() =>
         activeTemplate ? (
           <Button onClick={handleResetFilters} dimension="s" appearance="secondary">
