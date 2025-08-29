@@ -25,8 +25,6 @@ interface SelectValueProps {
 
 export const SelectValue = React.memo(
   ({ value, selectedAllValues, active, options, modified, pendingTemplate }: SelectValueProps) => {
-    console.log('🐸 Pepe said >> pendingTemplate:', pendingTemplate);
-
     const isValueArray = Array.isArray(value);
 
     if (!isValueArray) {

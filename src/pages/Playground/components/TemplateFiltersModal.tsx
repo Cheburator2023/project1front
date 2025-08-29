@@ -45,7 +45,6 @@ export const TemplateFiltersModal = () => {
     if (isOpen) {
       // Получаем активный шаблон из topFilters
       const activeTemplateId = topFilters.templates?.[0];
-      console.log('🐸 Pepe said >> TemplateFiltersModal >> activeTemplateId:', activeTemplateId);
 
       const activeTemplate = activeTemplateId
         ? templates.find((t) => t.template_id.toString() === activeTemplateId)
@@ -54,10 +53,22 @@ export const TemplateFiltersModal = () => {
       if (activeTemplate) {
         initializeFromTemplate(activeTemplate);
       } else if (pendingTemplate) {
-        console.log('🐸 Pepe said >> TemplateFiltersModal >> pendingTemplate:', pendingTemplate);
-        initializeFromTemplate(pendingTemplate);
+        const filterModel = agGridApiGlobal?.getFilterModel();
+        initializeFromTemplate({ ...pendingTemplate, filterModel });
       } else {
-        initializeFromTemplate(undefined);
+        // тут нужна логика забора данных и маппинга в пред-теплейт, не просто undefined
+        const filterModel = agGridApiGlobal?.getFilterModel();
+        const columnState = agGridApiGlobal?.getColumnState();
+
+        initializeFromTemplate({
+          // template_id: 666,
+          // @ts-ignore
+          template_id: 'Новый шаблон для сохранения',
+          template_name: 'Новый шаблон',
+          user_id: null,
+          filterModel,
+          isPending: true,
+        });
       }
     }
   }, [isOpen, templates, topFilters, pendingTemplate, initializeFromTemplate]);
@@ -104,21 +115,12 @@ export const TemplateFiltersModal = () => {
       columnFilters.forEach((column) => {
         if (column.isActive && column.filterValues.length > 0) {
           if (column.type === 'DATE') {
-            const dateFrom = column.filterValues
-              .find((v) => v.startsWith('От:'))
-              ?.replace('От: ', '');
-            const dateTo = column.filterValues
-              .find((v) => v.startsWith('До:'))
-              ?.replace('До: ', '');
-
-            if (dateFrom || dateTo) {
-              newFilterModel[column.colId] = {
-                filterType: 'date',
-                type: 'inRange',
-                dateFrom: dateFrom || null,
-                dateTo: dateTo || null,
-              };
-            }
+            newFilterModel[column.colId] = {
+              filterType: 'date',
+              type: column.filterValues[0] && column.filterValues[1] ? 'inRange' : 'equals',
+              dateFrom: column.filterValues[0] || null,
+              dateTo: column.filterValues[1] || null,
+            };
           } else {
             newFilterModel[column.colId] = {
               filterType: 'set',

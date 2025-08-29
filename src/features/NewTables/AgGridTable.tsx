@@ -359,8 +359,6 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     const { setFilterModel } = useFiltersStore();
 
     const handleFilterChange = (event: FilterChangedEvent): void => {
-      console.log('🐸 Pepe said >> handleFilterChange >> event:', event);
-
       if (event.source === 'api') return;
 
       const _filterModel = event.api.getFilterModel();
@@ -429,7 +427,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
         const activeTemplate = templates.find(
           (t) => String(t.template_id) === topFilters.templates[0],
         );
-        
+
 
         if (activeTemplate?.columnState) {
 

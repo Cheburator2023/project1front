@@ -18,11 +18,14 @@ import {
 } from '@shared/api';
 import { useDownloadReportStore } from '@shared/stores/downloadReportStore';
 
-import {
-  getISODateFormat,
-} from '@shared/helpers';
+import { getISODateFormat } from '@shared/helpers';
 import { ArtifactApi, CustomError } from '@src/shared/api/types';
-import { useExploitationModeStore, useFiltersStore, useDisplayStore, useTemplatesStore } from '@src/shared/stores';
+import {
+  useExploitationModeStore,
+  useFiltersStore,
+  useDisplayStore,
+  useTemplatesStore,
+} from '@src/shared/stores';
 import { useDeepEffect } from '../../../shared/hooks/useDeepEffect';
 
 export const getQueryParams = (
@@ -78,8 +81,6 @@ export type TFilters = {
   secondDate: string | null;
 };
 
-
-
 export interface IUseTableModels {
   display: TDisplayTableModels;
   modelsTable: TModelsTable;
@@ -88,8 +89,30 @@ export interface IUseTableModels {
 
 export const useTableModels = () => {
   const { downloadReportStatus } = useDownloadReportStore();
-  const { topFilters, setTopFilters, firstDate, setFirstDate, secondDate, setSecondDate, modelsDownloadingDate, setModelsDownloadingDate } = useFiltersStore();
-  const { activeScreen, setActiveScreen, compareMode, setCompareMode, rightPanelType, setRightPanelType, activeCellName, setActiveCellName, activeRowId, setActiveRowId, handleChangeCompare, handleOnClose } = useDisplayStore();
+  const {
+    topFilters,
+    setTopFilters,
+    firstDate,
+    setFirstDate,
+    secondDate,
+    setSecondDate,
+    modelsDownloadingDate,
+    setModelsDownloadingDate,
+  } = useFiltersStore();
+  const {
+    activeScreen,
+    setActiveScreen,
+    compareMode,
+    setCompareMode,
+    rightPanelType,
+    setRightPanelType,
+    activeCellName,
+    setActiveCellName,
+    activeRowId,
+    setActiveRowId,
+    handleChangeCompare,
+    handleOnClose,
+  } = useDisplayStore();
 
   // Table data
   const [rowList, setRowList] = useState<Array<Partial<Row>>>([]);
@@ -160,8 +183,6 @@ export const useTableModels = () => {
 
   useDeepEffect(() => {
     if (templateData) {
-      console.log('🐸 Pepe said >> useTableModels >> templateData:', templateData);
-      console.log('🐸 Pepe said >> useTableModels >> первый шаблон columnState:', templateData[0]?.columnState);
       setTemplates(templateData);
     }
   }, [templateData]);
@@ -202,13 +223,7 @@ export const useTableModels = () => {
       onChangeSecondDate: (newSecondDate: string | null) => setSecondDate(newSecondDate),
       onChangeModelDownloadingDate: handleChangeModelDownloadingDate,
     }),
-    [
-      topFilters,
-      firstDate,
-      secondDate,
-      modelsDownloadingDate,
-      handleChangeModelDownloadingDate,
-    ],
+    [topFilters, firstDate, secondDate, modelsDownloadingDate, handleChangeModelDownloadingDate],
   );
 
   const handleClickOnActionCell = useCallback(
@@ -243,8 +258,6 @@ export const useTableModels = () => {
     }
     fetchModels();
   }, []);
-
-
 
   const result: IUseTableModels = {
     display: {
