@@ -37,23 +37,24 @@ export const useTemplateFilters = (
     (filterId: string): boolean => {
       return activeTemplate?.filterModel ? filterId in activeTemplate.filterModel : false;
     },
-    [activeTemplate]
+    [activeTemplate],
   );
 
   const getFilteredColumns = useMemo(
-    () => (initialColumns: Column[], showFilterTemplate: boolean): Column[] => {
-      return initialColumns.filter((column) => {
-        const isTemplate = isTemplateFilter(column.name);
-        const isModified = modifiedFilters.has(column.name);
+    () =>
+      (initialColumns: Column[], showFilterTemplate: boolean): Column[] => {
+        return initialColumns.filter((column) => {
+          const isTemplate = isTemplateFilter(column.name);
+          const isModified = modifiedFilters.has(column.name);
 
-        if (isSystemSpecificFilter(column.name)) {
-          return false;
-        }
+          if (isSystemSpecificFilter(column.name)) {
+            return false;
+          }
 
-        return !showFilterTemplate ? isModified || !isTemplate : true;
-      });
-    },
-    [activeTemplate, modifiedFilters, isTemplateFilter]
+          return !showFilterTemplate ? isModified || !isTemplate : true;
+        });
+      },
+    [activeTemplate, modifiedFilters, isTemplateFilter],
   );
 
   const resetFilters = () => {
@@ -64,23 +65,7 @@ export const useTemplateFilters = (
     (columnFilterName: string): boolean => {
       return isTemplateFilter(columnFilterName) && !modifiedFilters.has(columnFilterName);
     },
-    [isTemplateFilter, modifiedFilters]
-  );
-
-  const shouldResetTemplateOnInitialValueChange = useCallback(
-    (
-      value: string | string[] | undefined,
-      initialTemplateValue: string[],
-      columnName: string,
-    ): boolean => {
-      return (
-        Array.isArray(initialTemplateValue) &&
-        initialTemplateValue.length > 0 &&
-        shouldResetTemplateOnInitialFilterRemove(columnName) &&
-        (!value?.length || JSON.stringify(value) !== JSON.stringify(initialTemplateValue))
-      );
-    },
-    [shouldResetTemplateOnInitialFilterRemove]
+    [isTemplateFilter, modifiedFilters],
   );
 
   return {
@@ -91,7 +76,6 @@ export const useTemplateFilters = (
     isModifiedFilter,
     isTemplateFilter,
     shouldResetTemplateOnInitialFilterRemove,
-    shouldResetTemplateOnInitialValueChange,
   };
 };
 

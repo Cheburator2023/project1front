@@ -86,6 +86,7 @@ export const SearchSelect = ({
   pendingTemplate,
 }: SearchSelectProps) => {
   const [addedOptions, setAddedOptions] = useState<SelectOption[]>([]);
+
   const options = useMemo(() => {
     return initialOptions.type === SELECT_TYPE.STRING ||
       initialOptions.type === SELECT_TYPE.STRING_WITH_PARENTS
@@ -265,12 +266,17 @@ export const SearchSelect = ({
     }
   };
 
+  const selectedValueText = (options as any)?.groups
+    ?.flatMap((group) => group?.options)
+    ?.find((option) => option?.value === selectedValues?.[0])?.text;
+
   return (
     <div
       className={className}
       onClick={handlePreventEvent}
       onKeyDown={handlePreventEvent}
       role="presentation"
+      title={selectedValueText}
     >
       <Field
         required={required}

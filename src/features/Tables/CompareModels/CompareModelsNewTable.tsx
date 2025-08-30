@@ -1,14 +1,11 @@
 import React, { useEffect } from 'react';
-import { Column as AdmiralColumn, T } from '@admiral-ds/react-ui';
-import styled from 'styled-components';
+import { Column as AdmiralColumn } from '@admiral-ds/react-ui';
 
-import { COLUMN_TYPE, Column, Row } from '@shared/types';
-import { RIGHT_PANEL_TYPE } from '@shared/constants';
-import { ActionsPanel, ColumnFilter } from '@entities';
+import { COLUMN_TYPE, Column } from '@shared/types';
+import { ColumnFilter } from '@entities';
+import { useFiltersStore } from '@shared/stores/filtersStore';
 
 import { AgGridModelsTable } from '@src/features/NewTables/AgGridModelsTable';
-import { useTableChange } from '../hooks';
-import { useTableModels } from '../../../pages/Home/hooks';
 import { useCompareModels } from '../../../widgets/CompareModelsWidget/hooks';
 
 interface TableModelsProps {
@@ -21,26 +18,13 @@ export const CompareModelsNewTable = React.memo(({ firstDate, secondDate }: Tabl
 
   const rowList = compareModelsTable.rowList;
   const columnList = compareModelsTable.columnList;
-  const page = compareModelsTable.page;
-  const pageSize = compareModelsTable.pageSize;
-  const searchString = compareModelsTable.searchString;
   const totalRows = compareModelsTable.totalRows;
   const setTotalRows = compareModelsTable.setTotalRows;
-  const setPage = compareModelsTable.setPage;
 
-  const { rows, setCols, setRows, handleChangeColumnsFilter, filterModel } = useTableChange({
-    rowList,
-    setCurrentPage: setPage,
-    page,
-    updateRowsCount: setTotalRows,
-    pageSize,
-    searchString,
-    columnList,
-  });
+  const { filterModel } = useFiltersStore();
 
   useEffect(() => {
     if (rowList?.length) {
-      setRows(rowList);
       setTotalRows(rowList.length);
 
       const newCols: Array<AdmiralColumn & Column> = columnList.map((column) => ({
@@ -54,20 +38,18 @@ export const CompareModelsNewTable = React.memo(({ firstDate, secondDate }: Tabl
             column={column}
             rowList={rowList}
             columnsFilters={filterModel}
-            onChangeColumnsFilter={handleChangeColumnsFilter}
           />
         ),
       }));
 
-      setCols(newCols);
     }
-  }, [rowList, columnList, filterModel, handleChangeColumnsFilter]);
+  }, [rowList, columnList, filterModel]);
 
   return (
     <AgGridModelsTable
       isCompared
       overrideColumnList={columnList}
-      overrideRowList={rows}
+      overrideRowList={rowList}
       overlayNoRowsTemplate={
         totalRows > 0 && firstDate && secondDate
           ? 'Нет данных'

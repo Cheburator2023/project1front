@@ -1,12 +1,15 @@
-import { useCallback, useMemo } from 'react';
+import { ChangeEvent, useCallback, useMemo, useState, useEffect } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { ColDef, GridReadyEvent, RowDragEndEvent, IHeaderParams } from 'ag-grid-community';
-import { Checkbox, Chips } from '@admiral-ds/react-ui';
+import { Button, Checkbox, MenuActionsPanel, Option, Select } from '@admiral-ds/react-ui';
 import {
   useTemplateFiltersModalStore,
   ColumnFilterData,
 } from '../stores/templateFiltersModalStore';
 import { Flexbox } from '../../../shared/ui/atoms';
+import { useGlobalStore } from '../../../shared/stores/globalStore';
+import { getColumnFilterOptions } from '../../../shared/helpers/helpers';
+import { useDeepEffect } from '../../../shared/hooks/useDeepEffect';
 
 const CheckboxHeaderRenderer = (props: IHeaderParams) => {
   const { toggleAllColumns, columnFilters } = useTemplateFiltersModalStore();
@@ -36,23 +39,86 @@ const CheckboxCellRenderer = ({ data }: any) => {
 };
 
 const ChipsCellRenderer = ({ data }: any) => {
-  if (!data.filterValues || data.filterValues.length === 0) {
-    return <span style={{ color: '#999' }}>Нет фильтров</span>;
-  }
+  const { updateColumnFilter } = useTemplateFiltersModalStore();
+  const { agGridApi } = useGlobalStore();
+  const [selectedValues, setSelectedValues] = useState<string[]>(data.filterValues || []);
+  const [availableOptions, setAvailableOptions] = useState<string[]>([]);
+
+  useDeepEffect(() => {
+    if (!agGridApi) {
+      setAvailableOptions([]);
+      return;
+    }
+
+    const rowData: any[] = [];
+    agGridApi.forEachNode((node) => {
+      if (node.data) {
+        rowData.push(node.data);
+      }
+    });
+
+    const columnOptions = getColumnFilterOptions(rowData, data.colId);
+    setAvailableOptions(columnOptions.map((option) => option.value));
+  }, [agGridApi, data.colId]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedOptions = e.target.selectedOptions;
+
+    let newSelectedValues = Array.from(selectedOptions).map((option) => option.value);
+    const _options = availableOptions as any;
+
+    if (selectedValues?.includes(newSelectedValues[0])) {
+      newSelectedValues = [];
+    }
+    const selectOptionsValues = _options;
+    const prevSelectedValues =
+      selectedValues?.filter((value) => !selectOptionsValues.includes(value)) ?? [];
+    newSelectedValues = [...prevSelectedValues, ...newSelectedValues];
+    setSelectedValues(newSelectedValues);
+  };
+
+  const handleApplyButtonClick = () => {
+    updateColumnFilter(data.colId, {
+      filterValues: selectedValues,
+    });
+  };
 
   return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-      {data.filterValues.map((value: string, index: number) => (
-        <Chips dimension="s" key={index} appearance="filled" color="secondary">
-          {value}
-        </Chips>
-      ))}
+    <div style={{ width: '100%' }}>
+      <Select
+        multiple
+        disabled={!data.isActive}
+        isLoading={!availableOptions.length}
+        mode="searchSelect"
+        placeholder="Выберите значения"
+        defaultValue={selectedValues}
+        onChange={handleChange}
+        style={{ width: '100%' }}
+        maxRowCount={1}
+        minRowCount={1}
+        renderDropDownBottomPanel={() => {
+          return (
+            <MenuActionsPanel dimension="s">
+              <Button dimension="s" onClick={handleApplyButtonClick}>
+                Применить
+              </Button>
+            </MenuActionsPanel>
+          );
+        }}
+      >
+        {availableOptions.map((option) => (
+          <Option key={option} value={option}>
+            {option}
+          </Option>
+        ))}
+      </Select>
     </div>
   );
 };
 
 export const TemplateFiltersGrid = () => {
-  const { columnFilters, reorderColumns, quickFilterText, setLocalGridApi } = useTemplateFiltersModalStore();
+  const { columnFilters, reorderColumns, quickFilterText, setLocalGridApi } =
+    useTemplateFiltersModalStore();
 
   const rowData = useMemo(() => {
     return columnFilters.sort((a, b) => a.order - b.order);
@@ -121,10 +187,13 @@ export const TemplateFiltersGrid = () => {
     [rowData, reorderColumns],
   );
 
-  const onGridReady = useCallback((params: GridReadyEvent) => {
-    params.api.sizeColumnsToFit();
-    setLocalGridApi(params.api);
-  }, [setLocalGridApi]);
+  const onGridReady = useCallback(
+    (params: GridReadyEvent) => {
+      params.api.sizeColumnsToFit();
+      setLocalGridApi(params.api);
+    },
+    [setLocalGridApi],
+  );
 
   return (
     <div className="ag-theme-quartz" style={{ height: '100%', width: '100%' }}>

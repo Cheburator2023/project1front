@@ -17,7 +17,6 @@ export interface ColumnFilterProps {
   column: Column;
   rowList: Partial<Row>[];
   columnsFilters: Partial<ColumnsFilter>;
-  onChangeColumnsFilter: (rowFieldName: string, selectValue: string[]) => void;
   onChangeTopFilters?: (filters: any) => void;
   topFilters?: TopFilters;
   templates?: Template[];
@@ -28,7 +27,6 @@ export const ColumnFilter = React.memo(
     column,
     rowList,
     columnsFilters,
-    onChangeColumnsFilter,
     onChangeTopFilters,
     topFilters,
     templates,
@@ -39,13 +37,6 @@ export const ColumnFilter = React.memo(
         : columnsFilters?.[column.name];
 
     const [value, setValue] = useState<string[] | string | undefined>(initialValue);
-    const initialTemplateValue = columnsFilters?.[column.name] || [];
-
-    const { shouldResetTemplateOnInitialValueChange } = useTemplateFilters(
-      columnsFilters,
-      templates,
-      topFilters?.templates,
-    );
 
     useEffect(() => {
       setValue(initialValue);
@@ -54,13 +45,12 @@ export const ColumnFilter = React.memo(
     const handleApplyFilter = () => {
       if (value) {
         const arrayValue = Array.isArray(value) ? value : [value];
-        onChangeColumnsFilter(column.name, arrayValue);
 
-        if (
-          shouldResetTemplateOnInitialValueChange(arrayValue, initialTemplateValue, column.name)
-        ) {
-          onChangeTopFilters?.({ ...topFilters, templates: [] });
-        }
+        // if (
+        //   shouldResetTemplateOnInitialValueChange(arrayValue, initialTemplateValue, column.name)
+        // ) {
+        //   onChangeTopFilters?.({ ...topFilters, templates: [] });
+        // }
       }
     };
 
@@ -89,11 +79,6 @@ export const ColumnFilter = React.memo(
 
                 setValue(newDateValue);
 
-                const dateRange = getDateRange(newDateValue);
-
-                if (dateRange) {
-                  onChangeColumnsFilter(column.name, dateRange);
-                }
               }}
             />
           </div>
