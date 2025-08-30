@@ -1,8 +1,8 @@
 import React from 'react';
 import { Template } from '@src/shared/api';
 import { Column, Row } from '@src/shared/types';
-import { ModelsListWidgetActions, ModelsListWidgetData } from '@src/widgets/ModelsListWidget/hooks';
 import { AgGridTable } from './AgGridTable';
+import { ModelsListWidgetActions, ModelsListWidgetData } from './useModelsListWidget';
 
 export const AgGridModelsListWidget = (props: {
   data: ModelsListWidgetData;

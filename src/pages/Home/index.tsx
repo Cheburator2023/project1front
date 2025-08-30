@@ -12,8 +12,6 @@ export const Home = () => {
   return (
     <>
       <RightModalPanel />
-      {/* {display?.activeScreen === ACTIVE_SCREEN.TEMPLATE_FILTERS && <TemplateFilters />} */}
-
       {display?.activeScreen === ACTIVE_SCREEN.COMPARE ? (
         <CompareModelsWidget />
       ) : (

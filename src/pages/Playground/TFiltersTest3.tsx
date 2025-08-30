@@ -8,22 +8,24 @@ import {
   ButtonCustom,
   CheckSolidCustom,
   FilterOutlineCustom,
-} from '../../entities/FilterButtonCount/style';
+} from './components/style';
 import { useFiltersStore } from '../../shared/stores';
 import { useTemplatesStore } from '../../shared/stores/templatesStore';
-import { useTableModels } from '../Home/hooks';
-import { getActiveFiltersCount } from '../../features/TemplateFilters/helpers';
-// import { getActiveFiltersCount } from '../../shared/helpers';
+import { getActiveFiltersCount } from '../../shared/helpers';
 
 export const TFiltersTest3 = () => {
   const templateFiltersModalStore = useTemplateFiltersModalStore();
   const { topFilters, filterModel } = useFiltersStore();
-  const { templates, pendingTemplate } = useTemplatesStore();
-  const activeFiltersCount = Object.keys(filterModel).length;
+  const { templates } = useTemplatesStore();
+  // const activeFiltersCount = Object.keys(filterModel).length;
+  const activeFiltersCount = useMemo(
+    () => getActiveFiltersCount(filterModel, templates, topFilters.templates[0]),
+    [filterModel, templates, topFilters.templates],
+  );
 
   const hasTemplates = topFilters.templates.length > 0;
   const activeTemplate = hasTemplates
-    ? templates.find(t => t.template_id.toString() === topFilters.templates[0])
+    ? templates.find((t) => t.template_id.toString() === topFilters.templates[0])
     : undefined;
 
   const hasActiveFilters = activeFiltersCount > 0;

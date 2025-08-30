@@ -5,7 +5,7 @@ import { useFiltersStore } from '@shared/stores/filtersStore';
 import { CustomSearchSelect } from '@shared/ui/organisms';
 import { useExploitationModeStore, useDisplayStore, useTemplatesStore } from '@src/shared/stores';
 import { ACTIVE_SCREEN, RIGHT_PANEL_TYPE, modelsSelectOptions } from '@shared/constants';
-import { TemplatesFilter, FilterButtonCount } from '@entities';
+import { TemplatesFilter } from '@entities';
 
 import { Container, CustomDateField, FiltersDivider, FilterButton, FiltersBox } from './styles';
 import { useGlobalStore } from '../../shared/stores/globalStore';
@@ -70,13 +70,6 @@ export const FiltersPanel = ({
     <Container style={{ justifyContent: 'space-between' }}>
       <FiltersBox>
         <div style={{ marginTop: '24px', marginRight: '20px' }}>
-          {/* <FilterButtonCount
-            topFilters={topFilters}
-            updateActiveScreen={setActiveScreen}
-            columnsFilters={filterModel}
-            activeScreen={ACTIVE_SCREEN.TEMPLATE_FILTERS}
-            templates={templates}
-          /> */}
           <TFiltersTest3 />
         </div>
 
