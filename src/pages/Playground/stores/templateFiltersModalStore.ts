@@ -86,7 +86,9 @@ export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((s
     const updatedFilters = columnFilters.map((filter) =>
       filter.colId === colId ? { ...filter, ...updates } : filter,
     );
+
     const isAllSelected = updatedFilters.every((f) => f.isActive);
+    console.log('🐸 Pepe said >> updatedFilters:', updatedFilters);
     set({ columnFilters: updatedFilters, isAllSelected, isDirty: true });
   },
 

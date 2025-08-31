@@ -8,7 +8,7 @@ import {
   ButtonCustom,
   CheckSolidCustom,
   FilterOutlineCustom,
-} from './components/style';
+} from './components/MiscStyledComponents';
 import { useFiltersStore } from '../../shared/stores';
 import { useTemplatesStore } from '../../shared/stores/templatesStore';
 import { getActiveFiltersCount } from '../../shared/helpers';

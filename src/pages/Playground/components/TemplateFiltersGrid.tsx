@@ -1,7 +1,15 @@
 import { ChangeEvent, useCallback, useMemo, useState, useEffect } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { ColDef, GridReadyEvent, RowDragEndEvent, IHeaderParams } from 'ag-grid-community';
-import { Button, Checkbox, MenuActionsPanel, Option, Select } from '@admiral-ds/react-ui';
+import {
+  Button,
+  Checkbox,
+  MenuActionsPanel,
+  Option,
+  Select,
+  DateField,
+} from '@admiral-ds/react-ui';
+import { format, parse, isValid } from 'date-fns';
 import {
   useTemplateFiltersModalStore,
   ColumnFilterData,
@@ -10,6 +18,7 @@ import { Flexbox } from '../../../shared/ui/atoms';
 import { useGlobalStore } from '../../../shared/stores/globalStore';
 import { getColumnFilterOptions } from '../../../shared/helpers/helpers';
 import { useDeepEffect } from '../../../shared/hooks/useDeepEffect';
+import { COLUMN_TYPE } from '../../../shared/types';
 
 const CheckboxHeaderRenderer = (props: IHeaderParams) => {
   const { toggleAllColumns, columnFilters } = useTemplateFiltersModalStore();
@@ -35,6 +44,160 @@ const CheckboxCellRenderer = ({ data }: any) => {
     <Flexbox alignItems="center" height="100%">
       <Checkbox checked={data.isActive} onChange={() => toggleColumnActive(data.colId)} />
     </Flexbox>
+  );
+};
+
+const DateFieldRenderer = ({ data }: any) => {
+  const filterValues: string[] = data.filterValues;
+
+  const { updateColumnFilter } = useTemplateFiltersModalStore();
+
+  const initializeDateValue = () => {
+    if (!data.filterValues || data.filterValues.length === 0) return '';
+
+    const firstFilter = data.filterValues[0];
+
+    if (typeof firstFilter === 'object' && firstFilter.dateFrom) {
+      const startDate = new Date(firstFilter.dateFrom);
+      const startFormatted = isValid(startDate) ? format(startDate, 'yyyy-MM-dd') : '';
+
+      if (firstFilter.dateTo && firstFilter.dateTo !== firstFilter.dateFrom) {
+        const endDate = new Date(firstFilter.dateTo);
+        const endFormatted = isValid(endDate) ? format(endDate, 'yyyy-MM-dd') : '';
+        return `${startFormatted} - ${endFormatted}`;
+      }
+
+      return startFormatted;
+    }
+
+    if (data.filterValues.length === 1) {
+      const date = new Date(data.filterValues[0]);
+      return isValid(date) ? format(date, 'yyyy-MM-dd') : '';
+    }
+
+    if (data.filterValues.length === 2) {
+      const startDate = new Date(data.filterValues[0]);
+      const endDate = new Date(data.filterValues[1]);
+      const startFormatted = isValid(startDate) ? format(startDate, 'yyyy-MM-dd') : '';
+      const endFormatted = isValid(endDate) ? format(endDate, 'yyyy-MM-dd') : '';
+      return `${startFormatted} - ${endFormatted}`;
+    }
+
+    return '';
+  };
+
+  const initializeFilterType = () => {
+    if (!data.filterValues || data.filterValues.length === 0) return 'equals';
+
+    const firstFilter = data.filterValues[0];
+
+    if (typeof firstFilter === 'object' && firstFilter.type) {
+      return firstFilter.type === 'inRange' ? 'isRange' : 'equals';
+    }
+
+    return data.filterValues.length === 2 ? 'isRange' : 'equals';
+  };
+
+  const [dateValue, setDateValue] = useState<string>(initializeDateValue());
+  const [filterType, setFilterType] = useState<'equals' | 'isRange'>(initializeFilterType());
+
+  useEffect(() => {
+    setDateValue(initializeDateValue());
+    setFilterType(initializeFilterType());
+  }, [data.filterValues]);
+
+  const parseDateValue = (value: string): Date | null => {
+    if (!value) return null;
+
+    const nativeDate = new Date(value);
+    if (isValid(nativeDate)) return nativeDate;
+
+    const parsedDate = parse(value, 'dd.MM.yyyy', new Date());
+    return isValid(parsedDate) ? parsedDate : null;
+  };
+
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    setDateValue(inputValue);
+  };
+
+  const handleApplyButtonClick = () => {
+    if (!dateValue) {
+      updateColumnFilter(data.colId, {
+        filterValues: [],
+      });
+      return;
+    }
+
+    if (filterType === 'isRange') {
+      // dateValue is array
+      const dates = dateValue.split(' - ');
+
+      if (dates.length === 2) {
+        const startDate = parseDateValue(dates[0]);
+        console.log('🐸 Pepe said >> handleApplyButtonClick >> startDate:', dates, startDate);
+
+        const endDate = parseDateValue(dates[1]);
+        console.log('🐸 Pepe said >> handleApplyButtonClick >> endDate:', endDate);
+
+
+        if (startDate && endDate) {
+          const formattedStartDate = format(startDate, 'yyyy-MM-dd 00:00:00');
+          const formattedEndDate = format(endDate, 'yyyy-MM-dd 00:00:00');
+          updateColumnFilter(data.colId, {
+            filterValues: [formattedStartDate, formattedEndDate],
+          });
+        }
+      }
+    } else {
+      const parsedDate = parseDateValue(dateValue);
+      if (parsedDate) {
+        const formattedDate = format(parsedDate, 'yyyy-MM-dd 00:00:00');
+        updateColumnFilter(data.colId, {
+          filterValues: [formattedDate],
+        });
+      }
+    }
+  };
+
+  const handleFilterTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newType = e.target.value as 'equals' | 'isRange';
+    setFilterType(newType);
+    setDateValue('');
+  };
+
+  return (
+    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      <Select
+        disabled={!data.isActive}
+        value={filterType}
+        onChange={handleFilterTypeChange}
+        style={{ width: '100%' }}
+      >
+        <Option value="equals">Равно</Option>
+        <Option value="isRange">Диапазон</Option>
+      </Select>
+
+      <DateField
+        type={filterType === 'isRange' ? 'date-range' : 'date'}
+        disabled={!data.isActive}
+        value={dateValue}
+        onChange={handleDateChange}
+        placeholder={filterType === 'equals' ? 'Выберите дату' : 'Выберите диапазон'}
+        style={{ width: '100%' }}
+        dimension="s"
+        displayClearIcon
+      />
+
+      <Button
+        dimension="s"
+        onClick={handleApplyButtonClick}
+        disabled={!data.isActive}
+        style={{ width: '100%' }}
+      >
+        Применить
+      </Button>
+    </div>
   );
 };
 
@@ -163,7 +326,12 @@ export const TemplateFiltersGrid = () => {
         suppressSorting: true,
         suppressFilter: true,
         autoHeight: true,
-        cellRenderer: ChipsCellRenderer,
+        cellRenderer: (params: any) => {
+          if (params.data.type === COLUMN_TYPE.DATE) {
+            return DateFieldRenderer(params);
+          }
+          return ChipsCellRenderer(params);
+        },
       },
     ],
     [],
