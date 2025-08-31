@@ -1,7 +1,7 @@
 import React from 'react';
 import { Navigate, useRoutes } from 'react-router-dom';
 
-import { Home, ChartsDashboardPage } from '@pages';
+import { Home, ChartsDashboardPage, ChartsDashboardPageBI } from '@pages';
 import { Playground } from '@pages/Playground';
 import { FutureTableHomePage } from '@pages/Playground/FutureTableHomePage';
 
@@ -10,6 +10,7 @@ export const ROUTES = {
   MF_HOME_ROUTE: '/sum-rm',
   FUTURE_TABLE: 'future_table',
   CHARTS: 'charts',
+  CHARTS_BI: 'charts_bi',
   PLAYGROUND: 'playground',
 };
 
@@ -30,6 +31,10 @@ const ROUTE_MAP = [
   {
     path: ROUTES.CHARTS,
     element: <ChartsDashboardPage />,
+  },
+  {
+    path: ROUTES.CHARTS_BI,
+    element: <ChartsDashboardPageBI />,
   },
   {
     path: ROUTES.PLAYGROUND,
