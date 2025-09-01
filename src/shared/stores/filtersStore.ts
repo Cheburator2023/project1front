@@ -61,7 +61,7 @@ export const useFiltersStore = create<FiltersStore>((set, get) => ({
 
   resetFilters: () => {
     const { agGridApi } = useGlobalStore.getState();
-    
+
     set({
       filterModel: {},
       sortState: [],
@@ -71,6 +71,7 @@ export const useFiltersStore = create<FiltersStore>((set, get) => ({
       secondDate: null,
       modelsDownloadingDate: undefined,
     });
+
 
     if (agGridApi) {
       agGridApi.setFilterModel(null);

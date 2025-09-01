@@ -9,7 +9,7 @@ import {
   InputField,
 } from '@admiral-ds/react-ui';
 import { Template } from '@shared/api/types';
-import { initialColumns } from '@shared/constants/InitialCollumns';
+import { initialColumns as _initialColumns } from '@shared/constants/InitialCollumns';
 import { useTemplatesStore } from '@shared/stores/templatesStore';
 import { useFiltersStore } from '@shared/stores/filtersStore';
 import { useGlobalStore } from '@shared/stores/globalStore';
@@ -17,6 +17,8 @@ import { ReactComponent as SearchOutline } from '@admiral-ds/icons/build/system/
 import { useTemplateFiltersModalStore } from '../stores/templateFiltersModalStore';
 import { TemplateFiltersGrid } from './TemplateFiltersGrid';
 import { Spacer } from '../../../shared/ui/atoms';
+
+const initialColumns = _initialColumns.filter((col) => col.name !== 'relations');
 
 export const TemplateFiltersModal = () => {
   const {
@@ -98,16 +100,6 @@ export const TemplateFiltersModal = () => {
           columnState.push({
             colId: column.colId,
             hide: !column.isActive,
-            sort: null,
-            sortIndex: null,
-            aggFunc: null,
-            width: null,
-            flex: null,
-            pinned: null,
-            rowGroupIndex: null,
-            pivotIndex: null,
-            rowGroup: false,
-            pivot: false,
           });
         }
       });
@@ -139,6 +131,7 @@ export const TemplateFiltersModal = () => {
             filterModel: newFilterModel,
             columnState,
           };
+        console.log('🐸 Pepe said >> handleSave >> selectedTemplateId:');
           setPendingTemplate(savedTemplate);
           agGridApiGlobal.setFilterModel(newFilterModel);
           agGridApiGlobal.applyColumnState({ state: columnState, applyOrder: true });
@@ -146,7 +139,6 @@ export const TemplateFiltersModal = () => {
         }
       } else {
         savedTemplate = {
-          // template_id: 666,
           // @ts-ignore
           template_id: 'Новый шаблон для сохранения',
           template_name: 'Новый шаблон',
@@ -156,26 +148,25 @@ export const TemplateFiltersModal = () => {
           isPending: true,
         };
         setPendingTemplate(savedTemplate);
+        console.log('🐸 Pepe said >> handleSave >> new temp:');
+        console.log('🐸 Pepe said >> handleSave >> columnState:', columnState);
         agGridApiGlobal.setFilterModel(newFilterModel);
         agGridApiGlobal.applyColumnState({ state: columnState, applyOrder: true });
         setTopFilters({ ...topFilters, templates: [] });
       }
 
       setTimeout(() => {
+        console.log('🐸 Pepe said >> handleSave >> setTimeout:');
         setFilterModel(newFilterModel);
         agGridApiGlobal.setFilterModel(newFilterModel);
         agGridApiGlobal.applyColumnState({ state: columnState, applyOrder: true });
-      }, 0);
+      }, 30);
     }
 
     closeModal();
   };
 
   const handleReset = () => {
-    if (agGridApiGlobal) {
-      agGridApiGlobal.setFilterModel({});
-      agGridApiGlobal.applyColumnState({ state: [], applyOrder: true });
-    }
     initializeFromTemplate(undefined);
   };
 

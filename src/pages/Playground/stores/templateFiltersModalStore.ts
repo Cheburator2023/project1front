@@ -1,8 +1,10 @@
 import { create } from 'zustand';
 import { Template } from '@shared/api/types';
-import { initialColumns } from '@shared/constants/InitialCollumns';
+import { initialColumns as _initialColumns } from '@shared/constants/InitialCollumns';
 import { GridApi } from 'ag-grid-community';
 import { useGlobalStore } from '@shared/stores/globalStore';
+
+const initialColumns = _initialColumns.filter((col) => col.name !== 'relations');
 
 export type ColumnFilterData = {
   colId: string;

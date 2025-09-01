@@ -21,6 +21,7 @@ import { getColumnFilterOptions } from '../../../shared/helpers/helpers';
 import { useDeepEffect } from '../../../shared/hooks/useDeepEffect';
 import { COLUMN_TYPE } from '../../../shared/types';
 
+
 const CheckboxHeaderRenderer = (props: IHeaderParams) => {
   const { toggleAllColumns, columnFilters } = useTemplateFiltersModalStore();
 
@@ -144,7 +145,6 @@ const DateFieldRenderer = ({ data }: any) => {
     }
 
     if (filterType === 'isRange') {
-      // dateValue is array
       const dates = dateValue.split(' - ');
 
       if (dates.length === 2) {
@@ -155,7 +155,11 @@ const DateFieldRenderer = ({ data }: any) => {
           const formattedStartDate = format(startDate, 'yyyy-MM-dd 00:00:00');
           const formattedEndDate = format(endDate, 'yyyy-MM-dd 00:00:00');
           updateColumnFilter(data.colId, {
-            filterValues: [formattedStartDate, formattedEndDate],
+            filterValues: [{
+              type: 'inRange',
+              dateFrom: formattedStartDate,
+              dateTo: formattedEndDate
+            }] as any,
           });
           setInitialDateValue(dateValue);
           setInitialFilterType(filterType);
@@ -253,17 +257,7 @@ const ChipsCellRenderer = ({ data }: any) => {
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedOptions = e.target.selectedOptions;
-
-    let newSelectedValues = Array.from(selectedOptions).map((option) => option.value);
-    const _options = availableOptions as any;
-
-    if (selectedValues?.includes(newSelectedValues[0])) {
-      newSelectedValues = [];
-    }
-    const selectOptionsValues = _options;
-    const prevSelectedValues =
-      selectedValues?.filter((value) => !selectOptionsValues.includes(value)) ?? [];
-    newSelectedValues = [...prevSelectedValues, ...newSelectedValues];
+    const newSelectedValues = Array.from(selectedOptions).map((option) => option.value);
     setSelectedValues(newSelectedValues);
   };
 
@@ -281,7 +275,7 @@ const ChipsCellRenderer = ({ data }: any) => {
         disabled={!data.isActive || !availableOptions.length}
         mode="searchSelect"
         placeholder="Выберите значения"
-        defaultValue={selectedValues}
+        value={selectedValues}
         onChange={handleChange}
         style={{ width: '100%' }}
         maxRowCount={1}
@@ -385,7 +379,7 @@ export const TemplateFiltersGrid = () => {
 
   const onGridReady = useCallback(
     (params: GridReadyEvent) => {
-      // params.api.sizeColumnsToFit();
+      params.api.sizeColumnsToFit();
       params.api.resetRowHeights();
       setLocalGridApi(params.api);
     },
@@ -394,7 +388,7 @@ export const TemplateFiltersGrid = () => {
 
   const getRowHeight = useCallback((params: any) => {
     if (params.data.type === COLUMN_TYPE.DATE) {
-      return 90;
+      return 130;
     }
     if (params.data.type === COLUMN_TYPE.STRING) {
       return 50;
@@ -413,7 +407,6 @@ export const TemplateFiltersGrid = () => {
         onGridReady={onGridReady}
         suppressRowClickSelection
         suppressCellFocus
-        headerHeight={40}
         getRowHeight={getRowHeight}
         // animateRows={false}
         quickFilterText={quickFilterText}

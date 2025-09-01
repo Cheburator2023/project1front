@@ -95,7 +95,6 @@ const sideBarProps: SideBarDef | string | string[] | boolean | null = {
     },
   ],
   defaultToolPanel: undefined,
-  // hiddenByDefault: true,
 };
 
 const toolTipValueGetter = (params: ITooltipParams) =>
@@ -133,25 +132,6 @@ const dateFilterParams: IDateFilterParams = {
 const setFilterParams: ISetFilterParams = {
   buttons: ['clear'],
   refreshValuesOnOpen: true,
-  // excelMode: 'windows',
-  // comparator: (a: any, b: any) => {
-  //   if (a == null && b == null) return 0;
-  //   if (a == null) return -1;
-  //   if (b == null) return 1;
-  //   return a.toString().localeCompare(b.toString());
-  // },
-  // valueFormatter: (params: any) => {
-  //   // if (params.value == null || params.value === '') {
-  //   //   return '(Пусто)';
-  //   // }
-  //   const cleanValue = params.value
-  //     .toString()
-  //     .replace(/<br\s*\/?>/gi, ' ')
-  //     .replace(/<[^>]*>/g, '')
-  //     .replace(/\s+/g, ' ')
-  //     .trim();
-  //   return cleanValue;
-  // },
 };
 
 const autoGroupColumnDefProps: ColDef = {
@@ -402,6 +382,8 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     const { setFilterModel } = useFiltersStore();
 
     const handleFilterChange = (event: FilterChangedEvent): void => {
+      console.log('🐸 Pepe said >> handleFilterChange >> event:', event);
+
       if (event.source === 'api') return;
       const _filterModel = event.api.getFilterModel();
       console.log('🐸 Pepe said >> handleFilterChange >> _filterModel:', _filterModel);
@@ -450,10 +432,13 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
           (t) => String(t.template_id) === topFilters.templates[0],
         );
 
+
         if (activeTemplate?.columnState) {
+        console.log('🐸 Pepe said >> activeTemplate:', activeTemplate);
           agGridApi.applyColumnState({
             state: activeTemplate.columnState,
             defaultState: { hide: true },
+            applyOrder: true,
           });
         }
       }
