@@ -7,7 +7,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { ReactComponent as EditOutline } from '@admiral-ds/icons/build/system/EditOutline.svg';
 import { ReactComponent as CalendarUpdateOutline } from '@admiral-ds/icons/build/system/CalendarUpdateOutline.svg';
-import { getLink } from '@entities/CustomCell/helpers';
+import { getLink } from '@src/features/AgGridTables/molecules/helpers';
 import { COLUMN_TYPE } from '@src/shared/types';
 import { Tooltip } from '@src/shared/ui/atoms';
 import { usePermissions } from '@src/shared/hooks';

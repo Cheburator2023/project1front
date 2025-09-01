@@ -121,7 +121,6 @@ const DateFieldRenderer = ({ data }: any) => {
   }, [data.filterValues]);
 
   const parseDateValue = (value: string): Date | null => {
-
     if (!value) return null;
 
     const parsedDate = parse(value, 'dd.MM.yyyy', new Date(), { locale: ru });
@@ -403,6 +402,7 @@ export const TemplateFiltersGrid = () => {
 const TableWrapper = styled.div`
   height: 100%;
   width: 100%;
+  zoom: 0.8;
 
   .ag-cell-wrapper {
     height: -webkit-fill-available;

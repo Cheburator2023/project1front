@@ -38,14 +38,14 @@ import { useNavigate } from 'react-router-dom';
 import { Column, COLUMN_TYPE, Row } from '@src/shared/types';
 import { Template } from '@src/shared/api/types';
 import styled from 'styled-components';
-import { AgGridTableCustomCell } from './AgGridTableCustomCell';
-import { AG_GRID_LOCALE_RU } from '../../app/agGridLocale.ru';
-import { useDeleteRightModelPanelStore, useDisplayStore } from '../../shared/stores';
-import { usePermissions, useRoles } from '../../shared/hooks';
-import { isInBusinessCustomers, isModelCreator } from '../../shared/helpers';
-import { useDeepEffect } from '../../shared/hooks/useDeepEffect';
-import { useGlobalStore } from '../../shared/stores/globalStore';
-import { useFiltersStore } from '../../shared/stores/filtersStore';
+import { AgGridTableCustomCell } from '../molecules/AgGridTableCustomCell';
+import { AG_GRID_LOCALE_RU } from '../../../app/agGridLocale.ru';
+import { useDeleteRightModelPanelStore, useModelsStore } from '../../../shared/stores';
+import { usePermissions, useRoles } from '../../../shared/hooks';
+import { isInBusinessCustomers, isModelCreator } from '../../../shared/helpers';
+import { useDeepEffect } from '../../../shared/hooks/useDeepEffect';
+import { useGlobalStore } from '../../../shared/stores/globalStore';
+import { useFiltersStore } from '../../../shared/stores/filtersStore';
 
 interface IAgGridTableProps {
   templates?: Template[];
@@ -181,7 +181,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     }: IAgGridTableProps,
     ref: any,
   ) => {
-    const { setRightPanelType } = useDisplayStore();
+    const { setRightPanelType } = useModelsStore();
     const { filtersResetCount, setAgGridApi, agGridApi } = useGlobalStore();
     const { filterModel, topFilters, setTopFilters } = useFiltersStore();
 
@@ -480,7 +480,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
                     id="filter-text-box"
                     onChange={onFilterTextBoxChanged}
                     placeholder="Поиск"
-                    dimension='s'
+                    dimension="s"
                     icons={<SearchOutline />}
                   />
                 </Flexbox>
@@ -516,8 +516,8 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
                     tooltip="Текущий интерфейс таблиц"
                     onClick={() => navigate(ROUTES.MF_HOME_ROUTE)}
                   /> */}
-                  <IconButton icon={<MenuOutline />} tooltip="Меню" onClick={() => null} />
-                  <IconButton icon={<SettingsOutline />} tooltip="Настройки" onClick={() => null} />
+                  {/* <IconButton icon={<MenuOutline />} tooltip="Меню" onClick={() => null} /> */}
+                  {/* <IconButton icon={<SettingsOutline />} tooltip="Настройки" onClick={() => null} /> */}
                 </div>
               </Flexbox>
 

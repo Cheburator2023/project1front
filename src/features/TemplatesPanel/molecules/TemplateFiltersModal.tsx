@@ -25,13 +25,9 @@ export const TemplateFiltersModal = () => {
     isOpen,
     closeModal,
     selectedTemplateId,
-    setSelectedTemplate,
     columnFilters,
-    setColumnFilters,
-    isDirty,
     resetState,
     initializeFromTemplate,
-    hasChanges,
     quickFilterText,
     setQuickFilterText,
     localGridApi,
@@ -39,8 +35,7 @@ export const TemplateFiltersModal = () => {
 
   const { templates, pendingTemplate, setPendingTemplate } = useTemplatesStore();
 
-  const { filterModel, setFilterModel, resetFilters, topFilters, setTopFilters } =
-    useFiltersStore();
+  const { topFilters, setTopFilters } = useFiltersStore();
   const { agGridApi: agGridApiGlobal } = useGlobalStore();
 
   useEffect(() => {
@@ -60,10 +55,8 @@ export const TemplateFiltersModal = () => {
       } else {
         // тут нужна логика забора данных и маппинга в пред-теплейт, не просто undefined
         const filterModel = agGridApiGlobal?.getFilterModel();
-        const columnState = agGridApiGlobal?.getColumnState();
 
         initializeFromTemplate({
-          // template_id: 666,
           // @ts-ignore
           template_id: 'Новый шаблон для сохранения',
           template_name: 'Новый шаблон',
@@ -93,7 +86,7 @@ export const TemplateFiltersModal = () => {
       const newFilterModel: any = {};
       const columnState: any[] = [];
 
-      columnFilters.forEach((column, index) => {
+      columnFilters.forEach((column) => {
         const matchingColumn = initialColumns.find((col) => col.name === column.colId);
 
         if (matchingColumn) {
@@ -183,10 +176,22 @@ export const TemplateFiltersModal = () => {
 
   return (
     isOpen && (
-      <Modal onClose={handleCancel} dimension="xl" style={{ width: '90%', maxWidth: '90%' }}>
+      <Modal
+        onClose={handleCancel}
+        dimension="xl"
+        style={{ width: '95%', maxWidth: '95%', height: '95%' }}
+      >
         <ModalTitle>Управление шаблонами фильтрации</ModalTitle>
-        <Spacer />
-        <div style={{ padding: '0 24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <Spacer space={10} />
+        <div
+          style={{
+            padding: '0 24px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '20px',
+            height: '100%',
+          }}
+        >
           <div
             style={{
               display: 'flex',
@@ -196,10 +201,11 @@ export const TemplateFiltersModal = () => {
             }}
           >
             <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-              <label style={{ fontWeight: 500 }}>Шаблон:</label>
+              <label style={{ fontWeight: 500 }}>Активный шаблон:</label>
               <Select
                 id="TemplateFiltersModal_select_template_input"
                 placeholder="Выберите шаблон"
+                dimension="s"
                 value={selectedTemplateId?.toString() || 'new'}
                 onChange={(e) => handleTemplateChange(e.target.value)}
                 style={{ minWidth: '300px' }}
@@ -215,6 +221,7 @@ export const TemplateFiltersModal = () => {
               <InputField
                 id="filter-text-box"
                 value={quickFilterText}
+                dimension="s"
                 onChange={(e) => setQuickFilterText(e.target.value)}
                 placeholder="Поиск"
                 icons={<SearchOutline />}
@@ -222,7 +229,7 @@ export const TemplateFiltersModal = () => {
             </div>
           </div>
 
-          <div style={{ height: '500px' }}>
+          <div style={{ height: '100%' }}>
             <TemplateFiltersGrid />
           </div>
 

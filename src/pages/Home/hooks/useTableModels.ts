@@ -23,7 +23,7 @@ import { ArtifactApi, CustomError } from '@src/shared/api/types';
 import {
   useExploitationModeStore,
   useFiltersStore,
-  useDisplayStore,
+  useModelsStore,
   useTemplatesStore,
 } from '@src/shared/stores';
 import { useDeepEffect } from '../../../shared/hooks/useDeepEffect';
@@ -113,7 +113,7 @@ export const useTableModels = () => {
     setActiveRowId,
     handleChangeCompare,
     handleOnClose,
-  } = useDisplayStore();
+  } = useModelsStore();
 
   // Table data
   const [rowList, setRowList] = useState<Array<Partial<Row>>>([]);

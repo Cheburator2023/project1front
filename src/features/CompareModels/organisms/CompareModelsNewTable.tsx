@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 
-import { AgGridModelsTable } from '@src/features/NewTables/AgGridModelsTable';
-import { useCompareModels } from '../../../widgets/CompareModelsWidget/hooks';
+import { AgGridModelsTable } from '@src/features/AgGridTables/templates/AgGridModelsTable';
+import { useCompareModels } from '../hooks';
 
 interface TableModelsProps {
   firstDate: string | null;
@@ -10,17 +10,11 @@ interface TableModelsProps {
 
 export const CompareModelsNewTable = React.memo(({ firstDate, secondDate }: TableModelsProps) => {
   const { compareModelsTable } = useCompareModels();
-
-  const rowList = compareModelsTable.rowList;
-  const columnList = compareModelsTable.columnList;
-  const totalRows = compareModelsTable.totalRows;
-  const setTotalRows = compareModelsTable.setTotalRows;
+  const { rowList, columnList, totalRows, setTotalRows } = compareModelsTable;
 
   useEffect(() => {
     if (rowList?.length) {
       setTotalRows(rowList.length);
-
-
     }
   }, [rowList]);
 
@@ -37,6 +31,4 @@ export const CompareModelsNewTable = React.memo(({ firstDate, secondDate }: Tabl
     />
   );
 });
-
-CompareModelsNewTable.displayName = 'CompareModelsNewTable';
 

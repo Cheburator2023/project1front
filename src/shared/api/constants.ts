@@ -12,6 +12,7 @@ export enum API_ROUTES {
   ARTIFACTS = '/artefacts',
   ARTIFACTS_EDIT = '/artefacts/update',
   REPORT = '/report',
+  REPORT_DOWNLOAD = '/reports/download',
   METRICS = '/metrics',
   METRICS_EXPORT = '/metrics/export',
   BI_DATAMART_SYNC_MODELS = '/bi-datamart/sync/models',

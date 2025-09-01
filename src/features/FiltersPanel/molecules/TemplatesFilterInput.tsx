@@ -5,13 +5,12 @@ import { Template } from '@shared/api';
 import { useFiltersStore } from '@shared/stores/filtersStore';
 import { SELECT_TYPE, CustomSearchSelect } from '@shared/ui/organisms';
 import { initialTopFilters, RIGHT_PANEL_TYPE } from '@shared/constants';
-import { useTemplateFilters } from '@src/shared/hooks';
 
-import { getGroupsOptions } from './helpers';
-import { useGlobalStore } from '../../shared/stores/globalStore';
-import { useTemplatesStore } from '../../shared/stores';
+import { getGroupsOptions } from '../helpers';
+import { useGlobalStore } from '../../../shared/stores/globalStore';
+import { useTemplatesStore } from '../../../shared/stores';
 
-export interface TemplatesFilterProps {
+export interface TemplatesFilterInputProps {
   templates: Template[];
   activeTemplate?: Template;
   loading?: boolean;
@@ -20,23 +19,19 @@ export interface TemplatesFilterProps {
   updateRightPanelType: (newRightPanelType: RIGHT_PANEL_TYPE | null) => void;
 }
 
-export const TemplatesFilter = ({
+export const TemplatesFilterInput = ({
   templates,
   activeTemplate,
   showLabel = true,
   loading = false,
   error = '',
   updateRightPanelType,
-}: TemplatesFilterProps) => {
+}: TemplatesFilterInputProps) => {
   const { topFilters, setTopFilters, filterModel, setFilterModel, resetFilters } =
     useFiltersStore();
 
-
-  const { isModifiedFilter, resetFilters: resetTemplateFilters } = useTemplateFilters(
-    filterModel,
-    templates,
-    topFilters.templates,
-  );
+  const { getIsModifiedFilter } = useFiltersStore();
+  const isModifiedFilter = getIsModifiedFilter();
 
   const groupedOptions = useMemo(() => {
     if (templates) {
@@ -63,8 +58,7 @@ export const TemplatesFilter = ({
   };
 
   const { setFiltersResetCount } = useGlobalStore();
-    const { pendingTemplate, setPendingTemplate } = useTemplatesStore();
-
+  const { pendingTemplate, setPendingTemplate } = useTemplatesStore();
 
   const handleResetFilters = () => {
     resetFilters();
@@ -89,7 +83,6 @@ export const TemplatesFilter = ({
       options={{
         type: SELECT_TYPE.TEMPLATES,
         groups: groupedOptions,
-
       }}
       onChange={handleChange}
       modified={isModifiedFilter}

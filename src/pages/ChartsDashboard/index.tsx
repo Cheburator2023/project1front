@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChartsDashboard } from '@src/features';
+import { ChartsDashboard } from '@features/ChartsDashboard';
 
 const ChartsDashboardPage = () => {
   return <ChartsDashboard useDatamart={false} />;

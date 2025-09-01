@@ -17,7 +17,7 @@ export const TemplatesPanel = () => {
   const templateFiltersModalStore = useTemplateFiltersModalStore();
   const { topFilters, filterModel } = useFiltersStore();
   const { templates } = useTemplatesStore();
-  
+
   const activeFiltersCount = useMemo(
     () => getActiveFiltersCount(filterModel, templates, topFilters.templates[0]),
     [filterModel, templates, topFilters.templates],

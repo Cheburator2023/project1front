@@ -3,15 +3,15 @@ import { Button, Checkbox, T, Toggle } from '@admiral-ds/react-ui';
 import { Template } from '@shared/api';
 import { useFiltersStore } from '@shared/stores/filtersStore';
 import { CustomSearchSelect } from '@shared/ui/organisms';
-import { useExploitationModeStore, useDisplayStore, useTemplatesStore } from '@src/shared/stores';
+import { useExploitationModeStore, useModelsStore, useTemplatesStore } from '@src/shared/stores';
 import { ACTIVE_SCREEN, RIGHT_PANEL_TYPE, modelsSelectOptions } from '@shared/constants';
-import { TemplatesFilter } from '@entities';
 
-import { Container, CustomDateField, FiltersDivider, FilterButton, FiltersBox } from './styles';
-import { useGlobalStore } from '../../shared/stores/globalStore';
-import { useTableModels } from '../../pages/Home/hooks';
-import { TemplatesPanel } from '../TemplatesPanel/organisms/TemplatesPanel';
-import { useTemplateFilters } from '../../shared/hooks';
+import { Container, CustomDateField, FiltersDivider, FilterButton, FiltersBox } from '../styles';
+import { useGlobalStore } from '../../../shared/stores/globalStore';
+import { useTableModels } from '../../../pages/Home/hooks';
+import { TemplatesPanel } from '../../TemplatesPanel/organisms/TemplatesPanel';
+import { TemplatesFilterInput } from '../molecules/TemplatesFilterInput';
+import { useTemplateFiltersModalStore } from '../../TemplatesPanel/stores/templateFiltersModalStore';
 
 export interface FiltersPanelProps {
   compareOnlyChanged?: boolean;
@@ -28,12 +28,12 @@ export const FiltersPanel = ({
   handleUpdateCompareList = () => null,
   handleCompareOnlyChanged = () => null,
 }: FiltersPanelProps) => {
+  const { pendingTemplate, setPendingTemplate } = useTemplatesStore();
   const { filters, fetchModelsByDate } = useTableModels();
 
   const templates = filters?.templates;
 
-  const { compareMode, setActiveScreen, setRightPanelType, handleChangeCompare } =
-    useDisplayStore();
+  const { compareMode, setActiveScreen, setRightPanelType, handleChangeCompare } = useModelsStore();
   const {
     topFilters,
     modelsDownloadingDate,
@@ -45,7 +45,10 @@ export const FiltersPanel = ({
     filterModel,
   } = useFiltersStore();
   const { setFiltersResetCount } = useGlobalStore();
-  const { activeTemplate } = useTemplateFilters(filterModel, templates, topFilters.templates);
+  const { getActiveTemplate } = useFiltersStore();
+  const { initializeFromTemplate, resetState } = useTemplateFiltersModalStore();
+
+  const activeTemplate = getActiveTemplate();
 
   const { exploitationModeOptions, selectedExploitationModes, updateSelectedExploitationModes } =
     useExploitationModeStore();
@@ -58,6 +61,9 @@ export const FiltersPanel = ({
     resetFilters();
     setTopFilters({ ...topFilters, templates: [] });
     setFiltersResetCount();
+    resetState();
+    initializeFromTemplate(undefined);
+    setPendingTemplate(undefined);
   };
 
   const handleChangeExploitationModes = (value: string[]) => {
@@ -80,7 +86,7 @@ export const FiltersPanel = ({
           selectedValues={topFilters.objectTypeRegistry}
           onChange={handleChange}
         />
-        <TemplatesFilter
+        <TemplatesFilterInput
           activeTemplate={activeTemplate}
           templates={templates}
           updateRightPanelType={setRightPanelType}

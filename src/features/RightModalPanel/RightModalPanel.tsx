@@ -14,10 +14,8 @@ import {
 import { Spinner } from '@admiral-ds/react-ui';
 import { 
   useDeleteRightModelPanelStore,
-  useDisplayStore,
-  useModelsTableStore,
-  useTemplatesStore,
-  useModelsOperationsStore
+  useModelsStore,
+  useTemplatesStore
 } from '@src/shared/stores';
 import { CustomError } from '@src/shared/api/types';
 import { ModelForm } from './ModelForm';
@@ -28,9 +26,7 @@ import { DeleteModelForm } from './DeleteModelForm/DeleteModelForm';
 export const RightModalPanel = React.memo(
   () => {
     const { templates, setTemplates } = useTemplatesStore();
-    const { rightPanelType: activeStatus, activeRowId, activeCellName } = useDisplayStore();
-    const { rows } = useModelsTableStore();
-    const { handleSubmit: onSubmit, handleOnClose: onClose } = useModelsOperationsStore();
+    const { rightPanelType: activeStatus, activeRowId, activeCellName, rows, handleSubmit: onSubmit, handleOnClose: onClose } = useModelsStore();
     
     const { responseData: artifactsData } = useFetch<ArtifactResponse | undefined>({
       apiRoute: API_ROUTES.ARTIFACTS,
@@ -104,7 +100,7 @@ export const RightModalPanel = React.memo(
 
     if (activeStatus === RIGHT_PANEL_TYPE.ADD_TEMPLATE) {
       return (
-        <Templates templates={templates} onClose={onClose} updateTemplates={setTemplates} />
+        <Templates templates={templates} onClose={onClose} updateTemplates={(updater) => setTemplates(typeof updater === 'function' ? updater(templates) : updater)} />
       );
     }
 

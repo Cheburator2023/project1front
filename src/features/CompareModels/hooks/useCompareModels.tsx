@@ -9,11 +9,12 @@ import {
   CompareModelsResponseType,
   mockedModelsCompareResponse,
 } from '@shared/api';
-import { CellWrapper, CellContentFactory } from '@entities';
 import { useExploitationModeStore, useFiltersStore } from '@src/shared/stores';
 
 import { initialColumns } from '@src/shared/constants';
 import { compareValues, prepareFetchParams, processFetchData } from '../helpers';
+import { CellWrapper } from '../../AgGridTables/molecules/CustomCell';
+import { CellContentFactory } from '../../AgGridTables/molecules/CellContentFactory';
 
 export const getQueryParams = (
   firstDate: string,

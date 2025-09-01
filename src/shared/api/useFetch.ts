@@ -8,7 +8,7 @@ import { stringToBoolean } from '../helpers/typeops';
 const MOCKED_REQUESTS = stringToBoolean(process.env.MOCKED_REQUESTS);
 
 export interface MutationProtectedFetchProps<T, N> {
-  // TODO: check this types
+  // TODO: check these types
   body?: T extends N ? T : any;
   fetchApiRoute: API_ROUTES;
   fetchMethod: 'POST' | 'PUT' | 'DELETE' | 'GET';
@@ -89,7 +89,7 @@ export const useFetch = <T>({
 
   return {
     // fetch for CREATE, UPDATE, DELETE operations
-    // TODO: check this types
+    // TODO: check these types
     mutationProtectedFetch: async <N, M>({
       body,
       fetchApiRoute,

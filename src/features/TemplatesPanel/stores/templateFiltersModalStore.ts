@@ -71,18 +71,13 @@ const initialState: TemplateFiltersModalState = {
 
 export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((set, get) => ({
   ...initialState,
-
   openModal: () => set({ isOpen: true }),
-
   closeModal: () => set({ isOpen: false, isDirty: false }),
-
   setSelectedTemplate: (templateId) => set({ selectedTemplateId: templateId, isDirty: true }),
-
   setColumnFilters: (filters) => {
     const isAllSelected = filters.every((f) => f.isActive);
     set({ columnFilters: filters, isAllSelected, isDirty: true });
   },
-
   updateColumnFilter: (colId, updates) => {
     const { columnFilters } = get();
     const updatedFilters = columnFilters.map((filter) =>
@@ -94,7 +89,6 @@ export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((s
     set({ columnFilters: updatedFilters, isAllSelected, isDirty: true });
 
   },
-
   toggleColumnActive: (colId) => {
     const { columnFilters, selectedTemplateId } = get();
     const updatedFilters = columnFilters.map((filter) =>
@@ -113,7 +107,6 @@ export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((s
       set({ columnFilters: updatedFilters, isAllSelected, isDirty: true });
     }
   },
-
   toggleAllColumns: () => {
     const { columnFilters, isAllSelected, selectedTemplateId } = get();
     const newActiveState = !isAllSelected;
@@ -133,7 +126,6 @@ export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((s
       set({ columnFilters: updatedFilters, isAllSelected: newActiveState, isDirty: true });
     }
   },
-
   reorderColumns: (startIndex, endIndex) => {
     const { columnFilters, selectedTemplateId } = get();
     const result = Array.from(columnFilters);
@@ -151,11 +143,8 @@ export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((s
       set({ columnFilters: reorderedFilters, isDirty: true });
     }
   },
-
   setIsDirty: (dirty) => set({ isDirty: dirty }),
-
   resetState: () => set(initialState),
-
   initializeFromTemplate: (template?: Template) => {
     const agGridApi = useGlobalStore.getState().agGridApi;
     const currentColumnState = agGridApi

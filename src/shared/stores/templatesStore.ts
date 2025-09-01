@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/ban-types */
 import { create } from 'zustand';
 import { Template } from '@shared/api';
-import React from 'react';
 
 export interface TemplatesStoreState {
   templates: Template[];
@@ -9,7 +7,8 @@ export interface TemplatesStoreState {
 }
 
 export interface TemplatesStoreActions {
-  setTemplates: React.Dispatch<React.SetStateAction<Template[]>>;
+  setTemplates: (templates: Template[]) => void;
+  updateTemplates: (updater: (templates: Template[]) => Template[]) => void;
   setPendingTemplate: (template?: Template) => void;
   resetPendingTemplate: () => void;
 }
@@ -19,8 +18,10 @@ export type TemplatesStore = TemplatesStoreState & TemplatesStoreActions;
 export const useTemplatesStore = create<TemplatesStore>((set, get) => ({
   templates: [],
   pendingTemplate: undefined,
-  setTemplates: (value: React.SetStateAction<Template[]>) => {
-    const newTemplates = typeof value === 'function' ? value(get().templates) : value;
+  setTemplates: (templates: Template[]) => set({ templates }),
+  updateTemplates: (updater: (templates: Template[]) => Template[]) => {
+    const currentTemplates = get().templates;
+    const newTemplates = updater(currentTemplates);
     set({ templates: newTemplates });
   },
   setPendingTemplate: (template?: Template) => {

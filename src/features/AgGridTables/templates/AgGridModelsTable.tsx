@@ -2,7 +2,7 @@ import React from 'react';
 import { TFilters, TModelsTable, useTableModels } from '@pages/Home/hooks';
 import { Template } from '@src/shared/api';
 import { Column, Row } from '@src/shared/types';
-import { AgGridTable } from './AgGridTable';
+import { AgGridTable } from '../organisms/AgGridTable';
 
 export const AgGridModelsTable = (props: {
   isCompared?: boolean;
