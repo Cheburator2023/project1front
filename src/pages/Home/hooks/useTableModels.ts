@@ -85,6 +85,7 @@ export interface IUseTableModels {
   display: TDisplayTableModels;
   modelsTable: TModelsTable;
   filters: TFilters;
+  fetchModelsByDate: (date: string) => void;
 }
 
 export const useTableModels = () => {
@@ -187,7 +188,7 @@ export const useTableModels = () => {
     }
   }, [templateData]);
 
-  const handleChangeModelDownloadingDate = useCallback((date: string) => {
+  const fetchModelsByDate = useCallback((date: string) => {
     fetchModels(date);
     setModelsDownloadingDate(date);
   }, []);
@@ -211,20 +212,6 @@ export const useTableModels = () => {
   const updateColumnList = useCallback(() => {
     setColumnList(initialColumns);
   }, []);
-
-  const contextValue = useMemo(
-    () => ({
-      firstDate,
-      secondDate,
-      modelsDownloadingDate,
-      topFilters,
-      onChangeTopFilters: (newTopFilters: TopFilters) => setTopFilters(newTopFilters),
-      onChangeFirstDate: (newFirstDate: string | null) => setFirstDate(newFirstDate),
-      onChangeSecondDate: (newSecondDate: string | null) => setSecondDate(newSecondDate),
-      onChangeModelDownloadingDate: handleChangeModelDownloadingDate,
-    }),
-    [topFilters, firstDate, secondDate, modelsDownloadingDate, handleChangeModelDownloadingDate],
-  );
 
   const handleClickOnActionCell = useCallback(
     (
@@ -289,6 +276,7 @@ export const useTableModels = () => {
       firstDate,
       secondDate,
     },
+    fetchModelsByDate,
   };
 
   return result;

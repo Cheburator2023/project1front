@@ -10,6 +10,7 @@ import {
   DateField,
 } from '@admiral-ds/react-ui';
 import { format, parse, isValid } from 'date-fns';
+import styled from 'styled-components';
 import {
   useTemplateFiltersModalStore,
   ColumnFilterData,
@@ -30,6 +31,7 @@ const CheckboxHeaderRenderer = (props: IHeaderParams) => {
     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
       <Checkbox
         checked={isAllSelected}
+        dimension="s"
         indeterminate={isIndeterminate}
         onChange={toggleAllColumns}
       />
@@ -42,14 +44,16 @@ const CheckboxCellRenderer = ({ data }: any) => {
 
   return (
     <Flexbox alignItems="center" height="100%">
-      <Checkbox checked={data.isActive} onChange={() => toggleColumnActive(data.colId)} />
+      <Checkbox
+        dimension="s"
+        checked={data.isActive}
+        onChange={() => toggleColumnActive(data.colId)}
+      />
     </Flexbox>
   );
 };
 
 const DateFieldRenderer = ({ data }: any) => {
-  const filterValues: string[] = data.filterValues;
-
   const { updateColumnFilter } = useTemplateFiltersModalStore();
 
   const initializeDateValue = () => {
@@ -100,10 +104,18 @@ const DateFieldRenderer = ({ data }: any) => {
 
   const [dateValue, setDateValue] = useState<string>(initializeDateValue());
   const [filterType, setFilterType] = useState<'equals' | 'isRange'>(initializeFilterType());
+  const [initialDateValue, setInitialDateValue] = useState<string>(initializeDateValue());
+  const [initialFilterType, setInitialFilterType] = useState<'equals' | 'isRange'>(
+    initializeFilterType(),
+  );
 
   useEffect(() => {
-    setDateValue(initializeDateValue());
-    setFilterType(initializeFilterType());
+    const newDateValue = initializeDateValue();
+    const newFilterType = initializeFilterType();
+    setDateValue(newDateValue);
+    setFilterType(newFilterType);
+    setInitialDateValue(newDateValue);
+    setInitialFilterType(newFilterType);
   }, [data.filterValues]);
 
   const parseDateValue = (value: string): Date | null => {
@@ -126,6 +138,8 @@ const DateFieldRenderer = ({ data }: any) => {
       updateColumnFilter(data.colId, {
         filterValues: [],
       });
+      setInitialDateValue(dateValue);
+      setInitialFilterType(filterType);
       return;
     }
 
@@ -135,11 +149,7 @@ const DateFieldRenderer = ({ data }: any) => {
 
       if (dates.length === 2) {
         const startDate = parseDateValue(dates[0]);
-        console.log('🐸 Pepe said >> handleApplyButtonClick >> startDate:', dates, startDate);
-
         const endDate = parseDateValue(dates[1]);
-        console.log('🐸 Pepe said >> handleApplyButtonClick >> endDate:', endDate);
-
 
         if (startDate && endDate) {
           const formattedStartDate = format(startDate, 'yyyy-MM-dd 00:00:00');
@@ -147,6 +157,8 @@ const DateFieldRenderer = ({ data }: any) => {
           updateColumnFilter(data.colId, {
             filterValues: [formattedStartDate, formattedEndDate],
           });
+          setInitialDateValue(dateValue);
+          setInitialFilterType(filterType);
         }
       }
     } else {
@@ -156,6 +168,8 @@ const DateFieldRenderer = ({ data }: any) => {
         updateColumnFilter(data.colId, {
           filterValues: [formattedDate],
         });
+        setInitialDateValue(dateValue);
+        setInitialFilterType(filterType);
       }
     }
   };
@@ -166,12 +180,23 @@ const DateFieldRenderer = ({ data }: any) => {
     setDateValue('');
   };
 
+  const hasChanges = dateValue !== initialDateValue || filterType !== initialFilterType;
+
   return (
-    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+    <div
+      style={{
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '8px',
+        padding: '8px 0',
+      }}
+    >
       <Select
         disabled={!data.isActive}
         value={filterType}
         onChange={handleFilterTypeChange}
+        dimension="s"
         style={{ width: '100%' }}
       >
         <Option value="equals">Равно</Option>
@@ -189,14 +214,16 @@ const DateFieldRenderer = ({ data }: any) => {
         displayClearIcon
       />
 
-      <Button
-        dimension="s"
-        onClick={handleApplyButtonClick}
-        disabled={!data.isActive}
-        style={{ width: '100%' }}
-      >
-        Применить
-      </Button>
+      {hasChanges && (
+        <Button
+          dimension="s"
+          onClick={handleApplyButtonClick}
+          disabled={!data.isActive}
+          style={{ width: '100%' }}
+        >
+          Применить
+        </Button>
+      )}
     </div>
   );
 };
@@ -247,11 +274,11 @@ const ChipsCellRenderer = ({ data }: any) => {
   };
 
   return (
-    <div style={{ width: '100%' }}>
+    <div style={{ width: '100%', padding: '8px 0' }}>
       <Select
         multiple
-        disabled={!data.isActive}
-        isLoading={!availableOptions.length}
+        dimension="s"
+        disabled={!data.isActive || !availableOptions.length}
         mode="searchSelect"
         placeholder="Выберите значения"
         defaultValue={selectedValues}
@@ -317,6 +344,7 @@ export const TemplateFiltersGrid = () => {
         suppressMenu: true,
         suppressSorting: true,
         suppressFilter: true,
+        wrapText: true,
       },
       {
         headerName: 'Значения фильтров',
@@ -325,7 +353,7 @@ export const TemplateFiltersGrid = () => {
         suppressMenu: true,
         suppressSorting: true,
         suppressFilter: true,
-        autoHeight: true,
+        wrapText: true,
         cellRenderer: (params: any) => {
           if (params.data.type === COLUMN_TYPE.DATE) {
             return DateFieldRenderer(params);
@@ -357,14 +385,25 @@ export const TemplateFiltersGrid = () => {
 
   const onGridReady = useCallback(
     (params: GridReadyEvent) => {
-      params.api.sizeColumnsToFit();
+      // params.api.sizeColumnsToFit();
+      params.api.resetRowHeights();
       setLocalGridApi(params.api);
     },
     [setLocalGridApi],
   );
 
+  const getRowHeight = useCallback((params: any) => {
+    if (params.data.type === COLUMN_TYPE.DATE) {
+      return 90;
+    }
+    if (params.data.type === COLUMN_TYPE.STRING) {
+      return 50;
+    }
+    return 50;
+  }, []);
+
   return (
-    <div className="ag-theme-quartz" style={{ height: '100%', width: '100%' }}>
+    <TableWrapper className="ag-theme-quartz">
       <AgGridReact
         rowData={rowData}
         columnDefs={columnDefs}
@@ -375,11 +414,24 @@ export const TemplateFiltersGrid = () => {
         suppressRowClickSelection
         suppressCellFocus
         headerHeight={40}
-        rowHeight={50}
-        animateRows
+        getRowHeight={getRowHeight}
+        // animateRows={false}
         quickFilterText={quickFilterText}
       />
-    </div>
+    </TableWrapper>
   );
 };
+
+const TableWrapper = styled.div`
+  height: 100%;
+  width: 100%;
+
+  .ag-cell-wrapper {
+    height: -webkit-fill-available;
+  }
+
+  .ag-cell {
+    line-height: normal;
+  }
+`;
 

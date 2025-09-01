@@ -27,8 +27,9 @@ export const FiltersPanel = ({
   compareModelsTableLoading = false,
   handleUpdateCompareList = () => null,
   handleCompareOnlyChanged = () => null,
+
 }: FiltersPanelProps) => {
-  const { filters } = useTableModels();
+  const { filters, fetchModelsByDate } = useTableModels();
 
   const templates = filters?.templates;
 
@@ -129,7 +130,7 @@ export const FiltersPanel = ({
               label="Выгрузка на определенную дату:"
               placeholder="Введите дату"
               dropContainerClassName="dropContainerClass"
-              onChange={(e) => setModelsDownloadingDate(e.target.value)}
+              onChange={(e) => fetchModelsByDate(e.target.value)}
             />
           </>
         )}
