@@ -1,23 +1,23 @@
 import { IconButton } from '@admiral-ds/react-ui';
 import { ReactComponent as SettingsIcon } from '@admiral-ds/icons/build/system/SettingsOutline.svg';
 import { useMemo, useState } from 'react';
-import { useTemplateFiltersModalStore } from './stores/templateFiltersModalStore';
-import { TemplateFiltersModal } from './components/TemplateFiltersModal';
+import { useTemplateFiltersModalStore } from '../stores/templateFiltersModalStore';
+import { TemplateFiltersModal } from '../molecules/TemplateFiltersModal';
 import {
   BadgeCount,
   ButtonCustom,
   CheckSolidCustom,
   FilterOutlineCustom,
-} from './components/MiscStyledComponents';
-import { useFiltersStore } from '../../shared/stores';
-import { useTemplatesStore } from '../../shared/stores/templatesStore';
-import { getActiveFiltersCount } from '../../shared/helpers';
+} from '../atoms/MiscStyledComponents';
+import { useFiltersStore } from '../../../shared/stores';
+import { useTemplatesStore } from '../../../shared/stores/templatesStore';
+import { getActiveFiltersCount } from '../../../shared/helpers';
 
-export const TFiltersTest3 = () => {
+export const TemplatesPanel = () => {
   const templateFiltersModalStore = useTemplateFiltersModalStore();
   const { topFilters, filterModel } = useFiltersStore();
   const { templates } = useTemplatesStore();
-  // const activeFiltersCount = Object.keys(filterModel).length;
+  
   const activeFiltersCount = useMemo(
     () => getActiveFiltersCount(filterModel, templates, topFilters.templates[0]),
     [filterModel, templates, topFilters.templates],

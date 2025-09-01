@@ -39,7 +39,7 @@ import { Column, COLUMN_TYPE, Row } from '@src/shared/types';
 import { Template } from '@src/shared/api/types';
 import styled from 'styled-components';
 import { AgGridTableCustomCell } from './AgGridTableCustomCell';
-import { AG_GRID_LOCALE_RU } from '../../pages/Playground/locale/agGridLocale.ru';
+import { AG_GRID_LOCALE_RU } from '../../app/agGridLocale.ru';
 import { useDeleteRightModelPanelStore, useDisplayStore } from '../../shared/stores';
 import { usePermissions, useRoles } from '../../shared/hooks';
 import { isInBusinessCustomers, isModelCreator } from '../../shared/helpers';

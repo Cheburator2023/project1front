@@ -10,7 +10,7 @@ import { TemplatesFilter } from '@entities';
 import { Container, CustomDateField, FiltersDivider, FilterButton, FiltersBox } from './styles';
 import { useGlobalStore } from '../../shared/stores/globalStore';
 import { useTableModels } from '../../pages/Home/hooks';
-import { TFiltersTest3 } from '../../pages/Playground/TFiltersTest3';
+import { TemplatesPanel } from '../TemplatesPanel/organisms/TemplatesPanel';
 import { useTemplateFilters } from '../../shared/hooks';
 
 export interface FiltersPanelProps {
@@ -27,7 +27,6 @@ export const FiltersPanel = ({
   compareModelsTableLoading = false,
   handleUpdateCompareList = () => null,
   handleCompareOnlyChanged = () => null,
-
 }: FiltersPanelProps) => {
   const { filters, fetchModelsByDate } = useTableModels();
 
@@ -46,9 +45,7 @@ export const FiltersPanel = ({
     filterModel,
   } = useFiltersStore();
   const { setFiltersResetCount } = useGlobalStore();
-  const {
-    activeTemplate,
-  } = useTemplateFilters(filterModel, templates, topFilters.templates);
+  const { activeTemplate } = useTemplateFilters(filterModel, templates, topFilters.templates);
 
   const { exploitationModeOptions, selectedExploitationModes, updateSelectedExploitationModes } =
     useExploitationModeStore();
@@ -71,7 +68,7 @@ export const FiltersPanel = ({
     <Container style={{ justifyContent: 'space-between' }}>
       <FiltersBox>
         <div style={{ marginTop: '24px', marginRight: '20px' }}>
-          <TFiltersTest3 />
+          <TemplatesPanel />
         </div>
 
         <CustomSearchSelect
@@ -83,7 +80,11 @@ export const FiltersPanel = ({
           selectedValues={topFilters.objectTypeRegistry}
           onChange={handleChange}
         />
-        <TemplatesFilter activeTemplate={activeTemplate} templates={templates} updateRightPanelType={setRightPanelType} />
+        <TemplatesFilter
+          activeTemplate={activeTemplate}
+          templates={templates}
+          updateRightPanelType={setRightPanelType}
+        />
         {compareMode ? (
           <>
             <CustomDateField

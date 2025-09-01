@@ -21,7 +21,6 @@ import { getColumnFilterOptions } from '../../../shared/helpers/helpers';
 import { useDeepEffect } from '../../../shared/hooks/useDeepEffect';
 import { COLUMN_TYPE } from '../../../shared/types';
 
-
 const CheckboxHeaderRenderer = (props: IHeaderParams) => {
   const { toggleAllColumns, columnFilters } = useTemplateFiltersModalStore();
 
@@ -155,11 +154,13 @@ const DateFieldRenderer = ({ data }: any) => {
           const formattedStartDate = format(startDate, 'yyyy-MM-dd 00:00:00');
           const formattedEndDate = format(endDate, 'yyyy-MM-dd 00:00:00');
           updateColumnFilter(data.colId, {
-            filterValues: [{
-              type: 'inRange',
-              dateFrom: formattedStartDate,
-              dateTo: formattedEndDate
-            }] as any,
+            filterValues: [
+              {
+                type: 'inRange',
+                dateFrom: formattedStartDate,
+                dateTo: formattedEndDate,
+              },
+            ] as any,
           });
           setInitialDateValue(dateValue);
           setInitialFilterType(filterType);
@@ -300,6 +301,46 @@ const ChipsCellRenderer = ({ data }: any) => {
   );
 };
 
+const columnDefs: ColDef[] = [
+  {
+    headerName: '',
+    field: 'drag',
+    rowDrag: true,
+    width: 50,
+    maxWidth: 55,
+    suppressMenu: true,
+  },
+  {
+    headerName: 'Активна',
+    field: 'isActive',
+    width: 55,
+    maxWidth: 55,
+    suppressMenu: true,
+    cellRenderer: CheckboxCellRenderer,
+    headerComponent: CheckboxHeaderRenderer,
+  },
+  {
+    headerName: 'Название колонки',
+    field: 'title',
+    flex: 1,
+    suppressMenu: true,
+    wrapText: true,
+  },
+  {
+    headerName: 'Значения фильтров',
+    field: 'filterValues',
+    flex: 2,
+    suppressMenu: true,
+    wrapText: true,
+    cellRenderer: (params: any) => {
+      if (params.data.type === COLUMN_TYPE.DATE) {
+        return DateFieldRenderer(params);
+      }
+      return ChipsCellRenderer(params);
+    },
+  },
+];
+
 export const TemplateFiltersGrid = () => {
   const { columnFilters, reorderColumns, quickFilterText, setLocalGridApi } =
     useTemplateFiltersModalStore();
@@ -307,57 +348,6 @@ export const TemplateFiltersGrid = () => {
   const rowData = useMemo(() => {
     return columnFilters.sort((a, b) => a.order - b.order);
   }, [columnFilters]);
-
-  const columnDefs: ColDef[] = useMemo(
-    () => [
-      {
-        headerName: '',
-        field: 'drag',
-        rowDrag: true,
-        width: 50,
-        maxWidth: 55,
-        suppressMenu: true,
-        suppressSorting: true,
-        suppressFilter: true,
-      },
-      {
-        headerName: 'Активна',
-        field: 'isActive',
-        width: 55,
-        maxWidth: 55,
-        suppressMenu: true,
-        suppressSorting: true,
-        suppressFilter: true,
-        cellRenderer: CheckboxCellRenderer,
-        headerComponent: CheckboxHeaderRenderer,
-      },
-      {
-        headerName: 'Название колонки',
-        field: 'title',
-        flex: 1,
-        suppressMenu: true,
-        suppressSorting: true,
-        suppressFilter: true,
-        wrapText: true,
-      },
-      {
-        headerName: 'Значения фильтров',
-        field: 'filterValues',
-        flex: 2,
-        suppressMenu: true,
-        suppressSorting: true,
-        suppressFilter: true,
-        wrapText: true,
-        cellRenderer: (params: any) => {
-          if (params.data.type === COLUMN_TYPE.DATE) {
-            return DateFieldRenderer(params);
-          }
-          return ChipsCellRenderer(params);
-        },
-      },
-    ],
-    [],
-  );
 
   const onRowDragEnd = useCallback(
     (event: RowDragEndEvent) => {
