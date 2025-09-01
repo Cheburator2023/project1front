@@ -382,11 +382,8 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     const { setFilterModel } = useFiltersStore();
 
     const handleFilterChange = (event: FilterChangedEvent): void => {
-      console.log('🐸 Pepe said >> handleFilterChange >> event:', event);
-
       if (event.source === 'api') return;
       const _filterModel = event.api.getFilterModel();
-      console.log('🐸 Pepe said >> handleFilterChange >> _filterModel:', _filterModel);
 
       setFilterModel(_filterModel);
 
@@ -395,7 +392,6 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       const isDate = colDef?.filterType === 'date';
 
       if (!isDate) {
-        console.log('🐸 Pepe said >> handleFilterChange >> isDate:', isDate);
         setTopFilters?.({ ...topFilters, templates: [] });
       }
     };
@@ -421,20 +417,14 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     }, [rowList, setTotalRows]);
 
     useDeepEffect(() => {
-      if (agGridApi && filterModel) {
-        agGridApi.setFilterModel(filterModel);
-      }
-    }, [agGridApi, filterModel]);
-
-    useDeepEffect(() => {
       if (agGridApi && templates && topFilters?.templates?.[0]) {
         const activeTemplate = templates.find(
           (t) => String(t.template_id) === topFilters.templates[0],
         );
 
+        agGridApi.setFilterModel(filterModel);
 
         if (activeTemplate?.columnState) {
-        console.log('🐸 Pepe said >> activeTemplate:', activeTemplate);
           agGridApi.applyColumnState({
             state: activeTemplate.columnState,
             defaultState: { hide: true },
@@ -489,6 +479,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
                     id="filter-text-box"
                     onChange={onFilterTextBoxChanged}
                     placeholder="Поиск"
+                    dimension='s'
                     icons={<SearchOutline />}
                   />
                 </Flexbox>
@@ -537,7 +528,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
               columnDefs={columnDefs as any}
               defaultColDef={defaultColDef}
               rowSelection={rowSelection}
-              animateRows={false}
+              animateRows
               pivotMode={pivot}
               cellSelection
               onGridReady={_onGridReady}
@@ -570,6 +561,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
 );
 
 const GridWrapper = styled.div`
+  zoom: 0.8;
   & .ag-column-panel .ag-pivot-mode-panel {
     display: none;
   }

@@ -131,7 +131,6 @@ export const TemplateFiltersModal = () => {
             filterModel: newFilterModel,
             columnState,
           };
-          console.log('🐸 Pepe said >> handleSave >> selectedTemplateId:');
           setPendingTemplate(savedTemplate);
           agGridApiGlobal.setFilterModel(newFilterModel);
           agGridApiGlobal.applyColumnState({ state: columnState, applyOrder: true });
@@ -148,16 +147,13 @@ export const TemplateFiltersModal = () => {
           isPending: true,
         };
         setPendingTemplate(savedTemplate);
-        console.log('🐸 Pepe said >> handleSave >> new temp:');
-        console.log('🐸 Pepe said >> handleSave >> columnState:', columnState);
         agGridApiGlobal.setFilterModel(newFilterModel);
         agGridApiGlobal.applyColumnState({ state: columnState, applyOrder: true });
         setTopFilters({ ...topFilters, templates: [] });
       }
 
       setTimeout(() => {
-        console.log('🐸 Pepe said >> handleSave >> setTimeout:');
-        setFilterModel(newFilterModel);
+        // setFilterModel(newFilterModel);
         agGridApiGlobal.setFilterModel(newFilterModel);
         agGridApiGlobal.applyColumnState({ state: columnState, applyOrder: true });
       }, 30);

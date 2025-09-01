@@ -42,7 +42,6 @@ export const useCompareModels = () => {
   const [resData, setResData] = useState<CompareModelsResponseType | undefined>(undefined);
   const [rowList, setRowList] = useState<Array<Partial<Row> & { comparisonKey: string }>>([]);
   const [columnList, setColumnList] = useState<Column[]>(initialColumns);
-  console.log('🐸 Pepe said >> useCompareModels >> columnList:', columnList);
 
   const [searchString, setSearchString] = useState<string>('');
 

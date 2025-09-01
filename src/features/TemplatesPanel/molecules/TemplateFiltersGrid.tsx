@@ -10,6 +10,8 @@ import {
   DateField,
 } from '@admiral-ds/react-ui';
 import { format, parse, isValid } from 'date-fns';
+import ru from 'date-fns/locale/ru/index.js';
+
 import styled from 'styled-components';
 import {
   useTemplateFiltersModalStore,
@@ -119,12 +121,10 @@ const DateFieldRenderer = ({ data }: any) => {
   }, [data.filterValues]);
 
   const parseDateValue = (value: string): Date | null => {
+
     if (!value) return null;
 
-    const nativeDate = new Date(value);
-    if (isValid(nativeDate)) return nativeDate;
-
-    const parsedDate = parse(value, 'dd.MM.yyyy', new Date());
+    const parsedDate = parse(value, 'dd.MM.yyyy', new Date(), { locale: ru });
     return isValid(parsedDate) ? parsedDate : null;
   };
 
@@ -151,16 +151,11 @@ const DateFieldRenderer = ({ data }: any) => {
         const endDate = parseDateValue(dates[1]);
 
         if (startDate && endDate) {
-          const formattedStartDate = format(startDate, 'yyyy-MM-dd 00:00:00');
-          const formattedEndDate = format(endDate, 'yyyy-MM-dd 00:00:00');
+          const formattedStartDate = format(startDate, 'yyyy-MM-dd 00:00:00', { locale: ru });
+          const formattedEndDate = format(endDate, 'yyyy-MM-dd 00:00:00', { locale: ru });
+
           updateColumnFilter(data.colId, {
-            filterValues: [
-              {
-                type: 'inRange',
-                dateFrom: formattedStartDate,
-                dateTo: formattedEndDate,
-              },
-            ] as any,
+            filterValues: [formattedStartDate, formattedEndDate],
           });
           setInitialDateValue(dateValue);
           setInitialFilterType(filterType);
@@ -415,6 +410,8 @@ const TableWrapper = styled.div`
 
   .ag-cell {
     line-height: normal;
+    display: flex;
+    align-items: center;
   }
 `;
 
