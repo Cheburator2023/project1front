@@ -14,4 +14,7 @@ export enum API_ROUTES {
   REPORT = '/report',
   METRICS = '/metrics',
   METRICS_EXPORT = '/metrics/export',
+  BI_DATAMART_SYNC_MODELS = '/bi-datamart/sync/models',
+  BI_DATAMART_SYNC_TASKS = '/bi-datamart/sync/tasks',
+  BI_DATAMART_STATUS = '/bi-datamart/status',
 }

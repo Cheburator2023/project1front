@@ -132,13 +132,14 @@ export const CustomSelectField = styled(Select)`
 `;
 
 export const WrapperFilter = styled.div`
-  height: 80px;
+  min-height: 80px;
   background: var(--neutral-neutral-10, #e5e7eb);
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: flex-start;
   justify-content: flex-start;
   box-sizing: border-box;
+  padding: 8px 0;
 `;
 
 export const WrapperTitle = styled.div`
@@ -168,6 +169,19 @@ export const FlexContainerFilter = styled.div`
   display: flex;
   align-items: end;
   gap: 16px;
+  flex-wrap: wrap;
+  padding: 16px 0;
+  
+  /* Улучшаем выравнивание для мобильных устройств */
+  @media (max-width: 1200px) {
+    gap: 12px;
+  }
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
 `;
 
 export const Cover = styled.div`
@@ -226,4 +240,3 @@ export const DisabledMetricWrapper = styled.div`
     opacity: 0.3;
   }
 `;
-

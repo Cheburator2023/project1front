@@ -193,5 +193,4 @@ const mockedTemplates: Template[] = [
 ];
 
 export const mockedTemplatesResponse: any[] = mockedTemplates;
-export { mockedTemplates };
 

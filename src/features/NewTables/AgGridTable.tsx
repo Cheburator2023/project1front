@@ -184,6 +184,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     const { setRightPanelType } = useDisplayStore();
     const { filtersResetCount, setAgGridApi, agGridApi } = useGlobalStore();
     const { filterModel, topFilters, setTopFilters } = useFiltersStore();
+
     const { modelsCount, modelSource, isDeleteButtonEnabled, userMatches, updateDeleteModelState } =
       useDeleteRightModelPanelStore();
     const { isAdmin, isValidatorLead } = useRoles();
@@ -502,8 +503,13 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
                   />
                   <IconButton
                     icon={<BrokerOutlineIcon />}
-                    tooltip="Графики"
+                    tooltip="Графики (живые данные)"
                     onClick={() => navigate('charts')}
+                  />
+                  <IconButton
+                    icon={<BrokerOutlineIcon />}
+                    tooltip="Графики (BI витрины)"
+                    onClick={() => navigate('charts_bi')}
                   />
                   {/* <IconButton
                     icon={<ShowTableOutline />}
@@ -535,7 +541,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
               rowClassRules={isCompared ? rowClassRules : undefined}
               selectionColumnDef={selectionColumnDef}
               autoGroupColumnDef={autoGroupColumnDefProps}
-              sideBar={sidePanel ? sideBarProps : undefined}
+              // sideBar={sidePanel ? sideBarProps : undefined}
               onSelectionChanged={handleSelectionChange}
               onFilterChanged={handleFilterChange}
               paginationPageSize={pageSize}

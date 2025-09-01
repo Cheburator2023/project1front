@@ -31,6 +31,7 @@ import {
   metricLabelMap,
 } from './constants';
 import MetricDisplay from './MetricDisplay';
+import { BiSyncInterface } from './BiSyncInterface';
 import './styles.css';
 import {
   Column,
@@ -53,10 +54,17 @@ import {
 import { MenuIconSelect } from './MenuIconSelect';
 import { MetricsCaption } from './types';
 
+interface ChartsDashboardProps {
+  useDatamart?: boolean;
+}
+
 const getQueryParams = (filters: {
   startDate?: string;
   endDate?: string;
   selectedStreams?: string[];
+  useDatamart?: boolean;
+  metric?: string;
+  dataType?: string;
 }) => {
   const params: Record<string, any> = {};
 
@@ -82,10 +90,22 @@ const getQueryParams = (filters: {
     });
   }
 
+  if (filters.useDatamart !== undefined) {
+    params.useDatamart = filters.useDatamart;
+  }
+
+  if (filters.metric) {
+    params.metric = filters.metric;
+  }
+
+  if (filters.dataType) {
+    params.dataType = filters.dataType;
+  }
+
   return params;
 };
 
-const ChartsDashboard = () => {
+const ChartsDashboard: React.FC<ChartsDashboardProps> = ({ useDatamart = false }) => {
   const [filters, setFilters] = useState({
     startDate: undefined as string | undefined,
     endDate: undefined as string | undefined,
@@ -105,13 +125,15 @@ const ChartsDashboard = () => {
     refetch: refetchMetrics,
   } = useFetch<MetricsResponseType>({
     apiRoute: API_ROUTES.METRICS,
-    params: getQueryParams(filters),
+    params: getQueryParams({
+      ...filters,
+      useDatamart,
+    }),
     mockedResponse: mockedMetricsResponse,
   });
 
   const { mutationProtectedFetch } = useFetch({});
 
-  // const [kpiSum, setKpiSum] = useState(initialKPI_SUM);
   const [totalModels, setTotalModels] = useState(initialTotalModels);
   const [implementedModels, setImplementedModels] = useState(initialImplementedModels);
   const [developedModels, setDevelopedModels] = useState(initialDevelopedModels);
@@ -453,21 +475,21 @@ const ChartsDashboard = () => {
 
     setIsExportingMetric(true);
 
-    // Парсим selectedMetric для определения базовой метрики и типа данных
     const isDelta = selectedMetric.endsWith('_delta');
     const baseMetric = isDelta ? selectedMetric.replace('_delta', '') : selectedMetric;
     const dataType = isDelta ? 'delta' : 'current';
 
-    const baseQueryParams = getQueryParams({
+    const queryParams = getQueryParams({
       startDate: tempFilters.tempStartDate && switchDateFormat(tempFilters.tempStartDate),
       endDate: tempFilters.tempEndDate && switchDateFormat(tempFilters.tempEndDate),
       selectedStreams: tempFilters.tempSelectedStreams,
+      useDatamart,
     });
 
-    const queryParams = {
-      ...baseQueryParams,
-      metric: baseMetric, // Отправляем базовое имя метрики без _delta
-      dataType, // Отправляем тип данных отдельно
+    const exportParams = {
+      ...queryParams,
+      metric: baseMetric,
+      dataType,
     };
 
     const today = new Date();
@@ -481,7 +503,7 @@ const ChartsDashboard = () => {
       await mutationProtectedFetch<void, Blob>({
         fetchApiRoute: API_ROUTES.METRICS_EXPORT,
         fetchMethod: 'GET',
-        newParams: queryParams,
+        newParams: exportParams,
         fileName: `${readableLabel} ${dateStr}.xlsx`,
       });
     } catch (error) {
@@ -571,13 +593,20 @@ const ChartsDashboard = () => {
               </Button>
             </ButtonContainer>
           </FlexContainerFilter>
+
+          <BiSyncInterface
+            useDatamart={useDatamart}
+            onSyncComplete={refetchMetrics}
+            mutationProtectedFetch={mutationProtectedFetch}
+          />
         </Container>
       </WrapperFilter>
+
       <WrapperTitle>
         <Container>
           <FlexContainerExport>
             <Title font="Additional/M" color="Neutral/Neutral 90">
-              Графики и диаграмы
+              Графики и диаграмы {useDatamart ? '(BI витрины)' : '(живые данные)'}
             </Title>
 
             <div style={{ position: 'relative', right: '60px' }}>
@@ -606,23 +635,6 @@ const ChartsDashboard = () => {
               <Cover>
                 <Column>
                   <GridRow>
-                    {/* <MetricDisplay
-                    caption={kpiSum.caption}
-                    value={kpiSum.value}
-                    delta={kpiSum.delta}
-                    relative={kpiSum.relative}
-                    size="stat-sm"
-                  /> */}
-                    {/* <MetricDisplay
-                      caption={totalModels.caption}
-                      value={totalModels.value}
-                      delta={totalModels.delta}
-                      relative={totalModels.relative}
-                      size="stat-sm"
-                      styles={{
-                        width: '100%',
-                      }}
-                    /> */}
                     <MetricDisplay
                       caption={sumRmModels.caption}
                       value={sumRmModels.value}

@@ -86,10 +86,15 @@ export const ActionsPanel = ({ updateRightPanelType, handleSearch }: ActionsPane
 
         <IconButton
           icon={<BrokerOutlineIcon />}
-          tooltip="Графики"
+          tooltip="Графики (живые данные)"
           onClick={() => navigate('charts')}
         />
 
+        <IconButton
+          icon={<BrokerOutlineIcon />}
+          tooltip="Графики (BI витрины)"
+          onClick={() => navigate('charts_bi')}
+        />
         <IconButton icon={<MenuOutline />} tooltip="Меню" onClick={() => null} />
         <IconButton icon={<SettingsOutline />} tooltip="Настройки" onClick={() => null} />
       </div>
