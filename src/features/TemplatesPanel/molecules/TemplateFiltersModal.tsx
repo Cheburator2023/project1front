@@ -7,6 +7,7 @@ import {
   Option,
   TextField,
   InputField,
+  Field,
 } from '@admiral-ds/react-ui';
 import { Template } from '@shared/api/types';
 import { initialColumns as _initialColumns } from '@shared/constants/InitialCollumns';
@@ -196,27 +197,28 @@ export const TemplateFiltersModal = () => {
             style={{
               display: 'flex',
               gap: '16px',
-              alignItems: 'center',
+              alignItems: 'flex-end',
               justifyContent: 'space-between',
             }}
           >
-            <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-              <label style={{ fontWeight: 500 }}>Активный шаблон:</label>
-              <Select
-                id="TemplateFiltersModal_select_template_input"
-                placeholder="Выберите шаблон"
-                dimension="s"
-                value={selectedTemplateId?.toString() || 'new'}
-                onChange={(e) => handleTemplateChange(e.target.value)}
-                style={{ minWidth: '300px' }}
-              >
-                {templateOptions.map((option) => (
-                  <Option key={option.value} value={option.value}>
-                    {option.label}
-                  </Option>
-                ))}
-              </Select>
-            </div>
+
+              <Field label="Активный шаблон:">
+                <Select
+                  id="TemplateFiltersModal_select_template_input"
+                  placeholder="Выберите шаблон"
+                  dimension="s"
+                  value={selectedTemplateId?.toString() || 'new'}
+                  onChange={(e) => handleTemplateChange(e.target.value)}
+                  style={{ minWidth: '300px' }}
+                >
+                  {templateOptions.map((option) => (
+                    <Option key={option.value} value={option.value}>
+                      {option.label}
+                    </Option>
+                  ))}
+                </Select>
+              </Field>
+
             <div style={{ minWidth: '300px' }}>
               <InputField
                 id="filter-text-box"

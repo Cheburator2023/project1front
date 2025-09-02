@@ -12,11 +12,16 @@ import {
 import { useFiltersStore } from '../../../shared/stores';
 import { useTemplatesStore } from '../../../shared/stores/templatesStore';
 import { getActiveFiltersCount } from '../../../shared/helpers';
+import { useTableModels } from '../../../pages/HomePage/hooks/useTableModels';
+import { useCompareModels } from '../../CompareModels/hooks';
 
 export const TemplatesPanel = () => {
   const templateFiltersModalStore = useTemplateFiltersModalStore();
-  const { topFilters, filterModel } = useFiltersStore();
+  const { topFilters, filterModel, firstDate, secondDate } = useFiltersStore();
   const { templates } = useTemplatesStore();
+  const { modelsTable } = useTableModels();
+  const { compareModelsTable } = useCompareModels();
+  const { rowList, columnList, totalRows, setTotalRows } = compareModelsTable;
 
   const activeFiltersCount = useMemo(
     () => getActiveFiltersCount(filterModel, templates, topFilters.templates[0]),
@@ -31,8 +36,8 @@ export const TemplatesPanel = () => {
   const hasActiveFilters = activeFiltersCount > 0;
   const hasNoActiveFilters = activeFiltersCount === 0;
   const isPendingTemplate = activeTemplate?.isPending || false;
-
-  const buttonAppearance = hasTemplates ? 'primary' : 'white';
+  const noData = !(totalRows > 0 && firstDate && secondDate);
+  const buttonAppearance = !noData && hasTemplates ? 'primary' : 'white';
   const badgeAppearance = isPendingTemplate
     ? 'warning'
     : hasTemplates && hasActiveFilters
@@ -46,16 +51,18 @@ export const TemplatesPanel = () => {
         dimension="s"
         icon={<FilterOutlineCustom appearance={buttonAppearance} />}
         displayAsSquare
+        disabled={noData}
         onClick={() => templateFiltersModalStore.openModal()}
       />
 
-      {hasTemplates && hasNoActiveFilters ? (
-        <CheckSolidCustom />
-      ) : (
-        <BadgeCount appearance={badgeAppearance} dimension="s">
-          {activeFiltersCount}
-        </BadgeCount>
-      )}
+      {!noData &&
+        (hasTemplates && hasNoActiveFilters ? (
+          <CheckSolidCustom />
+        ) : (
+          <BadgeCount appearance={badgeAppearance} dimension="s">
+            {activeFiltersCount}
+          </BadgeCount>
+        ))}
 
       <TemplateFiltersModal />
     </div>

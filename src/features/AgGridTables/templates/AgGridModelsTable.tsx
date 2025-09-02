@@ -1,8 +1,8 @@
 import React from 'react';
-import { TFilters, TModelsTable, useTableModels } from '@pages/Home/hooks';
 import { Template } from '@src/shared/api';
 import { Column, Row } from '@src/shared/types';
 import { AgGridTable } from '../organisms/AgGridTable';
+import { useTableModels } from '../../../pages/HomePage/hooks/useTableModels';
 
 export const AgGridModelsTable = (props: {
   isCompared?: boolean;
@@ -10,7 +10,7 @@ export const AgGridModelsTable = (props: {
   overrideRowList?: Partial<Row>[];
   overlayNoRowsTemplate?: string;
 }) => {
-  const { display, modelsTable, filters } = useTableModels();
+  const { modelsTable, filters } = useTableModels();
   const templates = filters?.templates;
   const { error, loading } = modelsTable;
 

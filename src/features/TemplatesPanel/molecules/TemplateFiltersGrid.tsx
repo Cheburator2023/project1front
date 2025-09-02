@@ -227,9 +227,10 @@ const DateFieldRenderer = ({ data }: any) => {
   );
 };
 
-const ChipsCellRenderer = ({ data }: any) => {
+const MSelectCellRenderer = ({ data }: any) => {
   const { updateColumnFilter } = useTemplateFiltersModalStore();
   const { agGridApi } = useGlobalStore();
+
   const [selectedValues, setSelectedValues] = useState<string[]>(data.filterValues || []);
   const [availableOptions, setAvailableOptions] = useState<string[]>([]);
 
@@ -263,7 +264,7 @@ const ChipsCellRenderer = ({ data }: any) => {
   };
 
   return (
-    <div style={{ width: '100%', padding: '8px 0' }}>
+    <MSelectWrapper style={{ width: '100%', padding: '8px 0' }}>
       <Select
         multiple
         dimension="s"
@@ -291,9 +292,22 @@ const ChipsCellRenderer = ({ data }: any) => {
           </Option>
         ))}
       </Select>
-    </div>
+    </MSelectWrapper>
   );
 };
+
+const MSelectWrapper = styled.div`
+& .close-button {
+  display: none
+}
+
+& .counter div div {
+  pointer-events: none;
+}
+& .counter div {
+  pointer-events: none;
+}
+`
 
 const columnDefs: ColDef[] = [
   {
@@ -330,7 +344,7 @@ const columnDefs: ColDef[] = [
       if (params.data.type === COLUMN_TYPE.DATE) {
         return DateFieldRenderer(params);
       }
-      return ChipsCellRenderer(params);
+      return MSelectCellRenderer(params);
     },
   },
 ];

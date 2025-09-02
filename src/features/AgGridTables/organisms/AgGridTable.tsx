@@ -46,6 +46,8 @@ import { isInBusinessCustomers, isModelCreator } from '../../../shared/helpers';
 import { useDeepEffect } from '../../../shared/hooks/useDeepEffect';
 import { useGlobalStore } from '../../../shared/stores/globalStore';
 import { useFiltersStore } from '../../../shared/stores/filtersStore';
+import { ROUTES } from '../../../app/Routes';
+import { useTableModels } from '../../../pages/HomePage/hooks/useTableModels';
 
 interface IAgGridTableProps {
   templates?: Template[];
@@ -157,7 +159,6 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       rowList,
       error,
       loading,
-      handleClickOnActionCell,
       setPage = (v) => v,
       page = 0,
       setTotalRows = (v) => v,
@@ -182,6 +183,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     ref: any,
   ) => {
     const { setRightPanelType } = useModelsStore();
+    const {modelsTable} = useTableModels();
     const { filtersResetCount, setAgGridApi, agGridApi } = useGlobalStore();
     const { filterModel, topFilters, setTopFilters } = useFiltersStore();
 
@@ -322,7 +324,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
         cellRendererParams: {
           noCustomCells,
           onAction: (action: any, row_system_model_id: any, columnName: any): any => {
-            handleClickOnActionCell?.(action, row_system_model_id, columnName);
+            modelsTable?.handleClickOnActionCell?.(action, row_system_model_id, columnName);
           },
         },
       };
@@ -454,7 +456,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     }, []);
 
     const getContextMenuItems = (params: any) => {
-      if (params.column.colId === 'model_alias') {
+      if (params?.column?.colId === 'model_alias') {
         return [];
       }
       return params.defaultItems;
@@ -511,11 +513,6 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
                     tooltip="Графики (BI витрины)"
                     onClick={() => navigate('charts_bi')}
                   />
-                  {/* <IconButton
-                    icon={<ShowTableOutline />}
-                    tooltip="Текущий интерфейс таблиц"
-                    onClick={() => navigate(ROUTES.MF_HOME_ROUTE)}
-                  /> */}
                   {/* <IconButton icon={<MenuOutline />} tooltip="Меню" onClick={() => null} /> */}
                   {/* <IconButton icon={<SettingsOutline />} tooltip="Настройки" onClick={() => null} /> */}
                 </div>

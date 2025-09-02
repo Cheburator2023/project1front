@@ -1,11 +1,13 @@
 import React from 'react';
 import { Navigate, useRoutes } from 'react-router-dom';
 
-import { Home, ChartsDashboardPage, ChartsDashboardPageBI } from '@pages';
+import { ChartsDashboardPage, ChartsDashboardPageBI, HomePage } from '@pages';
 import { Playground } from '@pages/Playground';
+import { CompareModelsPage } from '../pages/CompareModelsPage/CompareModelsPage';
 
 export const ROUTES = {
   HOME: '/',
+  COMPARE_MODELS: '/compare-models',
   MF_HOME_ROUTE: '/sum-rm',
   CHARTS: 'charts',
   CHARTS_BI: 'charts_bi',
@@ -16,11 +18,15 @@ const ROUTE_MAP = [
   {
     path: ROUTES.HOME,
     index: true,
-    element: <Home />,
+    element: <HomePage />,
   },
   {
     path: ROUTES.MF_HOME_ROUTE,
-    element: <Home />,
+    element: <HomePage />,
+  },
+  {
+    path: ROUTES.COMPARE_MODELS,
+    element: <CompareModelsPage />,
   },
   {
     path: ROUTES.CHARTS,

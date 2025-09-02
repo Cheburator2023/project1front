@@ -1,17 +1,18 @@
-import React from 'react';
 import { Button, Checkbox, T, Toggle } from '@admiral-ds/react-ui';
-import { Template } from '@shared/api';
 import { useFiltersStore } from '@shared/stores/filtersStore';
 import { CustomSearchSelect } from '@shared/ui/organisms';
 import { useExploitationModeStore, useModelsStore, useTemplatesStore } from '@src/shared/stores';
-import { ACTIVE_SCREEN, RIGHT_PANEL_TYPE, modelsSelectOptions } from '@shared/constants';
+import { modelsSelectOptions } from '@shared/constants';
 
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { Container, CustomDateField, FiltersDivider, FilterButton, FiltersBox } from '../styles';
 import { useGlobalStore } from '../../../shared/stores/globalStore';
-import { useTableModels } from '../../../pages/Home/hooks';
+import { useTableModels } from '../../../pages/HomePage/hooks/useTableModels';
 import { TemplatesPanel } from '../../TemplatesPanel/organisms/TemplatesPanel';
 import { TemplatesFilterInput } from '../molecules/TemplatesFilterInput';
 import { useTemplateFiltersModalStore } from '../../TemplatesPanel/stores/templateFiltersModalStore';
+import { ROUTES } from '../../../app/Routes';
 
 export interface FiltersPanelProps {
   compareOnlyChanged?: boolean;
@@ -28,21 +29,21 @@ export const FiltersPanel = ({
   handleUpdateCompareList = () => null,
   handleCompareOnlyChanged = () => null,
 }: FiltersPanelProps) => {
-  const { pendingTemplate, setPendingTemplate } = useTemplatesStore();
+  const { setPendingTemplate } = useTemplatesStore();
   const { filters, fetchModelsByDate } = useTableModels();
+  const navigate = useNavigate();
 
   const templates = filters?.templates;
 
-  const { compareMode, setActiveScreen, setRightPanelType, handleChangeCompare } = useModelsStore();
+  const { compareMode, setRightPanelType, setCompareMode } = useModelsStore();
+
   const {
     topFilters,
     modelsDownloadingDate,
-    setModelsDownloadingDate,
     setTopFilters,
     setFirstDate,
     setSecondDate,
     resetFilters,
-    filterModel,
   } = useFiltersStore();
   const { setFiltersResetCount } = useGlobalStore();
   const { getActiveTemplate } = useFiltersStore();
@@ -69,6 +70,12 @@ export const FiltersPanel = ({
   const handleChangeExploitationModes = (value: string[]) => {
     updateSelectedExploitationModes(value);
   };
+
+  const location = useLocation();
+
+  useEffect(() => {
+    setCompareMode(location.pathname === ROUTES.COMPARE_MODELS);
+  }, [location.pathname]);
 
   return (
     <Container style={{ justifyContent: 'space-between' }}>
@@ -149,18 +156,24 @@ export const FiltersPanel = ({
           checked={compareMode}
           dimension="s"
           labelPosition="right"
-          onChange={(event) => handleChangeCompare(event.target.checked)}
+          onChange={(event) => {
+            setCompareMode(event.target.checked);
+            navigate(compareOnlyChanged ? ROUTES.HOME : ROUTES.COMPARE_MODELS);
+          }}
         >
           Включен
         </Toggle>
         <FiltersBox style={{ gap: 8 }}>
-          <Checkbox
-            checked={compareOnlyChanged}
-            dimension="s"
-            disabled={!compareMode}
-            onChange={(event) => handleCompareOnlyChanged(event.target.checked)}
-          />
-          <T font="Body/Body 2 Short">Только измененные</T>
+          {compareMode && (
+            <>
+              <Checkbox
+                checked={compareOnlyChanged}
+                dimension="s"
+                onChange={(event) => handleCompareOnlyChanged(event.target.checked)}
+              />
+              <T font="Body/Body 2 Short">Только измененные</T>
+            </>
+          )}
           <Button
             dimension="s"
             appearance="primary"

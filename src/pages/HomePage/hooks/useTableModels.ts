@@ -3,7 +3,6 @@ import { Column, Row, TopFilters } from '@shared/types';
 import {
   initialColumns,
   initialTopFilters,
-  ACTIVE_SCREEN,
   RIGHT_PANEL_TYPE,
   MODEL_FORM_MODE,
 } from '@shared/constants';
@@ -19,7 +18,6 @@ import {
 import { useDownloadReportStore } from '@shared/stores/downloadReportStore';
 
 import { getISODateFormat } from '@shared/helpers';
-import { ArtifactApi, CustomError } from '@src/shared/api/types';
 import {
   useExploitationModeStore,
   useFiltersStore,
@@ -43,10 +41,6 @@ export const getQueryParams = (
   });
 
   return params;
-};
-
-export type TDisplayTableModels = {
-  activeScreen: ACTIVE_SCREEN;
 };
 
 export type TModelsTable = {
@@ -82,7 +76,6 @@ export type TFilters = {
 };
 
 export interface IUseTableModels {
-  display: TDisplayTableModels;
   modelsTable: TModelsTable;
   filters: TFilters;
   fetchModelsByDate: (date: string) => void;
@@ -91,28 +84,16 @@ export interface IUseTableModels {
 export const useTableModels = () => {
   const { downloadReportStatus } = useDownloadReportStore();
   const {
-    topFilters,
-    setTopFilters,
     firstDate,
-    setFirstDate,
     secondDate,
-    setSecondDate,
-    modelsDownloadingDate,
     setModelsDownloadingDate,
   } = useFiltersStore();
   const {
-    activeScreen,
-    setActiveScreen,
-    compareMode,
-    setCompareMode,
-    rightPanelType,
     setRightPanelType,
     activeCellName,
     setActiveCellName,
     activeRowId,
     setActiveRowId,
-    handleChangeCompare,
-    handleOnClose,
   } = useModelsStore();
 
   // Table data
@@ -226,30 +207,8 @@ export const useTableModels = () => {
     [rowList, setRightPanelType, setActiveCellName, setActiveRowId],
   );
 
-  const handleSubmit = useCallback((newRow?: any, formMode?: MODEL_FORM_MODE) => {
-    if (newRow) {
-      const newRowWithId = { ...newRow, id: newRow.system_model_id, hover: true };
-      if (
-        formMode === MODEL_FORM_MODE.EDIT ||
-        MODEL_FORM_MODE.DELETE ||
-        MODEL_FORM_MODE.DELETE_CONFIRM
-      ) {
-        setRowList((prevRows) =>
-          prevRows.map((row) =>
-            row?.system_model_id === newRowWithId.system_model_id ? newRowWithId : row,
-          ),
-        );
-      } else {
-        setRowList((prevRows) => [newRowWithId, ...prevRows]);
-      }
-    }
-    fetchModels();
-  }, []);
 
   const result: IUseTableModels = {
-    display: {
-      activeScreen,
-    },
     modelsTable: {
       rowList,
       setRowList,

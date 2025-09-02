@@ -1,13 +1,10 @@
 import React from 'react';
-
-import { ACTIVE_SCREEN, RIGHT_PANEL_TYPE } from '@shared/constants';
 import { useModelsStore } from '@src/shared/stores';
 
 import { CompareModelsNewTable } from '@src/features/CompareModels/organisms/CompareModelsNewTable';
 import { useCompareModels } from '../hooks';
-import { Template } from '../../../shared/api';
-import { useTableModels } from '../../../pages/Home/hooks';
 import { FiltersPanel } from '../../FiltersPanel/organisms/FiltersPanel';
+import { useTableModels } from '../../../pages/HomePage/hooks/useTableModels';
 
 const CompareModelsWidget = () => {
   const { setRightPanelType } = useModelsStore();
