@@ -196,47 +196,19 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     const gridRefInner = useRef<AgGridReact>(null);
     const gridRef = ref || gridRefInner;
 
-    const staticFilterValues = useMemo(() => {
-      const columnValues: Record<string, any[]> = {};
-
-      columnList.forEach((column) => {
-        if (column.type !== COLUMN_TYPE.DATE && column.type !== COLUMN_TYPE.NUMBER) {
-          const uniqueValues = Array.from(
-            new Set(
-              rowList
-                .map((row) => row[column.name])
-                .filter((value) => value != null && value !== ''),
-            ),
-          ).sort();
-          columnValues[column.name] = uniqueValues;
-        }
-      });
-
-      return columnValues;
-    }, [columnList, rowList]);
 
     const columnDefs: ColDef[] = columnList
       .map((data, colIndex) => {
         const dynamicSetFilterParams = {
           ...setFilterParams,
-          values: staticFilterValues[data.name] || [],
-          selectAllOnMiniFilter: false,
-          refreshValuesOnOpen: (params: any) => {
-            const visibleValues = new Set();
-            params.api.forEachNodeAfterFilter((node: any) => {
-              if (node.data && node.data[data.name] != null) {
-                visibleValues.add(node.data[data.name]);
-              }
-            });
-
-            const currentModel = params.api.getFilterModel();
-            const columnFilter = currentModel[data.name];
-
-            if (!columnFilter || !columnFilter.values) {
-              return Array.from(visibleValues);
+          valueFormatter: (params: any) => {
+            if (params.value === '(Пустые значения)') {
+              return '(Пустые значения)';
             }
-
-            return columnFilter.values.filter((value: any) => visibleValues.has(value));
+            if (params.value === '(Непустые значения)') {
+              return '(Непустые значения)';
+            }
+            return params.value;
           },
         };
 
@@ -283,25 +255,43 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
         cellDataType: false,
         filterParams: {
           ...setFilterParams,
-          values: [],
-          selectAllOnMiniFilter: false,
-          refreshValuesOnOpen: (params: any) => {
-            const fieldName = params.column.getColId();
-            const visibleValues = new Set();
-            params.api.forEachNodeAfterFilter((node: any) => {
-              if (node.data && node.data[fieldName] != null) {
-                visibleValues.add(node.data[fieldName]);
-              }
-            });
-
-            const currentModel = params.api.getFilterModel();
-            const columnFilter = currentModel[fieldName];
-
-            if (!columnFilter || !columnFilter.values) {
-              return Array.from(visibleValues);
+          valueFormatter: (params: any) => {
+            if (params.value === '(Пустые значения)') {
+              return '(Пустые значения)';
+            }
+            if (params.value === '(Непустые значения)') {
+              return '(Непустые значения)';
+            }
+            return params.value;
+          },
+          predicate: (filterValues: string[], cellValue: any) => {
+            if (!filterValues || filterValues.length === 0) {
+              return true;
             }
 
-            return columnFilter.values.filter((value: any) => visibleValues.has(value));
+            const hasEmptyFilter = filterValues.includes('(Пустые значения)');
+            const hasNonEmptyFilter = filterValues.includes('(Непустые значения)');
+            const isEmptyCell = cellValue == null || cellValue === '';
+            const isNonEmptyCell = !isEmptyCell;
+            const specificFilters = filterValues.filter(v => v !== '(Пустые значения)' && v !== '(Непустые значения)');
+
+            let matchesEmpty = false;
+            let matchesNonEmpty = false;
+            let matchesSpecific = false;
+
+            if (hasEmptyFilter && isEmptyCell) {
+              matchesEmpty = true;
+            }
+
+            if (hasNonEmptyFilter && isNonEmptyCell) {
+              matchesNonEmpty = true;
+            }
+
+            if (specificFilters.length > 0 && specificFilters.includes(cellValue)) {
+              matchesSpecific = true;
+            }
+
+            return matchesEmpty || matchesNonEmpty || matchesSpecific;
           },
         },
         floatingFilter: true,

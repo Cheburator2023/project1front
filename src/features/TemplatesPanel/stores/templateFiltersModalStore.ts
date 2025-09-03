@@ -12,7 +12,7 @@ export type ColumnFilterData = {
   title: string;
   type: string;
   isActive: boolean;
-  filterValues: string[];
+  filterValues: (string | null)[];
   order: number;
 };
 
@@ -164,13 +164,13 @@ export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((s
 
             const templateFilter = template.filterModel?.[templateCol.colId];
 
-            let filterValues: string[] = [];
+            let filterValues: (string | null)[] = [];
             if (templateFilter) {
               if ('values' in templateFilter && templateFilter.values) {
-                filterValues = templateFilter.values.filter((v): v is string => v !== null);
+                filterValues = templateFilter.values;
               } else if ('dateFrom' in templateFilter && 'dateTo' in templateFilter) {
                 const dateFilter = templateFilter as { dateFrom: string; dateTo: string };
-                const dateRange: string[] = [];
+                const dateRange: (string | null)[] = [];
                 if (dateFilter.dateFrom) dateRange.push(dateFilter.dateFrom);
                 if (dateFilter.dateTo) dateRange.push(dateFilter.dateTo);
                 filterValues = dateRange;
@@ -199,13 +199,13 @@ export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((s
         missingColumns.forEach((missingCol, index) => {
           const templateFilter = template.filterModel?.[missingCol.colId];
 
-          let filterValues: string[] = [];
+          let filterValues: (string | null)[] = [];
           if (templateFilter) {
             if ('values' in templateFilter && templateFilter.values) {
-              filterValues = templateFilter.values.filter((v): v is string => v !== null);
+              filterValues = templateFilter.values;
             } else if ('dateFrom' in templateFilter && 'dateTo' in templateFilter) {
               const dateFilter = templateFilter as { dateFrom: string; dateTo: string };
-              const dateRange: string[] = [];
+              const dateRange: (string | null)[] = [];
               if (dateFilter.dateFrom) dateRange.push(dateFilter.dateFrom);
               if (dateFilter.dateTo) dateRange.push(dateFilter.dateTo);
               filterValues = dateRange;
@@ -223,13 +223,13 @@ export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((s
         mergedColumns = baseColumns.map((baseColumn) => {
           const templateFilter = template.filterModel?.[baseColumn.colId];
 
-          let filterValues: string[] = [];
+          let filterValues: (string | null)[] = [];
           if (templateFilter) {
             if ('values' in templateFilter && templateFilter.values) {
-              filterValues = templateFilter.values.filter((v): v is string => v !== null);
+              filterValues = templateFilter.values;
             } else if ('dateFrom' in templateFilter && 'dateTo' in templateFilter) {
               const dateFilter = templateFilter as { dateFrom: string; dateTo: string };
-              const dateRange: string[] = [];
+              const dateRange: (string | null)[] = [];
               if (dateFilter.dateFrom) dateRange.push(dateFilter.dateFrom);
               if (dateFilter.dateTo) dateRange.push(dateFilter.dateTo);
               filterValues = dateRange;

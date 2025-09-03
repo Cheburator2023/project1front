@@ -231,8 +231,22 @@ const MSelectCellRenderer = ({ data }: any) => {
   const { updateColumnFilter } = useTemplateFiltersModalStore();
   const { agGridApi } = useGlobalStore();
 
-  const [selectedValues, setSelectedValues] = useState<string[]>(data.filterValues || []);
+  const initSelectedValues = () => {
+    const values = data.filterValues || [];
+    return values.map((value: any) => {
+      if (value === null) {
+        return '(Пустые значения)';
+      }
+      return value;
+    });
+  };
+
+  const [selectedValues, setSelectedValues] = useState<string[]>(initSelectedValues());
   const [availableOptions, setAvailableOptions] = useState<string[]>([]);
+
+  useEffect(() => {
+    setSelectedValues(initSelectedValues());
+  }, [data.filterValues]);
 
   useDeepEffect(() => {
     if (!agGridApi) {
@@ -248,7 +262,23 @@ const MSelectCellRenderer = ({ data }: any) => {
     });
 
     const columnOptions = getColumnFilterOptions(rowData, data.colId);
-    setAvailableOptions(columnOptions.map((option) => option.value));
+    const options = columnOptions.map((option) => option.value);
+
+    const hasEmptyValues = rowData.some((row) => {
+      const value = row[data.colId];
+      return value == null || value === '';
+    });
+
+    const hasNonEmptyValues = rowData.some((row) => {
+      const value = row[data.colId];
+      return value != null && value !== '';
+    });
+
+    if (hasEmptyValues) {
+      options.unshift('(Пустые значения)');
+    }
+
+    setAvailableOptions(options);
   }, [agGridApi, data.colId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -258,8 +288,15 @@ const MSelectCellRenderer = ({ data }: any) => {
   };
 
   const handleApplyButtonClick = () => {
+    const processedValues: any[] = selectedValues.map(value => {
+      if (value === '(Пустые значения)') {
+        return null;
+      }
+      return value;
+    });
+
     updateColumnFilter(data.colId, {
-      filterValues: selectedValues,
+      filterValues: processedValues,
     });
   };
 
@@ -306,6 +343,9 @@ const MSelectWrapper = styled.div`
 }
 & .counter div {
   pointer-events: none;
+}
+& .chip {
+  padding-right: 8px;
 }
 `
 

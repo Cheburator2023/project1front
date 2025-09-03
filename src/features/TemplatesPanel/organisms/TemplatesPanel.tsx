@@ -9,7 +9,7 @@ import {
   CheckSolidCustom,
   FilterOutlineCustom,
 } from '../atoms/MiscStyledComponents';
-import { useFiltersStore } from '../../../shared/stores';
+import { useFiltersStore, useModelsStore } from '../../../shared/stores';
 import { useTemplatesStore } from '../../../shared/stores/templatesStore';
 import { getActiveFiltersCount } from '../../../shared/helpers';
 import { useTableModels } from '../../../pages/HomePage/hooks/useTableModels';
@@ -21,7 +21,8 @@ export const TemplatesPanel = () => {
   const { templates } = useTemplatesStore();
   const { modelsTable } = useTableModels();
   const { compareModelsTable } = useCompareModels();
-  const { rowList, columnList, totalRows, setTotalRows } = compareModelsTable;
+  const { rowList, columnList, totalRows } = compareModelsTable;
+  const { compareMode } = useModelsStore();
 
   const activeFiltersCount = useMemo(
     () => getActiveFiltersCount(filterModel, templates, topFilters.templates[0]),
@@ -37,7 +38,7 @@ export const TemplatesPanel = () => {
   const hasNoActiveFilters = activeFiltersCount === 0;
   const isPendingTemplate = activeTemplate?.isPending || false;
   const noData = !(totalRows > 0 && firstDate && secondDate);
-  const buttonAppearance = !noData && hasTemplates ? 'primary' : 'white';
+  const buttonAppearance = (!noData || !compareMode) && hasTemplates ? 'primary' : 'white';
   const badgeAppearance = isPendingTemplate
     ? 'warning'
     : hasTemplates && hasActiveFilters
@@ -51,11 +52,11 @@ export const TemplatesPanel = () => {
         dimension="s"
         icon={<FilterOutlineCustom appearance={buttonAppearance} />}
         displayAsSquare
-        disabled={noData}
+        disabled={compareMode && noData}
         onClick={() => templateFiltersModalStore.openModal()}
       />
 
-      {!noData &&
+      { (!noData || !compareMode )&&
         (hasTemplates && hasNoActiveFilters ? (
           <CheckSolidCustom />
         ) : (
