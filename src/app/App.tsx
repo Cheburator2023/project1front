@@ -9,7 +9,7 @@ const IS_DEV = process.env.NODE_ENV === 'development';
 export const App = () => {
   return (
     <div>
-      <BrowserRouter basename={IS_DEV ? '/sum-rm' : '/'}>
+      <BrowserRouter basename={IS_DEV ? '/' : 'sum-rm'}>
         <Layout>
           <RoutesComponent />
         </Layout>
