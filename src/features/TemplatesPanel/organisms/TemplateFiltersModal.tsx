@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { ReactNode, useEffect } from 'react';
 import {
   Modal,
   ModalTitle,
@@ -15,59 +15,56 @@ import { useTemplatesStore } from '@shared/stores/templatesStore';
 import { useFiltersStore } from '@shared/stores/filtersStore';
 import { useGlobalStore } from '@shared/stores/globalStore';
 import { ReactComponent as SearchOutline } from '@admiral-ds/icons/build/system/SearchOutline.svg';
-import { useTemplateFiltersModalStore } from '../stores/templateFiltersModalStore';
+import {
+  useTemplateFiltersModalStore,
+  useTemplateFiltersModalStoreSelected,
+} from '../stores/templateFiltersModalStore';
 import { TemplateFiltersGrid } from './TemplateFiltersGrid';
 import { Spacer } from '../../../shared/ui/atoms';
 import { useDeepEffect } from '../../../shared/hooks/useDeepEffect';
 
 const initialColumns = _initialColumns.filter((col) => col.name !== 'relations');
 
-export const TemplateFiltersModal = () => {
-  const {
-    isOpen,
-    closeModal,
-    selectedTemplateId,
-    columnFilters,
-    resetState,
-    initializeFromTemplate,
-    quickFilterText,
-    setQuickFilterText,
-    localGridApi,
-  } = useTemplateFiltersModalStore();
+export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
+  const columnFilters = useTemplateFiltersModalStoreSelected.use.columnFilters();
+  const setQuickFilterText = useTemplateFiltersModalStoreSelected.use.setQuickFilterText();
+  const quickFilterText = useTemplateFiltersModalStoreSelected.use.quickFilterText();
+  const initializeFromTemplate = useTemplateFiltersModalStoreSelected.use.initializeFromTemplate();
+  const closeModal = useTemplateFiltersModalStoreSelected.use.closeModal();
+  const selectedTemplateId = useTemplateFiltersModalStoreSelected.use.selectedTemplateId();
+  const resetState = useTemplateFiltersModalStoreSelected.use.resetState();
+  const localGridApi = useTemplateFiltersModalStoreSelected.use.localGridApi();
 
   const { templates, pendingTemplate, setPendingTemplate } = useTemplatesStore();
-
   const { topFilters, setTopFilters } = useFiltersStore();
   const { agGridApi: agGridApiGlobal } = useGlobalStore();
 
   useDeepEffect(() => {
-    if (isOpen) {
-      // Получаем активный шаблон из topFilters
-      const activeTemplateId = topFilters.templates?.[0];
+    // Получаем активный шаблон из topFilters
+    const activeTemplateId = topFilters.templates?.[0];
 
-      const activeTemplate = activeTemplateId
-        ? templates.find((t) => t.template_id.toString() === activeTemplateId)
-        : undefined;
+    const activeTemplate = activeTemplateId
+      ? templates.find((t) => t.template_id.toString() === activeTemplateId)
+      : undefined;
 
-      if (activeTemplate) {
-        initializeFromTemplate(activeTemplate);
-      } else if (pendingTemplate) {
-        const filterModel = agGridApiGlobal?.getFilterModel();
-        initializeFromTemplate({ ...pendingTemplate, filterModel });
-      } else {
-        const filterModel = agGridApiGlobal?.getFilterModel();
+    if (activeTemplate) {
+      initializeFromTemplate(activeTemplate);
+    } else if (pendingTemplate) {
+      const filterModel = agGridApiGlobal?.getFilterModel();
+      initializeFromTemplate({ ...pendingTemplate, filterModel });
+    } else {
+      const filterModel = agGridApiGlobal?.getFilterModel();
 
-        initializeFromTemplate({
-          // @ts-ignore
-          template_id: 'Новый шаблон для сохранения',
-          template_name: 'Новый шаблон',
-          user_id: null,
-          filterModel,
-          isPending: true,
-        });
-      }
+      initializeFromTemplate({
+        // @ts-ignore
+        template_id: 'Новый шаблон для сохранения',
+        template_name: 'Новый шаблон',
+        user_id: null,
+        filterModel,
+        isPending: true,
+      });
     }
-  }, [isOpen, templates, topFilters, pendingTemplate, initializeFromTemplate]);
+  }, [templates, topFilters, pendingTemplate, initializeFromTemplate]);
 
   const handleTemplateChange = (templateId: string) => {
     const id = templateId === 'new' ? null : parseInt(templateId);
@@ -229,9 +226,7 @@ export const TemplateFiltersModal = () => {
           </div>
         </div>
 
-        <div style={{ height: '100%' }}>
-          <TemplateFiltersGrid />
-        </div>
+        {children}
 
         <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
           <Button appearance="secondary" dimension="s" onClick={handleReset}>

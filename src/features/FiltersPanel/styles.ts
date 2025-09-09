@@ -4,13 +4,11 @@ import styled from 'styled-components';
 const Container = styled('div')`
   width: 100%;
   height: 80px;
-  background: var(--neutral-neutral-10, #e5e7eb);
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: flex-start;
-  padding: 12px;
   box-sizing: border-box;
+  justify-content: space-between;
 `;
 
 const CustomToggle = styled(Toggle)`

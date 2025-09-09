@@ -1,7 +1,10 @@
 import { IconButton } from '@admiral-ds/react-ui';
 import { ReactComponent as SettingsIcon } from '@admiral-ds/icons/build/system/SettingsOutline.svg';
 import { useMemo, useState } from 'react';
-import { useTemplateFiltersModalStore } from '../stores/templateFiltersModalStore';
+import {
+  useTemplateFiltersModalStore,
+  useTemplateFiltersModalStoreSelected,
+} from '../stores/templateFiltersModalStore';
 import { TemplateFiltersModal } from './TemplateFiltersModal';
 import {
   BadgeCount,
@@ -14,9 +17,11 @@ import { useTemplatesStore } from '../../../shared/stores/templatesStore';
 import { getActiveFiltersCount } from '../../../shared/helpers';
 
 import { useCompareModels } from '../../CompareModels/hooks';
+import { TemplateFiltersGrid } from './TemplateFiltersGrid';
 
-export const TemplatesPanel = () => {
-  const templateFiltersModalStore = useTemplateFiltersModalStore();
+export const TemplatesPanelContainer = () => {
+  const openModal = useTemplateFiltersModalStoreSelected.use.openModal();
+
   const { topFilters, filterModel, firstDate, secondDate } = useFiltersStore();
   const { templates } = useTemplatesStore();
   const { compareMode, rows } = useModelsStore();
@@ -43,14 +48,14 @@ export const TemplatesPanel = () => {
     : 'white';
 
   return (
-    <div style={{ position: 'relative' }}>
+    <>
       <ButtonCustom
         appearance={buttonAppearance}
         dimension="s"
         icon={<FilterOutlineCustom appearance={buttonAppearance} />}
         displayAsSquare
         disabled={compareMode ? noData : !rows}
-        onClick={() => templateFiltersModalStore.openModal()}
+        onClick={() => openModal()}
       />
 
       {(!noData || !compareMode) &&
@@ -61,8 +66,22 @@ export const TemplatesPanel = () => {
             {activeFiltersCount}
           </BadgeCount>
         ))}
+    </>
+  );
+};
 
-      {templateFiltersModalStore.isOpen && <TemplateFiltersModal />}
+export const TemplatesPanel = () => {
+  const isOpen = useTemplateFiltersModalStoreSelected.use.isOpen();
+
+  return (
+    <div style={{ position: 'relative', top: 11 }}>
+      <TemplatesPanelContainer />
+
+      {isOpen && (
+        <TemplateFiltersModal>
+          <TemplateFiltersGrid />
+        </TemplateFiltersModal>
+      )}
     </div>
   );
 };

@@ -3,6 +3,7 @@ import { Template } from '@shared/api/types';
 import { initialColumns as _initialColumns } from '@shared/constants/InitialCollumns';
 import { GridApi } from 'ag-grid-community';
 import { useGlobalStore } from '@shared/stores/globalStore';
+import { createSelectors } from '../../../shared/hooks/useSelectors';
 
 const initialColumns = _initialColumns.filter((col) => col.name !== 'relations');
 
@@ -85,7 +86,6 @@ export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((s
     );
 
     const isAllSelected = updatedFilters.every((f) => f.isActive);
-    console.log('🐸 Pepe said >> updatedFilters:', updatedFilters);
     set({ columnFilters: updatedFilters, isAllSelected, isDirty: true });
 
   },
@@ -146,11 +146,11 @@ export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((s
   setIsDirty: (dirty) => set({ isDirty: dirty }),
   resetState: () => set(initialState),
   initializeFromTemplate: (template?: Template) => {
-    const agGridApi = useGlobalStore.getState().agGridApi;
-    const currentColumnState = agGridApi
-      ?.getColumnState()
-      ?.filter((col) => col.colId !== 'ag-Grid-ControlsColumn');
-    const currentFilterModel = agGridApi?.getFilterModel();
+    // const agGridApi = useGlobalStore.getState().agGridApi;
+    // const currentColumnState = agGridApi
+    //   ?.getColumnState()
+    //   ?.filter((col) => col.colId !== 'ag-Grid-ControlsColumn');
+    // const currentFilterModel = agGridApi?.getFilterModel();
     const baseColumns = createColumnFiltersFromInitialColumns();
 
     if (template) {
@@ -302,3 +302,5 @@ export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((s
   setLocalGridApi: (api) => set({ localGridApi: api }),
 }));
 
+
+export const useTemplateFiltersModalStoreSelected = createSelectors(useTemplateFiltersModalStore);

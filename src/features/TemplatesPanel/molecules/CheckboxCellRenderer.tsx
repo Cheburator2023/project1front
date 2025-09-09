@@ -1,9 +1,10 @@
 import { Checkbox } from '@admiral-ds/react-ui';
-import { useTemplateFiltersModalStore } from '../stores/templateFiltersModalStore';
+import { useTemplateFiltersModalStore, useTemplateFiltersModalStoreSelected } from '../stores/templateFiltersModalStore';
 import { Flexbox } from '../../../shared/ui/atoms';
 
 export const CheckboxCellRenderer = ({ data }: any) => {
-  const { toggleColumnActive } = useTemplateFiltersModalStore();
+  const toggleColumnActive = useTemplateFiltersModalStoreSelected.use.toggleColumnActive();
+
 
   return (
     <Flexbox alignItems="center" height="100%">

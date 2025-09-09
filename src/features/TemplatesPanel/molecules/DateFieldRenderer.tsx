@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react';
 import { Button, Select, Option, DateField } from '@admiral-ds/react-ui';
 import { format, parse, isValid } from 'date-fns';
 import ru from 'date-fns/locale/ru/index.js';
-import { useTemplateFiltersModalStore } from '../stores/templateFiltersModalStore';
+import { useTemplateFiltersModalStore, useTemplateFiltersModalStoreSelected } from '../stores/templateFiltersModalStore';
 
 export const DateFieldRenderer = ({ data }: any) => {
-  const { updateColumnFilter } = useTemplateFiltersModalStore();
+  const updateColumnFilter = useTemplateFiltersModalStoreSelected.use.updateColumnFilter();
 
   const initializeDateValue = () => {
     if (!data.filterValues || data.filterValues.length === 0) return '';

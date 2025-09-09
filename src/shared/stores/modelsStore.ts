@@ -68,8 +68,6 @@ export const useModelsStore = create<ModelsStore>((set, get) => ({
   },
 
   setRows: (rows: Partial<Row>[]) => {
-    console.log('🐸 Pepe said >> rows:', rows);
-
     const { initColOptionsMap } = get();
     set({ rows });
     initColOptionsMap(rows);
@@ -127,7 +125,8 @@ export const useModelsStore = create<ModelsStore>((set, get) => ({
             }
           });
 
-          colOptionsMap[colId] = Array.from(uniqueValues).sort();
+          const sortedValues = Array.from(uniqueValues).sort();
+          colOptionsMap[colId] = hasEmptyValues ? ['(Пустые значения)', ...sortedValues] : sortedValues;
         });
       }
     }

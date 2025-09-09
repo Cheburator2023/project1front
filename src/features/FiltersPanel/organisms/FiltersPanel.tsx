@@ -12,7 +12,9 @@ import { Container, CustomDateField, FiltersDivider, FilterButton, FiltersBox } 
 import { useGlobalStore } from '../../../shared/stores/globalStore';
 import { TemplatesPanel } from '../../TemplatesPanel/organisms/TemplatesPanel';
 import { TemplatesFilterInput } from '../molecules/TemplatesFilterInput';
-import { useTemplateFiltersModalStore } from '../../TemplatesPanel/stores/templateFiltersModalStore';
+import {
+  useTemplateFiltersModalStoreSelected,
+} from '../../TemplatesPanel/stores/templateFiltersModalStore';
 import { ROUTES } from '../../../app/Routes';
 
 export interface FiltersPanelProps {
@@ -52,7 +54,8 @@ export const FiltersPanel = ({
   } = useFiltersStore();
   const { setFiltersResetCount } = useGlobalStore();
   const { getActiveTemplate } = useFiltersStore();
-  const { initializeFromTemplate, resetState } = useTemplateFiltersModalStore();
+  const initializeFromTemplate = useTemplateFiltersModalStoreSelected.use.initializeFromTemplate();
+  const resetState = useTemplateFiltersModalStoreSelected.use.resetState();
 
   const activeTemplate = useMemo(() => getActiveTemplate(), [getActiveTemplate]);
 
@@ -82,9 +85,12 @@ export const FiltersPanel = ({
     [setModelsDownloadingDate, refetchModels],
   );
 
-  const handleChange = useCallback((name: string, value: string[]) => {
-    setTopFilters({ ...topFilters, templates: [], [name]: value });
-  }, [topFilters, setTopFilters]);
+  const handleChange = useCallback(
+    (name: string, value: string[]) => {
+      setTopFilters({ ...topFilters, templates: [], [name]: value });
+    },
+    [topFilters, setTopFilters],
+  );
 
   const handleResetFilters = useCallback(() => {
     resetFilters();
@@ -93,27 +99,37 @@ export const FiltersPanel = ({
     resetState();
     initializeFromTemplate(undefined);
     setPendingTemplate(undefined);
-  }, [resetFilters, setTopFilters, topFilters, setFiltersResetCount, resetState, initializeFromTemplate, setPendingTemplate]);
+  }, [
+    resetFilters,
+    setTopFilters,
+    topFilters,
+    setFiltersResetCount,
+    resetState,
+    initializeFromTemplate,
+    setPendingTemplate,
+  ]);
 
-  const handleChangeExploitationModes = useCallback((value: string[]) => {
-    updateSelectedExploitationModes(value);
-  }, [updateSelectedExploitationModes]);
+  const handleChangeExploitationModes = useCallback(
+    (value: string[]) => {
+      updateSelectedExploitationModes(value);
+    },
+    [updateSelectedExploitationModes],
+  );
 
   const location = useLocation();
 
-  const isComparePage = useMemo(() => location.pathname === ROUTES.COMPARE_MODELS, [location.pathname]);
+  const isComparePage = useMemo(
+    () => location.pathname === ROUTES.COMPARE_MODELS,
+    [location.pathname],
+  );
 
   useEffect(() => {
     setCompareMode(isComparePage);
   }, [isComparePage, setCompareMode]);
 
   return (
-    <Container style={{ justifyContent: 'space-between' }}>
+    <Container>
       <FiltersBox>
-        <div style={{ marginTop: '24px', marginRight: '20px' }}>
-          <TemplatesPanel />
-        </div>
-
         <CustomSearchSelect
           id="objectTypeRegistry"
           maxRowCount={1}

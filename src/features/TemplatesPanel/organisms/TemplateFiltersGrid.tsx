@@ -1,10 +1,15 @@
-import { useCallback, useMemo } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { GridReadyEvent, RowDragEndEvent } from 'ag-grid-community';
 import styled from 'styled-components';
-import { useTemplateFiltersModalStore } from '../stores/templateFiltersModalStore';
+import {
+  useTemplateFiltersModalStore,
+  useTemplateFiltersModalStoreSelected,
+} from '../stores/templateFiltersModalStore';
 import { COLUMN_TYPE } from '../../../shared/types';
-import { columnDefs } from '../columnDefs';
+import { FilterValuesCellRenderer } from '../molecules/FilterValuesCellRenderer';
+import { CheckboxCellRenderer } from '../molecules/CheckboxCellRenderer';
+import { CheckboxHeaderRenderer } from '../molecules/CheckboxHeaderRenderer';
 
 const getRowHeight = (params: any) => {
   if (params.data.type === COLUMN_TYPE.DATE) {
@@ -17,12 +22,42 @@ const getRowHeight = (params: any) => {
 };
 
 export const TemplateFiltersGrid = () => {
-  const { columnFilters, reorderColumns, quickFilterText, setLocalGridApi } =
-    useTemplateFiltersModalStore();
-
-  const rowData = useMemo(() => {
-    return columnFilters.sort((a, b) => a.order - b.order);
-  }, [columnFilters]);
+  const [columnDefs] = useState([
+    {
+      headerName: '',
+      field: 'drag',
+      rowDrag: true,
+      width: 50,
+      maxWidth: 55,
+      suppressMenu: true,
+    },
+    {
+      headerName: 'Активна',
+      field: 'isActive',
+      width: 55,
+      maxWidth: 55,
+      suppressMenu: true,
+      cellRenderer: CheckboxCellRenderer,
+      headerComponent: CheckboxHeaderRenderer,
+    },
+    {
+      headerName: 'Название колонки',
+      field: 'title',
+      flex: 1,
+      suppressMenu: true,
+      wrapText: true,
+    },
+    {
+      headerName: 'Значения фильтров',
+      field: 'filterValues',
+      suppressMenu: true,
+      cellRenderer: memo(FilterValuesCellRenderer),
+    },
+  ]);
+  const columnFilters = useTemplateFiltersModalStoreSelected.use.columnFilters();
+  const reorderColumns = useTemplateFiltersModalStoreSelected.use.reorderColumns();
+  const quickFilterText = useTemplateFiltersModalStoreSelected.use.quickFilterText();
+  const setLocalGridApi = useTemplateFiltersModalStoreSelected.use.setLocalGridApi();
 
   const onRowDragEnd = useCallback(
     (event: RowDragEndEvent) => {
@@ -54,14 +89,15 @@ export const TemplateFiltersGrid = () => {
   return (
     <TableWrapper className="ag-theme-quartz">
       <AgGridReact
-        rowData={rowData}
+        rowData={columnFilters}
         columnDefs={columnDefs}
         rowDragManaged
         suppressContextMenu
         onRowDragEnd={onRowDragEnd}
         onGridReady={onGridReady}
-        suppressRowClickSelection
+        rowBuffer={2}
         suppressCellFocus
+        rowSelection={undefined}
         getRowHeight={getRowHeight}
         animateRows={false}
         quickFilterText={quickFilterText}

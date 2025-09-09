@@ -2,9 +2,8 @@ import { useState, useEffect } from 'react';
 import { Button, MenuActionsPanel, Option, Select } from '@admiral-ds/react-ui';
 import styled from 'styled-components';
 
-import { useTemplateFiltersModalStore } from '../stores/templateFiltersModalStore';
+import { useTemplateFiltersModalStoreSelected } from '../stores/templateFiltersModalStore';
 import { useModelsStore } from '../../../shared/stores';
-import { useDeepEffect } from '../../../shared/hooks/useDeepEffect';
 
 const MSelectWrapper = styled('div')`
   & .close-button {
@@ -22,8 +21,8 @@ const MSelectWrapper = styled('div')`
   }
 `;
 
-const initSelectedValues = (data: any) => {
-  const values = data.filterValues || [];
+const initSelectedValues = (filterValues: any) => {
+  const values = filterValues || [];
   return values.map((value: any) => {
     if (value === null) {
       return '(Пустые значения)';
@@ -33,28 +32,25 @@ const initSelectedValues = (data: any) => {
 };
 
 export const MSelectCellRenderer = ({ data }: any) => {
-  const { updateColumnFilter } = useTemplateFiltersModalStore();
-  const { colOptionsMap, hasEmptyValues } = useModelsStore();
-  const [selectedValues, setSelectedValues] = useState<string[]>(initSelectedValues(data));
-  const [availableOptions, setAvailableOptions] = useState<string[]>([]);
+  console.log('🐸 Pepe said >> MSelectCellRenderer >> data:', data);
+
+  const updateColumnFilter = useTemplateFiltersModalStoreSelected.use.updateColumnFilter();
+
+  const { colOptionsMap } = useModelsStore();
+  const [selectedValues, setSelectedValues] = useState<string[]>(initSelectedValues(data.filterValues));
+  const [shouldRenderOptions, setShouldRenderOptions] = useState(false);
 
   useEffect(() => {
-    setSelectedValues(initSelectedValues(data));
-  }, [initSelectedValues, data]);
+    setSelectedValues(initSelectedValues(data.filterValues));
+  }, [data]);
 
-  useDeepEffect(() => {
-    const computedOptions = () => {
-      if (!data?.colId) {
-        return [];
-      }
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShouldRenderOptions(true);
+    }, 100);
 
-      const options = colOptionsMap[data.colId];
-
-      return options;
-    };
-
-    setAvailableOptions(computedOptions());
-  }, [data?.colId]);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedOptions = e.target.selectedOptions;
@@ -75,19 +71,23 @@ export const MSelectCellRenderer = ({ data }: any) => {
     });
   };
 
+  const options = colOptionsMap[data.colId];
+
   return (
     <MSelectWrapper style={{ width: '100%', padding: '8px 0' }}>
       <Select
         multiple
         dimension="s"
-        // disabled={!data.isActive || !availableOptions.length}
+        disabled={!data.isActive || !options.length}
         mode="searchSelect"
         placeholder="Выберите значения"
         value={selectedValues}
         onChange={handleChange}
         style={{ width: '100%' }}
+        virtualScroll={{ itemHeight: 'auto' }}
         maxRowCount={1}
         minRowCount={1}
+        isLoading={!shouldRenderOptions}
         renderDropDownBottomPanel={() => {
           return (
             <MenuActionsPanel dimension="s">
@@ -98,11 +98,12 @@ export const MSelectCellRenderer = ({ data }: any) => {
           );
         }}
       >
-        {availableOptions.map((option) => (
-          <Option key={option} value={option}>
-            {option}
-          </Option>
-        ))}
+        {shouldRenderOptions &&
+          options?.map((option) => (
+            <Option key={option} value={option}>
+              {option}
+            </Option>
+          ))}
       </Select>
     </MSelectWrapper>
   );
