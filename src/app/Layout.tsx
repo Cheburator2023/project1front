@@ -9,6 +9,7 @@ import 'ag-grid-enterprise';
 import { ColumnsFilter, Permission, Role } from '@shared/types';
 
 import { useUserStore, useAppInjectStore, useFetchStore } from '@src/shared/stores';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Header } from './Header';
 import { themes } from './theme/theme';
 
@@ -19,6 +20,18 @@ const RC_STATS = process.env.RC_STATS;
 
 console.log('GIT_REVISION IS:', GIT_REVISION);
 console.log('RELEASE_STATS IS:', RC_STATS);
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+      refetchOnWindowFocus: true,
+      staleTime: 0,
+      gcTime: 0,
+      refetchOnMount: true,
+    },
+  },
+});
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -107,23 +120,25 @@ const Layout = ({ children, user, protectedFetch, goToSum, onLogout }: LayoutPro
   };
 
   return (
-    <ThemeProvider theme={themes.light}>
-      <DropdownProvider>
-        <GlobalStyle />
-        <Container>
-          <Header
-            user={user}
-            downloadReportStatus={downloadReportStatus}
-            columnsFilters={columnsFilters}
-            updateColumnsFilters={updateColumnsFilters}
-            updateDownloadReportStatus={setDownloadReportStatus}
-            goToSum={goToSum}
-            onLogout={onLogoutHandler}
-          />
-          <RoutesWrapper>{children}</RoutesWrapper>
-        </Container>
-      </DropdownProvider>
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider theme={themes.light}>
+        <DropdownProvider>
+          <GlobalStyle />
+          <Container>
+            <Header
+              user={user}
+              downloadReportStatus={downloadReportStatus}
+              columnsFilters={columnsFilters}
+              updateColumnsFilters={updateColumnsFilters}
+              updateDownloadReportStatus={setDownloadReportStatus}
+              goToSum={goToSum}
+              onLogout={onLogoutHandler}
+            />
+            <RoutesWrapper>{children}</RoutesWrapper>
+          </Container>
+        </DropdownProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 };
 
@@ -174,11 +189,11 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
-const Container = styled.div`
+const Container = styled('div')`
   min-width: 1600px;
 `;
 
-const RoutesWrapper = styled.div`
+const RoutesWrapper = styled('div')`
   position: relative;
 `;
 

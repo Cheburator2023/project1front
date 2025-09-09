@@ -5,8 +5,11 @@ import { Button, Spinner } from '@admiral-ds/react-ui';
 import { ReactComponent as DownloadOutline } from '@admiral-ds/icons/build/system/DownloadOutline.svg';
 
 import { ErrorStatus, Loading } from '@src/shared/ui/atoms';
-import { API_ROUTES, mockedMetricsResponse, useFetch } from '@src/shared/api';
 import { MetricsResponseType } from '@src/shared/api/types';
+import {
+  useMetricsControllerGetMetrics,
+  useMetricsControllerExportMetricsToExcel,
+} from '@shared/api/generated/endpoints';
 
 import { switchDateFormat, validateDateRange } from './helpers';
 import {
@@ -118,21 +121,33 @@ const ChartsDashboard: React.FC<ChartsDashboardProps> = ({ useDatamart = false }
     tempSelectedStreams: dsStreamArtifactOptions.options.map((option) => option.value),
   });
 
-  const {
-    responseData: metricsData,
-    loading: loadingMetrics,
-    error: errorMetrics,
-    refetch: refetchMetrics,
-  } = useFetch<MetricsResponseType>({
-    apiRoute: API_ROUTES.METRICS,
-    params: getQueryParams({
+  const [metricsParams, setMetricsParams] = useState(
+    getQueryParams({
       ...filters,
       useDatamart,
     }),
-    mockedResponse: mockedMetricsResponse,
-  });
+  );
 
-  const { mutationProtectedFetch } = useFetch({});
+  const {
+    data: metricsData,
+    isLoading: loadingMetrics,
+    error: metricsError,
+    refetch: refetchMetrics,
+  } = useMetricsControllerGetMetrics(metricsParams);
+
+  const typedMetricsData = metricsData as MetricsResponseType | undefined;
+
+  const errorMetrics = metricsError ? String(metricsError) : undefined;
+  
+  const [exportParams, setExportParams] = useState<Record<string, string> | undefined>(undefined);
+  const {isSuccess: isExportSuccess, data: exportData, error: exportError} = useMetricsControllerExportMetricsToExcel(
+    exportParams,
+    {
+      query: {
+        enabled: !!exportParams,
+      },
+    }
+  );
 
   const [totalModels, setTotalModels] = useState(initialTotalModels);
   const [implementedModels, setImplementedModels] = useState(initialImplementedModels);
@@ -170,56 +185,57 @@ const ChartsDashboard: React.FC<ChartsDashboardProps> = ({ useDatamart = false }
 
   const [selectedMetric, setSelectedMetric] = useState<string | undefined>();
   const [isExportingMetric, setIsExportingMetric] = useState(false);
+  const [currentExportLabel, setCurrentExportLabel] = useState<string>('');
 
   useEffect(() => {
-    if (!metricsData) return;
+    if (!typedMetricsData) return;
 
     setTotalModels({
       ...totalModels,
-      value: metricsData.totalModels.count,
-      delta: metricsData.totalModels.delta,
+      value: typedMetricsData.totalModels.count,
+      delta: typedMetricsData.totalModels.delta,
     });
     setImplementedModels({
       ...implementedModels,
-      value: metricsData.implementedModels.count,
-      delta: metricsData.implementedModels.delta,
+      value: typedMetricsData.implementedModels.count,
+      delta: typedMetricsData.implementedModels.delta,
     });
     setDevelopedModels({
       ...developedModels,
-      value: metricsData.developedModels.count,
-      delta: metricsData.developedModels.delta,
+      value: typedMetricsData.developedModels.count,
+      delta: typedMetricsData.developedModels.delta,
     });
     setSumRmModels({
       ...sumRmModels,
-      value: metricsData.sumRmModels.count,
-      delta: metricsData.sumRmModels.delta,
+      value: typedMetricsData.sumRmModels.count,
+      delta: typedMetricsData.sumRmModels.delta,
     });
     setFinalStatusModels({
       ...finalStatusModels,
-      value: metricsData.finalStatusModels.count,
-      delta: metricsData.finalStatusModels.delta,
+      value: typedMetricsData.finalStatusModels.count,
+      delta: typedMetricsData.finalStatusModels.delta,
     });
     setRegistryCoverageModels({
       ...registryCoverageModels,
-      value: metricsData.registryCoverageModels.countPercent,
-      delta: metricsData.registryCoverageModels.deltaPercent,
+      value: typedMetricsData.registryCoverageModels.countPercent,
+      delta: typedMetricsData.registryCoverageModels.deltaPercent,
     });
     setRiskCoverageFinalStatusModels({
       ...riskCoverageFinalStatusModels,
-      value: metricsData.riskCoverageFinalStatusModels.countPercent,
-      delta: metricsData.riskCoverageFinalStatusModels.deltaPercent,
+      value: typedMetricsData.riskCoverageFinalStatusModels.countPercent,
+      delta: typedMetricsData.riskCoverageFinalStatusModels.deltaPercent,
     });
 
     setOnMonitoringModels({
       ...onMonitoringModels,
-      value: metricsData.onMonitoringModels.count,
-      delta: metricsData.onMonitoringModels.delta,
+      value: typedMetricsData.onMonitoringModels.count,
+      delta: typedMetricsData.onMonitoringModels.delta,
     });
 
     setTakenOutOfOperationModels({
       ...takenOutOfOperationModels,
-      value: metricsData.takenOutOfOperationModels.count,
-      delta: metricsData.takenOutOfOperationModels.delta,
+      value: typedMetricsData.takenOutOfOperationModels.count,
+      delta: typedMetricsData.takenOutOfOperationModels.delta,
     });
 
     setStalledModelsByMonth({
@@ -227,7 +243,7 @@ const ChartsDashboard: React.FC<ChartsDashboardProps> = ({ useDatamart = false }
       series: [
         {
           ...stalledModelsByMonth.series[0],
-          data: metricsData.stalledModelsByMonth,
+          data: typedMetricsData.stalledModelsByMonth,
         },
       ],
     });
@@ -237,11 +253,11 @@ const ChartsDashboard: React.FC<ChartsDashboardProps> = ({ useDatamart = false }
       series: [
         {
           ...pilots.series[0],
-          data: [metricsData.pilots.stage05A, null],
+          data: [typedMetricsData.pilots.stage05A, null],
         },
         {
           ...pilots.series[1],
-          data: [null, metricsData.pilots.stage05B],
+          data: [null, typedMetricsData.pilots.stage05B],
         },
       ],
     });
@@ -251,7 +267,7 @@ const ChartsDashboard: React.FC<ChartsDashboardProps> = ({ useDatamart = false }
       series: [
         {
           ...finalStatusByMonthModels.series[0],
-          data: metricsData.finalStatusByMonthModels,
+          data: typedMetricsData.finalStatusByMonthModels,
         },
       ],
     });
@@ -261,7 +277,7 @@ const ChartsDashboard: React.FC<ChartsDashboardProps> = ({ useDatamart = false }
       series: [
         {
           ...distributionByLifecycleStageModels?.series?.[0],
-          data: metricsData?.distributionByLifecycleStageModels,
+          data: typedMetricsData?.distributionByLifecycleStageModels,
         },
       ],
     } as any);
@@ -272,20 +288,45 @@ const ChartsDashboard: React.FC<ChartsDashboardProps> = ({ useDatamart = false }
         {
           ...modelDynamicsByStreams.series[0],
           data: [
-            metricsData.tasks.ds_lead,
-            metricsData.tasks.ds,
-            metricsData.tasks.de_lead,
-            metricsData.tasks.de,
-            metricsData.tasks.modelops_lead,
-            metricsData.tasks.modelops,
-            metricsData.tasks.mipm,
-            metricsData.tasks.validator_lead,
-            metricsData.tasks.validator,
+            typedMetricsData.tasks.ds_lead,
+            typedMetricsData.tasks.ds,
+            typedMetricsData.tasks.de_lead,
+            typedMetricsData.tasks.de,
+            typedMetricsData.tasks.modelops_lead,
+            typedMetricsData.tasks.modelops,
+            typedMetricsData.tasks.mipm,
+            typedMetricsData.tasks.validator_lead,
+            typedMetricsData.tasks.validator,
           ],
         },
       ],
     });
-  }, [metricsData]);
+  }, [typedMetricsData]);
+
+  useEffect(() => {
+    if (isExportSuccess && exportData && currentExportLabel) {
+      const url = window.URL.createObjectURL(exportData);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = currentExportLabel;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      setIsExportingMetric(false);
+      setExportParams(undefined);
+      setCurrentExportLabel('');
+    }
+  }, [isExportSuccess, exportData, currentExportLabel]);
+
+  useEffect(() => {
+    if (exportError) {
+      console.error('Ошибка экспорта:', exportError);
+      setIsExportingMetric(false);
+      setExportParams(undefined);
+      setCurrentExportLabel('');
+    }
+  }, [exportError]);
 
   const handleDateChange = (newDateRange: string | undefined) => {
     if (newDateRange) {
@@ -338,6 +379,11 @@ const ChartsDashboard: React.FC<ChartsDashboardProps> = ({ useDatamart = false }
       });
     }
 
+    const newParams = getQueryParams({
+      ...filters,
+      useDatamart,
+    });
+    setMetricsParams(newParams);
     refetchMetrics();
   };
 
@@ -357,6 +403,13 @@ const ChartsDashboard: React.FC<ChartsDashboardProps> = ({ useDatamart = false }
     setSelectedMetric(undefined);
 
     setDateError(false);
+    const newParams = getQueryParams({
+      startDate: undefined,
+      endDate: undefined,
+      selectedStreams: [],
+      useDatamart,
+    });
+    setMetricsParams(newParams);
     refetchMetrics();
   };
 
@@ -479,18 +532,16 @@ const ChartsDashboard: React.FC<ChartsDashboardProps> = ({ useDatamart = false }
     const baseMetric = isDelta ? selectedMetric.replace('_delta', '') : selectedMetric;
     const dataType = isDelta ? 'delta' : 'current';
 
-    const queryParams = getQueryParams({
-      startDate: tempFilters.tempStartDate && switchDateFormat(tempFilters.tempStartDate),
-      endDate: tempFilters.tempEndDate && switchDateFormat(tempFilters.tempEndDate),
-      selectedStreams: tempFilters.tempSelectedStreams,
-      useDatamart,
-    });
-
-    const exportParams = {
-      ...queryParams,
+    const newExportParams: Record<string, string> = {
+      ...(tempFilters.tempStartDate && { startDate: switchDateFormat(tempFilters.tempStartDate) }),
+      ...(tempFilters.tempEndDate && { endDate: switchDateFormat(tempFilters.tempEndDate) }),
       metric: baseMetric,
       dataType,
     };
+
+    tempFilters.tempSelectedStreams.forEach((stream, index) => {
+      newExportParams[`stream[${index}]`] = stream;
+    });
 
     const today = new Date();
     const dateStr = `${String(today.getDate()).padStart(2, '0')}.${String(
@@ -498,19 +549,10 @@ const ChartsDashboard: React.FC<ChartsDashboardProps> = ({ useDatamart = false }
     ).padStart(2, '0')}.${today.getFullYear()}`;
 
     const readableLabel = metricLabelMap[selectedMetric] || selectedMetric;
+    const fileName = `${readableLabel} ${dateStr}.xlsx`;
 
-    try {
-      await mutationProtectedFetch<void, Blob>({
-        fetchApiRoute: API_ROUTES.METRICS_EXPORT,
-        fetchMethod: 'GET',
-        newParams: exportParams,
-        fileName: `${readableLabel} ${dateStr}.xlsx`,
-      });
-    } catch (error) {
-      //
-    } finally {
-      setIsExportingMetric(false);
-    }
+    setCurrentExportLabel(fileName);
+    setExportParams(newExportParams);
   };
 
   if (errorMetrics) {
@@ -594,11 +636,7 @@ const ChartsDashboard: React.FC<ChartsDashboardProps> = ({ useDatamart = false }
             </ButtonContainer>
           </FlexContainerFilter>
 
-          <BiSyncInterface
-            useDatamart={useDatamart}
-            onSyncComplete={refetchMetrics}
-            mutationProtectedFetch={mutationProtectedFetch}
-          />
+          <BiSyncInterface useDatamart={useDatamart} onSyncComplete={refetchMetrics} />
         </Container>
       </WrapperFilter>
 

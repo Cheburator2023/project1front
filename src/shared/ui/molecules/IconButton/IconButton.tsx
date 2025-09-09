@@ -43,7 +43,7 @@ export const IconButton = ({
       >
         {icon}
       </IconPlacement>
-      {tooltip && isTooltipVisible && <Tooltip targetRef={iconRef} title={tooltip} />}
+      {tooltip && isTooltipVisible && <Tooltip targetRef={iconRef as any} title={tooltip} />}
     </div>
   );
 };

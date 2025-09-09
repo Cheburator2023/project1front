@@ -26,9 +26,12 @@ export const processFetchData = async (
 ) => {
   const { cards } = res.data;
 
+
+
   const rowNames = columnList.map((column) => {
     return column.name;
   });
+
 
   const formattedRows = Object.entries(cards).flatMap(([key, [row1, row2]]) => {
     const preparedRow1 = row1 || rowNames;

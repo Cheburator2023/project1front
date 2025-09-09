@@ -1,15 +1,11 @@
 /* eslint-disable no-nested-ternary */
-import React, { ReactNode, useEffect, useRef, useState } from 'react';
+import React, { ReactNode, useEffect, useRef, useState, useMemo } from 'react';
 import { T } from '@admiral-ds/react-ui';
 
 import { Column, COLUMN_TYPE, Row } from '@shared/types';
-import {
-  API_ROUTES,
-  useFetch,
-  CompareModelsResponseType,
-  mockedModelsCompareResponse,
-} from '@shared/api';
-import { useExploitationModeStore, useFiltersStore } from '@src/shared/stores';
+import { CompareModelsResponseType } from '@shared/api';
+import { useModelsControllerCompareModels } from '@shared/api/generated/endpoints';
+import { useExploitationModeStore } from '@src/shared/stores';
 
 import { initialColumns } from '@src/shared/constants';
 import { compareValues, prepareFetchParams, processFetchData } from '../helpers';
@@ -37,7 +33,6 @@ export const getQueryParams = (
 export const useCompareModels = () => {
   const cellRef = useRef(null);
   const [compareOnlyChanged, setCompareOnlyChanged] = useState(true);
-  const { filterModel } = useFiltersStore();
 
   // Table data
   const [resData, setResData] = useState<CompareModelsResponseType | undefined>(undefined);
@@ -52,50 +47,67 @@ export const useCompareModels = () => {
   // Pagination
   const [pageSize, setPageSize] = useState(20);
   const [page, setPage] = useState(1);
-  const [totalRows, setTotalRows] = useState<number>(0);
+  const [totalRows, setTotalRows] = useState<number | undefined>(undefined);
 
   const selectedExploitationModes = useExploitationModeStore(
     (state) => state.selectedExploitationModes,
   );
 
-  const { mutationProtectedFetch } = useFetch({});
+  const [queryParams, setQueryParams] = useState<any>(undefined);
+
+  const compareModelsQuery = useModelsControllerCompareModels(queryParams, {
+    query: {
+      enabled: !!queryParams,
+      retry: false,
+      refetchOnWindowFocus: true,
+      staleTime: 0,
+      gcTime: 0,
+      refetchOnMount: true,
+    },
+  });
+
+  useEffect(() => {
+    const processData = async () => {
+      if ((compareModelsQuery as any).data && !(compareModelsQuery as any).isFetching) {
+        try {
+          const responseData = (compareModelsQuery as any).data as CompareModelsResponseType;
+          setResData(responseData);
+
+          const formattedRows = await processFetchData(
+            responseData,
+            columnList,
+            compareOnlyChanged,
+          );
+
+          setRowList(formattedRows);
+          setTotalRows(formattedRows.length);
+        } catch (error) {
+          setError('Ошибка обработки данных');
+        }
+      }
+    };
+
+    processData();
+  }, [(compareModelsQuery as any).data, (compareModelsQuery as any).isFetching, columnList, compareOnlyChanged]);
+
+  useEffect(() => {
+    if ((compareModelsQuery as any).error) {
+      setError((compareModelsQuery as any).error.message || 'Ошибка загрузки данных');
+    }
+  }, [(compareModelsQuery as any).error]);
+
+  useEffect(() => {
+    setLoading((compareModelsQuery as any).isFetching || false);
+  }, [(compareModelsQuery as any).isFetching]);
 
   const handleSubmit = async (
     firstDate: string,
     secondDate: string,
     compareOnlyChanged: boolean,
   ) => {
-    setLoading(true);
     setError(null);
-    try {
-      const res = await mutationProtectedFetch<
-        CompareModelsResponseType,
-        CompareModelsResponseType
-      >({
-        fetchApiRoute: API_ROUTES.COMPARE_MODELS,
-        fetchMethod: 'GET',
-        mockedResponse: mockedModelsCompareResponse,
-        newParams: getQueryParams(firstDate, secondDate, selectedExploitationModes),
-      });
-
-      if (res?.error) {
-        setError('Ошибка загрузки');
-      }
-
-      setResData(res?.data as CompareModelsResponseType);
-      const formattedRows = await processFetchData(
-        res?.data as CompareModelsResponseType,
-        columnList,
-        compareOnlyChanged,
-      );
-
-      setRowList(formattedRows);
-      setTotalRows(formattedRows.length);
-      setLoading(false);
-    } catch (error) {
-      setError('Ошибка загрузки');
-      setLoading(false);
-    }
+    const newQueryParams = getQueryParams(firstDate, secondDate, selectedExploitationModes);
+    setQueryParams(newQueryParams);
   };
 
   const cellRender = (
@@ -135,7 +147,7 @@ export const useCompareModels = () => {
       };
     });
 
-    setColumnList(renderedColumnList);
+    setColumnList(renderedColumnList as any);
   };
 
   useEffect(() => {
@@ -160,27 +172,38 @@ export const useCompareModels = () => {
     setSearchString(newSearchString);
   };
 
-  return {
-    compareModelsTable: {
-      rowList,
-      setRowList,
-      columnList,
-      setColumnList,
-      handleSearch,
-      handleChangePage,
-      handleSubmit,
-      loading,
-      error,
-      searchString,
-      setTotalRows,
-      pageSize,
-      setPageSize,
-      page,
-      setPage,
+  const compareModelsTable = useMemo(() => ({
+    rowList,
+    setRowList,
+    columnList,
+    setColumnList,
+    handleSearch,
+    handleChangePage,
+    handleSubmit,
+    loading: (compareModelsQuery as any).isFetching,
+    error: (compareModelsQuery as any).error,
+    searchString,
+    setTotalRows,
+    pageSize,
+    setPageSize,
+    page,
+    setPage,
+    totalRows,
+    compareOnlyChanged,
+    setCompareOnlyChanged,
+  }), [rowList, setRowList, columnList, setColumnList, handleSearch, handleChangePage, handleSubmit, (compareModelsQuery as any).isFetching, (compareModelsQuery as any).error, searchString, setTotalRows, pageSize, setPageSize, page, setPage, totalRows, compareOnlyChanged, setCompareOnlyChanged]);
+
+  useEffect(() => {
+    console.log('useCompareModels - compareModelsTable обновился:', {
+      rowListLength: rowList?.length,
       totalRows,
-      compareOnlyChanged,
-      setCompareOnlyChanged,
-    },
+      loading: (compareModelsQuery as any).isFetching,
+      hasError: !!(compareModelsQuery as any).error
+    });
+  }, [compareModelsTable]);
+
+  return {
+    compareModelsTable,
   };
 };
 

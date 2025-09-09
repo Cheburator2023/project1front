@@ -18,12 +18,12 @@ import { Template } from '@shared/api';
 import styled from 'styled-components';
 import { IconButton } from '@shared/ui/molecules';
 
-const Wrapper = styled.div`
+const Wrapper = styled('div')`
   display: flex;
   flex-direction: row;
   margin-bottom: 15px;
 `;
-const Content = styled.div`
+const Content = styled('div')`
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -31,7 +31,7 @@ const Content = styled.div`
   width: 100%;
 `;
 
-const IconWrapper = styled.div`
+const IconWrapper = styled('div')`
   width: 20px;
   height: 20px;
   margin-right: 8px;
@@ -128,8 +128,7 @@ export const TemplateItem = ({
           <Content>
             <T font="Body/Body 2 Short">{template.template_name}</T>
             <T font="Caption/Caption 1" color="Neutral/Neutral 50">
-              Фильтров:{' '}
-              {template.filterModel ? Object.values(template.filterModel).length : 0}
+              Фильтров: {template.filterModel ? Object.values(template.filterModel).length : 0}
             </T>
           </Content>
           {editable && (

@@ -11,7 +11,8 @@ import { ReactComponent as PersonSolid } from '@admiral-ds/icons/build/system/Pe
 
 import { Loading, Tooltip } from '@shared/ui/atoms';
 import { IconButton } from '@shared/ui/molecules';
-import { API_ROUTES, useFetch, ReportApi } from '@shared/api';
+import { ReportApi } from '@shared/api';
+import { useReportsControllerGetReport } from '@shared/api/generated/endpoints';
 
 import { useExploitationModeStore } from '@src/shared/stores';
 import { ReactComponent as LogoIcon } from './logo.svg';
@@ -19,7 +20,7 @@ import { ColumnsFilter } from '../shared/types';
 import { ROUTES } from './Routes';
 import { useGlobalStore } from '../shared/stores/globalStore';
 
-const Container = styled.div`
+const Container = styled('div')`
   width: 100%;
   height: 64px;
   background: #0132b0;
@@ -31,7 +32,7 @@ const Container = styled.div`
   justify-content: space-between;
 `;
 
-const Logo = styled.div`
+const Logo = styled('div')`
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -59,11 +60,11 @@ const CustomButton = styled(Button)`
   }
 `;
 
-const LoadingWrapper = styled.div`
+const LoadingWrapper = styled('div')`
   margin-right: 65px;
 `;
 
-const ActionsGroup = styled.div`
+const ActionsGroup = styled('div')`
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -96,7 +97,7 @@ const Header = ({
   goToSum,
 }: HeaderProps) => {
   const sumBtnRef = useRef(null);
-  const { mutationProtectedFetch } = useFetch({});
+  const reportMutation = useReportsControllerGetReport();
   const { agGridApi } = useGlobalStore();
   const selectedExploitationModes = useExploitationModeStore(
     (state) => state.selectedExploitationModes,
@@ -138,10 +139,11 @@ const Header = ({
             <Loading text="" spinnerSize="s" />
           </LoadingWrapper>
         ) : (
-          <CustomButton dimension="s"
-          //  onClick={() => updateDownloadReportStatus(true)}
-          onClick={() => agGridApi?.exportDataAsExcel()}
-           >
+          <CustomButton
+            dimension="s"
+            //  onClick={() => updateDownloadReportStatus(true)}
+            onClick={() => agGridApi?.exportDataAsExcel()}
+          >
             <T font="Button/Button 2">Выгрузить отчет</T>
           </CustomButton>
         )}
@@ -155,7 +157,7 @@ const Header = ({
         >
           <T font="Button/Button 2">СУМ</T>
         </CustomButton>
-        <Tooltip targetRef={sumBtnRef} title="Перейти в СУМ" />
+        <Tooltip targetRef={sumBtnRef as any} title="Перейти в СУМ" />
         <Avatar
           dimension="xs"
           showTooltip

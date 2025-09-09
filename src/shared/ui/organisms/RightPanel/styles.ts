@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-const Overlay = styled.div`
+const Overlay = styled('div')`
   z-index: 11;
   background-color: rgb(0 0 0 / 40%);
   position: fixed;
@@ -13,7 +13,7 @@ const Overlay = styled.div`
   width: 100%;
 `;
 
-const Panel = styled.div<{ width?: string }>`
+const Panel = styled('div')<{ width?: string }>`
   z-index: 1;
   float: right;
   background-color: #fff;
@@ -25,7 +25,7 @@ const Panel = styled.div<{ width?: string }>`
   width: ${({ width = '400px' }) => width};
 `;
 
-const Header = styled.div`
+const Header = styled('div')`
   width: 100%;
   padding: 16px 12px 16px 24px;
   background-color: #edf5ff;
@@ -35,13 +35,13 @@ const Header = styled.div`
   justify-content: space-between;
 `;
 
-const HeaderRow = styled.div`
+const HeaderRow = styled('div')`
   display: flex;
   justify-content: space-between;
   flex-direction: row;
 `;
 
-const Body = styled.div`
+const Body = styled('div')`
   display: flex;
   height: 100%;
   overflow-y: auto;
@@ -49,7 +49,7 @@ const Body = styled.div`
   flex-direction: column;
 `;
 
-const Footer = styled.div`
+const Footer = styled('div')`
   height: 80px;
   display: flex;
   border-top: 1px solid #eee;
@@ -59,7 +59,7 @@ const Footer = styled.div`
   position: sticky;
 `;
 
-const StatusWrapper = styled.div`
+const StatusWrapper = styled('div')`
   display: flex;
   width: 100%;
   padding: 50px 0;

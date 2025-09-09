@@ -5,10 +5,11 @@ import { useExploitationModeStore, useModelsStore, useTemplatesStore } from '@sr
 import { modelsSelectOptions } from '@shared/constants';
 
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useCallback, useMemo } from 'react';
+import { useModelsControllerGetModels } from '@shared/api/generated/endpoints';
+import { getISODateFormat } from '@shared/helpers';
 import { Container, CustomDateField, FiltersDivider, FilterButton, FiltersBox } from '../styles';
 import { useGlobalStore } from '../../../shared/stores/globalStore';
-import { useTableModels } from '../../../pages/HomePage/hooks/useTableModels';
 import { TemplatesPanel } from '../../TemplatesPanel/organisms/TemplatesPanel';
 import { TemplatesFilterInput } from '../molecules/TemplatesFilterInput';
 import { useTemplateFiltersModalStore } from '../../TemplatesPanel/stores/templateFiltersModalStore';
@@ -30,12 +31,15 @@ export const FiltersPanel = ({
   handleCompareOnlyChanged = () => null,
 }: FiltersPanelProps) => {
   const { setPendingTemplate } = useTemplatesStore();
-  const { filters, fetchModelsByDate } = useTableModels();
+  const { templates } = useTemplatesStore();
   const navigate = useNavigate();
 
-  const templates = filters?.templates;
+  const { compareMode, setRightPanelType, setCompareMode, modelsParams, setModelsParams } =
+    useModelsStore();
 
-  const { compareMode, setRightPanelType, setCompareMode } = useModelsStore();
+  const { refetch: refetchModels } = useModelsControllerGetModels(modelsParams, {
+    query: { enabled: false },
+  });
 
   const {
     topFilters,
@@ -43,39 +47,65 @@ export const FiltersPanel = ({
     setTopFilters,
     setFirstDate,
     setSecondDate,
+    setModelsDownloadingDate,
     resetFilters,
   } = useFiltersStore();
   const { setFiltersResetCount } = useGlobalStore();
   const { getActiveTemplate } = useFiltersStore();
   const { initializeFromTemplate, resetState } = useTemplateFiltersModalStore();
 
-  const activeTemplate = getActiveTemplate();
+  const activeTemplate = useMemo(() => getActiveTemplate(), [getActiveTemplate]);
 
   const { exploitationModeOptions, selectedExploitationModes, updateSelectedExploitationModes } =
     useExploitationModeStore();
 
-  const handleChange = (name: string, value: string[]) => {
-    setTopFilters({ ...topFilters, templates: [], [name]: value });
-  };
+  const fetchModelsByDate = useCallback(
+    (date: string) => {
+      const { selectedExploitationModes } = useExploitationModeStore.getState();
+      setModelsDownloadingDate(date);
 
-  const handleResetFilters = () => {
+      if (date) {
+        setModelsParams({
+          date: getISODateFormat(date),
+          mode: selectedExploitationModes,
+        });
+      } else {
+        setModelsParams({
+          mode: selectedExploitationModes,
+        });
+      }
+
+      setTimeout(() => {
+        refetchModels();
+      }, 100);
+    },
+    [setModelsDownloadingDate, refetchModels],
+  );
+
+  const handleChange = useCallback((name: string, value: string[]) => {
+    setTopFilters({ ...topFilters, templates: [], [name]: value });
+  }, [topFilters, setTopFilters]);
+
+  const handleResetFilters = useCallback(() => {
     resetFilters();
     setTopFilters({ ...topFilters, templates: [] });
     setFiltersResetCount();
     resetState();
     initializeFromTemplate(undefined);
     setPendingTemplate(undefined);
-  };
+  }, [resetFilters, setTopFilters, topFilters, setFiltersResetCount, resetState, initializeFromTemplate, setPendingTemplate]);
 
-  const handleChangeExploitationModes = (value: string[]) => {
+  const handleChangeExploitationModes = useCallback((value: string[]) => {
     updateSelectedExploitationModes(value);
-  };
+  }, [updateSelectedExploitationModes]);
 
   const location = useLocation();
 
+  const isComparePage = useMemo(() => location.pathname === ROUTES.COMPARE_MODELS, [location.pathname]);
+
   useEffect(() => {
-    setCompareMode(location.pathname === ROUTES.COMPARE_MODELS);
-  }, [location.pathname]);
+    setCompareMode(isComparePage);
+  }, [isComparePage, setCompareMode]);
 
   return (
     <Container style={{ justifyContent: 'space-between' }}>

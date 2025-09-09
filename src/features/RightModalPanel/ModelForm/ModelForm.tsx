@@ -8,7 +8,8 @@ import { Row } from '@shared/types';
 import { StatusScreen } from '@shared/ui/molecules';
 import { RIGHT_PANEL_TYPE, MODEL_FORM_MODE, initialColumns } from '@shared/constants';
 import { INPUT_TYPE, InputFactory, InputValue, RightPanel } from '@shared/ui/organisms';
-import { API_ROUTES, useFetch, ArtifactApi, ModelEditApi } from '@shared/api';
+import { ArtifactApi, ModelEditApi } from '@shared/api';
+import { useModelsControllerUpdateModels, useModelsControllerCreateModel } from '@shared/api/generated/endpoints';
 import { usePermissions, useRoles } from '@src/shared/hooks';
 
 import { groupBy, isEqual, omit, sortBy, uniqBy } from 'lodash';
@@ -55,7 +56,8 @@ export const ModelForm = ({
   onSubmit,
   onClose,
 }: ModelFormProps) => {
-  const { mutationProtectedFetch } = useFetch({});
+  const updateModelsMutation = useModelsControllerUpdateModels();
+  const createModelMutation = useModelsControllerCreateModel();
   const formMode = getFormMode(mode);
   const { currentCustomer } = useAppInjectStore();
   const { isEditAllocationEnabled } = usePermissions();
@@ -377,20 +379,18 @@ export const ModelForm = ({
         );
 
         if (system_model_id && model_source) {
-          // TODO: fix response type and structure and input type ModelEditApi[]
-          const res: any = await mutationProtectedFetch<ModelEditApi[], { data: { cards: Row[] } }>(
-            {
-              body: [
-                {
-                  model_id: system_model_id,
-                  artefacts: artifactApiItems,
-                  model_source,
-                },
-              ],
-              fetchApiRoute: API_ROUTES.MODELS_EDIT,
-              fetchMethod: 'PUT',
-            },
-          );
+          const res: any = await new Promise((resolve) => {
+             updateModelsMutation.mutate({
+               data: [{
+                 model_id: system_model_id,
+                 artefacts: artifactApiItems as any,
+                 model_source,
+               } as any]
+             }, {
+               onSuccess: (data) => resolve({ data: { data: { cards: [data] } }, error: false }),
+               onError: () => resolve({ error: true })
+             });
+           });
 
           if (!res || res.error) {
             setSubmitError('Произошла ошибка при обновлении модели');
@@ -405,18 +405,21 @@ export const ModelForm = ({
       }
 
       if (IS_FORM_MODE_ADD && !checkOnly) {
-        const res = await mutationProtectedFetch<ArtifactApi[], Row>({
-          body: artifactApiItems,
-          fetchApiRoute: API_ROUTES.MODEL_ADD,
-          fetchMethod: 'POST',
-        });
+        const res: any = await new Promise((resolve) => {
+           createModelMutation.mutate({
+             data: artifactApiItems as any
+           }, {
+             onSuccess: (data) => resolve({ data, error: false }),
+             onError: () => resolve({ error: true })
+           });
+         });
 
-        if (!res || res.error) {
-          setSubmitError('Произошла ошибка при добавлении модели');
-          return;
-        }
+         if (!res || res.error) {
+           setSubmitError('Произошла ошибка при добавлении модели');
+           return;
+         }
 
-        newRow = res.data as Row;
+         newRow = res.data as Row;
       }
 
       if (formMode) {
@@ -561,7 +564,7 @@ export const ModelForm = ({
           apiLoading={submitLoading}
           onFinished={handleOnClose}
         >
-          <FormContainer ref={formRef} id="model_form_parent_container">
+          <FormContainer ref={formRef as any} id="model_form_parent_container">
             {Object.keys(groupedFieldsBySchemaName).map((schemaKey) => {
               const fieldsByGroup = groupedFieldsBySchemaName[schemaKey || 'Аллокация'];
               const fieldsByGroupSorted = sortBy(fieldsByGroup, (v) =>

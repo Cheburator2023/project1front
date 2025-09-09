@@ -4,7 +4,7 @@ import React, { useRef } from 'react';
 import styled from 'styled-components';
 import { Tooltip } from '@shared/ui/atoms';
 
-export const Container = styled.label`
+export const Container = styled('label')`
   display: flex;
   flex-direction: row;
   padding: 6px 0;
@@ -51,7 +51,7 @@ export const CustomOption = React.memo(({ text, checked, onChange, style }: Opti
       <Label ref={textRef} font="Body/Body 2 Long" as="div">
         {text}
       </Label>
-      <Tooltip showOnOverflowOnly targetRef={textRef} title={text} />
+      <Tooltip showOnOverflowOnly targetRef={textRef as any} title={text} />
     </Container>
   );
 });

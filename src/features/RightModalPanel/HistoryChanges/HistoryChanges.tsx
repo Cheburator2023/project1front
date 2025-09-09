@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Avatar, T } from '@admiral-ds/react-ui';
 
 import { RightPanel } from '@shared/ui/organisms';
-import { API_ROUTES, useFetch, ModelHistoryChangesResponse } from '@shared/api';
+import { ModelHistoryChangesResponse } from '@shared/api';
+import { useModelsControllerGetModelHistory } from '@shared/api/generated/endpoints';
 
 import { HistoryChangeItem, Wrapper } from './styles';
 
@@ -20,17 +21,15 @@ export const HistoryChanges = ({
   onClose,
 }: ModelFormProps) => {
   const {
-    responseData: artifactHistoryData,
-    error,
-    loading,
-  } = useFetch<ModelHistoryChangesResponse>({
-    apiRoute: API_ROUTES.MODEL_ARTIFACT_HISTORY,
-    params: {
-      model_id: modelId,
-      artefact_tech_label: artifactName,
-      model_source: modelSource,
-    },
+    data: artifactHistoryData,
+    error: historyError,
+    isLoading: loading,
+  } = useModelsControllerGetModelHistory({
+    model_id: modelId,
+    artefact_tech_label: artifactName,
   });
+
+  const error = historyError ? String(historyError) : undefined;
 
   const [artifactHistory, setArtifactHistory] = useState<ModelHistoryChangesResponse>();
 

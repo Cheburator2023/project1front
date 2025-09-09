@@ -10,23 +10,24 @@ import type { TreeItemProps, TreeProps } from '@admiral-ds/react-ui';
 import styled from 'styled-components';
 
 import { ErrorStatus, Loading } from '@shared/ui/atoms';
-import { API_ROUTES, mockedRelationsResponse, useFetch } from '@shared/api';
+import { mockedRelationsResponse } from '@shared/api';
 import { Relations, RelationsModelResponseType } from '@shared/api/types';
+import { useModelsControllerGetModelWithRelations } from '@shared/api/generated/endpoints';
 import { initialColumns } from '@shared/constants';
 
-const RelationsModalArtefacts = styled.div`
+const RelationsModalArtefacts = styled('div')`
   display: flex;
   min-width: 400px;
   height: 100%;
   flex-direction: column;
 `;
 
-const RelationsModalArtefactsTitle = styled.div`
+const RelationsModalArtefactsTitle = styled('div')`
   height: 60px;
   background: var(--Neutral-Neutral-White, #fff);
 `;
 
-const RelationsModalArtefactsBody = styled.div`
+const RelationsModalArtefactsBody = styled('div')`
   width: 100%;
   height: 620px;
   overflow: auto;
@@ -53,19 +54,19 @@ const RelationsTreeNode = styled(TreeNode)`
   flex-shrink: 0;
 `;
 
-const StatusWrapper = styled.div`
+const StatusWrapper = styled('div')`
   display: flex;
   width: 100%;
   padding: 50px 0;
   justify-content: center;
 `;
 
-const RelationsModalBody = styled.div`
+const RelationsModalBody = styled('div')`
   width: 100%;
   display: flex;
 `;
 
-const RelationsModalTree = styled.div`
+const RelationsModalTree = styled('div')`
   display: flex;
   min-width: 800px;
   flex-direction: column;
@@ -130,27 +131,21 @@ export const RelationsBody = (props: TreeProps & { modelId: string }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { mutationProtectedFetch } = useFetch({});
+  const relationsMutation = useModelsControllerGetModelWithRelations({ model_id: props.modelId });
 
   const handleUpdateData = async () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await mutationProtectedFetch<
-        RelationsModelResponseType,
-        RelationsModelResponseType
-      >({
-        fetchApiRoute: API_ROUTES.MODEL_RELATIONS,
-        fetchMethod: 'GET',
-        mockedResponse: mockedRelationsResponse,
-        newParams: { model_id: props.modelId },
-      });
+      const result = await relationsMutation.refetch();
 
-      if (res?.error) {
+      if (result.error) {
         setError('Ошибка загрузки');
+        setLoading(false);
+        return;
       }
 
-      const resData = res?.data as RelationsModelResponseType;
+      const resData = result.data as RelationsModelResponseType | null;
       setResData(resData);
 
       const treeRelations: Array<TreeItemProps> = [

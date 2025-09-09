@@ -2,7 +2,7 @@ import { IconButton } from '@admiral-ds/react-ui';
 import { ReactComponent as SettingsIcon } from '@admiral-ds/icons/build/system/SettingsOutline.svg';
 import { useMemo, useState } from 'react';
 import { useTemplateFiltersModalStore } from '../stores/templateFiltersModalStore';
-import { TemplateFiltersModal } from '../molecules/TemplateFiltersModal';
+import { TemplateFiltersModal } from './TemplateFiltersModal';
 import {
   BadgeCount,
   ButtonCustom,
@@ -12,17 +12,14 @@ import {
 import { useFiltersStore, useModelsStore } from '../../../shared/stores';
 import { useTemplatesStore } from '../../../shared/stores/templatesStore';
 import { getActiveFiltersCount } from '../../../shared/helpers';
-import { useTableModels } from '../../../pages/HomePage/hooks/useTableModels';
+
 import { useCompareModels } from '../../CompareModels/hooks';
 
 export const TemplatesPanel = () => {
   const templateFiltersModalStore = useTemplateFiltersModalStore();
   const { topFilters, filterModel, firstDate, secondDate } = useFiltersStore();
   const { templates } = useTemplatesStore();
-  const { modelsTable } = useTableModels();
-  const { compareModelsTable } = useCompareModels();
-  const { rowList, columnList, totalRows } = compareModelsTable;
-  const { compareMode } = useModelsStore();
+  const { compareMode, rows } = useModelsStore();
 
   const activeFiltersCount = useMemo(
     () => getActiveFiltersCount(filterModel, templates, topFilters.templates[0]),
@@ -37,7 +34,7 @@ export const TemplatesPanel = () => {
   const hasActiveFilters = activeFiltersCount > 0;
   const hasNoActiveFilters = activeFiltersCount === 0;
   const isPendingTemplate = activeTemplate?.isPending || false;
-  const noData = !(totalRows > 0 && firstDate && secondDate);
+  const noData = !(firstDate && secondDate);
   const buttonAppearance = (!noData || !compareMode) && hasTemplates ? 'primary' : 'white';
   const badgeAppearance = isPendingTemplate
     ? 'warning'
@@ -52,11 +49,11 @@ export const TemplatesPanel = () => {
         dimension="s"
         icon={<FilterOutlineCustom appearance={buttonAppearance} />}
         displayAsSquare
-        disabled={compareMode && noData}
+        disabled={compareMode ? noData : !rows}
         onClick={() => templateFiltersModalStore.openModal()}
       />
 
-      { (!noData || !compareMode )&&
+      {(!noData || !compareMode) &&
         (hasTemplates && hasNoActiveFilters ? (
           <CheckSolidCustom />
         ) : (
@@ -65,7 +62,7 @@ export const TemplatesPanel = () => {
           </BadgeCount>
         ))}
 
-      <TemplateFiltersModal />
+      {templateFiltersModalStore.isOpen && <TemplateFiltersModal />}
     </div>
   );
 };

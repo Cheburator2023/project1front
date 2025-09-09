@@ -18,6 +18,7 @@ import { ReactComponent as SearchOutline } from '@admiral-ds/icons/build/system/
 import { useTemplateFiltersModalStore } from '../stores/templateFiltersModalStore';
 import { TemplateFiltersGrid } from './TemplateFiltersGrid';
 import { Spacer } from '../../../shared/ui/atoms';
+import { useDeepEffect } from '../../../shared/hooks/useDeepEffect';
 
 const initialColumns = _initialColumns.filter((col) => col.name !== 'relations');
 
@@ -39,7 +40,7 @@ export const TemplateFiltersModal = () => {
   const { topFilters, setTopFilters } = useFiltersStore();
   const { agGridApi: agGridApiGlobal } = useGlobalStore();
 
-  useEffect(() => {
+  useDeepEffect(() => {
     if (isOpen) {
       // Получаем активный шаблон из topFilters
       const activeTemplateId = topFilters.templates?.[0];
@@ -54,7 +55,6 @@ export const TemplateFiltersModal = () => {
         const filterModel = agGridApiGlobal?.getFilterModel();
         initializeFromTemplate({ ...pendingTemplate, filterModel });
       } else {
-        // тут нужна логика забора данных и маппинга в пред-теплейт, не просто undefined
         const filterModel = agGridApiGlobal?.getFilterModel();
 
         initializeFromTemplate({
@@ -176,79 +176,76 @@ export const TemplateFiltersModal = () => {
   ];
 
   return (
-    isOpen && (
-      <Modal
-        onClose={handleCancel}
-        dimension="xl"
-        style={{ width: '95%', maxWidth: '95%', height: '95%' }}
+    <Modal
+      onClose={handleCancel}
+      dimension="xl"
+      style={{ width: '95%', maxWidth: '95%', height: '95%' }}
+    >
+      <ModalTitle>Управление шаблонами фильтрации</ModalTitle>
+      <Spacer space={10} />
+      <div
+        style={{
+          padding: '0 24px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '20px',
+          height: '100%',
+        }}
       >
-        <ModalTitle>Управление шаблонами фильтрации</ModalTitle>
-        <Spacer space={10} />
         <div
           style={{
-            padding: '0 24px',
             display: 'flex',
-            flexDirection: 'column',
-            gap: '20px',
-            height: '100%',
+            gap: '16px',
+            alignItems: 'flex-end',
+            justifyContent: 'space-between',
           }}
         >
-          <div
-            style={{
-              display: 'flex',
-              gap: '16px',
-              alignItems: 'flex-end',
-              justifyContent: 'space-between',
-            }}
-          >
+          <Field label="Активный шаблон:">
+            <Select
+              id="TemplateFiltersModal_select_template_input"
+              placeholder="Выберите шаблон"
+              dimension="s"
+              value={selectedTemplateId?.toString() || 'new'}
+              onChange={(e) => handleTemplateChange(e.target.value)}
+              style={{ minWidth: '300px' }}
+            >
+              {templateOptions.map((option) => (
+                <Option key={option.value} value={option.value}>
+                  {option.label}
+                </Option>
+              ))}
+            </Select>
+          </Field>
 
-              <Field label="Активный шаблон:">
-                <Select
-                  id="TemplateFiltersModal_select_template_input"
-                  placeholder="Выберите шаблон"
-                  dimension="s"
-                  value={selectedTemplateId?.toString() || 'new'}
-                  onChange={(e) => handleTemplateChange(e.target.value)}
-                  style={{ minWidth: '300px' }}
-                >
-                  {templateOptions.map((option) => (
-                    <Option key={option.value} value={option.value}>
-                      {option.label}
-                    </Option>
-                  ))}
-                </Select>
-              </Field>
-
-            <div style={{ minWidth: '300px' }}>
-              <InputField
-                id="filter-text-box"
-                value={quickFilterText}
-                dimension="s"
-                onChange={(e) => setQuickFilterText(e.target.value)}
-                placeholder="Поиск"
-                icons={<SearchOutline />}
-              />
-            </div>
-          </div>
-
-          <div style={{ height: '100%' }}>
-            <TemplateFiltersGrid />
-          </div>
-
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-            <Button appearance="secondary" dimension="s" onClick={handleReset}>
-              Сбросить
-            </Button>
-            <Button appearance="secondary" dimension="s" onClick={handleCancel}>
-              Отмена
-            </Button>
-            <Button appearance="primary" dimension="s" onClick={handleSave}>
-              Сохранить
-            </Button>
+          <div style={{ minWidth: '300px' }}>
+            <InputField
+              id="filter-text-box"
+              value={quickFilterText}
+              dimension="s"
+              onChange={(e) => setQuickFilterText(e.target.value)}
+              placeholder="Поиск"
+              icons={<SearchOutline />}
+            />
           </div>
         </div>
-      </Modal>
-    )
+
+        <div style={{ height: '100%' }}>
+          <TemplateFiltersGrid />
+        </div>
+
+        <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+          <Button appearance="secondary" dimension="s" onClick={handleReset}>
+            Сбросить
+          </Button>
+          <Button appearance="secondary" dimension="s" onClick={handleCancel}>
+            Отмена
+          </Button>
+          <Button appearance="primary" dimension="s" onClick={handleSave}>
+            Сохранить
+          </Button>
+        </div>
+      </div>
+    </Modal>
   );
 };
 

@@ -9,7 +9,8 @@ import { Row } from '@shared/types';
 import { StatusScreen } from '@shared/ui/molecules';
 import { MODEL_FORM_MODE } from '@shared/constants';
 import { INPUT_TYPE, InputFactory, InputValue, RightPanel } from '@shared/ui/organisms';
-import { API_ROUTES, ArtifactApi, useFetch } from '@shared/api';
+import { ArtifactApi } from '@shared/api';
+import { useModelsControllerUpdateModels } from '@shared/api/generated/endpoints';
 import { groupBy } from 'lodash';
 import { Flexbox, Spacer } from '@shared/ui/atoms';
 import { Artifact, CustomError, ModelEditApi } from '@shared/api/types';
@@ -115,7 +116,7 @@ export const DeleteModelForm = ({
   onSubmit,
   onClose,
 }: DeleteModelFormProps) => {
-  const { mutationProtectedFetch } = useFetch({});
+  const updateModelsMutation = useModelsControllerUpdateModels();
   const { currentCustomer } = useAppInjectStore();
 
   const [values, setValues] = useState<FormValues | undefined>();
@@ -263,19 +264,18 @@ export const DeleteModelForm = ({
         const { system_model_id, model_source } = initialRow;
 
         if (system_model_id && model_source) {
-          const res: any = await mutationProtectedFetch<ModelEditApi[], { data: { cards: Row[] } }>(
-            {
-              body: [
-                {
-                  model_id: system_model_id,
-                  artefacts: artifactApiItems,
-                  model_source,
-                },
-              ],
-              fetchApiRoute: API_ROUTES.MODELS_EDIT,
-              fetchMethod: 'PUT',
-            },
-          );
+          const res: any = await new Promise((resolve) => {
+             updateModelsMutation.mutate({
+               data: [{
+                 model_id: system_model_id,
+                 artefacts: artifactApiItems as any,
+                 model_source,
+               } as any]
+             }, {
+               onSuccess: (data) => resolve({ data: { data: { cards: [data] } }, error: false }),
+               onError: () => resolve({ error: true })
+             });
+           });
 
           if (!res || res.error) {
             setSubmitError('Произошла ошибка при удалении модели');

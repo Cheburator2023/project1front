@@ -143,7 +143,7 @@ export const AgGridTableCustomCell = (params: AgGridTableCustomCellParams) => {
   );
 };
 
-const Wrapper = styled.div`
+const Wrapper = styled('div')`
   display: flex;
   align-items: center;
   gap: 8px;

@@ -11,7 +11,7 @@ export const CustomSelect = styled(Select)`
     padding-left: 0;
   }
 `;
-export const DropDownBottomPanelContainer = styled.div`
+export const DropDownBottomPanelContainer = styled('div')`
   padding: 8px 10px 0 10px;
 
   button {

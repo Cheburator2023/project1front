@@ -10,7 +10,7 @@ import { COLUMN_TYPE, Column, Row } from '@shared/types';
 
 import { CellContentFactory } from './CellContentFactory';
 
-export const CellWrapper = styled.div<{ type: COLUMN_TYPE }>`
+export const CellWrapper = styled('div')<{ type: COLUMN_TYPE }>`
   display: block;
   width: 100%;
   margin: 2px 0;
@@ -43,7 +43,7 @@ const ActionBtn = styled(IconButton)`
   }
 `;
 
-const ActionsContainer = styled.div`
+const ActionsContainer = styled('div')`
   position: absolute;
   margin: 0;
   top: 0;
@@ -106,7 +106,7 @@ export const CustomCell = ({
         </ActionsContainer>
         <div ref={cellRef}>{CellContentFactory({ value, column, row })}</div>
       </CellWrapper>
-      <Tooltip targetRef={cellRef} showOnOverflowOnly title={value} />
+      <Tooltip targetRef={cellRef as any} showOnOverflowOnly title={value} />
     </>
   );
 };

@@ -1,12 +1,14 @@
 /* eslint-disable react/button-has-type */
 import React, { useState } from 'react';
 import { Button } from '@admiral-ds/react-ui';
-import { API_ROUTES } from '@src/shared/api';
+import {
+  useBiDatamartControllerSyncModelsDatamart,
+  useBiDatamartControllerSyncTasksDatamart,
+} from '@src/shared/api/generated/endpoints';
 
 interface BiSyncInterfaceProps {
   useDatamart: boolean;
   onSyncComplete: () => void;
-  mutationProtectedFetch: any;
 }
 
 interface SyncProgress {
@@ -21,13 +23,15 @@ interface SyncProgress {
 export const BiSyncInterface: React.FC<BiSyncInterfaceProps> = ({
   useDatamart,
   onSyncComplete,
-  mutationProtectedFetch,
 }) => {
   const [isSyncingModels, setIsSyncingModels] = useState(false);
   const [isSyncingTasks, setIsSyncingTasks] = useState(false);
   const [syncNotification, setSyncNotification] = useState<string | null>(null);
   const [syncLogs, setSyncLogs] = useState<string[]>([]);
   const [syncProgress, setSyncProgress] = useState<SyncProgress | null>(null);
+
+  const syncModelsMutation = useBiDatamartControllerSyncModelsDatamart();
+  const syncTasksMutation = useBiDatamartControllerSyncTasksDatamart();
 
   const handleSyncModelsDatamart = async () => {
     setIsSyncingModels(true);
@@ -37,13 +41,12 @@ export const BiSyncInterface: React.FC<BiSyncInterfaceProps> = ({
     try {
       setSyncLogs((prev) => [...prev, '🚀 Начало синхронизации BI витрины моделей...']);
 
-      const response = await mutationProtectedFetch({
-        fetchApiRoute: API_ROUTES.BI_DATAMART_SYNC_MODELS,
-        fetchMethod: 'POST',
-      });
+      const response: any = await syncModelsMutation.mutateAsync();
+      console.log('🐸 Pepe said >> handleSyncModelsDatamart >> response:', response);
 
-      if (response && !response.error) {
-        const data = response.data as any;
+
+      if (response && !syncModelsMutation.isError) {
+        const data = response as any;
 
         if (data.message) {
           setSyncLogs((prev) => [...prev, `✅ ${data.message}`]);
@@ -110,13 +113,12 @@ export const BiSyncInterface: React.FC<BiSyncInterfaceProps> = ({
     try {
       setSyncLogs((prev) => [...prev, '🚀 Начало синхронизации BI витрины задач...']);
 
-      const response = await mutationProtectedFetch({
-        fetchApiRoute: API_ROUTES.BI_DATAMART_SYNC_TASKS,
-        fetchMethod: 'POST',
-      });
+      const response: any = await syncTasksMutation.mutateAsync();
+      console.log('🐸 Pepe said >> handleSyncTasksDatamart >> response:', response);
 
-      if (response && !response.error) {
-        const data = response.data as any;
+
+      if (response && !syncTasksMutation.isError) {
+        const data = response as any;
 
         if (data.message) {
           setSyncLogs((prev) => [...prev, `✅ ${data.message}`]);

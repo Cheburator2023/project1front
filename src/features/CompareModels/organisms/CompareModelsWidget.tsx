@@ -1,18 +1,18 @@
 import React from 'react';
-import { useModelsStore } from '@src/shared/stores';
+import { useFiltersStore, useTemplatesStore, useModelsStore } from '@src/shared/stores';
 
 import { CompareModelsNewTable } from '@src/features/CompareModels/organisms/CompareModelsNewTable';
 import { useCompareModels } from '../hooks';
 import { FiltersPanel } from '../../FiltersPanel/organisms/FiltersPanel';
-import { useTableModels } from '../../../pages/HomePage/hooks/useTableModels';
 
 const CompareModelsWidget = () => {
-  const { setRightPanelType } = useModelsStore();
   const { compareModelsTable } = useCompareModels();
-  const { filters } = useTableModels();
+  const { templates } = useTemplatesStore();
+  const { firstDate, secondDate } = useFiltersStore();
 
-  const firstDate = filters?.firstDate;
-  const secondDate = filters?.secondDate;
+  const filters = { templates, firstDate, secondDate };
+  const firstDateValue = filters?.firstDate;
+  const secondDateValue = filters?.secondDate;
   const disabledCompare = !firstDate || !secondDate;
 
   return (
@@ -32,7 +32,7 @@ const CompareModelsWidget = () => {
           }
         }}
       />
-      <CompareModelsNewTable firstDate={firstDate} secondDate={secondDate} />
+      <CompareModelsNewTable compareModelsTable={compareModelsTable} firstDate={firstDate} secondDate={secondDate} />
     </>
   );
 };

@@ -9,18 +9,20 @@ interface FetchState {
 interface FetchActions {
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
-  setProtectedFetch: (fetchFn: <T, N = void>(
-    routeUrl: string,
-    params?: Record<string, string>,
-    body?: N,
-    method?: string,
-    fileName?: string,
-  ) => Promise<SuccessResponse<T> | ErrorResponse>) => void;
+  setProtectedFetch: (
+    fetchFn: <T, N = void>(
+      routeUrl: string,
+      params?: Record<string, string>,
+      body?: N,
+      method?: string,
+      fileName?: string,
+    ) => Promise<SuccessResponse<T> | ErrorResponse>,
+  ) => void;
   protectedFetch: <T, N = void>(
     routeUrl: string,
     params?: Record<string, string>,
     body?: N,
-    method?: string,
+    method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
     fileName?: string,
   ) => Promise<SuccessResponse<T> | ErrorResponse>;
 }
@@ -39,17 +41,19 @@ export const useFetchStore = create<FetchStore>((set, get) => ({
     routeUrl: string,
     params?: Record<string, string>,
     body?: N,
+    method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
     fileName?: string,
-    method = 'GET',
   ): Promise<SuccessResponse<T> | ErrorResponse> => {
     const { setLoading, setError } = get();
-    
+
+    console.log('🐸 Pepe said >> config:', method);
+
     try {
       setLoading(true);
       setError(null);
 
-      const url = new URL(routeUrl, process.env.REACT_APP_API_BASE_URL || 'http://localhost:3000');
-      
+      const url = new URL(routeUrl, 'http://localhost:3000');
+
       if (params) {
         Object.entries(params).forEach(([key, value]) => {
           url.searchParams.append(key, value);
@@ -70,11 +74,19 @@ export const useFetchStore = create<FetchStore>((set, get) => ({
       }
 
       const response = await fetch(url.toString(), config);
-      
+
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ statusCode: response.status, message: 'Ошибка сети' }));
+        const errorData = await response
+          .json()
+          .catch(() => ({ statusCode: response.status, message: 'Ошибка сети' }));
         setError(errorData.message || 'Ошибка запроса');
-        return { error: true, data: { statusCode: errorData.statusCode || response.status, message: errorData.message || 'Ошибка запроса' } };
+        return {
+          error: true,
+          data: {
+            statusCode: errorData.statusCode || response.status,
+            message: errorData.message || 'Ошибка запроса',
+          },
+        };
       }
 
       const data = await response.json();
@@ -88,3 +100,4 @@ export const useFetchStore = create<FetchStore>((set, get) => ({
     }
   },
 }));
+

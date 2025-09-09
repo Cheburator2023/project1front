@@ -90,7 +90,7 @@ export const DateSelect = ({ value, initType, onChange }: DateSelectProps) => {
       {isOpen && (
         <DropdownContainer
           alignSelf="stretch"
-          targetRef={triggerRef}
+          targetRef={triggerRef as any}
           onClickOutside={() => setIsOpen(false)}
         >
           <div

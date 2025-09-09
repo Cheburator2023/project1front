@@ -22,15 +22,16 @@ import {
   SelectionColumnDef,
   SideBarDef,
   SortChangedEvent,
+  ColumnMovedEvent,
+  ColumnPinnedEvent,
+  ColumnVisibleEvent,
+  ColumnResizedEvent,
 } from 'ag-grid-community';
 import { ReactComponent as BrokerOutlineIcon } from '@admiral-ds/icons/build/finance/BrokerOutline.svg';
-import { ReactComponent as MenuOutline } from '@admiral-ds/icons/build/service/MenuOutline.svg';
 import { ReactComponent as PlusCircleSolid } from '@admiral-ds/icons/build/service/PlusCircleSolid.svg';
-import { ReactComponent as SettingsOutline } from '@admiral-ds/icons/build/system/SettingsOutline.svg';
 import { ReactComponent as SearchOutline } from '@admiral-ds/icons/build/system/SearchOutline.svg';
 import { ReactComponent as DeleteSolid } from '@admiral-ds/icons/build/system/DeleteSolid.svg';
 import { InputField } from '@admiral-ds/react-ui';
-
 import { ErrorStatus, Flexbox, Spacer } from '@src/shared/ui/atoms';
 import { IconButton } from '@shared/ui/molecules';
 import { RIGHT_PANEL_TYPE } from '@shared/constants';
@@ -46,8 +47,7 @@ import { isInBusinessCustomers, isModelCreator } from '../../../shared/helpers';
 import { useDeepEffect } from '../../../shared/hooks/useDeepEffect';
 import { useGlobalStore } from '../../../shared/stores/globalStore';
 import { useFiltersStore } from '../../../shared/stores/filtersStore';
-import { ROUTES } from '../../../app/Routes';
-import { useTableModels } from '../../../pages/HomePage/hooks/useTableModels';
+import { useTemplatesStore } from '../../../shared/stores/templatesStore';
 
 interface IAgGridTableProps {
   templates?: Template[];
@@ -159,11 +159,9 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       rowList,
       error,
       loading,
-      setPage = (v) => v,
-      page = 0,
       setTotalRows = (v) => v,
+      handleClickOnActionCell,
       pageSize = 1000,
-      searchString = '',
       onRowDragMove,
       onRowSelected,
       rowDragManaged,
@@ -183,9 +181,10 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     ref: any,
   ) => {
     const { setRightPanelType } = useModelsStore();
-    const {modelsTable} = useTableModels();
+    const handleClickOnActionCellFromProps = handleClickOnActionCell || (() => {});
     const { filtersResetCount, setAgGridApi, agGridApi } = useGlobalStore();
-    const { filterModel, topFilters, setTopFilters } = useFiltersStore();
+    const { filterModel, topFilters, setTopFilters, setFilterModel } = useFiltersStore();
+    const { pendingTemplate, setPendingTemplate } = useTemplatesStore();
 
     const { modelsCount, modelSource, isDeleteButtonEnabled, userMatches, updateDeleteModelState } =
       useDeleteRightModelPanelStore();
@@ -195,7 +194,6 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     const navigate = useNavigate();
     const gridRefInner = useRef<AgGridReact>(null);
     const gridRef = ref || gridRefInner;
-
 
     const columnDefs: ColDef[] = columnList
       .map((data, colIndex) => {
@@ -273,7 +271,9 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
             const hasNonEmptyFilter = filterValues.includes('(Непустые значения)');
             const isEmptyCell = cellValue == null || cellValue === '';
             const isNonEmptyCell = !isEmptyCell;
-            const specificFilters = filterValues.filter(v => v !== '(Пустые значения)' && v !== '(Непустые значения)');
+            const specificFilters = filterValues.filter(
+              (v) => v !== '(Пустые значения)' && v !== '(Непустые значения)',
+            );
 
             let matchesEmpty = false;
             let matchesNonEmpty = false;
@@ -314,7 +314,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
         cellRendererParams: {
           noCustomCells,
           onAction: (action: any, row_system_model_id: any, columnName: any): any => {
-            modelsTable?.handleClickOnActionCell?.(action, row_system_model_id, columnName);
+            handleClickOnActionCellFromProps?.(action, row_system_model_id, columnName);
           },
         },
       };
@@ -372,7 +372,24 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       }
     };
 
-    const { setFilterModel } = useFiltersStore();
+    const handleColumnStateChange = () => {
+
+      // if (agGridApi) {
+      //   const columnState = agGridApi.getColumnState();
+      //   const updatedTemplate = {
+      //     ...pendingTemplate,
+      //     columnState,
+      //   };
+      //   console.log('🐸 Pepe said >> handleColumnStateChange >> updatedTemplate:', updatedTemplate);
+
+      //   setPendingTemplate(updatedTemplate as any);
+      // }
+    };
+
+
+    const handleColumnMoved = (event: ColumnMovedEvent) => {
+      handleColumnStateChange();
+    };
 
     const handleFilterChange = (event: FilterChangedEvent): void => {
       if (event.source === 'api') return;
@@ -452,6 +469,11 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       return params.defaultItems;
     };
 
+
+    const _onRowDragEnd = (e) => {
+      onRowDragEnd?.(e)
+    }
+
     return (
       <Flexbox height="calc(100vh - 230px)">
         {error ? (
@@ -528,7 +550,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
               rowClassRules={isCompared ? rowClassRules : undefined}
               selectionColumnDef={selectionColumnDef}
               autoGroupColumnDef={autoGroupColumnDefProps}
-              // sideBar={sidePanel ? sideBarProps : undefined}
+              sideBar={sidePanel ? sideBarProps : undefined}
               onSelectionChanged={handleSelectionChange}
               onFilterChanged={handleFilterChange}
               paginationPageSize={pageSize}
@@ -542,7 +564,8 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
               onRowSelected={onRowSelected}
               onFirstDataRendered={_onFirstDataRendered}
               onRowDataUpdated={onRowDataUpdated}
-              onRowDragEnd={onRowDragEnd}
+              onRowDragEnd={_onRowDragEnd}
+              onColumnMoved={handleColumnMoved}
               loading={loading}
               overlayNoRowsTemplate={overlayNoRowsTemplate}
             />
@@ -553,7 +576,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
   },
 );
 
-const GridWrapper = styled.div`
+const GridWrapper = styled('div')`
   zoom: 0.8;
   & .ag-column-panel .ag-pivot-mode-panel {
     display: none;
@@ -564,7 +587,7 @@ const GridWrapper = styled.div`
   }
 `;
 
-const StatusWrapper = styled.div`
+const StatusWrapper = styled('div')`
   display: flex;
   width: 100%;
   height: 100%;

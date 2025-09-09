@@ -15,7 +15,7 @@ const CustomPagination = styled(PaginationOne)`
   box-sizing: border-box;
 `;
 
-const Container = styled.div`
+const Container = styled('div')`
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -23,7 +23,7 @@ const Container = styled.div`
   padding: 8px;
 `;
 
-const Row = styled.div`
+const Row = styled('div')`
   display: flex;
   flex-direction: row;
   align-items: center;

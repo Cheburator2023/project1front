@@ -4,12 +4,10 @@ import { useDownloadReportStore } from '@shared/stores/downloadReportStore';
 import { Column, Row } from '@shared/types';
 import { initialColumns, MODEL_FORM_MODE, RIGHT_PANEL_TYPE } from '@shared/constants';
 import {
-  API_ROUTES,
-
-  useFetch,
   ModelsResponseType,
   mockedModelsResponse,
 } from '@shared/api';
+import { useModelsControllerGetModels } from '@shared/api/generated/endpoints';
 
 export interface ModelsListWidgetData {
   rowList: Array<Partial<Row>>;
@@ -62,17 +60,16 @@ export const useModelsListWidget = (
   const [totalRows, setTotalRows] = useState<number>(0);
 
   const {
-    responseData: modelsData,
-    loading,
-    error,
-  } = useFetch<ModelsResponseType>({
-    apiRoute: API_ROUTES.MODELS,
-    mockedResponse: mockedModelsResponse,
-  });
+    data: modelsData,
+    isLoading: loading,
+    error: modelsError,
+  } = useModelsControllerGetModels({ model_id: '' });
+
+  const error = modelsError ? String(modelsError) : null;
 
   useEffect(() => {
-    if (modelsData) {
-      const formattedRows = modelsData.data.cards.map((row) => ({
+    if (modelsData && (modelsData as any)?.data) {
+      const formattedRows = (modelsData as any).data.cards.map((row) => ({
         ...row,
         model_version: row.model_version?.toString(), // TODO: remove after fix on backend
         id: row.system_model_id,

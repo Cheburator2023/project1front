@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
 
 import { RIGHT_PANEL_TYPE } from '@shared/constants';
-import { API_ROUTES, useFetch, ArtifactResponse, mockedModelsArtifacts } from '@shared/api';
+import { ArtifactResponse, mockedModelsArtifacts } from '@shared/api';
+import { useArtefactsControllerGetArtefacts } from '@shared/api/generated/endpoints';
 
 import { Spinner } from '@admiral-ds/react-ui';
 import {
@@ -13,12 +14,10 @@ import { ModelForm } from './ModelForm';
 import { HistoryChanges } from './HistoryChanges';
 import { Templates } from './Templates';
 import { DeleteModelForm } from './DeleteModelForm/DeleteModelForm';
-import { useTableModels } from '../../pages/HomePage/hooks/useTableModels';
 
 export const RightModalPanel = React.memo(() => {
   const { templates, setTemplates } = useTemplatesStore();
-  const { modelsTable } = useTableModels();
-  const rows = modelsTable.rowList;
+  const { rows } = useModelsStore();
 
   const {
     rightPanelType: activeStatus,
@@ -28,10 +27,8 @@ export const RightModalPanel = React.memo(() => {
     handleOnClose: onClose,
   } = useModelsStore();
 
-  const { responseData: artifactsData } = useFetch<ArtifactResponse | undefined>({
-    apiRoute: API_ROUTES.ARTIFACTS,
-    mockedResponse: mockedModelsArtifacts,
-  });
+  const { data: artifactsResponse } = useArtefactsControllerGetArtefacts();
+  const artifactsData = artifactsResponse as ArtifactResponse | undefined;
 
   const { activeRowId: activeRowIdDelete } = useDeleteRightModelPanelStore();
 
@@ -63,7 +60,7 @@ export const RightModalPanel = React.memo(() => {
 
   if (activeStatus === RIGHT_PANEL_TYPE.ADD_MODEL || activeStatus === RIGHT_PANEL_TYPE.EDIT_MODEL) {
     if (activeStatus === RIGHT_PANEL_TYPE.ADD_MODEL) {
-      return artifactsData?.data ? (
+      return rows && artifactsData?.data ? (
         <ModelForm
           rows={rows}
           mode={activeStatus}
@@ -79,7 +76,7 @@ export const RightModalPanel = React.memo(() => {
         return null;
       }
 
-      return artifactsData?.data ? (
+      return rows && artifactsData?.data ? (
         <ModelForm
           rows={rows}
           mode={activeStatus}

@@ -1,11 +1,11 @@
 import styled from 'styled-components';
 
-export const Wrapper = styled.div`
+export const Wrapper = styled('div')`
   padding: 16px 24px;
   box-sizing: border-box;
 `;
 
-export const HistoryChangeItem = styled.div`
+export const HistoryChangeItem = styled('div')`
   display: flex;
   align-items: start;
   flex-direction: column;

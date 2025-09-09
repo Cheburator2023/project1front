@@ -12,23 +12,23 @@ export const StyledMenuItem = styled(MenuItem)`
   justify-content: flex-start;
 `;
 
-export const IconWrapper = styled.div`
+export const IconWrapper = styled('div')`
   width: 20px;
   height: 20px;
   margin-right: 8px;
 `;
 
-export const BodyWrapper = styled.div`
+export const BodyWrapper = styled('div')`
   height: 100%;
 `;
 
-export const TemplatesGroupWrapper = styled.div<{ $users?: boolean }>`
+export const TemplatesGroupWrapper = styled('div')<{ $users?: boolean }>`
   height: ${(props) => (props.$users ? '60%' : '40%')};
   overflow: hidden;
   box-sizing: border-box;
 `;
 
-export const TemplatesGroup = styled.div`
+export const TemplatesGroup = styled('div')`
   overflow-y: scroll;
   box-sizing: border-box;
   padding: 0 24px;

@@ -1,8 +1,21 @@
-import React from 'react';
-import { Template } from '@src/shared/api';
+import React, { useCallback, useEffect } from 'react';
+import { ModelsResponseType } from '@src/shared/api';
 import { Column, Row } from '@src/shared/types';
+import { getISODateFormat } from '@shared/helpers';
+import { initialColumns, RIGHT_PANEL_TYPE } from '@shared/constants';
+import { useDeepEffect } from '@shared/hooks/useDeepEffect';
+import {
+  useFiltersStore,
+  useModelsStore,
+  useTemplatesStore,
+  useExploitationModeStore,
+} from '@src/shared/stores';
+import {
+  useModelsControllerGetModels,
+  useTemplatesControllerGetTemplates,
+} from '@shared/api/generated/endpoints';
+
 import { AgGridTable } from '../organisms/AgGridTable';
-import { useTableModels } from '../../../pages/HomePage/hooks/useTableModels';
 
 export const AgGridModelsTable = (props: {
   isCompared?: boolean;
@@ -10,26 +23,104 @@ export const AgGridModelsTable = (props: {
   overrideRowList?: Partial<Row>[];
   overlayNoRowsTemplate?: string;
 }) => {
-  const { modelsTable, filters } = useTableModels();
-  const templates = filters?.templates;
-  const { error, loading } = modelsTable;
+  const {
+    setRightPanelType,
+    setActiveCellName,
+    setRows,
+    setActiveRowId,
+    modelsParams,
+    setModelsParams,
+  } = useModelsStore();
 
-  const { rowList, setPage, page, setTotalRows, pageSize, searchString, columnList } = modelsTable;
+    const {
+    modelsDownloadingDate,
+  } = useFiltersStore();
+
+
+  const { templates, setTemplates } = useTemplatesStore();
+  const _selectedExploitationModes = useExploitationModeStore(
+    (state) => state.selectedExploitationModes,
+  );
+
+  const { data: templateData } = useTemplatesControllerGetTemplates({ query: { enabled: true } });
+  const {
+    data: _modelsData,
+    isLoading: loadingModels,
+    error: modelsError,
+    refetch: refetchModels,
+  } = useModelsControllerGetModels(modelsParams, {
+    query: {
+      enabled: false,
+      staleTime: 0,
+      gcTime: 0,
+      refetchOnMount: true,
+      refetchOnWindowFocus: false,
+    },
+  });
+
+  const modelsData = _modelsData as ModelsResponseType | undefined;
+
+  const fetchModels = useCallback(
+    (date?: string) => {
+      const { selectedExploitationModes } = useExploitationModeStore.getState();
+      const dateToUse = date || modelsDownloadingDate;
+
+      if (dateToUse) {
+        setModelsParams({
+          date: getISODateFormat(dateToUse),
+          mode: selectedExploitationModes,
+        });
+      } else {
+        setModelsParams({
+          mode: selectedExploitationModes,
+        });
+      }
+
+      setTimeout(() => {
+        refetchModels();
+      }, 100);
+    },
+    [modelsDownloadingDate, refetchModels, setModelsParams],
+  );
+
+  useEffect(() => {
+    fetchModels();
+  }, [fetchModels, _selectedExploitationModes]);
+
+  useDeepEffect(() => {
+    if (templateData) {
+      setTemplates(templateData);
+    }
+  }, [templateData]);
+
+  useDeepEffect(() => {
+    if (modelsData?.data?.cards) {
+      setRows(modelsData.data.cards);
+    }
+  }, [modelsData?.data?.cards]);
+
+  const handleClickOnActionCell = useCallback(
+    (
+      action: RIGHT_PANEL_TYPE.EDIT_MODEL | RIGHT_PANEL_TYPE.HISTORY_CHANGES,
+      rowId: string,
+      cellName: keyof Row,
+    ) => {
+      setRightPanelType(action);
+      setActiveCellName(cellName);
+      setActiveRowId(rowId);
+    },
+    [setRightPanelType, setActiveCellName, setActiveRowId],
+  );
 
   return (
     <AgGridTable
       templates={templates}
-      rowList={props.overrideRowList || rowList}
-      columnList={props.overrideColumnList || columnList}
-      setPage={setPage}
-      page={page}
-      setTotalRows={setTotalRows}
-      pageSize={pageSize}
-      searchString={searchString}
+      rowList={props.overrideRowList || (modelsData as any)?.data?.cards}
+      columnList={props.overrideColumnList || initialColumns}
       isCompared={props.isCompared}
-      handleClickOnActionCell={modelsTable.handleClickOnActionCell}
-      error={error}
-      loading={loading}
+      handleClickOnActionCell={handleClickOnActionCell}
+      error={modelsError && 'Ошибка загрузки моделей'}
+      loading={loadingModels}
       overlayNoRowsTemplate={props.overlayNoRowsTemplate}
     />
   );

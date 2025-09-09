@@ -125,8 +125,8 @@ export function useDebouncedCallback<T extends (...args: any) => ReturnType<T>>(
   const lastInvokeTime: any = useRef(0);
   const timerId: any = useRef(null);
   const lastArgs: any = useRef<unknown[]>([]);
-  const lastThis: any = useRef<unknown>();
-  const result: any = useRef<ReturnType<T>>();
+  const lastThis: any = useRef<unknown>(undefined);
+  const result: any = useRef<ReturnType<T>>(undefined);
   const funcRef: any = useRef(func);
   const mounted: any = useRef(true);
   // Always keep the latest version of debounce callback, with no wait time.

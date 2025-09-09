@@ -78,9 +78,6 @@ export const viteCommonConfig = ({ appName, base = '/' }: { appName?: string; ba
         react({
           // jsxImportSource: '@emotion/react',
           // extra babel plugins
-          babel: {
-            plugins: ['./plugins/babel/babel-plugin-react-add-test-id.js'],
-          },
         }),
         svgr({
           dimensions: false,
@@ -112,6 +109,7 @@ export const viteCommonConfig = ({ appName, base = '/' }: { appName?: string; ba
         'process.env.MOCKED_REQUESTS': JSON.stringify(process.env.MOCKED_REQUESTS),
         'process.env.GIT_REVISION': JSON.stringify(git_revision),
         'process.env.RC_STATS': JSON.stringify(RC_STATS),
+        'process.env.IS_DEV': JSON.stringify(IS_DEV),
       },
 
       // resolve: {

@@ -27,7 +27,7 @@ const BadgeCount = styled(Badge)<{ appearance: string }>`
     `}
 `;
 
-const CheckSolidCustom = styled.div`
+const CheckSolidCustom = styled('div')`
   position: absolute;
   width: 16px;
   height: 16px;
