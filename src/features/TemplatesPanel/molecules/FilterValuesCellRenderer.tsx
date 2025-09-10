@@ -1,4 +1,3 @@
-import { memo } from 'react';
 import { COLUMN_TYPE } from '../../../shared/types';
 import { DateFieldRenderer } from './DateFieldRenderer';
 import { MSelectCellRenderer } from './MSelectCellRenderer';

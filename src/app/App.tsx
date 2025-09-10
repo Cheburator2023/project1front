@@ -9,6 +9,7 @@ const IS_DEV = process.env.NODE_ENV === 'development';
 export const App = () => {
   return (
     <div>
+      <div id="portal-root" />
       <BrowserRouter basename={IS_DEV ? '/' : 'sum-rm'}>
         <Layout>
           <RoutesComponent />
@@ -17,3 +18,4 @@ export const App = () => {
     </div>
   );
 };
+

@@ -1,6 +1,6 @@
 import { memo, useCallback, useMemo, useState } from 'react';
 import { AgGridReact } from 'ag-grid-react';
-import { GridReadyEvent, RowDragEndEvent } from 'ag-grid-community';
+import { ColDef, GridReadyEvent, IRichCellEditorParams, RowDragEndEvent } from 'ag-grid-community';
 import styled from 'styled-components';
 import {
   useTemplateFiltersModalStore,
@@ -16,48 +16,52 @@ const getRowHeight = (params: any) => {
     return 130;
   }
   if (params.data.type === COLUMN_TYPE.STRING) {
-    return 50;
+    return 100;
   }
-  return 50;
+  return 100;
 };
 
+const columnDefs: ColDef[] = [
+  {
+    headerName: '',
+    field: 'drag',
+    rowDrag: true,
+    width: 50,
+    maxWidth: 55,
+    suppressMenu: true,
+  },
+  {
+    headerName: 'Активна',
+    field: 'isActive',
+    width: 55,
+    maxWidth: 55,
+    suppressMenu: true,
+    cellRenderer: CheckboxCellRenderer,
+    headerComponent: CheckboxHeaderRenderer,
+  },
+  {
+    headerName: 'Название колонки',
+    field: 'title',
+    flex: 1,
+    suppressMenu: true,
+    wrapText: true,
+  },
+  {
+    headerName: 'Значения фильтров',
+    field: 'filterValues',
+    suppressMenu: true,
+    cellRenderer: FilterValuesCellRenderer,
+  },
+];
+
 export const TemplateFiltersGrid = () => {
-  const [columnDefs] = useState([
-    {
-      headerName: '',
-      field: 'drag',
-      rowDrag: true,
-      width: 50,
-      maxWidth: 55,
-      suppressMenu: true,
-    },
-    {
-      headerName: 'Активна',
-      field: 'isActive',
-      width: 55,
-      maxWidth: 55,
-      suppressMenu: true,
-      cellRenderer: CheckboxCellRenderer,
-      headerComponent: CheckboxHeaderRenderer,
-    },
-    {
-      headerName: 'Название колонки',
-      field: 'title',
-      flex: 1,
-      suppressMenu: true,
-      wrapText: true,
-    },
-    {
-      headerName: 'Значения фильтров',
-      field: 'filterValues',
-      suppressMenu: true,
-      cellRenderer: memo(FilterValuesCellRenderer),
-    },
-  ]);
   const columnFilters = useTemplateFiltersModalStoreSelected.use.columnFilters();
   const reorderColumns = useTemplateFiltersModalStoreSelected.use.reorderColumns();
-  const quickFilterText = useTemplateFiltersModalStoreSelected.use.quickFilterText();
+  const _quickFilterText = useTemplateFiltersModalStoreSelected.use.quickFilterText();
   const setLocalGridApi = useTemplateFiltersModalStoreSelected.use.setLocalGridApi();
+
+  const rowData = useMemo(() => columnFilters, [columnFilters]);
+  const quickFilterText = useMemo(() => _quickFilterText, [_quickFilterText]);
 
   const onRowDragEnd = useCallback(
     (event: RowDragEndEvent) => {
@@ -89,17 +93,16 @@ export const TemplateFiltersGrid = () => {
   return (
     <TableWrapper className="ag-theme-quartz">
       <AgGridReact
-        rowData={columnFilters}
+        rowData={rowData}
         columnDefs={columnDefs}
         rowDragManaged
         suppressContextMenu
         onRowDragEnd={onRowDragEnd}
         onGridReady={onGridReady}
         rowBuffer={2}
-        suppressCellFocus
+        // suppressCellFocus
         rowSelection={undefined}
         getRowHeight={getRowHeight}
-        animateRows={false}
         quickFilterText={quickFilterText}
       />
     </TableWrapper>

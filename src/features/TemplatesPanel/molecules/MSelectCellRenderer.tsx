@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
-import { Button, MenuActionsPanel, Option, Select } from '@admiral-ds/react-ui';
+import { useState, useEffect, memo, useMemo } from 'react';
+import { Button, MenuActionsPanel } from '@admiral-ds/react-ui';
 import styled from 'styled-components';
 
 import { useTemplateFiltersModalStoreSelected } from '../stores/templateFiltersModalStore';
 import { useModelsStore } from '../../../shared/stores';
+import { MultiSearchSelect } from '../atoms/MultiSearchSelect';
 
 const MSelectWrapper = styled('div')`
   & .close-button {
@@ -27,21 +28,26 @@ const initSelectedValues = (filterValues: any) => {
     if (value === null) {
       return '(Пустые значения)';
     }
-    return value;
+    return String(value);
   });
 };
 
 export const MSelectCellRenderer = ({ data }: any) => {
-  console.log('🐸 Pepe said >> MSelectCellRenderer >> data:', data);
-
   const updateColumnFilter = useTemplateFiltersModalStoreSelected.use.updateColumnFilter();
 
   const { colOptionsMap } = useModelsStore();
-  const [selectedValues, setSelectedValues] = useState<string[]>(initSelectedValues(data.filterValues));
+  const [selectedValues, setSelectedValues] = useState<string[]>(
+    initSelectedValues(data.filterValues),
+  );
+  const [initialValues, setInitialValues] = useState<string[]>(
+    initSelectedValues(data.filterValues),
+  );
   const [shouldRenderOptions, setShouldRenderOptions] = useState(false);
 
   useEffect(() => {
-    setSelectedValues(initSelectedValues(data.filterValues));
+    const newValues = initSelectedValues(data.filterValues);
+    setSelectedValues(newValues);
+    setInitialValues(newValues);
   }, [data]);
 
   useEffect(() => {
@@ -52,9 +58,7 @@ export const MSelectCellRenderer = ({ data }: any) => {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedOptions = e.target.selectedOptions;
-    const newSelectedValues = Array.from(selectedOptions).map((option) => option.value);
+  const handleChange = (newSelectedValues: string[]) => {
     setSelectedValues(newSelectedValues);
   };
 
@@ -63,49 +67,56 @@ export const MSelectCellRenderer = ({ data }: any) => {
       if (value === '(Пустые значения)') {
         return null;
       }
-      return value;
+      const originalOption = (colOptionsMap[data.colId] || []).find((opt: any) =>
+        String(opt) === value || (opt === null && value === '(Пустые значения)')
+      );
+      return originalOption !== undefined ? originalOption : value;
     });
 
     updateColumnFilter(data.colId, {
       filterValues: processedValues,
     });
+    setInitialValues([...selectedValues]);
   };
 
-  const options = colOptionsMap[data.colId];
+  const handleCancelButtonClick = () => {
+    setSelectedValues([...initialValues]);
+  };
+
+  const hasChanges = useMemo(() => {
+    if (selectedValues.length !== initialValues.length) return true;
+    return selectedValues.some((value, index) => value !== initialValues[index]);
+  }, [selectedValues, initialValues]);
+
+  const options = useMemo(() => {
+    const rawOptions = colOptionsMap[data.colId] || [];
+    return rawOptions.map((option: any) => ({
+      value: option,
+      label: option === null ? '(Пустые значения)' : String(option)
+    }));
+  }, [colOptionsMap, data.colId]);
 
   return (
     <MSelectWrapper style={{ width: '100%', padding: '8px 0' }}>
-      <Select
-        multiple
-        dimension="s"
-        disabled={!data.isActive || !options.length}
-        mode="searchSelect"
-        placeholder="Выберите значения"
+      <MultiSearchSelect
+        options={options}
         value={selectedValues}
         onChange={handleChange}
-        style={{ width: '100%' }}
-        virtualScroll={{ itemHeight: 'auto' }}
-        maxRowCount={1}
-        minRowCount={1}
+        placeholder="Выберите значения"
+        isDisabled={!data.isActive || !options.length}
         isLoading={!shouldRenderOptions}
-        renderDropDownBottomPanel={() => {
-          return (
-            <MenuActionsPanel dimension="s">
-              <Button dimension="s" onClick={handleApplyButtonClick}>
-                Применить
-              </Button>
-            </MenuActionsPanel>
-          );
-        }}
-      >
-        {shouldRenderOptions &&
-          options?.map((option) => (
-            <Option key={option} value={option}>
-              {option}
-            </Option>
-          ))}
-      </Select>
+        maxMenuHeight={200}
+      />
+      {hasChanges && (
+        <div style={{ marginTop: '8px', display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+          <Button dimension="s" appearance="secondary" onClick={handleCancelButtonClick}>
+            Отменить
+          </Button>
+          <Button dimension="s" onClick={handleApplyButtonClick}>
+            Применить
+          </Button>
+        </div>
+      )}
     </MSelectWrapper>
   );
 };
-
