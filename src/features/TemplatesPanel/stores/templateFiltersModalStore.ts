@@ -1,7 +1,7 @@
 import { create } from 'zustand';
+import { GridApi } from 'ag-grid-community';
 import { Template } from '@shared/api/types';
 import { initialColumns as _initialColumns } from '@shared/constants/InitialCollumns';
-import { GridApi } from 'ag-grid-community';
 import { useGlobalStore } from '@shared/stores/globalStore';
 import { createSelectors } from '../../../shared/hooks/useSelectors';
 
@@ -48,6 +48,30 @@ type TemplateFiltersModalActions = {
 type TemplateFiltersModalStore = TemplateFiltersModalState & TemplateFiltersModalActions;
 
 const createColumnFiltersFromInitialColumns = (): ColumnFilterData[] => {
+  const agGridApi = useGlobalStore.getState().agGridApi;
+  const currentColumnState = agGridApi
+    ?.getColumnState()
+    ?.filter((col) => col.colId !== 'ag-Grid-ControlsColumn');
+
+  if (currentColumnState && currentColumnState.length > 0) {
+    return currentColumnState
+      .map((currentCol, index) => {
+        const column = initialColumns.find((col) => col.name === currentCol.colId);
+        if (!column) return null;
+
+        return {
+          colId: column.name,
+          name: column.name,
+          title: column.title,
+          type: column.type,
+          isActive: !currentCol.hide,
+          filterValues: [],
+          order: index,
+        };
+      })
+      .filter(Boolean) as ColumnFilterData[];
+  }
+
   return initialColumns.map((column, index) => ({
     colId: column.name,
     name: column.name,
@@ -146,11 +170,11 @@ export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((s
   setIsDirty: (dirty) => set({ isDirty: dirty }),
   resetState: () => set(initialState),
   initializeFromTemplate: (template?: Template) => {
-    // const agGridApi = useGlobalStore.getState().agGridApi;
-    // const currentColumnState = agGridApi
-    //   ?.getColumnState()
-    //   ?.filter((col) => col.colId !== 'ag-Grid-ControlsColumn');
-    // const currentFilterModel = agGridApi?.getFilterModel();
+    const agGridApi = useGlobalStore.getState().agGridApi;
+    const currentColumnState = agGridApi
+      ?.getColumnState()
+      ?.filter((col) => col.colId !== 'ag-Grid-ControlsColumn');
+    
     const baseColumns = createColumnFiltersFromInitialColumns();
 
     if (template) {
@@ -220,29 +244,60 @@ export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((s
           });
         });
       } else {
-        mergedColumns = baseColumns.map((baseColumn) => {
-          const templateFilter = template.filterModel?.[baseColumn.colId];
+        if (currentColumnState && currentColumnState.length > 0) {
+          mergedColumns = currentColumnState
+            .map((currentCol, index) => {
+              const baseColumn = baseColumns.find((col) => col.colId === currentCol.colId);
+              if (!baseColumn) return null;
 
-          let filterValues: (string | null)[] = [];
-          if (templateFilter) {
-            if ('values' in templateFilter && templateFilter.values) {
-              filterValues = templateFilter.values;
-            } else if ('dateFrom' in templateFilter && 'dateTo' in templateFilter) {
-              const dateFilter = templateFilter as { dateFrom: string; dateTo: string };
-              const dateRange: (string | null)[] = [];
-              if (dateFilter.dateFrom) dateRange.push(dateFilter.dateFrom);
-              if (dateFilter.dateTo) dateRange.push(dateFilter.dateTo);
-              filterValues = dateRange;
+              const templateFilter = template.filterModel?.[baseColumn.colId];
+
+              let filterValues: (string | null)[] = [];
+              if (templateFilter) {
+                if ('values' in templateFilter && templateFilter.values) {
+                  filterValues = templateFilter.values;
+                } else if ('dateFrom' in templateFilter && 'dateTo' in templateFilter) {
+                  const dateFilter = templateFilter as { dateFrom: string; dateTo: string };
+                  const dateRange: (string | null)[] = [];
+                  if (dateFilter.dateFrom) dateRange.push(dateFilter.dateFrom);
+                  if (dateFilter.dateTo) dateRange.push(dateFilter.dateTo);
+                  filterValues = dateRange;
+                }
+              }
+
+              return {
+                ...baseColumn,
+                isActive: !currentCol.hide,
+                filterValues,
+                order: index,
+              };
+            })
+            .filter(Boolean) as ColumnFilterData[];
+        } else {
+          mergedColumns = baseColumns.map((baseColumn) => {
+            const templateFilter = template.filterModel?.[baseColumn.colId];
+
+            let filterValues: (string | null)[] = [];
+            if (templateFilter) {
+              if ('values' in templateFilter && templateFilter.values) {
+                filterValues = templateFilter.values;
+              } else if ('dateFrom' in templateFilter && 'dateTo' in templateFilter) {
+                const dateFilter = templateFilter as { dateFrom: string; dateTo: string };
+                const dateRange: (string | null)[] = [];
+                if (dateFilter.dateFrom) dateRange.push(dateFilter.dateFrom);
+                if (dateFilter.dateTo) dateRange.push(dateFilter.dateTo);
+                filterValues = dateRange;
+              }
             }
-          }
 
-          return {
-            ...baseColumn,
-            isActive: true,
-            filterValues,
-            order: baseColumn.order,
-          };
-        });
+            return {
+              ...baseColumn,
+              isActive: true,
+              filterValues,
+              order: baseColumn.order,
+            };
+          });
+        }
       }
 
       const isAllSelected = mergedColumns.every((f) => f.isActive);
@@ -254,13 +309,32 @@ export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((s
         isDirty: false,
       });
     } else {
-      const defaultColumns = baseColumns.map((column) => {
-        return {
-          ...column,
-          isActive: true,
-          filterValues: [],
-        };
-      });
+      let defaultColumns: ColumnFilterData[];
+      
+      if (currentColumnState && currentColumnState.length > 0) {
+        defaultColumns = currentColumnState
+          .map((currentCol, index) => {
+            const baseColumn = baseColumns.find((col) => col.colId === currentCol.colId);
+            if (!baseColumn) return null;
+
+            return {
+              ...baseColumn,
+              isActive: !currentCol.hide,
+              order: index,
+              filterValues: [],
+            };
+          })
+          .filter(Boolean) as ColumnFilterData[];
+      } else {
+        defaultColumns = baseColumns.map((column) => {
+          return {
+            ...column,
+            isActive: true,
+            filterValues: [],
+          };
+        });
+      }
+      
       const isAllSelected = defaultColumns.every((f) => f.isActive);
       set({
         columnFilters: defaultColumns,
