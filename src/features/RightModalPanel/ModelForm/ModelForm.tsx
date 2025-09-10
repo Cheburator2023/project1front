@@ -6,17 +6,21 @@ import { format } from 'date-fns';
 
 import { Row } from '@shared/types';
 import { StatusScreen } from '@shared/ui/molecules';
-import { RIGHT_PANEL_TYPE, MODEL_FORM_MODE, initialColumns } from '@shared/constants';
+import { MODEL_FORM_MODE, initialColumns } from '@shared/constants';
 import { INPUT_TYPE, InputFactory, InputValue, RightPanel } from '@shared/ui/organisms';
 import { ArtifactApi, ModelEditApi } from '@shared/api';
-import { useModelsControllerUpdateModels, useModelsControllerCreateModel } from '@shared/api/generated/endpoints';
+import {
+  useModelsControllerUpdateModels,
+  useModelsControllerCreateModel,
+  useModelsControllerGetModels,
+} from '@shared/api/generated/endpoints';
 import { usePermissions, useRoles } from '@src/shared/hooks';
 
 import { groupBy, isEqual, omit, sortBy, uniqBy } from 'lodash';
 import { Flexbox, Spacer } from '@shared/ui/atoms';
-import { Artifact } from '@shared/api/types';
+import { Artifact, ModelsResponseType } from '@shared/api/types';
 
-import { useAppInjectStore } from '@shared/stores/appInjectStore';
+import { useGlobalStore } from '@shared/stores/globalStore';
 import { useScrollTo } from '@src/shared/hooks/useScrollTo';
 import { useDeepEffect } from '@src/shared/hooks/useDeepEffect';
 import { FormValues } from '../types';
@@ -33,11 +37,12 @@ import { useActiveFormSchema } from './useActiveFormSchema';
 import { useFormFields } from './useFormFields';
 import { ALLOCATION_FIELDS_NAMES_USAGE, SCHEMA_NAME_MAP } from './constants';
 import { ModelFormDotMenu } from './ModelFormDotMenu';
+import { useModelsStore } from '../../../shared/stores';
 
 type SubmitType = { checkOnly?: boolean };
 
 export interface ModelFormProps {
-  mode: RIGHT_PANEL_TYPE.ADD_MODEL | RIGHT_PANEL_TYPE.EDIT_MODEL;
+  mode: 'add' | 'edit';
   artifacts: Artifact[];
   editCellName?: keyof Row;
   rows: Partial<Row>[];
@@ -56,10 +61,25 @@ export const ModelForm = ({
   onSubmit,
   onClose,
 }: ModelFormProps) => {
-  const updateModelsMutation = useModelsControllerUpdateModels();
-  const createModelMutation = useModelsControllerCreateModel();
+    const {
+    setRows,
+    modelsParams,
+  } = useModelsStore();
+
+  const updateModelsMutation: any = useModelsControllerUpdateModels();
+  const createModelMutation: any = useModelsControllerCreateModel();
+  const { data: _modelsData, refetch: refetchModels } = useModelsControllerGetModels(modelsParams);
+
+  const modelsData = _modelsData as ModelsResponseType | undefined;
+
+  const isUpdateLoading = updateModelsMutation.isPending;
+  const isCreateLoading = createModelMutation.isPending;
+  const isUpdateError = updateModelsMutation.isError;
+  const isCreateError = createModelMutation.isError;
+  const isUpdateSuccess = updateModelsMutation.isSuccess;
+  const isCreateSuccess = createModelMutation.isSuccess;
   const formMode = getFormMode(mode);
-  const { currentCustomer } = useAppInjectStore();
+  const { currentCustomer } = useGlobalStore();
   const { isEditAllocationEnabled } = usePermissions();
 
   const [values, setValues] = useState<FormValues | undefined>();
@@ -366,7 +386,9 @@ export const ModelForm = ({
       // TODO: check this type
       let newRow: Row | undefined;
 
-      setSubmitLoading(checkOnly ? false : true);
+      if (!checkOnly) {
+        setSubmitLoading(true);
+      }
 
       if (!IS_FORM_MODE_ADD && initialRow && !checkOnly) {
         const { system_model_id, model_source } = initialRow;
@@ -379,53 +401,22 @@ export const ModelForm = ({
         );
 
         if (system_model_id && model_source) {
-          const res: any = await new Promise((resolve) => {
-             updateModelsMutation.mutate({
-               data: [{
-                 model_id: system_model_id,
-                 artefacts: artifactApiItems as any,
-                 model_source,
-               } as any]
-             }, {
-               onSuccess: (data) => resolve({ data: { data: { cards: [data] } }, error: false }),
-               onError: () => resolve({ error: true })
-             });
-           });
-
-          if (!res || res.error) {
-            setSubmitError('Произошла ошибка при обновлении модели');
-            return;
-          }
-
-          if (res?.data?.data?.cards && res.data.data.cards[0]) {
-            newRow = res.data.data.cards[0];
-            console.log('📝 FORM LOGS: ~ newRow:', newRow);
-          }
+          updateModelsMutation.mutate({
+            data: [
+              {
+                model_id: system_model_id,
+                artefacts: artifactApiItems as any,
+                model_source,
+              } as any,
+            ],
+          });
         }
       }
 
       if (IS_FORM_MODE_ADD && !checkOnly) {
-        const res: any = await new Promise((resolve) => {
-           createModelMutation.mutate({
-             data: artifactApiItems as any
-           }, {
-             onSuccess: (data) => resolve({ data, error: false }),
-             onError: () => resolve({ error: true })
-           });
-         });
-
-         if (!res || res.error) {
-           setSubmitError('Произошла ошибка при добавлении модели');
-           return;
-         }
-
-         newRow = res.data as Row;
-      }
-
-      if (formMode) {
-        onSubmit(newRow, formMode);
-        setSubmitLoading(false);
-        setSubmitError('');
+        createModelMutation.mutate({
+          data: artifactApiItems as any,
+        });
       }
     },
     [values, formSchema, formMode, activeModelByDefault, hasNoAccessToActiveModel, fields],
@@ -470,6 +461,49 @@ export const ModelForm = ({
   }, [initialRow, artifacts]);
 
   useEffect(() => {
+    setSubmitLoading(isUpdateLoading || isCreateLoading);
+  }, [isUpdateLoading, isCreateLoading]);
+
+  useEffect(() => {
+    if (isUpdateError) {
+      setSubmitError('Произошла ошибка при обновлении модели');
+      setSubmitLoading(false);
+    }
+  }, [isUpdateError]);
+
+  useEffect(() => {
+    if (isCreateError) {
+      setSubmitError('Произошла ошибка при добавлении модели');
+      setSubmitLoading(false);
+    }
+  }, [isCreateError]);
+
+  useEffect(() => {
+    if (isUpdateSuccess && updateModelsMutation.data) {
+      const newRow = updateModelsMutation.data as Row;
+      console.log('📝 FORM LOGS: ~ newRow:', newRow);
+      refetchModels();
+      if (formMode) {
+        onSubmit(newRow, formMode);
+        setSubmitLoading(false);
+        setSubmitError('');
+      }
+    }
+  }, [isUpdateSuccess, updateModelsMutation.data, formMode, onSubmit, refetchModels]);
+
+  useEffect(() => {
+    if (isCreateSuccess && createModelMutation.data) {
+      const newRow = createModelMutation.data as Row;
+      refetchModels();
+      if (formMode) {
+        onSubmit(newRow, formMode);
+        setSubmitLoading(false);
+        setSubmitError('');
+      }
+    }
+  }, [isCreateSuccess, createModelMutation.data, formMode, onSubmit, refetchModels]);
+
+  useEffect(() => {
     if (!hasNoAccessToActiveModel) {
       if (!isEditByRatingModel) {
         setActiveModelByDefault(false);
@@ -502,6 +536,12 @@ export const ModelForm = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editCellName, formRef.current]);
+
+  useDeepEffect(() => {
+    if (modelsData?.data?.cards) {
+      setRows(modelsData.data.cards);
+    }
+  }, [modelsData?.data?.cards]);
 
   useDeepEffect(() => {
     if (dirtyFields.length) {

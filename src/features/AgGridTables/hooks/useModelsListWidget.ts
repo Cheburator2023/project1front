@@ -2,7 +2,8 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useDownloadReportStore } from '@shared/stores/downloadReportStore';
 
 import { Column, Row } from '@shared/types';
-import { initialColumns, MODEL_FORM_MODE, RIGHT_PANEL_TYPE } from '@shared/constants';
+import { initialColumns, MODEL_FORM_MODE } from '@shared/constants';
+import { usePanelsStore } from '@shared/stores';
 import {
   ModelsResponseType,
   mockedModelsResponse,
@@ -31,7 +32,7 @@ export interface ModelsListWidgetActions {
   setPageSize: React.Dispatch<React.SetStateAction<number>>;
   setPage: React.Dispatch<React.SetStateAction<number>>;
   handleClickOnActionCell: (
-    action: RIGHT_PANEL_TYPE.EDIT_MODEL | RIGHT_PANEL_TYPE.HISTORY_CHANGES,
+    action: 'edit' | 'history',
     rowId: string,
     cellName: keyof Row,
   ) => void;
@@ -39,9 +40,12 @@ export interface ModelsListWidgetActions {
   handleOnClose: () => void;
 }
 
-export const useModelsListWidget = (
-  setRightPanelType: React.Dispatch<React.SetStateAction<RIGHT_PANEL_TYPE | null>>,
-) => {
+export const useModelsListWidget = () => {
+  const {
+    openEditModelPanel,
+    openHistoryChangesPanel,
+    closeAllPanels,
+  } = usePanelsStore();
   const { downloadReportStatus } = useDownloadReportStore();
 
   // Cell activities
@@ -105,15 +109,17 @@ export const useModelsListWidget = (
 
   const handleClickOnActionCell = useCallback(
     (
-      action: RIGHT_PANEL_TYPE.EDIT_MODEL | RIGHT_PANEL_TYPE.HISTORY_CHANGES,
+      action: 'edit' | 'history',
       rowId: string,
       cellName: keyof Row,
     ) => {
-      setRightPanelType(action);
-      setActiveCellName(cellName);
-      setActiveRowId(rowId);
+      if (action === 'edit') {
+        openEditModelPanel(rowId, cellName);
+      } else if (action === 'history') {
+        openHistoryChangesPanel(rowId, cellName);
+      }
     },
-    [rowList],
+    [openEditModelPanel, openHistoryChangesPanel],
   );
 
   const handleSubmit = useCallback((newRow?: any, formMode?: MODEL_FORM_MODE) => {
@@ -131,10 +137,8 @@ export const useModelsListWidget = (
   }, []);
 
   const handleOnClose = useCallback(() => {
-    setRightPanelType(null);
-    setActiveCellName(undefined);
-    setActiveRowId(undefined);
-  }, []);
+    closeAllPanels();
+  }, [closeAllPanels]);
 
   const data: ModelsListWidgetData = {
     rowList,

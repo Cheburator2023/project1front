@@ -8,4 +8,5 @@
 export type ModelsControllerGetModelHistoryParams = {
 artefact_tech_label: string;
 model_id: string;
+model_source?: string;
 };

@@ -1,14 +1,11 @@
 import { create } from 'zustand';
-import { RIGHT_PANEL_TYPE, MODEL_FORM_MODE } from '@shared/constants';
+import { MODEL_FORM_MODE } from '@shared/constants';
 import { Row } from '@shared/types';
 import { ArtifactApi, CustomError } from '@shared/api/types';
 import { ModelsControllerGetModelsParams } from '@shared/api/generated/models';
 
 interface ModelsState {
   compareMode: boolean;
-  rightPanelType: RIGHT_PANEL_TYPE | null;
-  activeCellName?: keyof Row;
-  activeRowId?: string;
   rows?: Partial<Row>[];
   isLoading: boolean;
   modelsParams: ModelsControllerGetModelsParams;
@@ -19,10 +16,6 @@ interface ModelsState {
 
 interface ModelsActions {
   setCompareMode: (newCompareMode: boolean) => void;
-  setRightPanelType: (newRightPanelType: RIGHT_PANEL_TYPE | null) => void;
-  setActiveCellName: (cellName?: keyof Row) => void;
-  setActiveRowId: (rowId?: string) => void;
-  handleOnClose: () => void;
   setRows: (rows: Partial<Row>[]) => void;
   updateRow: (updatedRow: Partial<Row>) => void;
   addRow: (newRow: Partial<Row>) => void;
@@ -38,9 +31,6 @@ export type ModelsStore = ModelsState & ModelsActions;
 
 const initialState: ModelsState = {
   compareMode: false,
-  rightPanelType: null,
-  activeCellName: undefined,
-  activeRowId: undefined,
   rows: undefined,
   isLoading: false,
   modelsParams: { mode: [] },
@@ -53,19 +43,8 @@ export const useModelsStore = create<ModelsStore>((set, get) => ({
   ...initialState,
   setSelectedDate: (selectedDate) => set({ selectedDate }),
   setCompareMode: (newCompareMode: boolean) => set({ compareMode: newCompareMode }),
-  setRightPanelType: (newRightPanelType: RIGHT_PANEL_TYPE | null) =>
-    set({ rightPanelType: newRightPanelType }),
-  setActiveCellName: (cellName?: keyof Row) => set({ activeCellName: cellName }),
-  setActiveRowId: (rowId?: string) => set({ activeRowId: rowId }),
   setIsLoading: (loading: boolean) => set({ isLoading: loading }),
   setModelsParams: (modelsParams: ModelsControllerGetModelsParams) => set({ modelsParams }),
-  handleOnClose: () => {
-    set({
-      rightPanelType: null,
-      activeCellName: undefined,
-      activeRowId: undefined,
-    });
-  },
 
   setRows: (rows: Partial<Row>[]) => {
     const { initColOptionsMap } = get();
@@ -88,7 +67,7 @@ export const useModelsStore = create<ModelsStore>((set, get) => ({
   handleSubmit: (newRow?: Row | CustomError | ArtifactApi[], formMode?: MODEL_FORM_MODE) => {
     if (newRow && typeof newRow === 'object' && 'system_model_id' in newRow) {
       const newRowWithId = { ...newRow, id: newRow.system_model_id, hover: true };
-      const { updateRow, addRow, handleOnClose, initColOptionsMap, rows } = get();
+      const { updateRow, addRow, initColOptionsMap, rows } = get();
 
       if (
         formMode === MODEL_FORM_MODE.EDIT ||
@@ -102,8 +81,6 @@ export const useModelsStore = create<ModelsStore>((set, get) => ({
 
       initColOptionsMap(rows);
     }
-
-    get().handleOnClose();
   },
 
   initColOptionsMap: (rows?: Partial<Row>[]) => {

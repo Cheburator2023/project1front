@@ -27,6 +27,7 @@ export const HistoryChanges = ({
   } = useModelsControllerGetModelHistory({
     model_id: modelId,
     artefact_tech_label: artifactName,
+    model_source: modelSource,
   });
 
   const error = historyError ? String(historyError) : undefined;

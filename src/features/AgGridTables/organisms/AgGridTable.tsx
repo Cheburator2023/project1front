@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import { forwardRef, useCallback, useEffect, useMemo, useRef } from 'react';
+import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 
 import {
@@ -23,9 +23,6 @@ import {
   SideBarDef,
   SortChangedEvent,
   ColumnMovedEvent,
-  ColumnPinnedEvent,
-  ColumnVisibleEvent,
-  ColumnResizedEvent,
 } from 'ag-grid-community';
 import { ReactComponent as BrokerOutlineIcon } from '@admiral-ds/icons/build/finance/BrokerOutline.svg';
 import { ReactComponent as PlusCircleSolid } from '@admiral-ds/icons/build/service/PlusCircleSolid.svg';
@@ -34,14 +31,13 @@ import { ReactComponent as DeleteSolid } from '@admiral-ds/icons/build/system/De
 import { InputField } from '@admiral-ds/react-ui';
 import { ErrorStatus, Flexbox, Spacer } from '@src/shared/ui/atoms';
 import { IconButton } from '@shared/ui/molecules';
-import { RIGHT_PANEL_TYPE } from '@shared/constants';
 import { useNavigate } from 'react-router-dom';
 import { Column, COLUMN_TYPE, Row } from '@src/shared/types';
 import { Template } from '@src/shared/api/types';
 import styled from 'styled-components';
 import { AgGridTableCustomCell } from '../molecules/AgGridTableCustomCell';
 import { AG_GRID_LOCALE_RU } from '../../../app/agGridLocale.ru';
-import { useDeleteRightModelPanelStore, useModelsStore } from '../../../shared/stores';
+import { useDeleteRightModelPanelStore, usePanelsStore } from '../../../shared/stores';
 import { usePermissions, useRoles } from '../../../shared/hooks';
 import { isInBusinessCustomers, isModelCreator } from '../../../shared/helpers';
 import { useDeepEffect } from '../../../shared/hooks/useDeepEffect';
@@ -77,6 +73,7 @@ interface IAgGridTableProps {
   noCustomCells?: boolean;
   pivot?: boolean;
   overlayNoRowsTemplate?: string;
+  refetchModels?: () => void;
 }
 
 const sideBarProps: SideBarDef | string | string[] | boolean | null = {
@@ -177,10 +174,11 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       pivot = false,
       noCustomCells = false,
       overlayNoRowsTemplate,
+      refetchModels,
     }: IAgGridTableProps,
     ref: any,
   ) => {
-    const { setRightPanelType } = useModelsStore();
+    const { openAddModelPanel, openDeleteModelPanel } = usePanelsStore();
     const handleClickOnActionCellFromProps = handleClickOnActionCell || (() => {});
     const { filtersResetCount, setAgGridApi, agGridApi } = useGlobalStore();
     const { filterModel, topFilters, setTopFilters, setFilterModel } = useFiltersStore();
@@ -194,6 +192,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     const navigate = useNavigate();
     const gridRefInner = useRef<AgGridReact>(null);
     const gridRef = ref || gridRefInner;
+    const [activeRows, setActiveRows] = useState<Partial<Row>[]>([]);
 
     const columnDefs: ColDef[] = useMemo(() => {
       return columnList
@@ -223,7 +222,8 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
                 : data.type === COLUMN_TYPE.NUMBER
                 ? 'agNumberColumnFilter'
                 : 'agSetColumnFilter',
-            filterParams: data.type === COLUMN_TYPE.DATE ? dateFilterParams : dynamicSetFilterParams,
+            filterParams:
+              data.type === COLUMN_TYPE.DATE ? dateFilterParams : dynamicSetFilterParams,
             cellRenderer: data.cellRenderer,
             cellClass: (params) => {
               if (isCompared) {
@@ -360,22 +360,29 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     const handleSelectionChange = (event: SelectionChangedEvent): void => {
       onSelectionChanged?.(event);
       const selectedRows = event.api.getSelectedRows();
+      setActiveRows(selectedRows as Partial<Row>[]);
+
+      const selectedRow: Partial<Row> = selectedRows[0];
+
+      const { model_source, status, system_model_id } = selectedRow;
+
+      console.log('🐸 Pepe said >> handleSelectionChange >> model_source:', model_source);
+
+      console.log('🐸 Pepe said >> handleSelectionChange >> selectedRows:', selectedRows);
 
       if (selectedRows.length === 1) {
-        const selectedRow = selectedRows[0];
+        const _userMatches =
+          !!process.env.NO_ROLES ||
+          isModelCreator(selectedRow) ||
+          isInBusinessCustomers(selectedRow);
 
-        const { model_source, status, id } = selectedRow;
-
-        const _userMatches = isModelCreator(selectedRow) || isInBusinessCustomers(selectedRow);
-
-        updateDeleteModelState(1, model_source, status, id, _userMatches);
+        updateDeleteModelState(1, model_source, status, system_model_id, _userMatches);
       } else {
         updateDeleteModelState(selectedRows.length);
       }
     };
 
     const handleColumnStateChange = () => {
-
       // if (agGridApi) {
       //   const columnState = agGridApi.getColumnState();
       //   const updatedTemplate = {
@@ -383,11 +390,9 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       //     columnState,
       //   };
       //   console.log('🐸 Pepe said >> handleColumnStateChange >> updatedTemplate:', updatedTemplate);
-
       //   setPendingTemplate(updatedTemplate as any);
       // }
     };
-
 
     const handleColumnMoved = (event: ColumnMovedEvent) => {
       handleColumnStateChange();
@@ -472,10 +477,9 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       return params.defaultItems;
     };
 
-
     const _onRowDragEnd = (e) => {
-      onRowDragEnd?.(e)
-    }
+      onRowDragEnd?.(e);
+    };
 
     return (
       <Flexbox height="calc(100vh - 230px)">
@@ -508,14 +512,16 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
                       icon={<PlusCircleSolid />}
                       tooltip="Добавить модель"
                       color="#0062FF"
-                      onClick={() => setRightPanelType(RIGHT_PANEL_TYPE.ADD_MODEL)}
+                      onClick={() => openAddModelPanel()}
                     />
                   )}
                   <IconButton
                     icon={<DeleteSolid />}
                     tooltip={deleteTooltipMessage}
                     color="#0062FF"
-                    onClick={() => setRightPanelType(RIGHT_PANEL_TYPE.DELETE_MODEL)}
+                    onClick={() => {
+                      return openDeleteModelPanel(activeRows);
+                    }}
                     disabled={!isDeleteButtonEnabled}
                   />
                   <IconButton

@@ -131,13 +131,13 @@ export const RelationsBody = (props: TreeProps & { modelId: string }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const relationsMutation = useModelsControllerGetModelWithRelations({ model_id: props.modelId });
+  const relationsQuery = useModelsControllerGetModelWithRelations({ model_id: props.modelId });
 
   const handleUpdateData = async () => {
     setLoading(true);
     setError(null);
     try {
-      const result = await relationsMutation.refetch();
+      const result = await relationsQuery.refetch();
 
       if (result.error) {
         setError('Ошибка загрузки');

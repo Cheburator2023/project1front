@@ -8,9 +8,30 @@ import { useModelsControllerCompareModels } from '@shared/api/generated/endpoint
 import { useExploitationModeStore } from '@src/shared/stores';
 
 import { initialColumns } from '@src/shared/constants';
+import styled, { css } from 'styled-components';
 import { compareValues, prepareFetchParams, processFetchData } from '../helpers';
-import { CellWrapper } from '../../AgGridTables/molecules/CustomCell';
 import { CellContentFactory } from '../../AgGridTables/molecules/CellContentFactory';
+
+export const CellWrapper = styled('div')<{ type: COLUMN_TYPE }>`
+  display: block;
+  width: 100%;
+  margin: 2px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  position: relative;
+  ${({ type }) =>
+    type === COLUMN_TYPE.NUMBER &&
+    css`
+      text-align: right;
+    `}
+
+  &:hover .actionsContainer {
+    opacity: 1;
+  }
+`;
 
 export const getQueryParams = (
   firstDate: string,
@@ -88,7 +109,12 @@ export const useCompareModels = () => {
     };
 
     processData();
-  }, [(compareModelsQuery as any).data, (compareModelsQuery as any).isFetching, columnList, compareOnlyChanged]);
+  }, [
+    (compareModelsQuery as any).data,
+    (compareModelsQuery as any).isFetching,
+    columnList,
+    compareOnlyChanged,
+  ]);
 
   useEffect(() => {
     if ((compareModelsQuery as any).error) {
@@ -120,9 +146,8 @@ export const useCompareModels = () => {
 
     const rowsToCompare = resData?.data?.cards[comparisonKey];
 
-    const backgroundColor = record?.id
-      ? // @ts-ignore
-        record.id[`${record.id}`.length - 1] === '1'
+    const backgroundColor = record?.system_model_id
+      ? record.system_model_id[`${record.system_model_id}`.length - 1] === '1'
         ? undefined
         : compareValues(rowsToCompare?.[0][field], rowsToCompare?.[1][field])
       : undefined;
@@ -172,33 +197,55 @@ export const useCompareModels = () => {
     setSearchString(newSearchString);
   };
 
-  const compareModelsTable = useMemo(() => ({
-    rowList,
-    setRowList,
-    columnList,
-    setColumnList,
-    handleSearch,
-    handleChangePage,
-    handleSubmit,
-    loading: (compareModelsQuery as any).isFetching,
-    error: (compareModelsQuery as any).error,
-    searchString,
-    setTotalRows,
-    pageSize,
-    setPageSize,
-    page,
-    setPage,
-    totalRows,
-    compareOnlyChanged,
-    setCompareOnlyChanged,
-  }), [rowList, setRowList, columnList, setColumnList, handleSearch, handleChangePage, handleSubmit, (compareModelsQuery as any).isFetching, (compareModelsQuery as any).error, searchString, setTotalRows, pageSize, setPageSize, page, setPage, totalRows, compareOnlyChanged, setCompareOnlyChanged]);
+  const compareModelsTable = useMemo(
+    () => ({
+      rowList,
+      setRowList,
+      columnList,
+      setColumnList,
+      handleSearch,
+      handleChangePage,
+      handleSubmit,
+      loading: (compareModelsQuery as any).isFetching,
+      error: (compareModelsQuery as any).error,
+      searchString,
+      setTotalRows,
+      pageSize,
+      setPageSize,
+      page,
+      setPage,
+      totalRows,
+      compareOnlyChanged,
+      setCompareOnlyChanged,
+    }),
+    [
+      rowList,
+      setRowList,
+      columnList,
+      setColumnList,
+      handleSearch,
+      handleChangePage,
+      handleSubmit,
+      (compareModelsQuery as any).isFetching,
+      (compareModelsQuery as any).error,
+      searchString,
+      setTotalRows,
+      pageSize,
+      setPageSize,
+      page,
+      setPage,
+      totalRows,
+      compareOnlyChanged,
+      setCompareOnlyChanged,
+    ],
+  );
 
   useEffect(() => {
     console.log('useCompareModels - compareModelsTable обновился:', {
       rowListLength: rowList?.length,
       totalRows,
       loading: (compareModelsQuery as any).isFetching,
-      hasError: !!(compareModelsQuery as any).error
+      hasError: !!(compareModelsQuery as any).error,
     });
   }, [compareModelsTable]);
 

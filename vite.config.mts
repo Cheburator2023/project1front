@@ -16,6 +16,9 @@ import packageJSON from './package.json';
 const publicEnvVars = ['MOCKED_REQUESTS'];
 const { STAGE } = process.env;
 const IS_DEV = process.env.NODE_ENV === 'development';
+const NO_ROLES = process.env.NO_ROLES;
+
+
 const ROOT_DIR = path.resolve(__dirname, './');
 const DIST_DIR = path.resolve(ROOT_DIR, './dist');
 const RC_STATS = (packageJSON as any)?.release_stats;
@@ -113,6 +116,7 @@ export const viteCommonConfig = ({ appName, base = '/' }: { appName?: string; ba
         'process.env.GIT_REVISION': JSON.stringify(git_revision),
         'process.env.RC_STATS': JSON.stringify(RC_STATS),
         'process.env.IS_DEV': JSON.stringify(IS_DEV),
+        'process.env.NO_ROLES': JSON.stringify(NO_ROLES),
       },
 
       // resolve: {

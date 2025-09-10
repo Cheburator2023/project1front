@@ -36,7 +36,7 @@ export const FiltersPanel = ({
   const { templates } = useTemplatesStore();
   const navigate = useNavigate();
 
-  const { compareMode, setRightPanelType, setCompareMode, modelsParams, setModelsParams } =
+  const { compareMode, setCompareMode, modelsParams, setModelsParams } =
     useModelsStore();
 
   const { refetch: refetchModels } = useModelsControllerGetModels(modelsParams, {
@@ -142,7 +142,6 @@ export const FiltersPanel = ({
         <TemplatesFilterInput
           activeTemplate={activeTemplate}
           templates={templates}
-          setRightPanelType={setRightPanelType}
         />
         {compareMode ? (
           <>

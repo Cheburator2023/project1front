@@ -13,7 +13,7 @@ import {
 
 import { ArtifactType, type Artifact, type ArtifactApi, type ArtifactValue } from '@shared/api';
 import { Column, COLUMN_TYPE, ModelSource, Role, Row } from '@shared/types';
-import { initialColumns, RIGHT_PANEL_TYPE, MODEL_FORM_MODE } from '@shared/constants';
+import { initialColumns, MODEL_FORM_MODE } from '@shared/constants';
 import {
   CommonInputProps,
   INPUT_TYPE,
@@ -1140,8 +1140,8 @@ const getParentModelOptions = (rows: Partial<Row>[]) =>
     return options;
   }, [] as SelectStringOptions);
 
-const getFormMode = (activePanelType: RIGHT_PANEL_TYPE) => {
-  if (activePanelType === RIGHT_PANEL_TYPE.EDIT_MODEL) {
+const getFormMode = (activePanelType: 'edit' | 'add') => {
+  if (activePanelType === 'edit') {
     return MODEL_FORM_MODE.EDIT;
   }
 

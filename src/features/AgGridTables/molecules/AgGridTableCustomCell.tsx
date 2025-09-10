@@ -1,7 +1,6 @@
 import { IconButton } from '@shared/ui/molecules';
 import { format } from 'date-fns';
 
-import { RIGHT_PANEL_TYPE } from '@src/shared/constants';
 import { CustomCellRendererProps } from 'ag-grid-react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
@@ -11,6 +10,9 @@ import { getLink } from '@src/features/AgGridTables/molecules/helpers';
 import { COLUMN_TYPE } from '@src/shared/types';
 import { Tooltip } from '@src/shared/ui/atoms';
 import { usePermissions } from '@src/shared/hooks';
+import { usePanelsStore } from '@src/shared/stores/panelsStore';
+
+const NO_ROLES = process.env.NO_ROLES;
 
 interface AgGridTableCustomCellParams extends CustomCellRendererProps {
   onAction: (action: any, row_system_model_id: any, columnName: any) => any;
@@ -62,17 +64,19 @@ export const AgGridTableCustomCell = (params: AgGridTableCustomCellParams) => {
   const wrapperRef = useRef<any>(null);
   const [visible, setVisible] = useState(false);
   const { isEditModelEnabled } = usePermissions();
+  const panelStore = usePanelsStore();
+
+  const { openEditModelPanel, openHistoryChangesPanel } = panelStore;
   const colName = params.colDef?.field;
 
   const noCustomCells = params?.noCustomCells;
 
   const handleActionClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     const { name }: { name?: string } = e.target as HTMLButtonElement;
-
-    if (name === 'edit') {
-      params.onAction(RIGHT_PANEL_TYPE.EDIT_MODEL, params.data.system_model_id, colName);
-    } else {
-      params.onAction(RIGHT_PANEL_TYPE.HISTORY_CHANGES, params.data.system_model_id, colName);
+    if (colName && name === 'edit') {
+      openEditModelPanel(params.data.system_model_id, colName as any);
+    } else if (colName) {
+      openHistoryChangesPanel(params.data.system_model_id, colName as any);
     }
   };
 
@@ -109,7 +113,8 @@ export const AgGridTableCustomCell = (params: AgGridTableCustomCellParams) => {
   });
 
   const editable =
-    isEditModelEnabled && !(colName === 'reason_model_delete' || colName === 'status');
+    NO_ROLES ||
+    (isEditModelEnabled && !(colName === 'reason_model_delete' || colName === 'status'));
 
   return (
     <div>

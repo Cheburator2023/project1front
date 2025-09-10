@@ -2,13 +2,14 @@ import React, { useCallback, useEffect } from 'react';
 import { ModelsResponseType } from '@src/shared/api';
 import { Column, Row } from '@src/shared/types';
 import { getISODateFormat } from '@shared/helpers';
-import { initialColumns, RIGHT_PANEL_TYPE } from '@shared/constants';
+import { initialColumns } from '@shared/constants';
 import { useDeepEffect } from '@shared/hooks/useDeepEffect';
 import {
   useFiltersStore,
   useModelsStore,
   useTemplatesStore,
   useExploitationModeStore,
+  usePanelsStore,
 } from '@src/shared/stores';
 import {
   useModelsControllerGetModels,
@@ -24,17 +25,19 @@ export const AgGridModelsTable = (props: {
   overlayNoRowsTemplate?: string;
 }) => {
   const {
-    setRightPanelType,
-    setActiveCellName,
     setRows,
-    setActiveRowId,
     modelsParams,
     setModelsParams,
   } = useModelsStore();
 
-    const {
+  const {
     modelsDownloadingDate,
   } = useFiltersStore();
+
+  const {
+    openEditModelPanel,
+    openHistoryChangesPanel,
+  } = usePanelsStore();
 
 
   const { templates, setTemplates } = useTemplatesStore();
@@ -46,6 +49,7 @@ export const AgGridModelsTable = (props: {
   const {
     data: _modelsData,
     isLoading: loadingModels,
+    isFetching: fetchingModels,
     error: modelsError,
     refetch: refetchModels,
   } = useModelsControllerGetModels(modelsParams, {
@@ -101,15 +105,17 @@ export const AgGridModelsTable = (props: {
 
   const handleClickOnActionCell = useCallback(
     (
-      action: RIGHT_PANEL_TYPE.EDIT_MODEL | RIGHT_PANEL_TYPE.HISTORY_CHANGES,
+      action: 'edit' | 'history',
       rowId: string,
       cellName: keyof Row,
     ) => {
-      setRightPanelType(action);
-      setActiveCellName(cellName);
-      setActiveRowId(rowId);
+      if (action === 'edit') {
+        openEditModelPanel(rowId, cellName);
+      } else if (action === 'history') {
+        openHistoryChangesPanel(rowId, cellName);
+      }
     },
-    [setRightPanelType, setActiveCellName, setActiveRowId],
+    [openEditModelPanel, openHistoryChangesPanel],
   );
 
   return (
@@ -120,8 +126,9 @@ export const AgGridModelsTable = (props: {
       isCompared={props.isCompared}
       handleClickOnActionCell={handleClickOnActionCell}
       error={modelsError && 'Ошибка загрузки моделей'}
-      loading={loadingModels}
+      loading={loadingModels || fetchingModels}
       overlayNoRowsTemplate={props.overlayNoRowsTemplate}
+      refetchModels={refetchModels}
     />
   );
 };

@@ -8,7 +8,7 @@ import 'ag-grid-enterprise';
 
 import { ColumnsFilter, Permission, Role } from '@shared/types';
 
-import { useUserStore, useAppInjectStore, useFetchStore } from '@src/shared/stores';
+import { useUserStore, useGlobalStore, useFetchStore } from '@src/shared/stores';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Header } from './Header';
 import { themes } from './theme/theme';
@@ -58,7 +58,7 @@ interface LayoutProps {
 const Layout = ({ children, user, protectedFetch, goToSum, onLogout }: LayoutProps) => {
   const [downloadReportStatus, setDownloadReportStatus] = useState(false);
   const [columnsFilters, setColumnsFilters] = useState<Partial<ColumnsFilter>>();
-  const { setCurrentCustomer } = useAppInjectStore();
+  const { setCurrentCustomer } = useGlobalStore();
   const { setUsername, setGroups, setRoles, setPermissions } = useUserStore();
   const { setProtectedFetch } = useFetchStore();
 

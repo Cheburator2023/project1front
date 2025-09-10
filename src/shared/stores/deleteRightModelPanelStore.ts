@@ -3,6 +3,8 @@ import { MODEL_FORM_MODE } from '../constants';
 import { useUserStore } from './userStore';
 import { Role } from '../types';
 
+const NO_ROLES = process.env.NO_ROLES;
+
 export type DeleteRightModelPanelStoreState = {
   isDeleteButtonEnabled: boolean;
   modelsCount: number;
@@ -43,9 +45,10 @@ export const useDeleteRightModelPanelStore = create<DeleteRightModelPanelStoreSt
     const isValidatorLead = hasRole(Role.VALIDATOR_LEAD);
 
     const isDeleteButtonEnabled =
-      count === 1 &&
-      source === 'sum-rm' &&
-      (isAdmin || userMatches || (isValidatorLead && !!status));
+
+      (count === 1 &&
+        source === 'sum-rm' &&
+        (!!NO_ROLES || isAdmin || userMatches || (isValidatorLead && !!status)));
 
     set({
       modelsCount: count,

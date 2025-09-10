@@ -1,4 +1,4 @@
-export { useAppInjectStore } from './appInjectStore';
+export { useGlobalStore } from './globalStore';
 export { useDeleteRightModelPanelStore } from './deleteRightModelPanelStore';
 export { useUserStore } from './userStore';
 export { useExploitationModeStore } from './exploitationModeStore';
@@ -7,4 +7,5 @@ export { useFiltersStore } from './filtersStore';
 export { useDownloadReportStore } from './downloadReportStore';
 export { useTemplatesStore } from './templatesStore';
 export { useModelsStore } from './modelsStore';
+export { usePanelsStore } from './panelsStore';
 

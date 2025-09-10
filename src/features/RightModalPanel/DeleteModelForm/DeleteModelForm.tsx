@@ -10,14 +10,17 @@ import { StatusScreen } from '@shared/ui/molecules';
 import { MODEL_FORM_MODE } from '@shared/constants';
 import { INPUT_TYPE, InputFactory, InputValue, RightPanel } from '@shared/ui/organisms';
 import { ArtifactApi } from '@shared/api';
-import { useModelsControllerUpdateModels } from '@shared/api/generated/endpoints';
+import {
+  useModelsControllerGetModels,
+  useModelsControllerUpdateModels,
+} from '@shared/api/generated/endpoints';
 import { groupBy } from 'lodash';
 import { Flexbox, Spacer } from '@shared/ui/atoms';
-import { Artifact, CustomError, ModelEditApi } from '@shared/api/types';
+import { Artifact, CustomError, ModelEditApi, ModelsResponseType } from '@shared/api/types';
 import { useDeepEffect } from '@src/shared/hooks/useDeepEffect';
 
-import { useAppInjectStore } from '@shared/stores/appInjectStore';
-import { useDeleteRightModelPanelStore } from '@src/shared/stores';
+import { useGlobalStore } from '@shared/stores/globalStore';
+import { useDeleteRightModelPanelStore, useModelsStore } from '@src/shared/stores';
 import { useScrollTo } from '@src/shared/hooks/useScrollTo';
 import { useRoles } from '@src/shared/hooks';
 import { FormValues } from '../types';
@@ -117,7 +120,7 @@ export const DeleteModelForm = ({
   onClose,
 }: DeleteModelFormProps) => {
   const updateModelsMutation = useModelsControllerUpdateModels();
-  const { currentCustomer } = useAppInjectStore();
+  const { currentCustomer } = useGlobalStore();
 
   const [values, setValues] = useState<FormValues | undefined>();
   const [invalidFields, setInvalidFields] = useState<Array<keyof Row>>([]);
@@ -133,6 +136,12 @@ export const DeleteModelForm = ({
   const [activeTab, setActiveTab] = useState<string>('1');
   const { formMode, setFormMode } = useDeleteRightModelPanelStore();
   const { isValidatorLead } = useRoles();
+
+  const { setRows, modelsParams } = useModelsStore();
+
+  const { data: _modelsData, refetch: refetchModels } = useModelsControllerGetModels(modelsParams);
+
+  const modelsData = _modelsData as ModelsResponseType | undefined;
 
   const resolutionValue = values?.lead_validator_resolution_model_delete?.value as ResolutionValue;
   const modelStatusValue = values?.status?.value as ModelStatus;
@@ -265,17 +274,25 @@ export const DeleteModelForm = ({
 
         if (system_model_id && model_source) {
           const res: any = await new Promise((resolve) => {
-             updateModelsMutation.mutate({
-               data: [{
-                 model_id: system_model_id,
-                 artefacts: artifactApiItems as any,
-                 model_source,
-               } as any]
-             }, {
-               onSuccess: (data) => resolve({ data: { data: { cards: [data] } }, error: false }),
-               onError: () => resolve({ error: true })
-             });
-           });
+            updateModelsMutation.mutate(
+              {
+                data: [
+                  {
+                    model_id: system_model_id,
+                    artefacts: artifactApiItems as any,
+                    model_source,
+                  } as any,
+                ],
+              },
+              {
+                onSuccess: (data) => {
+                  refetchModels();
+                  return resolve({ data: { data: { cards: [data] } }, error: false });
+                },
+                onError: () => resolve({ error: true }),
+              },
+            );
+          });
 
           if (!res || res.error) {
             setSubmitError('Произошла ошибка при удалении модели');
@@ -304,6 +321,12 @@ export const DeleteModelForm = ({
 
     onClose();
   }, [onClose]);
+
+  useDeepEffect(() => {
+    if (modelsData?.data?.cards) {
+      setRows(modelsData.data.cards);
+    }
+  }, [modelsData?.data?.cards]);
 
   useEffect(() => {
     if (modelStatusValue === ModelStatus.AWAITING_DELETION) {

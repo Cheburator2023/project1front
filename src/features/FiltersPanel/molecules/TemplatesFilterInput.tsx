@@ -4,11 +4,11 @@ import { Button } from '@admiral-ds/react-ui';
 import { Template } from '@shared/api';
 import { useFiltersStore } from '@shared/stores/filtersStore';
 import { SELECT_TYPE, CustomSearchSelect } from '@shared/ui/organisms';
-import { initialTopFilters, RIGHT_PANEL_TYPE } from '@shared/constants';
+import { initialTopFilters } from '@shared/constants';
 
 import { getGroupsOptions } from '../helpers';
 import { useGlobalStore } from '../../../shared/stores/globalStore';
-import { useTemplatesStore } from '../../../shared/stores';
+import { useTemplatesStore, usePanelsStore } from '../../../shared/stores';
 
 export interface TemplatesFilterInputProps {
   templates: Template[];
@@ -16,7 +16,6 @@ export interface TemplatesFilterInputProps {
   loading?: boolean;
   error?: string;
   showLabel?: boolean;
-  setRightPanelType: (newRightPanelType: RIGHT_PANEL_TYPE | null) => void;
 }
 
 export const TemplatesFilterInput = ({
@@ -25,10 +24,10 @@ export const TemplatesFilterInput = ({
   showLabel = true,
   loading = false,
   error = '',
-  setRightPanelType,
 }: TemplatesFilterInputProps) => {
   const { topFilters, setTopFilters, filterModel, setFilterModel, resetFilters } =
     useFiltersStore();
+  const { openAddTemplatePanel } = usePanelsStore();
 
   const { getIsModifiedFilter } = useFiltersStore();
   const isModifiedFilter = getIsModifiedFilter();
@@ -93,7 +92,7 @@ export const TemplatesFilterInput = ({
             Сбросить
           </Button>
         ) : (
-          <Button onClick={() => setRightPanelType(RIGHT_PANEL_TYPE.ADD_TEMPLATE)} dimension="s">
+          <Button onClick={() => openAddTemplatePanel()} dimension="s">
             Сохранить
           </Button>
         )
