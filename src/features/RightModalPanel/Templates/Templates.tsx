@@ -36,6 +36,7 @@ import {
 } from './styles';
 import { TemplateCreateDto, TemplateUpdateDto } from '../../../shared/api/generated/models';
 import { useGlobalStore } from '../../../shared/stores/globalStore';
+import { useTemplatesStore } from '../../../shared/stores/templatesStore';
 
 const options = [
   {
@@ -60,6 +61,7 @@ export const Templates = ({ templates, onClose, updateTemplates }: TemplatesProp
   const { sortState, selectedIds } = useFiltersStore();
 
   const { agGridApi } = useGlobalStore();
+  const { setPendingTemplate } = useTemplatesStore();
 
   const { isAddPublicTemplateEnabled } = usePermissions();
 
@@ -159,6 +161,7 @@ export const Templates = ({ templates, onClose, updateTemplates }: TemplatesProp
               return prevTemplates;
             });
           }
+          setPendingTemplate(undefined);
           getTemplatesQuery.refetch();
         },
         onError: handleMutationError,
@@ -199,6 +202,7 @@ export const Templates = ({ templates, onClose, updateTemplates }: TemplatesProp
               }),
             );
           }
+          setPendingTemplate(undefined);
         },
         onError: handleMutationError,
       },

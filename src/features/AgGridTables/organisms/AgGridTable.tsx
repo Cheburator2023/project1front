@@ -184,6 +184,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     const handleClickOnActionCellFromProps = handleClickOnActionCell || (() => {});
     const { filtersResetCount, setAgGridApi, agGridApi } = useGlobalStore();
     const { filterModel, topFilters, setTopFilters, setFilterModel } = useFiltersStore();
+    const { setPendingTemplate } = useTemplatesStore();
 
     const { modelsCount, modelSource, isDeleteButtonEnabled, userMatches, updateDeleteModelState } =
       useDeleteRightModelPanelStore();
@@ -404,6 +405,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
 
       if (!isDate) {
         setTopFilters?.({ ...topFilters, templates: [] });
+        setPendingTemplate?.(undefined);
       }
     };
 
