@@ -91,6 +91,9 @@ export const viteCommonConfig = ({ appName, base = '/' }: { appName?: string; ba
         checker(
           IS_DEV
             ? {
+                overlay: {
+                  initialIsOpen: false,
+                },
                 typescript: true,
                 eslint: {
                   lintCommand: 'eslint "./src/**/*.{ts,tsx}"',

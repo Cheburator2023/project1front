@@ -184,7 +184,6 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     const handleClickOnActionCellFromProps = handleClickOnActionCell || (() => {});
     const { filtersResetCount, setAgGridApi, agGridApi } = useGlobalStore();
     const { filterModel, topFilters, setTopFilters, setFilterModel } = useFiltersStore();
-    const { pendingTemplate, setPendingTemplate } = useTemplatesStore();
 
     const { modelsCount, modelSource, isDeleteButtonEnabled, userMatches, updateDeleteModelState } =
       useDeleteRightModelPanelStore();
@@ -195,52 +194,54 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     const gridRefInner = useRef<AgGridReact>(null);
     const gridRef = ref || gridRefInner;
 
-    const columnDefs: ColDef[] = columnList
-      .map((data, colIndex) => {
-        const dynamicSetFilterParams = {
-          ...setFilterParams,
-          valueFormatter: (params: any) => {
-            if (params.value === '(Пустые значения)') {
-              return '(Пустые значения)';
-            }
-            if (params.value === '(Непустые значения)') {
-              return '(Непустые значения)';
-            }
-            return params.value;
-          },
-        };
-
-        return {
-          ...data,
-          headerName: data.title,
-          field: data.name,
-          headerTooltip: data.title,
-          rowDrag: colIndex === 0 && rowDragManaged,
-          filter:
-            data.type === COLUMN_TYPE.DATE
-              ? 'agDateColumnFilter'
-              : data.type === COLUMN_TYPE.NUMBER
-              ? 'agNumberColumnFilter'
-              : 'agSetColumnFilter',
-          filterParams: data.type === COLUMN_TYPE.DATE ? dateFilterParams : dynamicSetFilterParams,
-          cellRenderer: data.cellRenderer,
-          cellClass: (params) => {
-            if (isCompared) {
-              const rowIndex = params.node.rowIndex;
-              const prevRow = params.api.getDisplayedRowAtIndex(Number(rowIndex) - 1);
-              const colId = params.column.getColId();
-              const cellValue = params.data[colId];
-              const prevRowSameCellValue = prevRow?.data[colId];
-              const sameId = params?.data?.id?.split(':')[0] === prevRow?.data?.id?.split(':')[0];
-
-              if (prevRow && sameId && prevRowSameCellValue !== cellValue) {
-                return 'ag-custom-cell-value-changed';
+    const columnDefs: ColDef[] = useMemo(() => {
+      return columnList
+        .map((data, colIndex) => {
+          const dynamicSetFilterParams = {
+            ...setFilterParams,
+            valueFormatter: (params: any) => {
+              if (params.value === '(Пустые значения)') {
+                return '(Пустые значения)';
               }
-            }
-          },
-        };
-      })
-      .filter((col) => col.name !== 'relations') as ColDef[];
+              if (params.value === '(Непустые значения)') {
+                return '(Непустые значения)';
+              }
+              return params.value;
+            },
+          };
+
+          return {
+            ...data,
+            headerName: data.title,
+            field: data.name,
+            headerTooltip: data.title,
+            rowDrag: colIndex === 0 && rowDragManaged,
+            filter:
+              data.type === COLUMN_TYPE.DATE
+                ? 'agDateColumnFilter'
+                : data.type === COLUMN_TYPE.NUMBER
+                ? 'agNumberColumnFilter'
+                : 'agSetColumnFilter',
+            filterParams: data.type === COLUMN_TYPE.DATE ? dateFilterParams : dynamicSetFilterParams,
+            cellRenderer: data.cellRenderer,
+            cellClass: (params) => {
+              if (isCompared) {
+                const rowIndex = params.node.rowIndex;
+                const prevRow = params.api.getDisplayedRowAtIndex(Number(rowIndex) - 1);
+                const colId = params.column.getColId();
+                const cellValue = params.data[colId];
+                const prevRowSameCellValue = prevRow?.data[colId];
+                const sameId = params?.data?.id?.split(':')[0] === prevRow?.data?.id?.split(':')[0];
+
+                if (prevRow && sameId && prevRowSameCellValue !== cellValue) {
+                  return 'ag-custom-cell-value-changed';
+                }
+              }
+            },
+          };
+        })
+        .filter((col) => col.name !== 'relations') as ColDef[];
+    }, [columnList, rowDragManaged, isCompared]);
 
     const defaultColDef = useMemo<ColDef>(() => {
       return {

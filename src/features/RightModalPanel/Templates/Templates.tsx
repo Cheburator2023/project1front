@@ -57,8 +57,7 @@ export interface TemplatesProps {
 }
 
 export const Templates = ({ templates, onClose, updateTemplates }: TemplatesProps) => {
-  const { filterModel, sortState, selectedIds } = useFiltersStore();
-  console.log('🐸 Pepe said >> Templates >> filterModel:', filterModel);
+  const { sortState, selectedIds } = useFiltersStore();
 
   const { agGridApi } = useGlobalStore();
 
@@ -133,6 +132,10 @@ export const Templates = ({ templates, onClose, updateTemplates }: TemplatesProp
     setError('');
 
     const columnState = agGridApi?.getColumnState();
+    const filterModel: any = agGridApi?.getFilterModel();
+    console.log('🐸 Pepe said >> handleOnAddTemplate >> filterModel:', filterModel);
+    console.log('🐸 Pepe said >> handleOnAddTemplate >> columnState:', columnState);
+
 
     const templateData: TemplateCreateDto = {
       template_name: value,
@@ -168,6 +171,8 @@ export const Templates = ({ templates, onClose, updateTemplates }: TemplatesProp
     setError('');
 
     const columnState = agGridApi?.getColumnState();
+    const filterModel: any = agGridApi?.getFilterModel();
+    
 
     const templateData: TemplateUpdateDto = {
       template_id: templateId,

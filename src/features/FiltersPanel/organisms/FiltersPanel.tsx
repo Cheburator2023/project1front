@@ -142,7 +142,7 @@ export const FiltersPanel = ({
         <TemplatesFilterInput
           activeTemplate={activeTemplate}
           templates={templates}
-          updateRightPanelType={setRightPanelType}
+          setRightPanelType={setRightPanelType}
         />
         {compareMode ? (
           <>

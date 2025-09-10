@@ -16,7 +16,7 @@ export interface TemplatesFilterInputProps {
   loading?: boolean;
   error?: string;
   showLabel?: boolean;
-  updateRightPanelType: (newRightPanelType: RIGHT_PANEL_TYPE | null) => void;
+  setRightPanelType: (newRightPanelType: RIGHT_PANEL_TYPE | null) => void;
 }
 
 export const TemplatesFilterInput = ({
@@ -25,7 +25,7 @@ export const TemplatesFilterInput = ({
   showLabel = true,
   loading = false,
   error = '',
-  updateRightPanelType,
+  setRightPanelType,
 }: TemplatesFilterInputProps) => {
   const { topFilters, setTopFilters, filterModel, setFilterModel, resetFilters } =
     useFiltersStore();
@@ -58,7 +58,7 @@ export const TemplatesFilterInput = ({
   };
 
   const { setFiltersResetCount } = useGlobalStore();
-  const { pendingTemplate, setPendingTemplate } = useTemplatesStore();
+  const { pendingTemplate } = useTemplatesStore();
 
   const handleResetFilters = () => {
     resetFilters();
@@ -93,7 +93,7 @@ export const TemplatesFilterInput = ({
             Сбросить
           </Button>
         ) : (
-          <Button onClick={() => updateRightPanelType(RIGHT_PANEL_TYPE.ADD_TEMPLATE)} dimension="s">
+          <Button onClick={() => setRightPanelType(RIGHT_PANEL_TYPE.ADD_TEMPLATE)} dimension="s">
             Сохранить
           </Button>
         )
