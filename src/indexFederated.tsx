@@ -14,6 +14,7 @@ import { ColumnsFilter, Permission, Role } from './shared/types';
 import { useFetchStore, useGlobalStore, useUserStore } from './shared/stores';
 import { CUSTOMER_MAP } from './shared/constants/customers';
 import { Flexbox, Loading } from './shared/ui/atoms';
+import { useDeepEffect } from './shared/hooks/useDeepEffect';
 
 export type MFProps = {
   urlConfig?: T_CONFIG_MAP;
@@ -34,12 +35,12 @@ const MfeRoot = (props: MFProps) => {
   const { setUsername, setGroups, setRoles, setPermissions } = useUserStore();
   const { setProtectedFetch, protectedFetch: protectedFetchFromStore } = useFetchStore();
 
-  useEffect(() => {
+  useDeepEffect(() => {
     console.log('🐸 Pepe said >> Layout >> protectedFetch:', protectedFetch);
     if (protectedFetch) {
       setProtectedFetch(protectedFetch);
     }
-  }, [protectedFetch, setProtectedFetch]);
+  }, [props, setProtectedFetch]);
 
   useEffect(() => {
     // DEV
