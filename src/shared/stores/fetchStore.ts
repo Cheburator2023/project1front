@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { ErrorResponse, SuccessResponse } from '@shared/api/types';
 
+const IS_DEV = process.env.NODE_ENV === 'development';
+
 interface FetchState {
   isLoading: boolean;
   error: string | null;
@@ -35,7 +37,11 @@ export const useFetchStore = create<FetchStore>((set, get) => ({
 
   setLoading: (loading) => set({ isLoading: loading }),
   setError: (error) => set({ error }),
-  setProtectedFetch: (fetchFn) => set({ protectedFetch: fetchFn }),
+  setProtectedFetch: (fetchFn) => {
+    console.log('🐸 Pepe said >> NEW PROTECTED FETCH:', fetchFn);
+
+    return set({ protectedFetch: fetchFn });
+  },
 
   protectedFetch: async <T, N = void>(
     routeUrl: string,

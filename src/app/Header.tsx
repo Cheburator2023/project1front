@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { format } from 'date-fns';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Keycloak from 'keycloak-js';
 import styled from 'styled-components';
 
@@ -71,8 +71,7 @@ const ActionsGroup = styled('div')`
 `;
 
 interface HeaderProps {
-  columnsFilters?: Partial<ColumnsFilter>;
-  downloadReportStatus: boolean;
+  downloadReportStatus?: boolean;
   user?: Keycloak.KeycloakTokenParsed & {
     family_name: string;
     given_name: string;
@@ -81,44 +80,17 @@ interface HeaderProps {
     };
     roles: string[];
   };
-  updateColumnsFilters: (newColumnsFilters?: Partial<ColumnsFilter>) => void;
-  updateDownloadReportStatus: React.Dispatch<React.SetStateAction<boolean>>;
   onLogout?: () => void;
-  goToSum?: () => void;
 }
 
-const Header = ({
-  columnsFilters,
-  user,
-  downloadReportStatus,
-  updateColumnsFilters,
-  updateDownloadReportStatus,
-  onLogout,
-  goToSum,
-}: HeaderProps) => {
+const Header = ({ user, downloadReportStatus, onLogout }: HeaderProps) => {
   const sumBtnRef = useRef(null);
+  const navigate = useNavigate();
   const reportMutation = useReportsControllerGetReport();
   const { agGridApi } = useGlobalStore();
   const selectedExploitationModes = useExploitationModeStore(
     (state) => state.selectedExploitationModes,
   );
-
-  // useEffect(() => {
-  //   if (columnsFilters && downloadReportStatus) {
-  //     mutationProtectedFetch<ReportApi, Blob>({
-  //       body: {
-  //         filters: columnsFilters,
-  //         mode: selectedExploitationModes,
-  //       },
-  //       fetchApiRoute: API_ROUTES.REPORT,
-  //       fetchMethod: 'POST',
-  //       fileName: `Отчёт ${format(new Date(), 'dd.MM.yyyy')}`,
-  //     })?.then(() => {
-  //       updateDownloadReportStatus(false);
-  //       updateColumnsFilters(undefined);
-  //     });
-  //   }
-  // }, [columnsFilters, downloadReportStatus, selectedExploitationModes]);
 
   const userName =
     user?.family_name && user?.given_name
@@ -134,22 +106,13 @@ const Header = ({
         </Logo>
       </Link>
       <ActionsGroup>
-        {downloadReportStatus ? (
-          <LoadingWrapper>
-            <Loading text="" spinnerSize="s" />
-          </LoadingWrapper>
-        ) : (
-          <CustomButton
-            dimension="s"
-            //  onClick={() => updateDownloadReportStatus(true)}
-            onClick={() => agGridApi?.exportDataAsExcel()}
-          >
-            <T font="Button/Button 2">Выгрузить отчет</T>
-          </CustomButton>
-        )}
+        <CustomButton dimension="s" onClick={() => agGridApi?.exportDataAsExcel()}>
+          <T font="Button/Button 2">Выгрузить отчет</T>
+        </CustomButton>
+
         <CustomButton
           ref={sumBtnRef}
-          onClick={goToSum}
+          onClick={() => navigate('/sum')}
           dimension="m"
           appearance="ghost"
           iconPlace="right"
