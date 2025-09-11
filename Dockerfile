@@ -1,7 +1,7 @@
-FROM docker.repo-ci.sfera.inno.local/sumd-docker-lib/ubi8-base-mrms-frontned:v1.0.4 as build-deps
+FROM docker.repo-ci.sfera.inno.local/sumd-docker-lib/ubi8-base-mrms-frontned:v1.0.5 as build-deps
 ### image with packages
 #FROM docker.repo-ci.sfera.inno.local/sumd-docker-lib/ubi8-base-mrms-frontned:v1.0.1 as build-deps
-#FROM nexus-ci.corp.dev.vtb/sumd-docker-lib/ubi8-python39-npm:1.2 as build-deps
+##FROM nexus-ci.corp.dev.vtb/sumd-docker-lib/ubi8-python39-npm:1.2 as build-deps
 #
 #ARG NPM_REGISTRY
 ##ARG NPM_ADMIRAL_REGISTRY
@@ -19,7 +19,7 @@ FROM docker.repo-ci.sfera.inno.local/sumd-docker-lib/ubi8-base-mrms-frontned:v1.
 #    npm config set audit false && \
 ##    npm config set @admiral-ds:registry https://${NPM_ADMIRAL_REGISTRY} && \
 ##    npm config set //${NPM_ADMIRAL_REGISTRY}:_auth ${NPM_AUTH} && \
-#    npm i --only-production --registry=https://${NPM_REGISTRY}
+#    npm i --force --only-production --registry=https://${NPM_REGISTRY}
 
 COPY . ./
 RUN npm run build
