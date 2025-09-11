@@ -27,6 +27,13 @@ interface FetchActions {
     method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
     fileName?: string,
   ) => Promise<SuccessResponse<T> | ErrorResponse>;
+  protectedFetchDev: <T, N = void>(
+    routeUrl: string,
+    params?: Record<string, string>,
+    body?: N,
+    method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
+    fileName?: string,
+  ) => Promise<SuccessResponse<T> | ErrorResponse>;
 }
 
 export type FetchStore = FetchState & FetchActions;
@@ -34,7 +41,7 @@ export type FetchStore = FetchState & FetchActions;
 export const useFetchStore = create<FetchStore>((set, get) => ({
   isLoading: false,
   error: null,
-
+  protectedFetch: undefined as any,
   setLoading: (loading) => set({ isLoading: loading }),
   setError: (error) => set({ error }),
   setProtectedFetch: (fetchFn) => {
@@ -43,7 +50,7 @@ export const useFetchStore = create<FetchStore>((set, get) => ({
     return set({ protectedFetch: fetchFn });
   },
 
-  protectedFetch: async <T, N = void>(
+  protectedFetchDev: async <T, N = void>(
     routeUrl: string,
     params?: Record<string, string>,
     body?: N,

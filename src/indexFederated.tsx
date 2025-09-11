@@ -3,11 +3,17 @@
 import { createBridgeComponent } from '@module-federation/bridge-react/v18';
 
 import { useCallback, useEffect, useState } from 'react';
+import { CircularProgress } from '@mui/material';
+import { ThemeProvider } from 'styled-components';
+import { DropdownProvider } from '@admiral-ds/react-ui';
 import App from './app/App';
+import { themes } from './app/theme/theme';
+
 import { T_CONFIG_MAP, T_KEYCLOAK_USER } from './shared/types/infra';
 import { ColumnsFilter, Permission, Role } from './shared/types';
 import { useFetchStore, useGlobalStore, useUserStore } from './shared/stores';
 import { CUSTOMER_MAP } from './shared/constants/customers';
+import { Flexbox, Loading } from './shared/ui/atoms';
 
 export type MFProps = {
   urlConfig?: T_CONFIG_MAP;
@@ -26,7 +32,7 @@ const MfeRoot = (props: MFProps) => {
 
   const { setCurrentCustomer } = useGlobalStore();
   const { setUsername, setGroups, setRoles, setPermissions } = useUserStore();
-  const { setProtectedFetch } = useFetchStore();
+  const { setProtectedFetch, protectedFetch: protectedFetchFromStore } = useFetchStore();
 
   useEffect(() => {
     console.log('🐸 Pepe said >> Layout >> protectedFetch:', protectedFetch);
@@ -76,12 +82,17 @@ const MfeRoot = (props: MFProps) => {
   }, [user?.roles, user?.realm_access, setCurrentCustomer]);
 
   return (
-    <App
-      {...props}
-      bridged
-      user={user}
-      onLogout={onLogout}
-    />
+    <ThemeProvider theme={themes.light}>
+      <DropdownProvider>
+        {(protectedFetchFromStore as any) ? (
+          <Flexbox justifyContent="center" alignItems="center" width="100%" height="100%">
+            <Loading text="Загрузка mfe свойств..." />
+          </Flexbox>
+        ) : (
+          <App {...props} bridged user={user} onLogout={onLogout} />
+        )}
+      </DropdownProvider>
+    </ThemeProvider>
   );
 };
 

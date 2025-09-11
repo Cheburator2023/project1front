@@ -12,7 +12,9 @@ export const customInstance = async <T>(config: {
   responseType?: string;
   signal?: AbortSignal;
 }): Promise<T> => {
-  const { protectedFetch } = useFetchStore.getState();
+  const { protectedFetch, protectedFetchDev } = useFetchStore.getState();
+
+  const fetchFn = IS_DEV ? protectedFetchDev : protectedFetch;
 
   console.log('🐸 Pepe said >> customInstance >> method:', config);
 
@@ -27,7 +29,7 @@ export const customInstance = async <T>(config: {
       )
     : undefined;
 
-  const response = await protectedFetch<T>(
+  const response = await fetchFn<T>(
     `${API_PREFIX}${config.url}`,
     queryParams,
     config.data as any,

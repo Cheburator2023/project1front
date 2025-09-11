@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React from 'react';
 import styled, { createGlobalStyle, ThemeProvider } from 'styled-components';
 import { DropdownProvider } from '@admiral-ds/react-ui';
 import Keycloak from 'keycloak-js';
@@ -6,16 +6,11 @@ import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 import 'ag-grid-enterprise';
 
-import { ColumnsFilter, Permission, Role } from '@shared/types';
+import { ColumnsFilter } from '@shared/types';
 
-import { useUserStore, useGlobalStore, useFetchStore } from '@src/shared/stores';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
-import { GlobalStyles } from '@mui/material';
 import { Header } from './Header';
-import { themes } from './theme/theme';
-
-import { CUSTOMER_MAP } from '../shared/constants/customers';
 import RoutesComponent from './Routes';
 
 const GIT_REVISION = process.env.GIT_REVISION;
@@ -70,8 +65,6 @@ const App = ({ user, onLogout }: AppProps) => {
       <div id="portal-root" />
       <BrowserRouter basename={IS_DEV ? '/' : 'sum-rm'}>
         <QueryClientProvider client={queryClient}>
-          <ThemeProvider theme={themes.light}>
-            <DropdownProvider>
               <GlobalStyle />
               <Container>
                 <Header user={user} onLogout={onLogoutHandler} />
@@ -79,8 +72,6 @@ const App = ({ user, onLogout }: AppProps) => {
                   <RoutesComponent />
                 </RoutesWrapper>
               </Container>
-            </DropdownProvider>
-          </ThemeProvider>
         </QueryClientProvider>
       </BrowserRouter>
     </div>
