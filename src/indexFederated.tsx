@@ -85,7 +85,7 @@ const MfeRoot = (props: MFProps) => {
   return (
     <ThemeProvider theme={themes.light}>
       <DropdownProvider>
-        {(protectedFetchFromStore as any) ? (
+        {(!protectedFetchFromStore as any) ? (
           <Flexbox justifyContent="center" alignItems="center" width="100%" height="100%">
             <Loading text="Загрузка mfe свойств..." />
           </Flexbox>
