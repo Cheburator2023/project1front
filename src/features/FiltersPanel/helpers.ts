@@ -16,7 +16,10 @@ export const getGroupsOptions = (templates: Template[]): SelectTemplatesOptions 
       .map((template) => ({
         value: String(template.template_id),
         text: template.template_name,
-        filtersCount: template.filterModel ? Object.values(template.filterModel).length : 0,
+        filtersCount:
+          Object.values(template.sortState ? template.sortState : {}).length +
+          Object.values(template.filterModel ? template.filterModel : {}).length,
       })),
   }));
 };
+
