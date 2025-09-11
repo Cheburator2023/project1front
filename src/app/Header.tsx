@@ -112,7 +112,9 @@ const Header = ({ user, downloadReportStatus, onLogout }: HeaderProps) => {
 
         <CustomButton
           ref={sumBtnRef}
-          onClick={() => navigate('/sum')}
+          onClick={() => {
+            window.location.href = '/sum';
+          }}
           dimension="m"
           appearance="ghost"
           iconPlace="right"
