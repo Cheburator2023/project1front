@@ -84,9 +84,6 @@ interface HeaderProps {
 }
 
 const Header = ({ user, downloadReportStatus, onLogout }: HeaderProps) => {
-  const sumBtnRef = useRef(null);
-  const navigate = useNavigate();
-  const reportMutation = useReportsControllerGetReport();
   const { agGridApi } = useGlobalStore();
   const selectedExploitationModes = useExploitationModeStore(
     (state) => state.selectedExploitationModes,
@@ -111,7 +108,7 @@ const Header = ({ user, downloadReportStatus, onLogout }: HeaderProps) => {
         </CustomButton>
 
         <CustomButton
-          ref={sumBtnRef}
+          title="Перейти в СУМ"
           onClick={() => {
             window.location.href = '/sum';
           }}
@@ -122,7 +119,6 @@ const Header = ({ user, downloadReportStatus, onLogout }: HeaderProps) => {
         >
           <T font="Button/Button 2">СУМ</T>
         </CustomButton>
-        <Tooltip targetRef={sumBtnRef as any} title="Перейти в СУМ" />
         <Avatar
           dimension="xs"
           showTooltip

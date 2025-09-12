@@ -118,32 +118,33 @@ export const AgGridTableCustomCell = (params: AgGridTableCustomCellParams) => {
 
   return (
     <div>
-      <Wrapper ref={wrapperRef}>
+      <Wrapper title={params.value}>
         <div className="ag-custom-cell-value">{value || ''}</div>
         {!noCustomCells && (
           <div className="actionButtons">
-            <ActionBtn
-              name="historyChanges"
-              dimension="s"
-              color="#0062FF"
-              icon={<CalendarUpdateOutline />}
-              tooltip="История изменений"
-              onClick={handleActionClick}
-            />
-            {editable && (
+            <div title="История изменений">
               <ActionBtn
-                name="edit"
+                name="historyChanges"
                 dimension="s"
                 color="#0062FF"
-                icon={<EditOutline />}
-                tooltip="Редактировать"
+                icon={<CalendarUpdateOutline />}
                 onClick={handleActionClick}
               />
+            </div>
+            {editable && (
+              <div title="Редактировать">
+                <ActionBtn
+                  name="edit"
+                  dimension="s"
+                  color="#0062FF"
+                  icon={<EditOutline />}
+                  onClick={handleActionClick}
+                />
+              </div>
             )}
           </div>
         )}
       </Wrapper>
-      <Tooltip targetRef={wrapperRef} title={params.value} />
     </div>
   );
 };

@@ -29,6 +29,7 @@ export const IconButton = ({
   return (
     <div
       ref={iconRef}
+      title={tooltip}
       onMouseEnter={() => setTooltipVisible(true)}
       onMouseLeave={() => setTooltipVisible(false)}
       style={{ display: 'inline-block' }}
@@ -43,7 +44,6 @@ export const IconButton = ({
       >
         {icon}
       </IconPlacement>
-      {tooltip && isTooltipVisible && <Tooltip targetRef={iconRef as any} title={tooltip} />}
     </div>
   );
 };

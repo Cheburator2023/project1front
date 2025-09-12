@@ -48,10 +48,9 @@ export const CustomOption = React.memo(({ text, checked, onChange, style }: Opti
     <Container key={text} style={style}>
       <Checkbox dimension="s" onChange={onChange} checked={checked} />
 
-      <Label ref={textRef} font="Body/Body 2 Long" as="div">
+      <Label ref={textRef} font="Body/Body 2 Long" as="div" title={text}>
         {text}
       </Label>
-      <Tooltip showOnOverflowOnly targetRef={textRef as any} title={text} />
     </Container>
   );
 });

@@ -364,11 +364,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
 
       const selectedRow: Partial<Row> = selectedRows[0];
 
-      const { model_source, status, system_model_id } = selectedRow;
-
-      console.log('🐸 Pepe said >> handleSelectionChange >> model_source:', model_source);
-
-      console.log('🐸 Pepe said >> handleSelectionChange >> selectedRows:', selectedRows);
+      const { model_source, status, system_model_id } = selectedRow || {};
 
       if (selectedRows.length === 1) {
         const _userMatches =

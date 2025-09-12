@@ -27,10 +27,13 @@ export const TemplatesFilterInput = ({
 }: TemplatesFilterInputProps) => {
   const { topFilters, setTopFilters, filterModel, setFilterModel, resetFilters } =
     useFiltersStore();
+
   const { openAddTemplatePanel } = usePanelsStore();
 
   const { getIsModifiedFilter } = useFiltersStore();
   const isModifiedFilter = getIsModifiedFilter();
+
+  const [dropdownOpen, setDropdownOpen] = React.useState(false);
 
   const groupedOptions = useMemo(() => {
     if (templates) {
@@ -63,6 +66,12 @@ export const TemplatesFilterInput = ({
     resetFilters();
     setTopFilters({ ...topFilters, templates: [] });
     setFiltersResetCount();
+    setDropdownOpen(false);
+  };
+
+  const handleOpenAddTemplatePanel = () => {
+    openAddTemplatePanel();
+    setDropdownOpen(false);
   };
 
   const dynamicKeyForRenderSelect = templates[templates.length - 1]?.template_name;
@@ -86,13 +95,15 @@ export const TemplatesFilterInput = ({
       onChange={handleChange}
       modified={isModifiedFilter}
       pendingTemplate={pendingTemplate}
+      forcedOpen={dropdownOpen}
+      onChangeDropDownState={(isOpen) => setDropdownOpen(isOpen)}
       renderDropDownBottomPanel={() =>
-        activeTemplate ? (
+        topFilters.templates.length ? (
           <Button onClick={handleResetFilters} dimension="s" appearance="secondary">
             Сбросить
           </Button>
         ) : (
-          <Button onClick={() => openAddTemplatePanel()} dimension="s">
+          <Button onClick={handleOpenAddTemplatePanel} dimension="s">
             Сохранить
           </Button>
         )

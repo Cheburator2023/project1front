@@ -54,11 +54,14 @@ export interface SearchSelectProps {
   modified?: boolean;
   selectType?: INPUT_TYPE;
   pendingTemplate?: Template;
+  onChangeDropDownState?: (isOpen: boolean) => void;
+  forcedOpen?: boolean;
 }
 
 export const SearchSelect = ({
   name,
   onChange,
+  forcedOpen: _forcedOpen,
   options: initialOptions,
   autoFocus,
   className,
@@ -84,6 +87,7 @@ export const SearchSelect = ({
   renderDropDownBottomPanel,
   onAddNewOption,
   pendingTemplate,
+  onChangeDropDownState,
 }: SearchSelectProps) => {
   const [addedOptions, setAddedOptions] = useState<SelectOption[]>([]);
 
@@ -114,7 +118,7 @@ export const SearchSelect = ({
 
   const [searchValue, setSearchValue] = useState('');
 
-  const [forcedOpen, setForcedOpen] = useState(false);
+  const [forcedOpen, setForcedOpen] = useState(_forcedOpen);
 
   useDeepEffect(() => {
     let newOptions = options;
@@ -270,6 +274,8 @@ export const SearchSelect = ({
     ?.flatMap((group) => group?.options)
     ?.find((option) => option?.value === selectedValues?.[0])?.text;
 
+  console.log('🐸 Pepe said >> SearchSelect >> _forcedOpen:', _forcedOpen);
+
   return (
     <div
       className={className}
@@ -291,7 +297,7 @@ export const SearchSelect = ({
           autoFocus={autoFocus}
           maxRowCount={maxRowCount}
           className="searchSelect"
-          forcedOpen={forcedOpen}
+          forcedOpen={_forcedOpen ?? forcedOpen}
           value={selectedValues || ''}
           multiple={multiple}
           onChange={handleChange}
@@ -301,7 +307,10 @@ export const SearchSelect = ({
           isLoading={loading}
           status={error ? 'error' : undefined}
           readOnly={loading}
-          onChangeDropDownState={setForcedOpen}
+          onChangeDropDownState={(isOpen) => {
+            setForcedOpen(isOpen);
+            onChangeDropDownState?.(isOpen);
+          }}
           placeholder={getPlaceholder(loading, error)}
           dropContainerCssMixin={DropContainerCssMixin}
           showCheckbox={false}
