@@ -7,19 +7,23 @@ export const getGroupsOptions = (templates: Template[]): SelectTemplatesOptions 
   return <
     Array<{
       text: string;
-      options: Array<SelectOption & { filtersCount: number }>;
+      options: Array<SelectOption & { filtersCount: number; activeCols: number }>;
     }>
   >templatesGroups?.map((groupName) => ({
     text: groupName,
     options: templates
       .filter((template) => template.group_label === groupName)
-      .map((template) => ({
-        value: String(template.template_id),
-        text: template.template_name,
-        filtersCount:
-          (template.sortState ? template.sortState : []).length +
-          Object.values(template.filterModel ? template.filterModel : {}).length,
-      })),
+      .map((template) => {
+        const filtersCount = Object.values(template.filterModel ? template.filterModel : {}).length;
+        const activeCols = (template.columnState ? template.columnState : []).length;
+
+        return {
+          value: String(template.template_id),
+          text: template.template_name,
+          filtersCount,
+          activeCols,
+        };
+      }),
   }));
 };
 

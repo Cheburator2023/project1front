@@ -65,11 +65,12 @@ export const OptionsFactory = React.memo(
           <>
             {groups.map((group, index) => (
               <OptionGroup key={`${group.text}-${index + 1}`} label={group.text}>
-                {group.options.map(({ value, text, filtersCount }) => (
+                {group.options.map(({ value, text, filtersCount, activeCols }) => (
                   <Option key={value} value={value}>
                     <TextWrapper>
                       {text}
                       <span>Фильтров в шаблоне: {filtersCount}</span>
+                      <span>Активных колонок: {activeCols}</span>
                     </TextWrapper>
                   </Option>
                 ))}
