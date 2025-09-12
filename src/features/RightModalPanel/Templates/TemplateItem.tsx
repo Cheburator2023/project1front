@@ -129,7 +129,7 @@ export const TemplateItem = ({
             <T font="Body/Body 2 Short">{template.template_name}</T>
             <T font="Caption/Caption 1" color="Neutral/Neutral 50">
               Фильтров:{' '}
-              {Object.values(template.sortState ? template.sortState : {}).length +
+              {(template.sortState ? template.sortState : []).length +
                 Object.values(template.filterModel ? template.filterModel : {}).length}
             </T>
           </Content>

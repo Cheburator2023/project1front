@@ -17,7 +17,7 @@ export const getGroupsOptions = (templates: Template[]): SelectTemplatesOptions 
         value: String(template.template_id),
         text: template.template_name,
         filtersCount:
-          Object.values(template.sortState ? template.sortState : {}).length +
+          (template.sortState ? template.sortState : []).length +
           Object.values(template.filterModel ? template.filterModel : {}).length,
       })),
   }));

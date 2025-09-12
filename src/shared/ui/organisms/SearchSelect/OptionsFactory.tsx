@@ -69,7 +69,7 @@ export const OptionsFactory = React.memo(
                   <Option key={value} value={value}>
                     <TextWrapper>
                       {text}
-                      <span>Фильтров: {filtersCount}</span>
+                      <span>Фильтров в шаблоне: {filtersCount}</span>
                     </TextWrapper>
                   </Option>
                 ))}
