@@ -37,6 +37,7 @@ import {
 import { TemplateCreateDto, TemplateUpdateDto } from '../../../shared/api/generated/models';
 import { useGlobalStore } from '../../../shared/stores/globalStore';
 import { useTemplatesStore } from '../../../shared/stores/templatesStore';
+import { initialTopFilters } from '../../../shared/constants';
 
 const options = [
   {
@@ -58,13 +59,12 @@ export interface TemplatesProps {
 }
 
 export const Templates = ({ templates, onClose, updateTemplates }: TemplatesProps) => {
-  const { sortState, selectedIds } = useFiltersStore();
+  const { sortState, selectedIds, setTopFilters } = useFiltersStore();
 
   const { agGridApi } = useGlobalStore();
   const { setPendingTemplate } = useTemplatesStore();
 
   const { isAddPublicTemplateEnabled } = usePermissions();
-
   const createTemplateMutation = useTemplatesControllerCreateTemplate();
   const updateTemplateMutation = useTemplatesControllerUpdateTemplate();
   const deleteTemplateMutation = useTemplatesControllerDeleteTemplate();
@@ -108,9 +108,18 @@ export const Templates = ({ templates, onClose, updateTemplates }: TemplatesProp
     getNewTemplates?: (templates: Template[], responseTemplate?: Template) => Template[],
   ) => {
     if (getNewTemplates) {
-      updateTemplates((prevTemplates: Template[]) =>
-        getNewTemplates(prevTemplates, responseTemplate),
-      );
+      updateTemplates((prevTemplates: Template[]) => {
+        const newTemplates = getNewTemplates?.(prevTemplates, responseTemplate);
+
+        const result = {
+          ...initialTopFilters,
+          templates: [String(responseTemplate?.template_id)],
+        };
+
+        setTopFilters(result);
+
+        return newTemplates;
+      });
       setFilteredTemplates(() => getNewTemplates(templates, responseTemplate));
     }
     setValue('');
@@ -137,7 +146,6 @@ export const Templates = ({ templates, onClose, updateTemplates }: TemplatesProp
     const filterModel: any = agGridApi?.getFilterModel();
     console.log('🐸 Pepe said >> handleOnAddTemplate >> filterModel:', filterModel);
     console.log('🐸 Pepe said >> handleOnAddTemplate >> columnState:', columnState);
-
 
     const templateData: TemplateCreateDto = {
       template_name: value,
@@ -175,7 +183,6 @@ export const Templates = ({ templates, onClose, updateTemplates }: TemplatesProp
 
     const columnState = agGridApi?.getColumnState();
     const filterModel: any = agGridApi?.getFilterModel();
-    
 
     const templateData: TemplateUpdateDto = {
       template_id: templateId,
