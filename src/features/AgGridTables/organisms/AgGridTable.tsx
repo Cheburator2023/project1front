@@ -35,6 +35,7 @@ import { useNavigate } from 'react-router-dom';
 import { Column, COLUMN_TYPE, Row } from '@src/shared/types';
 import { Template } from '@src/shared/api/types';
 import styled from 'styled-components';
+import { isEmpty } from 'lodash';
 import { AgGridTableCustomCell } from '../molecules/AgGridTableCustomCell';
 import { AG_GRID_LOCALE_RU } from '../../../app/agGridLocale.ru';
 import { useDeleteRightModelPanelStore, usePanelsStore } from '../../../shared/stores';
@@ -391,23 +392,87 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     };
 
     const handleColumnMoved = (event: ColumnMovedEvent) => {
+      if (event.source === 'api') return;
+
+      // * Если есть изменение порядка столбцов (главная талица, панель шаблонов после сохранения pending шаблона), то шаблон сбрасывается до “Шаблон не активен”
+      setTopFilters?.({ ...topFilters, templates: [] });
+
       handleColumnStateChange();
     };
 
-    const handleFilterChange = (event: FilterChangedEvent): void => {
+    const handleSortChanged = (event: SortChangedEvent) => {
+      // // Проверяем, нужно ли сбросить активный шаблон при изменении сортировки
+      // // Используем setTimeout чтобы дать AgGrid время обновить состояние
+      // setTimeout(() => {
+      //   if (shouldResetActiveTemplate?.()) {
+      //     setTopFilters?.({ ...topFilters, templates: [] });
+      //     setPendingTemplate?.(undefined);
+      //   }
+      // }, 0);
+
+      // Вызываем внешний обработчик, если он передан
+      onSortChanged?.(event);
+    };
+
+    const currentTemplate = templates?.find(
+      ({ template_id }) => String(template_id) === topFilters?.templates?.[0],
+    );
+
+    const handleFilterChange = async (event: FilterChangedEvent): Promise<void> => {
       if (event.source === 'api') return;
-      const _filterModel = event.api.getFilterModel();
 
-      setFilterModel(_filterModel);
-
+      const filterModelPending = event.api.getFilterModel();
+      const filterModelCountPending = Object.keys(filterModelPending).length;
+      const filterModelCount = Object.keys(currentTemplate?.filterModel || {}).length;
       const colName: string = event?.columns[0]?.getColId();
       const colDef: any = event.api.getColumnFilterModel(colName);
       const isDate = colDef?.filterType === 'date';
+      // @ts-ignore
+      const currentTempleteFilterVals = currentTemplate?.filterModel?.[colName]?.values;
+      const allColDataFromRows = rowList.map((row) => row[colName]);
+      const isColDefaultNonFiltered =
+        JSON.stringify(allColDataFromRows) === JSON.stringify(currentTempleteFilterVals) ||
+        isEmpty(currentTempleteFilterVals);
 
-      if (!isDate) {
+      const wasInitialyFiltered =
+        !isColDefaultNonFiltered && colName in (currentTemplate?.filterModel || {});
+
+      const hasNewColInFilter = filterModelCountPending > filterModelCount;
+      const hasSameColNumberInFilter = filterModelCountPending === filterModelCount;
+      const hasRemovedColInFilter = filterModelCountPending < filterModelCount;
+      const hasChangesInFilter =
+        JSON.stringify(filterModelPending) !== JSON.stringify(currentTemplate?.filterModel || {});
+
+      setFilterModel(filterModelPending);
+
+      // * Если я добавляю новый атрибут в набор фильтра, то шаблон остается активным
+      if (hasNewColInFilter) {
+        console.log('🐸 Pepe said -- 1.');
+        return undefined;
+      }
+
+      // * Если я добавляю сортирвоку/фильтрацию на атрибут (колонку) в шаблоне, на котором нет сортировки или фильтрации, то шаблон не сбрасывается. То есть расширение шаблона не сбрасывает шаблон
+      if (!currentTempleteFilterVals && hasSameColNumberInFilter) {
+        console.log('🐸 Pepe said -- 2.');
+        return undefined;
+      }
+
+      // * Если я удаляю атрибут из набора фильтра (в таблице или после применения шаблона через панель фильтров), который входит в шаблон, то шаблон сбрасывается до “Шаблон не активен”
+      if (hasRemovedColInFilter) {
+        console.log('🐸 Pepe said -- 3.');
         setTopFilters?.({ ...topFilters, templates: [] });
         setPendingTemplate?.(undefined);
+        return undefined;
       }
+
+      // * Если я добавляю сортировку/фильтрацию на атрибут в шаблоне, на котором уже есть сортировка или фильтрация, шаблон сбрасывается до “Шаблон не активен”
+      if (wasInitialyFiltered && hasChangesInFilter) {
+        console.log('🐸 Pepe said -- 4.');
+        setTopFilters?.({ ...topFilters, templates: [] });
+        setPendingTemplate?.(undefined);
+        return undefined;
+      }
+      console.log('🐸 Pepe said -- 5.');
     };
 
     const clearFilters = () => {
@@ -565,7 +630,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
               tooltipShowDelay={500}
               getContextMenuItems={getContextMenuItems}
               onRowDragMove={onRowDragMove}
-              // onSortChanged={handleSortChanged}
+              onSortChanged={handleSortChanged}
               onRowSelected={onRowSelected}
               onFirstDataRendered={_onFirstDataRendered}
               onRowDataUpdated={onRowDataUpdated}

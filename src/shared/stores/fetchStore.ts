@@ -45,8 +45,6 @@ export const useFetchStore = create<FetchStore>((set, get) => ({
   setLoading: (loading) => set({ isLoading: loading }),
   setError: (error) => set({ error }),
   setProtectedFetch: (fetchFn) => {
-    console.log('🐸 Pepe said >> NEW PROTECTED FETCH:', fetchFn);
-
     return set({ protectedFetch: fetchFn });
   },
 
@@ -58,8 +56,6 @@ export const useFetchStore = create<FetchStore>((set, get) => ({
     fileName?: string,
   ): Promise<SuccessResponse<T> | ErrorResponse> => {
     const { setLoading, setError } = get();
-
-    console.log('🐸 Pepe said >> config:', method);
 
     try {
       setLoading(true);

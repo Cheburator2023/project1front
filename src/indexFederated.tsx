@@ -36,7 +36,6 @@ const MfeRoot = (props: MFProps) => {
   const { setProtectedFetch, protectedFetch: protectedFetchFromStore } = useFetchStore();
 
   useDeepEffect(() => {
-    console.log('🐸 Pepe said >> Layout >> protectedFetch:', protectedFetch);
     if (protectedFetch) {
       setProtectedFetch(protectedFetch);
     }

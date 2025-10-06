@@ -274,8 +274,6 @@ export const SearchSelect = ({
     ?.flatMap((group) => group?.options)
     ?.find((option) => option?.value === selectedValues?.[0])?.text;
 
-  console.log('🐸 Pepe said >> SearchSelect >> _forcedOpen:', _forcedOpen);
-
   return (
     <div
       className={className}

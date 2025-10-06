@@ -42,7 +42,6 @@ export const BiSyncInterface: React.FC<BiSyncInterfaceProps> = ({
       setSyncLogs((prev) => [...prev, '🚀 Начало синхронизации BI витрины моделей...']);
 
       const response: any = await syncModelsMutation.mutateAsync();
-      console.log('🐸 Pepe said >> handleSyncModelsDatamart >> response:', response);
 
 
       if (response && !syncModelsMutation.isError) {
@@ -114,8 +113,7 @@ export const BiSyncInterface: React.FC<BiSyncInterfaceProps> = ({
       setSyncLogs((prev) => [...prev, '🚀 Начало синхронизации BI витрины задач...']);
 
       const response: any = await syncTasksMutation.mutateAsync();
-      console.log('🐸 Pepe said >> handleSyncTasksDatamart >> response:', response);
-
+    
 
       if (response && !syncTasksMutation.isError) {
         const data = response as any;

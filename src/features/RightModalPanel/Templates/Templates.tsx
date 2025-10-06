@@ -144,9 +144,7 @@ export const Templates = ({ templates, onClose, updateTemplates }: TemplatesProp
 
     const columnState = agGridApi?.getColumnState();
     const filterModel: any = agGridApi?.getFilterModel();
-    console.log('🐸 Pepe said >> handleOnAddTemplate >> filterModel:', filterModel);
-    console.log('🐸 Pepe said >> handleOnAddTemplate >> columnState:', columnState);
-
+  
     const templateData: TemplateCreateDto = {
       template_name: value,
       public: id === 'public',

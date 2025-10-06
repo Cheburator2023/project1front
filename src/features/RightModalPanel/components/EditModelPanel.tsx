@@ -24,16 +24,7 @@ export const EditModelPanel = ({
   onSubmit,
 }: EditModelPanelProps) => {
   if (!isOpen || !activeRow || !editCellName || !rows || !artifacts) {
-    console.log('🐸 Pepe said >> EditModelPanel >> isOpen:', isOpen);
-
-    console.log('🐸 Pepe said >> EditModelPanel >> activeRow:', activeRow);
-
-    console.log('🐸 Pepe said >> EditModelPanel >> editCellName:', editCellName);
-
-    console.log('🐸 Pepe said >> EditModelPanel >> rows:', rows);
-
-    console.log('🐸 Pepe said >> EditModelPanel >> artifacts:', artifacts);
-    return null;
+   return null;
   }
 
   return (

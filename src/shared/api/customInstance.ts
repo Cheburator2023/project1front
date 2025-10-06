@@ -16,8 +16,6 @@ export const customInstance = async <T>(config: {
 
   const fetchFn = IS_DEV ? protectedFetchDev : protectedFetch;
 
-  console.log('🐸 Pepe said >> customInstance >> method:', config);
-
   const queryParams = config.params
     ? Object.fromEntries(
         Object.entries(config.params).map(([key, value]) => {
