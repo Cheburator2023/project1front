@@ -34,8 +34,10 @@ const initSelectedValues = (filterValues: any) => {
 
 export const MSelectCellRenderer = ({ data }: any) => {
   const updateColumnFilter = useTemplateFiltersModalStoreSelected.use.updateColumnFilter();
+  const isEditMode = useTemplateFiltersModalStoreSelected.use.isEditMode();
 
   const { colOptionsMap } = useModelsStore();
+  const readOnly = !isEditMode;
   const [selectedValues, setSelectedValues] = useState<string[]>(
     initSelectedValues(data.filterValues),
   );
@@ -62,7 +64,7 @@ export const MSelectCellRenderer = ({ data }: any) => {
     setSelectedValues(newSelectedValues);
   };
 
-  const handleApplyButtonClick = () => {
+  const handleApply = () => {
     const processedValues: any[] = selectedValues.map((value) => {
       if (value === '(Пустые значения)') {
         return null;
@@ -96,6 +98,14 @@ export const MSelectCellRenderer = ({ data }: any) => {
     }));
   }, [colOptionsMap, data.colId]);
 
+  useEffect(() => {
+    if (!hasChanges) return;
+
+    setTimeout(() => {
+      handleApply();
+    }, 100);
+  }, [hasChanges]);
+
   return (
     <MSelectWrapper style={{ width: '100%', padding: '8px 0' }}>
       <MultiSearchSelect
@@ -103,11 +113,11 @@ export const MSelectCellRenderer = ({ data }: any) => {
         value={selectedValues}
         onChange={handleChange}
         placeholder="Выберите значения"
-        isDisabled={!data.isActive || !options.length}
+        isDisabled={!data.isActive || !options.length || readOnly}
         isLoading={!shouldRenderOptions}
         maxMenuHeight={200}
       />
-      {hasChanges && (
+      {/* {hasChanges && (
         <div style={{ marginTop: '8px', display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
           <Button dimension="s" appearance="secondary" onClick={handleCancelButtonClick}>
             Отменить
@@ -116,7 +126,7 @@ export const MSelectCellRenderer = ({ data }: any) => {
             Применить
           </Button>
         </div>
-      )}
+      )} */}
     </MSelectWrapper>
   );
 };

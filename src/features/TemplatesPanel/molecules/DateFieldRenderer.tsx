@@ -2,10 +2,17 @@ import { useState, useEffect } from 'react';
 import { Button, Select, Option, DateField } from '@admiral-ds/react-ui';
 import { format, parse, isValid } from 'date-fns';
 import ru from 'date-fns/locale/ru/index.js';
-import { useTemplateFiltersModalStore, useTemplateFiltersModalStoreSelected } from '../stores/templateFiltersModalStore';
+import styled from 'styled-components';
+import {
+  useTemplateFiltersModalStore,
+  useTemplateFiltersModalStoreSelected,
+} from '../stores/templateFiltersModalStore';
 
 export const DateFieldRenderer = ({ data }: any) => {
   const updateColumnFilter = useTemplateFiltersModalStoreSelected.use.updateColumnFilter();
+  const isEditMode = useTemplateFiltersModalStoreSelected.use.isEditMode();
+  
+  const readOnly = !isEditMode;
 
   const initializeDateValue = () => {
     if (!data.filterValues || data.filterValues.length === 0) return '';
@@ -81,7 +88,7 @@ export const DateFieldRenderer = ({ data }: any) => {
     setDateValue(inputValue);
   };
 
-  const handleApplyButtonClick = () => {
+  const handleApply = () => {
     if (!dateValue) {
       updateColumnFilter(data.colId, {
         filterValues: [],
@@ -130,48 +137,67 @@ export const DateFieldRenderer = ({ data }: any) => {
 
   const hasChanges = dateValue !== initialDateValue || filterType !== initialFilterType;
 
+  useEffect(() => {
+    if (!hasChanges) return;
+
+    setTimeout(() => {
+      handleApply();
+    }, 100);
+  }, [hasChanges]);
+
   return (
     <div
       style={{
         width: '100%',
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'row',
         gap: '8px',
         padding: '8px 0',
       }}
     >
       <Select
-        disabled={!data.isActive}
+        disabled={!data.isActive || readOnly}
         value={filterType}
         onChange={handleFilterTypeChange}
         dimension="s"
-        style={{ width: '100%' }}
+        readOnly={readOnly}
       >
         <Option value="equals">Равно</Option>
         <Option value="isRange">Диапазон</Option>
       </Select>
 
-      <DateField
-        type={filterType === 'isRange' ? 'date-range' : 'date'}
-        disabled={!data.isActive}
-        value={dateValue}
-        onChange={handleDateChange}
-        placeholder={filterType === 'equals' ? 'Выберите дату' : 'Выберите диапазон'}
-        style={{ width: '100%' }}
-        dimension="s"
-        displayClearIcon
-      />
+      <DateFieldWrapper>
+        <DateField
+          readOnly={readOnly}
+          type={filterType === 'isRange' ? 'date-range' : 'date'}
+          disabled={!data.isActive || readOnly}
+          value={dateValue}
+          onChange={handleDateChange}
+          placeholder={filterType === 'equals' ? 'Выберите дату' : 'Выберите диапазон'}
+          style={{ width: '100%' }}
+          dimension="s"
+          displayClearIcon
+        />
+      </DateFieldWrapper>
 
-      {hasChanges && (
+      {/* {hasChanges && (
         <Button
           dimension="s"
-          onClick={handleApplyButtonClick}
+          onClick={handleApply}
           disabled={!data.isActive}
           style={{ width: '100%' }}
         >
           Применить
         </Button>
-      )}
+      )} */}
     </div>
   );
 };
+
+const DateFieldWrapper = styled('div')`
+  width: 100%;
+  * > {
+    width: 100%;
+  }
+`;
+

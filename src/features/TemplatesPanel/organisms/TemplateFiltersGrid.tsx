@@ -13,12 +13,12 @@ import { CheckboxHeaderRenderer } from '../molecules/CheckboxHeaderRenderer';
 
 const getRowHeight = (params: any) => {
   if (params.data.type === COLUMN_TYPE.DATE) {
-    return 130;
+    return 60;
   }
   if (params.data.type === COLUMN_TYPE.STRING) {
-    return 100;
+    return 60;
   }
-  return 100;
+  return 60;
 };
 
 const columnDefs: ColDef[] = [
@@ -45,11 +45,15 @@ const columnDefs: ColDef[] = [
     flex: 1,
     suppressMenu: true,
     wrapText: true,
+    minWidth: 550,
+    initialWidth: 550,
+    maxWidth: 755,
   },
   {
     headerName: 'Значения фильтров',
     field: 'filterValues',
     suppressMenu: true,
+
     cellRenderer: FilterValuesCellRenderer,
   },
 ];
@@ -112,7 +116,7 @@ export const TemplateFiltersGrid = () => {
 const TableWrapper = styled('div')`
   height: 100%;
   width: 100%;
-  zoom: 0.8;
+  zoom: 0.6;
 
   .ag-cell-wrapper {
     height: -webkit-fill-available;
@@ -122,6 +126,11 @@ const TableWrapper = styled('div')`
     line-height: normal;
     display: flex;
     align-items: center;
+    font-size: 18px;
+  }
+
+  .ag-header-cell {
+    font-size: 18px;
   }
 `;
 

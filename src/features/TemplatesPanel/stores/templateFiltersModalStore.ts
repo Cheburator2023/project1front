@@ -26,6 +26,7 @@ type TemplateFiltersModalState = {
   originalTemplateFilters: ColumnFilterData[] | null;
   quickFilterText: string;
   localGridApi: GridApi | null;
+  isEditMode: boolean;
 };
 
 type TemplateFiltersModalActions = {
@@ -43,6 +44,7 @@ type TemplateFiltersModalActions = {
   hasChanges: () => boolean;
   setQuickFilterText: (text: string) => void;
   setLocalGridApi: (api: GridApi | null) => void;
+  toggleEditMode: () => void;
 };
 
 type TemplateFiltersModalStore = TemplateFiltersModalState & TemplateFiltersModalActions;
@@ -92,6 +94,7 @@ const initialState: TemplateFiltersModalState = {
   originalTemplateFilters: null,
   quickFilterText: '',
   localGridApi: null,
+  isEditMode: false,
 };
 
 export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((set, get) => ({
@@ -374,6 +377,27 @@ export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((s
   setQuickFilterText: (text) => set({ quickFilterText: text }),
 
   setLocalGridApi: (api) => set({ localGridApi: api }),
+
+  toggleEditMode: () => {
+    const { isEditMode, originalTemplateFilters } = get();
+    const newEditMode = !isEditMode;
+    
+    // При выключении режима редактирования (isEditMode: true -> false)
+    // сбрасываем фильтры к исходному состоянию активного шаблона
+    if (isEditMode && !newEditMode && originalTemplateFilters) {
+      const restoredFilters = JSON.parse(JSON.stringify(originalTemplateFilters));
+      const isAllSelected = restoredFilters.every((f) => f.isActive);
+      
+      set({ 
+        isEditMode: newEditMode,
+        columnFilters: restoredFilters,
+        isAllSelected,
+        isDirty: false
+      });
+    } else {
+      set({ isEditMode: newEditMode });
+    }
+  },
 }));
 
 

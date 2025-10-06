@@ -15,6 +15,7 @@ import { useTemplatesStore } from '@shared/stores/templatesStore';
 import { useFiltersStore } from '@shared/stores/filtersStore';
 import { useGlobalStore } from '@shared/stores/globalStore';
 import { ReactComponent as SearchOutline } from '@admiral-ds/icons/build/system/SearchOutline.svg';
+import { ReactComponent as EditOutline } from '@admiral-ds/icons/build/system/EditOutline.svg';
 import {
   useTemplateFiltersModalStore,
   useTemplateFiltersModalStoreSelected,
@@ -34,6 +35,8 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
   const selectedTemplateId = useTemplateFiltersModalStoreSelected.use.selectedTemplateId();
   const resetState = useTemplateFiltersModalStoreSelected.use.resetState();
   const localGridApi = useTemplateFiltersModalStoreSelected.use.localGridApi();
+  const isEditMode = useTemplateFiltersModalStoreSelected.use.isEditMode();
+  const toggleEditMode = useTemplateFiltersModalStoreSelected.use.toggleEditMode();
 
   const { templates, pendingTemplate, setPendingTemplate } = useTemplatesStore();
   const { topFilters, setTopFilters } = useFiltersStore();
@@ -57,7 +60,7 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
 
       initializeFromTemplate({
         // @ts-ignore
-        template_id: 'Новый шаблон для сохранения',
+        template_id: 'Не активен',
         template_name: 'Новый шаблон',
         user_id: null,
         filterModel,
@@ -130,7 +133,7 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
       } else {
         savedTemplate = {
           // @ts-ignore
-          template_id: 'Новый шаблон для сохранения',
+          template_id: 'Не активен',
           template_name: 'Новый шаблон',
           user_id: null,
           filterModel: newFilterModel,
@@ -163,7 +166,7 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
   };
 
   const templateOptions = [
-    { value: 'new', label: 'Новый шаблон для сохранения' },
+    { value: 'new', label: 'Не активен' },
     ...templates
       .filter((template) => template.template_id > 0)
       .map((template) => ({
@@ -176,10 +179,9 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
     <Modal
       onClose={handleCancel}
       dimension="xl"
-      style={{ width: '95%', maxWidth: '95%', height: '95%' }}
+      style={{ width: '99%', maxWidth: '99%', height: '99%', maxHeight: '99%' }}
     >
       <ModalTitle>Управление шаблонами фильтрации</ModalTitle>
-      <Spacer space={10} />
       <div
         style={{
           padding: '0 24px',
@@ -214,15 +216,26 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
             </Select>
           </Field>
 
-          <div style={{ minWidth: '300px' }}>
-            <InputField
-              id="filter-text-box"
-              value={quickFilterText}
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-end' }}>
+            <Button
+              appearance={isEditMode ? 'primary' : 'secondary'}
               dimension="s"
-              onChange={(e) => setQuickFilterText(e.target.value)}
-              placeholder="Поиск"
-              icons={<SearchOutline />}
+              onClick={toggleEditMode}
+              displayAsSquare
+              icon={<EditOutline />}
+              title={isEditMode ? 'Переключить в режим просмотра' : 'Переключить в режим редактирования'}
             />
+            
+            <div style={{ minWidth: '300px' }}>
+              <InputField
+                id="filter-text-box"
+                value={quickFilterText}
+                dimension="s"
+                onChange={(e) => setQuickFilterText(e.target.value)}
+                placeholder="Поиск"
+                icons={<SearchOutline />}
+              />
+            </div>
           </div>
         </div>
 

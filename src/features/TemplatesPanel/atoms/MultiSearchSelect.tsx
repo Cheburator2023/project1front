@@ -46,7 +46,7 @@ interface MultiSearchSelectProps {
   className?: string;
 }
 
-const StyledSelect = styled(Select as any)`
+const StyledSelect = styled(Select)`
   .react-select__control {
     min-height: 32px;
     border: 1px solid #d1d5db;
@@ -191,7 +191,7 @@ export const MultiSearchSelect = ({
         }),
       }}
       value={selectedOptions}
-      onChange={handleChange}
+      onChange={handleChange as any}
       options={filteredOptions}
       placeholder={placeholder}
       isDisabled={isDisabled}
