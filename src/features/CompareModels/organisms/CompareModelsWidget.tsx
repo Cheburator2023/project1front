@@ -4,6 +4,7 @@ import { useFiltersStore, useTemplatesStore, useModelsStore } from '@src/shared/
 import { CompareModelsNewTable } from '@src/features/CompareModels/organisms/CompareModelsNewTable';
 import { useCompareModels } from '../hooks';
 import { FiltersPanel } from '../../FiltersPanel/organisms/FiltersPanel';
+import { Flexbox } from '../../../shared/ui/atoms';
 
 const CompareModelsWidget = () => {
   const { compareModelsTable } = useCompareModels();
@@ -17,22 +18,28 @@ const CompareModelsWidget = () => {
 
   return (
     <>
-      <FiltersPanel
-        compareOnlyChanged={compareModelsTable.compareOnlyChanged}
-        handleCompareOnlyChanged={compareModelsTable.setCompareOnlyChanged}
-        compareModelsTableLoading={compareModelsTable.loading}
-        disabledCompare={disabledCompare}
-        handleUpdateCompareList={() => {
-          if (!disabledCompare) {
-            compareModelsTable.handleSubmit(
-              firstDate,
-              secondDate,
-              compareModelsTable.compareOnlyChanged,
-            );
-          }
-        }}
+      <Flexbox alignItems="center" gap={12} style={{ padding: '0px 12px', background: '#e5e7eb' }}>
+        <FiltersPanel
+          compareOnlyChanged={compareModelsTable.compareOnlyChanged}
+          handleCompareOnlyChanged={compareModelsTable.setCompareOnlyChanged}
+          compareModelsTableLoading={compareModelsTable.loading}
+          disabledCompare={disabledCompare}
+          handleUpdateCompareList={() => {
+            if (!disabledCompare) {
+              compareModelsTable.handleSubmit(
+                firstDate,
+                secondDate
+              );
+            }
+          }}
+        />
+      </Flexbox>
+
+      <CompareModelsNewTable
+        compareModelsTable={compareModelsTable}
+        firstDate={firstDate}
+        secondDate={secondDate}
       />
-      <CompareModelsNewTable compareModelsTable={compareModelsTable} firstDate={firstDate} secondDate={secondDate} />
     </>
   );
 };

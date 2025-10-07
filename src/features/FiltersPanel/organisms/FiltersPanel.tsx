@@ -46,6 +46,8 @@ export const FiltersPanel = ({
   const {
     topFilters,
     modelsDownloadingDate,
+    firstDate,
+    secondDate,
     setTopFilters,
     setFirstDate,
     setSecondDate,
@@ -58,6 +60,11 @@ export const FiltersPanel = ({
   const resetState = useTemplateFiltersModalStoreSelected.use.resetState();
 
   const activeTemplate = useMemo(() => getActiveTemplate(), [getActiveTemplate]);
+
+  // Check if both dates are selected to enable the "Только измененные" checkbox
+  const areDatesSelected = useMemo(() => {
+    return Boolean(firstDate && secondDate);
+  }, [firstDate, secondDate]);
 
   const { exploitationModeOptions, selectedExploitationModes, updateSelectedExploitationModes } =
     useExploitationModeStore();
@@ -214,9 +221,18 @@ export const FiltersPanel = ({
               <Checkbox
                 checked={compareOnlyChanged}
                 dimension="s"
+                disabled={!areDatesSelected}
                 onChange={(event) => handleCompareOnlyChanged(event.target.checked)}
               />
-              <T font="Body/Body 2 Short">Только измененные</T>
+              <T 
+                font="Body/Body 2 Short" 
+                style={{ 
+                  opacity: areDatesSelected ? 1 : 0.5,
+                  cursor: areDatesSelected ? 'default' : 'not-allowed'
+                }}
+              >
+                Только измененные
+              </T>
             </>
           )}
           <Button

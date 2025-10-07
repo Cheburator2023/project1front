@@ -92,13 +92,11 @@ export const useCompareModels = () => {
       if ((compareModelsQuery as any).data && !(compareModelsQuery as any).isFetching) {
         try {
           const responseData = (compareModelsQuery as any).data as CompareModelsResponseType;
+
           setResData(responseData);
 
-          const formattedRows = await processFetchData(
-            responseData,
-            columnList,
-            compareOnlyChanged,
-          );
+          const formattedRows = await processFetchData(responseData, columnList, compareOnlyChanged);
+
 
           setRowList(formattedRows);
           setTotalRows(formattedRows.length);
@@ -129,10 +127,13 @@ export const useCompareModels = () => {
   const handleSubmit = async (
     firstDate: string,
     secondDate: string,
-    compareOnlyChanged: boolean,
   ) => {
     setError(null);
-    const newQueryParams = getQueryParams(firstDate, secondDate, selectedExploitationModes);
+    const newQueryParams = getQueryParams(
+      firstDate,
+      secondDate,
+      selectedExploitationModes,
+    );
     setQueryParams(newQueryParams);
   };
 
