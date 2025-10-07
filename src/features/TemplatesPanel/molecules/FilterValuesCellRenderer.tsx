@@ -1,6 +1,8 @@
 import { COLUMN_TYPE } from '../../../shared/types';
 import { DateFieldRenderer } from './DateFieldRenderer';
 import { MSelectCellRenderer } from './MSelectCellRenderer';
+import { ChipsCellRenderer } from './ChipsCellRenderer';
+import { useTemplateFiltersModalStoreSelected } from '../stores/templateFiltersModalStore';
 
 interface FilterValuesCellRendererProps {
   data: any;
@@ -22,6 +24,14 @@ interface FilterValuesCellRendererProps {
 }
 
 export const FilterValuesCellRenderer = (params: FilterValuesCellRendererProps) => {
+  const isEditMode = useTemplateFiltersModalStoreSelected.use.isEditMode();
+  
+  // If not in edit mode, render chips for read-only display
+  if (!isEditMode) {
+    return ChipsCellRenderer(params);
+  }
+  
+  // In edit mode, render the appropriate interactive component
   if (params.data.type === COLUMN_TYPE.DATE) {
     return DateFieldRenderer(params);
   }

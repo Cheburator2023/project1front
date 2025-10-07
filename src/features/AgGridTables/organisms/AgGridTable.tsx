@@ -655,6 +655,10 @@ const GridWrapper = styled('div')`
   & .ag-column-panel .ag-unselectable.ag-column-drop {
     display: none;
   }
+
+  & .ag-popup {
+    zoom: 1.25;
+  }
 `;
 
 const StatusWrapper = styled('div')`

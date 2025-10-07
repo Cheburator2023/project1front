@@ -103,7 +103,21 @@ const Header = ({ user, downloadReportStatus, onLogout }: HeaderProps) => {
         </Logo>
       </Link>
       <ActionsGroup>
-        <CustomButton dimension="s" onClick={() => agGridApi?.exportDataAsExcel()}>
+        <CustomButton
+          dimension="s"
+          disabled={!agGridApi}
+          onClick={() => {
+            // @ts-ignore
+            const columnKeys = agGridApi
+              ?.getColumns()
+              .filter((col) => col.getColId() !== 'ag-Grid-ControlsColumn')
+              .map((col) => col.getColId());
+
+            return agGridApi?.exportDataAsExcel({
+              columnKeys,
+            });
+          }}
+        >
           <T font="Button/Button 2">Выгрузить отчет</T>
         </CustomButton>
 

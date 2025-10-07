@@ -217,15 +217,15 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
           </Field>
 
           <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-end' }}>
-            <Button
+            {/* <Button
               appearance={isEditMode ? 'primary' : 'secondary'}
               dimension="s"
               onClick={toggleEditMode}
               displayAsSquare
               icon={<EditOutline />}
               title={isEditMode ? 'Переключить в режим просмотра' : 'Переключить в режим редактирования'}
-            />
-            
+            /> */}
+
             <div style={{ minWidth: '300px' }}>
               <InputField
                 id="filter-text-box"
