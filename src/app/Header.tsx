@@ -96,12 +96,11 @@ const Header = ({ user, downloadReportStatus, onLogout }: HeaderProps) => {
 
   return (
     <Container>
-      <Link to={ROUTES.MF_HOME_ROUTE}>
-        <Logo>
-          <LogoIcon />
-          <CustomLabel font="Caption/Caption 1">Реестр моделей</CustomLabel>
-        </Logo>
-      </Link>
+      <Logo>
+        <LogoIcon />
+        <CustomLabel font="Caption/Caption 1">Реестр моделей</CustomLabel>
+      </Logo>
+
       <ActionsGroup>
         <CustomButton
           dimension="s"

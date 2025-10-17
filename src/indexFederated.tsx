@@ -89,7 +89,7 @@ const MfeRoot = (props: MFProps) => {
             <Loading text="Загрузка mfe свойств..." />
           </Flexbox>
         ) : (
-          <App {...props} bridged user={user} onLogout={onLogout} />
+          <App {...props} bridged user={user} />
         )}
       </DropdownProvider>
     </ThemeProvider>

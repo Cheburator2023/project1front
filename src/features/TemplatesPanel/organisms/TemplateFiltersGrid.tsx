@@ -13,12 +13,12 @@ import { CheckboxHeaderRenderer } from '../molecules/CheckboxHeaderRenderer';
 
 const getRowHeight = (params: any) => {
   if (params.data.type === COLUMN_TYPE.DATE) {
-    return 60;
+    return 40;
   }
   if (params.data.type === COLUMN_TYPE.STRING) {
-    return 60;
+    return 40;
   }
-  return 60;
+  return 40;
 };
 
 const columnDefs: ColDef[] = [
@@ -31,7 +31,7 @@ const columnDefs: ColDef[] = [
     suppressMenu: true,
   },
   {
-    headerName: 'Активна',
+    headerName: 'Колонка с чексбоксами (Активный)',
     field: 'isActive',
     width: 55,
     maxWidth: 55,
@@ -116,7 +116,6 @@ export const TemplateFiltersGrid = () => {
 const TableWrapper = styled('div')`
   height: 100%;
   width: 100%;
-  zoom: 0.6;
 
   .ag-cell-wrapper {
     height: -webkit-fill-available;
@@ -126,11 +125,11 @@ const TableWrapper = styled('div')`
     line-height: normal;
     display: flex;
     align-items: center;
-    font-size: 18px;
+    font-size: 11px;
   }
 
   .ag-header-cell {
-    font-size: 18px;
+    font-size: 11px;
   }
 `;
 

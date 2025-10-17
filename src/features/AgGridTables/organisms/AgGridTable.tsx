@@ -179,6 +179,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     }: IAgGridTableProps,
     ref: any,
   ) => {
+
     const { openAddModelPanel, openDeleteModelPanel } = usePanelsStore();
     const handleClickOnActionCellFromProps = handleClickOnActionCell || (() => {});
     const { filtersResetCount, setAgGridApi, agGridApi } = useGlobalStore();

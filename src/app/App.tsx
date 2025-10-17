@@ -33,6 +33,7 @@ const queryClient = new QueryClient({
 
 interface AppProps {
   bridged?: boolean;
+  keycloak?: any;
   downloadReportStatus?: boolean;
   columnsFilters?: ColumnsFilter[];
   updateColumnsFilters?: (filters: ColumnsFilter[]) => void;
@@ -52,9 +53,10 @@ interface AppProps {
 
 const IS_DEV = process.env.NODE_ENV === 'development';
 
-const App = ({ user, onLogout }: AppProps) => {
+const App = ({ user, onLogout, keycloak }: AppProps) => {
   const onLogoutHandler = () => {
     if (onLogout) {
+      keycloak.logout({ redirectUri: window.location.origin });
       onLogout();
     }
     localStorage.removeItem('currentCustomer');
@@ -65,13 +67,13 @@ const App = ({ user, onLogout }: AppProps) => {
       <div id="portal-root" />
       <BrowserRouter basename={IS_DEV ? '/' : 'sum-rm'}>
         <QueryClientProvider client={queryClient}>
-              <GlobalStyle />
-              <Container>
-                <Header user={user} onLogout={onLogoutHandler} />
-                <RoutesWrapper>
-                  <RoutesComponent />
-                </RoutesWrapper>
-              </Container>
+          <GlobalStyle />
+          <Container>
+            <Header user={user} onLogout={onLogoutHandler} />
+            <RoutesWrapper>
+              <RoutesComponent />
+            </RoutesWrapper>
+          </Container>
         </QueryClientProvider>
       </BrowserRouter>
     </div>

@@ -179,12 +179,18 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
     <Modal
       onClose={handleCancel}
       dimension="xl"
-      style={{ width: '99%', maxWidth: '99%', height: '99%', maxHeight: '99%' }}
+      style={{
+        width: '99%',
+        maxWidth: '99%',
+        height: '99%',
+        maxHeight: '99%',
+        padding: '10px 0 14px',
+      }}
     >
-      <ModalTitle>Управление шаблонами фильтрации</ModalTitle>
+      <ModalTitle style={{ padding: '0 14px 10px' }}>Управление шаблонами фильтрации</ModalTitle>
       <div
         style={{
-          padding: '0 24px',
+          padding: '0 14px',
           display: 'flex',
           flexDirection: 'column',
           gap: '20px',

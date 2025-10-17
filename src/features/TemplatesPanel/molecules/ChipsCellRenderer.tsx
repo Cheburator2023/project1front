@@ -29,7 +29,7 @@ const EllipsisButton = styled(Button)`
   background-color: #f5f6f7;
   border: 1px solid #d5d8de;
   color: #717681;
-  
+
   &:hover {
     background-color: #e8eaed;
     border-color: #c1c6cc;
@@ -57,7 +57,7 @@ interface ChipsCellRendererProps {
 
 const formatDateValue = (value: string | null): string => {
   if (!value) return '';
-  
+
   try {
     const date = new Date(value);
     if (isValid(date)) {
@@ -66,7 +66,7 @@ const formatDateValue = (value: string | null): string => {
   } catch (error) {
     // If date parsing fails, return the original value
   }
-  
+
   return value;
 };
 
@@ -74,18 +74,18 @@ const formatDisplayValue = (value: any, type: string): string => {
   if (value === null || value === undefined) {
     return '(Пустые значения)';
   }
-  
+
   if (type === COLUMN_TYPE.DATE) {
     return formatDateValue(String(value));
   }
-  
+
   return String(value);
 };
 
 export const ChipsCellRenderer = (params: ChipsCellRendererProps) => {
   const { data } = params;
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+
   const displayValues = useMemo(() => {
     if (!data.filterValues || data.filterValues.length === 0) {
       return [];
@@ -98,7 +98,7 @@ export const ChipsCellRenderer = (params: ChipsCellRendererProps) => {
         const endDate = formatDateValue(data.filterValues[1]);
         return [`${startDate} - ${endDate}`];
       }
-      
+
       // Handle single dates - make unique and sort (null values first)
       const formattedValues = data.filterValues.map((value: any) => formatDisplayValue(value, data.type));
       const uniqueValues = [...new Set(formattedValues)];
@@ -124,11 +124,11 @@ export const ChipsCellRenderer = (params: ChipsCellRendererProps) => {
   }, [data.filterValues, data.type]);
 
   const visibleValues = useMemo(() => {
-    return displayValues.slice(0, 3);
+    return displayValues.slice(0, 1);
   }, [displayValues]);
 
-  const hasMoreValues = displayValues.length > 3;
-  const remainingCount = displayValues.length - 3;
+  const hasMoreValues = displayValues.length > 1;
+  const remainingCount = displayValues.length - 1;
 
   const handleEllipsisClick = () => {
     setIsModalOpen(true);
@@ -168,7 +168,7 @@ export const ChipsCellRenderer = (params: ChipsCellRendererProps) => {
           </EllipsisButton>
         )}
       </ChipsContainer>
-      
+
       <FilterValuesModal
         isOpen={isModalOpen}
         onClose={handleModalClose}
