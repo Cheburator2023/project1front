@@ -15,13 +15,9 @@ import { useTemplatesStore } from '@shared/stores/templatesStore';
 import { useFiltersStore } from '@shared/stores/filtersStore';
 import { useGlobalStore } from '@shared/stores/globalStore';
 import { ReactComponent as SearchOutline } from '@admiral-ds/icons/build/system/SearchOutline.svg';
-import { ReactComponent as EditOutline } from '@admiral-ds/icons/build/system/EditOutline.svg';
 import {
-  useTemplateFiltersModalStore,
   useTemplateFiltersModalStoreSelected,
 } from '../stores/templateFiltersModalStore';
-import { TemplateFiltersGrid } from './TemplateFiltersGrid';
-import { Spacer } from '../../../shared/ui/atoms';
 import { useDeepEffect } from '../../../shared/hooks/useDeepEffect';
 
 const initialColumns = _initialColumns.filter((col) => col.name !== 'relations');
@@ -157,7 +153,7 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
   };
 
   const handleReset = () => {
-    initializeFromTemplate(undefined);
+    resetState();
   };
 
   const handleCancel = () => {

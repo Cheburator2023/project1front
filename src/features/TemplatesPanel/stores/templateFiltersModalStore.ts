@@ -171,7 +171,21 @@ export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((s
     }
   },
   setIsDirty: (dirty) => set({ isDirty: dirty }),
-  resetState: () => set(initialState),
+  resetState: () => {
+    const resetColumnFilters = createColumnFiltersFromInitialColumns().map(col => ({
+      ...col,
+      isActive: true,
+      filterValues: []
+    }));
+    
+    set({
+      ...initialState,
+      isOpen: true, // Keep modal open
+      columnFilters: resetColumnFilters,
+      isAllSelected: true,
+      isDirty: true
+    });
+  },
   initializeFromTemplate: (template?: Template) => {
     const agGridApi = useGlobalStore.getState().agGridApi;
     const currentColumnState = agGridApi
