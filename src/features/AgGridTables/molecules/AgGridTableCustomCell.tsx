@@ -156,6 +156,7 @@ const Wrapper = styled('div')`
   position: relative;
 
   & .actionButtons {
+    display: flex;
     position: absolute;
     opacity: 0;
     right: 0%;

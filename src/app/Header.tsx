@@ -114,6 +114,7 @@ const Header = ({ user, downloadReportStatus, onLogout }: HeaderProps) => {
 
             return agGridApi?.exportDataAsExcel({
               columnKeys,
+              fileName: `Отчет ${format(new Date(), 'dd.MM.yyyy')}.xlsx`,
             });
           }}
         >

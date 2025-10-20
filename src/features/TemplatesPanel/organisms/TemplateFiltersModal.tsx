@@ -251,7 +251,7 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
             Отмена
           </Button>
           <Button appearance="primary" dimension="s" onClick={handleSave}>
-            Сохранить
+            Применить
           </Button>
         </div>
       </div>
