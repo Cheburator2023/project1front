@@ -157,7 +157,8 @@ export const SearchSelect = ({
       }
 
       // Add selected options that are out of the scope of the search
-      if (searchValue) {
+      // Only for multiple select - single select should replace the selection
+      if (searchValue && multiple) {
         const selectOptionsValues = getOptionsValues(selectOptions);
 
         const prevSelectedValues =
