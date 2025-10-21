@@ -15,7 +15,7 @@ export const getGroupsOptions = (templates: Template[]): SelectTemplatesOptions 
       .filter((template) => template.group_label === groupName)
       .map((template) => {
         const filtersCount = Object.values(template.filterModel ? template.filterModel : {}).length;
-        const activeCols = (template.columnState ? template.columnState : []).length;
+        const activeCols = (template.columnState ? template.columnState.filter((col) => !col.hide) : []).length;
 
         return {
           value: String(template.template_id),
