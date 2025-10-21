@@ -210,6 +210,22 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
               }
               return params.value;
             },
+            ...(data.name === 'group_company' && {
+              comparator: (a: string, b: string) => {
+                const priorityValue = 'Банк ВТБ (ПАО)';
+                
+                // Handle null/undefined values - empty values come first
+                if (!a && !b) return 0;
+                if (!a && b === priorityValue) return -1; // empty before priority
+                if (!a) return -1; // empty before other values
+                if (!b && a === priorityValue) return 1; // priority after empty
+                if (!b) return 1; // other values after empty
+                
+                if (a === priorityValue && b !== priorityValue) return -1;
+                if (a !== priorityValue && b === priorityValue) return 1;
+                return a.localeCompare(b, 'ru');
+              },
+            }),
           };
 
           return {
