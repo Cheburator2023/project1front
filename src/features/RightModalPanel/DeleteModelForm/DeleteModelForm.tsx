@@ -30,6 +30,8 @@ import { useFormFields } from '../ModelForm/useFormFields';
 import { DELETE_CONFIRM_MODEL_SCHEMA, DELETE_MODEL_SCHEMA, SCHEMA_NAME_MAP } from './constants';
 import { useActiveDeleteFormSchema } from './useActiveDeleteFormSchema';
 
+const NO_ROLES = process.env.NO_ROLES === 'true';
+
 const StyledTabMenu = styled(TabMenu)`
   display: flex;
   justify-content: space-around;
@@ -385,7 +387,8 @@ export const DeleteModelForm = ({
 
   const renderFooter = useCallback(() => {
     const modelStatus = values?.status?.value || initialRow?.status;
-    const isEnabled = isSubmitButtonEnabled(activeTab, isValidatorLead, modelStatus as ModelStatus);
+    const isEnabled =
+      NO_ROLES || isSubmitButtonEnabled(activeTab, isValidatorLead, modelStatus as ModelStatus);
 
     return (
       <>
