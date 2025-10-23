@@ -59,11 +59,8 @@ const getActiveFiltersCount = (
   const activeTemplate = getActiveTemplate(templates, activeTemplateId);
   const modifiedFilters = getModifiedFilters(columnsFilters, activeTemplate);
 
-  const processedFilters = modifiedFilters.flatMap(([columnName, filters]) => {
-    return processFiltersByType(columnName, filters);
-  });
-
-  return processedFilters.length;
+  // Count the number of filtered columns, not the total number of filter values
+  return modifiedFilters.length;
 };
 
 export {

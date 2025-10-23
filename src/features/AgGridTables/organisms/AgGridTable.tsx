@@ -45,6 +45,7 @@ import { useDeepEffect } from '../../../shared/hooks/useDeepEffect';
 import { useGlobalStore } from '../../../shared/stores/globalStore';
 import { useFiltersStore } from '../../../shared/stores/filtersStore';
 import { useTemplatesStore } from '../../../shared/stores/templatesStore';
+import { convertFilterModelToColumnsFilters } from '../../../shared/helpers/filterModelConverter';
 
 interface IAgGridTableProps {
   templates?: Template[];
@@ -179,11 +180,10 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     }: IAgGridTableProps,
     ref: any,
   ) => {
-
     const { openAddModelPanel, openDeleteModelPanel } = usePanelsStore();
     const handleClickOnActionCellFromProps = handleClickOnActionCell || (() => {});
     const { filtersResetCount, setAgGridApi, agGridApi } = useGlobalStore();
-    const { filterModel, topFilters, setTopFilters, setFilterModel } = useFiltersStore();
+    const { filterModel, topFilters, setTopFilters, setFilterModel, setColumnsFilters } = useFiltersStore();
     const { setPendingTemplate } = useTemplatesStore();
 
     const { modelsCount, modelSource, isDeleteButtonEnabled, userMatches, updateDeleteModelState } =
@@ -213,14 +213,14 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
             ...(data.name === 'group_company' && {
               comparator: (a: string, b: string) => {
                 const priorityValue = 'Банк ВТБ (ПАО)';
-                
+
                 // Handle null/undefined values - empty values come first
                 if (!a && !b) return 0;
                 if (!a && b === priorityValue) return -1; // empty before priority
                 if (!a) return -1; // empty before other values
                 if (!b && a === priorityValue) return 1; // priority after empty
                 if (!b) return 1; // other values after empty
-                
+
                 if (a === priorityValue && b !== priorityValue) return -1;
                 if (a !== priorityValue && b === priorityValue) return 1;
                 return a.localeCompare(b, 'ru');
@@ -255,6 +255,8 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
                 if (prevRow && sameId && prevRowSameCellValue !== cellValue) {
                   return 'ag-custom-cell-value-changed';
                 }
+              } else {
+                return `data-tech-label_${data.name}`;
               }
             },
           };
@@ -461,6 +463,10 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
         JSON.stringify(filterModelPending) !== JSON.stringify(currentTemplate?.filterModel || {});
 
       setFilterModel(filterModelPending);
+
+      // Convert filterModel to columnsFilters format and update the store
+      const newColumnsFilters = convertFilterModelToColumnsFilters(filterModelPending);
+      setColumnsFilters(newColumnsFilters);
 
       // * Если я добавляю новый атрибут в набор фильтра, то шаблон остается активным
       if (hasNewColInFilter) {

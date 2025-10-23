@@ -22,19 +22,26 @@ import { TemplateFiltersGrid } from './TemplateFiltersGrid';
 export const TemplatesPanelContainer = () => {
   const openModal = useTemplateFiltersModalStoreSelected.use.openModal();
 
-  const { topFilters, filterModel, firstDate, secondDate } = useFiltersStore();
+  const { topFilters, filterModel, firstDate, secondDate, columnsFilters } = useFiltersStore();
+  console.log('🐸 Pepe said >> TemplatesPanelContainer >> topFilters:', topFilters);
+
   const { templates } = useTemplatesStore();
   const { compareMode, rows } = useModelsStore();
 
   const activeFiltersCount = useMemo(
-    () => getActiveFiltersCount(filterModel, templates, topFilters.templates[0]),
-    [filterModel, templates, topFilters.templates],
+    () => getActiveFiltersCount(columnsFilters, templates, topFilters.templates[0]),
+    [columnsFilters, templates, topFilters.templates],
   );
 
   const hasTemplates = topFilters.templates.length > 0;
   const activeTemplate = hasTemplates
     ? templates.find((t) => t.template_id.toString() === topFilters.templates[0])
     : undefined;
+  console.log('🐸 Pepe said >> TemplatesPanelContainer >> activeTemplate:', activeTemplate);
+
+  const activeTemplateFromServiceFilterCount = Object.keys(
+    activeTemplate?.filterModel || {},
+  ).length;
 
   const hasActiveFilters = activeFiltersCount > 0;
   const hasNoActiveFilters = activeFiltersCount === 0;
@@ -63,7 +70,7 @@ export const TemplatesPanelContainer = () => {
           <CheckSolidCustom />
         ) : (
           <BadgeCount appearance={badgeAppearance} dimension="s">
-            {activeFiltersCount}
+            {activeFiltersCount + activeTemplateFromServiceFilterCount}
           </BadgeCount>
         ))}
     </>
