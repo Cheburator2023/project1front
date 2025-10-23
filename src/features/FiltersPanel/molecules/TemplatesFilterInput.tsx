@@ -9,6 +9,7 @@ import { initialTopFilters } from '@shared/constants';
 import { getGroupsOptions } from '../helpers';
 import { useGlobalStore } from '../../../shared/stores/globalStore';
 import { useTemplatesStore, usePanelsStore } from '../../../shared/stores';
+import { useTemplateFiltersModalStoreSelected } from '../../TemplatesPanel/stores/templateFiltersModalStore';
 
 export interface TemplatesFilterInputProps {
   templates: Template[];
@@ -35,6 +36,11 @@ export const TemplatesFilterInput = ({
 
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
 
+  const { setFiltersResetCount } = useGlobalStore();
+  const { pendingTemplate, setPendingTemplate } = useTemplatesStore();
+  const initializeFromTemplate = useTemplateFiltersModalStoreSelected.use.initializeFromTemplate();
+  const resetState = useTemplateFiltersModalStoreSelected.use.resetState();
+
   const groupedOptions = useMemo(() => {
     if (templates) {
       return getGroupsOptions(templates);
@@ -59,13 +65,15 @@ export const TemplatesFilterInput = ({
     }
   };
 
-  const { setFiltersResetCount } = useGlobalStore();
-  const { pendingTemplate } = useTemplatesStore();
+
 
   const handleResetFilters = () => {
     resetFilters();
     setTopFilters({ ...topFilters, templates: [] });
     setFiltersResetCount();
+    resetState();
+    initializeFromTemplate(undefined);
+    setPendingTemplate(undefined);
     setDropdownOpen(false);
   };
 

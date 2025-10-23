@@ -15,9 +15,7 @@ import { useTemplatesStore } from '@shared/stores/templatesStore';
 import { useFiltersStore } from '@shared/stores/filtersStore';
 import { useGlobalStore } from '@shared/stores/globalStore';
 import { ReactComponent as SearchOutline } from '@admiral-ds/icons/build/system/SearchOutline.svg';
-import {
-  useTemplateFiltersModalStoreSelected,
-} from '../stores/templateFiltersModalStore';
+import { useTemplateFiltersModalStoreSelected } from '../stores/templateFiltersModalStore';
 import { useDeepEffect } from '../../../shared/hooks/useDeepEffect';
 
 const initialColumns = _initialColumns.filter((col) => col.name !== 'relations');
@@ -33,10 +31,17 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
   const localGridApi = useTemplateFiltersModalStoreSelected.use.localGridApi();
   const isEditMode = useTemplateFiltersModalStoreSelected.use.isEditMode();
   const toggleEditMode = useTemplateFiltersModalStoreSelected.use.toggleEditMode();
+  const resetInitialized = useTemplateFiltersModalStoreSelected.use.resetInitialized();
+  console.log('🐸 Pepe said >> TemplateFiltersModal >> resetInitialized:', resetInitialized);
+
+  const setResetInitialized = useTemplateFiltersModalStoreSelected.use.setResetInitialized();
+  const hasColumnsChangedAfterReset =
+    useTemplateFiltersModalStoreSelected.use.hasColumnsChangedAfterReset();
+  const hasChanges = useTemplateFiltersModalStoreSelected.use.hasChanges();
 
   const { templates, pendingTemplate, setPendingTemplate } = useTemplatesStore();
-  const { topFilters, setTopFilters } = useFiltersStore();
-  const { agGridApi: agGridApiGlobal } = useGlobalStore();
+  const { topFilters, setTopFilters, resetFilters } = useFiltersStore();
+  const { filtersResetCount, setFiltersResetCount, agGridApi: agGridApiGlobal } = useGlobalStore();
 
   useDeepEffect(() => {
     // Получаем активный шаблон из topFilters
@@ -79,7 +84,71 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
   };
 
   const handleSave = () => {
-    if (agGridApiGlobal && localGridApi) {
+    // Check if reset was initiated and apply reset logic
+    if (resetInitialized) {
+      // Check if columns were modified after reset
+      const hasColumnsChanged = hasColumnsChangedAfterReset();
+
+      if (hasColumnsChanged) {
+        // If columns were modified after reset, apply the modified column state instead of full reset
+        if (agGridApiGlobal) {
+          const columnState: any[] = [];
+
+          columnFilters.forEach((column) => {
+            const matchingColumn = initialColumns.find((col) => col.name === column.colId);
+
+            if (matchingColumn) {
+              columnState.push({
+                colId: column.colId,
+                hide: !column.isActive,
+              });
+            }
+          });
+
+          // Reset filters first (this will show all columns)
+          resetFilters();
+
+          // Then apply the modified column state to override the reset column visibility
+          agGridApiGlobal.applyColumnState({
+            state: columnState,
+            defaultState: { sort: null },
+            applyOrder: true,
+          });
+
+          setTopFilters({ ...topFilters, templates: [] });
+          setFiltersResetCount();
+          initializeFromTemplate(undefined);
+          setPendingTemplate(undefined);
+        }
+      } else {
+        // Apply the same reset logic as in TemplatesFilterInput (full reset)
+        resetFilters();
+        setTopFilters({ ...topFilters, templates: [] });
+        setFiltersResetCount();
+        resetState();
+        initializeFromTemplate(undefined);
+        setPendingTemplate(undefined);
+      }
+
+      // Reset the resetInitialized flag
+      setResetInitialized(false);
+
+      closeModal();
+      return;
+    }
+
+    // Check if there are any changes before applying template logic
+    if (!hasChanges()) {
+      // No changes detected, just close the modal without applying anything
+      console.log('🐸 Pepe said >> handleSave >> No changes detected');
+
+      closeModal();
+      return;
+    }
+
+    console.log('🐸 Pepe said >> handleSave >> agGridApiGlobal:', agGridApiGlobal);
+
+    if (agGridApiGlobal) {
       const newFilterModel: any = {};
       const columnState: any[] = [];
 
@@ -95,7 +164,7 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
       });
 
       columnFilters.forEach((column) => {
-        if (column.isActive && column.filterValues.length > 0) {
+        if (column.filterValues.length > 0) {
           if (column.type === 'DATE') {
             newFilterModel[column.colId] = {
               filterType: 'date',
@@ -113,7 +182,9 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
       });
 
       let savedTemplate: Template;
+
       if (selectedTemplateId) {
+        console.log('🐸 Pepe said >> handleSave >> selectedTemplateId 111:', selectedTemplateId);
         const template = templates.find((t) => t.template_id === selectedTemplateId);
         if (template) {
           savedTemplate = {
@@ -138,13 +209,16 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
         };
         setPendingTemplate(savedTemplate);
         agGridApiGlobal.setFilterModel(newFilterModel);
+        console.log('🐸 Pepe said >> handleSave >> columnState 222:', columnState);
         agGridApiGlobal.applyColumnState({ state: columnState, applyOrder: true });
+
         setTopFilters({ ...topFilters, templates: [] });
       }
 
       setTimeout(() => {
         // setFilterModel(newFilterModel);
         agGridApiGlobal.setFilterModel(newFilterModel);
+        console.log('🐸 Pepe said >> handleSave >> columnState 333:', columnState);
         agGridApiGlobal.applyColumnState({ state: columnState, applyOrder: true });
       }, 30);
     }

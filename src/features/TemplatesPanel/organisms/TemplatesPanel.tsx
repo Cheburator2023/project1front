@@ -23,7 +23,6 @@ export const TemplatesPanelContainer = () => {
   const openModal = useTemplateFiltersModalStoreSelected.use.openModal();
 
   const { topFilters, filterModel, firstDate, secondDate, columnsFilters } = useFiltersStore();
-  console.log('🐸 Pepe said >> TemplatesPanelContainer >> topFilters:', topFilters);
 
   const { templates } = useTemplatesStore();
   const { compareMode, rows } = useModelsStore();
@@ -37,7 +36,6 @@ export const TemplatesPanelContainer = () => {
   const activeTemplate = hasTemplates
     ? templates.find((t) => t.template_id.toString() === topFilters.templates[0])
     : undefined;
-  console.log('🐸 Pepe said >> TemplatesPanelContainer >> activeTemplate:', activeTemplate);
 
   const activeTemplateFromServiceFilterCount = Object.keys(
     activeTemplate?.filterModel || {},

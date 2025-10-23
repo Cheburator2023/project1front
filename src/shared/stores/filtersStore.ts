@@ -25,7 +25,9 @@ interface FiltersState {
 
 interface FiltersActions {
   setFilterModel: (filterModel: any) => void;
-  setSortState: (sortState: Array<{ colId: string; sort: 'asc' | 'desc'; sortIndex: number; }>) => void;
+  setSortState: (
+    sortState: Array<{ colId: string; sort: 'asc' | 'desc'; sortIndex: number }>,
+  ) => void;
   setSelectedIds: (selectedIds: string[]) => void;
   setFirstDate: (date: string | null) => void;
   setSecondDate: (date: string | null) => void;
@@ -134,7 +136,6 @@ export const useFiltersStore = create<FiltersStore>((set, get) => ({
 
   resetFilters: () => {
     const { agGridApi } = useGlobalStore.getState();
-
     set({
       filterModel: {},
       sortState: [],
@@ -149,8 +150,11 @@ export const useFiltersStore = create<FiltersStore>((set, get) => ({
 
     if (agGridApi) {
       agGridApi.setFilterModel(null);
+      // Reset column state completely - clear all existing states and show all columns
       agGridApi.applyColumnState({
-        defaultState: { sort: null },
+        state: [],
+        defaultState: { sort: null, hide: false },
+        applyOrder: false,
       });
     }
   },

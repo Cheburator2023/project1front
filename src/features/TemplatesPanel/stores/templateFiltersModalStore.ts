@@ -27,6 +27,7 @@ type TemplateFiltersModalState = {
   quickFilterText: string;
   localGridApi: GridApi | null;
   isEditMode: boolean;
+  resetInitialized: boolean;
 };
 
 type TemplateFiltersModalActions = {
@@ -45,6 +46,8 @@ type TemplateFiltersModalActions = {
   setQuickFilterText: (text: string) => void;
   setLocalGridApi: (api: GridApi | null) => void;
   toggleEditMode: () => void;
+  setResetInitialized: (resetInitialized: boolean) => void;
+  hasColumnsChangedAfterReset: () => boolean;
 };
 
 type TemplateFiltersModalStore = TemplateFiltersModalState & TemplateFiltersModalActions;
@@ -95,6 +98,7 @@ const initialState: TemplateFiltersModalState = {
   quickFilterText: '',
   localGridApi: null,
   isEditMode: false,
+  resetInitialized: false,
 };
 
 export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((set, get) => ({
@@ -114,7 +118,6 @@ export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((s
 
     const isAllSelected = updatedFilters.every((f) => f.isActive);
     set({ columnFilters: updatedFilters, isAllSelected, isDirty: true });
-
   },
   toggleColumnActive: (colId) => {
     const { columnFilters, selectedTemplateId } = get();
@@ -129,9 +132,15 @@ export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((s
         isAllSelected,
         selectedTemplateId: null,
         isDirty: true,
+        resetInitialized: false, // Reset the flag when checkbox is clicked
       });
     } else {
-      set({ columnFilters: updatedFilters, isAllSelected, isDirty: true });
+      set({
+        columnFilters: updatedFilters,
+        isAllSelected,
+        isDirty: true,
+        resetInitialized: false, // Reset the flag when checkbox is clicked
+      });
     }
   },
   toggleAllColumns: () => {
@@ -148,9 +157,15 @@ export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((s
         isAllSelected: newActiveState,
         selectedTemplateId: null,
         isDirty: true,
+        resetInitialized: false, // Reset the flag when select all checkbox is clicked
       });
     } else {
-      set({ columnFilters: updatedFilters, isAllSelected: newActiveState, isDirty: true });
+      set({
+        columnFilters: updatedFilters,
+        isAllSelected: newActiveState,
+        isDirty: true,
+        resetInitialized: false, // Reset the flag when select all checkbox is clicked
+      });
     }
   },
   reorderColumns: (startIndex, endIndex) => {
@@ -172,18 +187,26 @@ export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((s
   },
   setIsDirty: (dirty) => set({ isDirty: dirty }),
   resetState: () => {
-    const resetColumnFilters = createColumnFiltersFromInitialColumns().map(col => ({
-      ...col,
+    const resetColumnFilters = initialColumns.map((column, index) => ({
+      colId: column.name,
+      name: column.name,
+      title: column.title,
+      type: column.type,
       isActive: true,
-      filterValues: []
+      filterValues: [],
+      order: index,
     }));
-    
+
+    const { isOpen } = get();
+
     set({
       ...initialState,
-      isOpen: true, // Keep modal open
+      isOpen, // Preserve current modal state
       columnFilters: resetColumnFilters,
+      originalTemplateFilters: resetColumnFilters, // Update originalTemplateFilters to reset state
       isAllSelected: true,
-      isDirty: true
+      isDirty: true,
+      resetInitialized: true,
     });
   },
   initializeFromTemplate: (template?: Template) => {
@@ -191,7 +214,7 @@ export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((s
     const currentColumnState = agGridApi
       ?.getColumnState()
       ?.filter((col) => col.colId !== 'ag-Grid-ControlsColumn');
-    
+
     const baseColumns = createColumnFiltersFromInitialColumns();
 
     if (template) {
@@ -327,7 +350,7 @@ export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((s
       });
     } else {
       let defaultColumns: ColumnFilterData[];
-      
+
       if (currentColumnState && currentColumnState.length > 0) {
         defaultColumns = currentColumnState
           .map((currentCol, index) => {
@@ -351,7 +374,7 @@ export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((s
           };
         });
       }
-      
+
       const isAllSelected = defaultColumns.every((f) => f.isActive);
       set({
         columnFilters: defaultColumns,
@@ -380,10 +403,23 @@ export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((s
 
     return columnFilters.some((current, index) => {
       const original = originalTemplateFilters[index];
-      return (
+
+      // Check for basic property changes
+      if (
         current.isActive !== original.isActive ||
         current.order !== original.order ||
         current.colId !== original.colId
+      ) {
+        return true;
+      }
+
+      // Check for filterValues changes
+      if (current.filterValues.length !== original.filterValues.length) {
+        return true;
+      }
+
+      return current.filterValues.some(
+        (value, valueIndex) => value !== original.filterValues[valueIndex],
       );
     });
   },
@@ -393,26 +429,42 @@ export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((s
   setLocalGridApi: (api) => set({ localGridApi: api }),
 
   toggleEditMode: () => {
-    const { isEditMode, originalTemplateFilters } = get();
+    const { isEditMode, originalTemplateFilters, columnFilters } = get();
     const newEditMode = !isEditMode;
-    
-    // При выключении режима редактирования (isEditMode: true -> false)
-    // сбрасываем фильтры к исходному состоянию активного шаблона
-    if (isEditMode && !newEditMode && originalTemplateFilters) {
-      const restoredFilters = JSON.parse(JSON.stringify(originalTemplateFilters));
-      const isAllSelected = restoredFilters.every((f) => f.isActive);
-      
-      set({ 
+
+    if (newEditMode && !originalTemplateFilters) {
+      set({
+        isEditMode: newEditMode,
+        originalTemplateFilters: columnFilters,
+      });
+    } else if (!newEditMode && originalTemplateFilters) {
+      const restoredFilters = originalTemplateFilters;
+      const isAllSelected = restoredFilters.every((filter) => filter.isActive);
+
+      set({
         isEditMode: newEditMode,
         columnFilters: restoredFilters,
         isAllSelected,
-        isDirty: false
+        isDirty: false,
       });
     } else {
       set({ isEditMode: newEditMode });
     }
   },
+
+  setResetInitialized: (resetInitialized) => set({ resetInitialized }),
+
+  hasColumnsChangedAfterReset: () => {
+    const { resetInitialized, columnFilters } = get();
+
+    if (!resetInitialized) {
+      return false;
+    }
+
+    // Check if any column's isActive state differs from the reset state (all true)
+    return columnFilters.some((column) => !column.isActive);
+  },
 }));
 
-
 export const useTemplateFiltersModalStoreSelected = createSelectors(useTemplateFiltersModalStore);
+
