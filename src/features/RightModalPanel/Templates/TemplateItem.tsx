@@ -128,8 +128,9 @@ export const TemplateItem = ({
           <Content>
             <T font="Body/Body 2 Short">{template.template_name}</T>
             <T font="Caption/Caption 1" color="Neutral/Neutral 50">
-              Фильтров: {Object.values(template.filterModel ? template.filterModel : {}).length}
-              Активных колонок: {template.columnState ? template.columnState.length : 0}
+              Фильтров: {Object.values(template.filterModel ? template.filterModel : {}).length};
+              Активных колонок:{' '}
+              {template.columnState ? template.columnState.filter((col) => !col.hide).length : 0}
             </T>
           </Content>
           {editable && (
