@@ -365,6 +365,7 @@ export const getStartDateInCurrentYear = (startDate: Date) => {
 const ENABLE_FEBRUARY_EXTENSION = false;
 const ENABLE_MARCH_EXTENSION = false;
 const ENABLE_4Q_EXTENSION_UNTIL_APRIL_13 = true;
+const ENABLE_2Q_EXTENSION_UNTIL_NOVEMBER_30 = true;
 
 const getDateLimits = (quarter: number) => {
   const currentDate = new Date();
@@ -377,6 +378,12 @@ const getDateLimits = (quarter: number) => {
   const firstDateOfEffectiveYear = startOfYear(new Date(effectiveYear, 0, 1)); // TODO: Получаем 1 января effectiveYear
   const minDate = addMonths(firstDateOfEffectiveYear, (quarter - 1) * 3); // TODO: Старт квартала
   let maxDate = endOfQuarter(minDate); // TODO: По умолчанию — конец квартала
+
+  if (quarter === 2) {
+    if (ENABLE_2Q_EXTENSION_UNTIL_NOVEMBER_30) {
+      maxDate = new Date(`${effectiveYear}-11-30T23:59:59`);
+    }
+  }
 
   // TODO: Специальная логика продления срока редактирования для 4 квартала
   if (quarter === 4) {
