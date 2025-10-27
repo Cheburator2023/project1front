@@ -365,7 +365,6 @@ export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((s
         isAllSelected,
         selectedTemplateId: template.template_id,
         originalTemplateFilters: JSON.parse(JSON.stringify(mergedColumns)),
-        isDirty: false,
       });
     } else {
       let defaultColumns: ColumnFilterData[];
@@ -433,7 +432,6 @@ export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((s
         isAllSelected,
         selectedTemplateId: null,
         originalTemplateFilters: null,
-        isDirty: false,
       });
     }
   },

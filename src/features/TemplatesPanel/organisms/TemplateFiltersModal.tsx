@@ -37,6 +37,7 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
   const hasColumnsChangedAfterReset =
     useTemplateFiltersModalStoreSelected.use.hasColumnsChangedAfterReset();
   const hasChanges = useTemplateFiltersModalStoreSelected.use.hasChanges();
+  const setIsDirty = useTemplateFiltersModalStoreSelected.use.setIsDirty();
 
   const { templates, pendingTemplate, setPendingTemplate } = useTemplatesStore();
   const { topFilters, setTopFilters, resetFilters } = useFiltersStore();
@@ -71,6 +72,9 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
 
   const handleTemplateChange = (templateId: string) => {
     const id = templateId === 'new' ? null : parseInt(templateId);
+
+    // Set dirty flag to indicate that user performed an action
+    setIsDirty(true);
 
     if (id) {
       const template = templates.find((t) => t.template_id === id);

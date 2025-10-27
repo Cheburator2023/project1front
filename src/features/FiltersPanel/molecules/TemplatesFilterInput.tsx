@@ -36,7 +36,7 @@ export const TemplatesFilterInput = ({
 
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
 
-  const { setFiltersResetCount } = useGlobalStore();
+  const { setFiltersResetCount, agGridApi } = useGlobalStore();
   const { pendingTemplate, setPendingTemplate } = useTemplatesStore();
   const initializeFromTemplate = useTemplateFiltersModalStoreSelected.use.initializeFromTemplate();
   const resetState = useTemplateFiltersModalStoreSelected.use.resetState();
@@ -65,8 +65,6 @@ export const TemplatesFilterInput = ({
     }
   };
 
-
-
   const handleResetFilters = () => {
     resetFilters();
     setTopFilters({ ...topFilters, templates: [] });
@@ -75,6 +73,12 @@ export const TemplatesFilterInput = ({
     initializeFromTemplate(undefined);
     setPendingTemplate(undefined);
     setDropdownOpen(false);
+    // Reset column state (order, width, visibility, sort, pin)
+    agGridApi?.resetColumnState();
+    // Reset all filters
+    agGridApi?.setFilterModel(null);
+    // Optional: Reset column groups
+    agGridApi?.resetColumnGroupState();
   };
 
   const handleOpenAddTemplatePanel = () => {

@@ -120,7 +120,11 @@ export const TemplateItem = ({
             onChange={handleChangeEditedTemplateValue}
           />
           <IconButton icon={<CloseOutline />} onClick={() => setIsEditMode(false)} />
-          <IconButton icon={<SaveOutline />} onClick={handleOnSave} />
+          <IconButton
+            icon={<SaveOutline />}
+            onClick={handleOnSave}
+            disabled={!editedTemplateValue}
+          />
         </div>
       ) : (
         <>

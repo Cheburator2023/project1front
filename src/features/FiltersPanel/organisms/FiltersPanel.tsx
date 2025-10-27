@@ -12,9 +12,7 @@ import { Container, CustomDateField, FiltersDivider, FilterButton, FiltersBox } 
 import { useGlobalStore } from '../../../shared/stores/globalStore';
 import { TemplatesPanel } from '../../TemplatesPanel/organisms/TemplatesPanel';
 import { TemplatesFilterInput } from '../molecules/TemplatesFilterInput';
-import {
-  useTemplateFiltersModalStoreSelected,
-} from '../../TemplatesPanel/stores/templateFiltersModalStore';
+import { useTemplateFiltersModalStoreSelected } from '../../TemplatesPanel/stores/templateFiltersModalStore';
 import { ROUTES } from '../../../app/Routes';
 
 export interface FiltersPanelProps {
@@ -36,8 +34,7 @@ export const FiltersPanel = ({
   const { templates } = useTemplatesStore();
   const navigate = useNavigate();
 
-  const { compareMode, setCompareMode, modelsParams, setModelsParams } =
-    useModelsStore();
+  const { compareMode, setCompareMode, modelsParams, setModelsParams } = useModelsStore();
 
   const { refetch: refetchModels } = useModelsControllerGetModels(modelsParams, {
     query: { enabled: false },
@@ -54,7 +51,7 @@ export const FiltersPanel = ({
     setModelsDownloadingDate,
     resetFilters,
   } = useFiltersStore();
-  const { setFiltersResetCount } = useGlobalStore();
+  const { setFiltersResetCount, agGridApi } = useGlobalStore();
   const { getActiveTemplate } = useFiltersStore();
   const initializeFromTemplate = useTemplateFiltersModalStoreSelected.use.initializeFromTemplate();
   const resetState = useTemplateFiltersModalStoreSelected.use.resetState();
@@ -106,6 +103,12 @@ export const FiltersPanel = ({
     resetState();
     initializeFromTemplate(undefined);
     setPendingTemplate(undefined);
+    // Reset column state (order, width, visibility, sort, pin)
+    agGridApi?.resetColumnState();
+    // Reset all filters
+    agGridApi?.setFilterModel(null);
+    // Optional: Reset column groups
+    agGridApi?.resetColumnGroupState();
   }, [
     resetFilters,
     setTopFilters,
@@ -146,10 +149,7 @@ export const FiltersPanel = ({
           selectedValues={topFilters.objectTypeRegistry}
           onChange={handleChange}
         />
-        <TemplatesFilterInput
-          activeTemplate={activeTemplate}
-          templates={templates}
-        />
+        <TemplatesFilterInput activeTemplate={activeTemplate} templates={templates} />
         {compareMode ? (
           <>
             <CustomDateField
@@ -224,11 +224,11 @@ export const FiltersPanel = ({
                 disabled={!areDatesSelected}
                 onChange={(event) => handleCompareOnlyChanged(event.target.checked)}
               />
-              <T 
-                font="Body/Body 2 Short" 
-                style={{ 
+              <T
+                font="Body/Body 2 Short"
+                style={{
                   opacity: areDatesSelected ? 1 : 0.5,
-                  cursor: areDatesSelected ? 'default' : 'not-allowed'
+                  cursor: areDatesSelected ? 'default' : 'not-allowed',
                 }}
               >
                 Только измененные
