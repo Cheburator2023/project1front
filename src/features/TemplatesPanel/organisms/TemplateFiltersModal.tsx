@@ -32,7 +32,6 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
   const isEditMode = useTemplateFiltersModalStoreSelected.use.isEditMode();
   const toggleEditMode = useTemplateFiltersModalStoreSelected.use.toggleEditMode();
   const resetInitialized = useTemplateFiltersModalStoreSelected.use.resetInitialized();
-  console.log('🐸 Pepe said >> TemplateFiltersModal >> resetInitialized:', resetInitialized);
 
   const setResetInitialized = useTemplateFiltersModalStoreSelected.use.setResetInitialized();
   const hasColumnsChangedAfterReset =
@@ -324,7 +323,12 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
           <Button appearance="secondary" dimension="s" onClick={handleCancel}>
             Отмена
           </Button>
-          <Button appearance="primary" dimension="s" onClick={handleSave}>
+          <Button
+            appearance="primary"
+            dimension="s"
+            onClick={handleSave}
+            disabled={!hasChanges()}
+          >
             Применить
           </Button>
         </div>
