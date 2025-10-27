@@ -411,6 +411,13 @@ const getDisabledStatus = (minDate: Date, maxDate: Date, quarter: number, canEdi
   const currentDate = new Date();
   const currentQuarter = Math.floor((currentDate.getMonth() + 3) / 3); // TODO: Вычисляем текущий квартал
 
+  if (quarter === 2) {
+    // TODO: Для 2 квартала разрешаем редактирование до 30 ноября (в зависимости от флага)
+    if (ENABLE_2Q_EXTENSION_UNTIL_NOVEMBER_30) {
+      return !isWithinInterval(currentDate, { start: minDate, end: maxDate });
+    }
+  }
+
   if (quarter === 4) {
     // TODO: Для 4 квартала в Q1 и Q2 разрешаем редактирование до maxDate (в зависимости от флагов)
     if (currentQuarter === 1 || currentQuarter === 2) {
