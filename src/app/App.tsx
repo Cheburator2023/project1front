@@ -55,9 +55,9 @@ const IS_DEV = process.env.NODE_ENV === 'development';
 
 const App = ({ user, onLogout, keycloak }: AppProps) => {
   const onLogoutHandler = () => {
-    if (onLogout) {
+    if (onLogout || keycloak) {
       keycloak.logout({ redirectUri: window.location.origin });
-      onLogout();
+      onLogout?.();
     }
     localStorage.removeItem('currentCustomer');
   };
