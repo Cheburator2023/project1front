@@ -13,6 +13,8 @@ import { OptionsFactoryProps, SELECT_TYPE } from '../types';
 import { SingleSelectContainer, TagsContainer, CustomTags, MultiSelectContainer } from './styles';
 import { getSelectedValuesString } from './helpers';
 import { Template } from '../../../../api';
+import { useFiltersStore, useTemplatesStore } from '../../../../stores';
+import { useTemplateFiltersModalStoreSelected } from '../../../../../features/TemplatesPanel/stores/templateFiltersModalStore';
 
 interface SelectValueProps {
   options: OptionsFactoryProps;
@@ -25,6 +27,8 @@ interface SelectValueProps {
 
 export const SelectValue = React.memo(
   ({ value, selectedAllValues, active, options, modified, pendingTemplate }: SelectValueProps) => {
+
+
     const isValueArray = Array.isArray(value);
 
     if (!isValueArray) {
@@ -36,6 +40,7 @@ export const SelectValue = React.memo(
         const selectedValueText = options.groups
           .flatMap((group) => group.options)
           .find((option) => option.value === value[0])?.text;
+        console.log('🐸 Pepe said >> selectedValueText:', selectedValueText);
 
         return (
           <SingleSelectContainer>
@@ -51,7 +56,7 @@ export const SelectValue = React.memo(
               {active && selectedValueText
                 ? selectedValueText
                 : active || pendingTemplate
-                ? 'Новый шаблон (не сохранен)'
+                ? 'Не активен'
                 : 'Не активен'}
             </div>
             {active ? (

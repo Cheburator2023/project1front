@@ -122,6 +122,8 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
           setFiltersResetCount();
           initializeFromTemplate(undefined);
           setPendingTemplate(undefined);
+          console.log('🐸 AAA 1', setPendingTemplate);
+
         }
       } else {
         // Apply the same reset logic as in TemplatesFilterInput (full reset)
@@ -131,6 +133,8 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
         resetState();
         initializeFromTemplate(undefined);
         setPendingTemplate(undefined);
+          console.log('🐸 AAA 2', setPendingTemplate);
+
       }
 
       // Reset the resetInitialized flag
@@ -195,6 +199,8 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
             filterModel: newFilterModel,
             columnState,
           };
+          console.log('🐸 AAA 3', setPendingTemplate);
+
           setPendingTemplate(savedTemplate);
           agGridApiGlobal.setFilterModel(newFilterModel);
           agGridApiGlobal.applyColumnState({ state: columnState, applyOrder: true });
@@ -210,6 +216,7 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
           columnState,
           isPending: true,
         };
+          console.log('🐸 AAA 4', setPendingTemplate);
         setPendingTemplate(savedTemplate);
         agGridApiGlobal.setFilterModel(newFilterModel);
         console.log('🐸 Pepe said >> handleSave >> columnState 222:', columnState);

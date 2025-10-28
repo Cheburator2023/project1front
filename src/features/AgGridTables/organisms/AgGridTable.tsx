@@ -183,7 +183,8 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     const { openAddModelPanel, openDeleteModelPanel } = usePanelsStore();
     const handleClickOnActionCellFromProps = handleClickOnActionCell || (() => {});
     const { filtersResetCount, setAgGridApi, agGridApi } = useGlobalStore();
-    const { filterModel, topFilters, setTopFilters, setFilterModel, setColumnsFilters } = useFiltersStore();
+    const { filterModel, topFilters, setTopFilters, setFilterModel, setColumnsFilters } =
+      useFiltersStore();
     const { setPendingTemplate } = useTemplatesStore();
 
     const { modelsCount, modelSource, isDeleteButtonEnabled, userMatches, updateDeleteModelState } =
@@ -566,7 +567,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     };
 
     return (
-      <Flexbox height="calc(100vh - 230px)">
+      <Flexbox height="calc(100vh - 220px)">
         {error ? (
           <StatusWrapper>{error ? <ErrorStatus text={error} /> : null}</StatusWrapper>
         ) : null}
@@ -670,7 +671,6 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
 );
 
 const GridWrapper = styled('div')`
-  zoom: 0.8;
   & .ag-column-panel .ag-pivot-mode-panel {
     display: none;
   }
@@ -680,7 +680,6 @@ const GridWrapper = styled('div')`
   }
 
   & .ag-popup {
-    zoom: 1.25;
   }
 `;
 

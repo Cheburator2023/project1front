@@ -40,6 +40,9 @@ export const TemplatesFilterInput = ({
   const { pendingTemplate, setPendingTemplate } = useTemplatesStore();
   const initializeFromTemplate = useTemplateFiltersModalStoreSelected.use.initializeFromTemplate();
   const resetState = useTemplateFiltersModalStoreSelected.use.resetState();
+  const setResetInitialized = useTemplateFiltersModalStoreSelected.use.setResetInitialized();
+
+
 
   const groupedOptions = useMemo(() => {
     if (templates) {
@@ -79,6 +82,8 @@ export const TemplatesFilterInput = ({
     agGridApi?.setFilterModel(null);
     // Optional: Reset column groups
     agGridApi?.resetColumnGroupState();
+    // Reset the resetInitialized flag
+    setResetInitialized(false);
   };
 
   const handleOpenAddTemplatePanel = () => {

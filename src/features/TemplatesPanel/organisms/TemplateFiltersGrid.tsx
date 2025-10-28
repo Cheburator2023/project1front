@@ -161,11 +161,11 @@ const TableWrapper = styled('div')`
     line-height: normal;
     display: flex;
     align-items: center;
-    font-size: 11px;
+    font-size: 14px;
   }
 
   .ag-header-cell {
-    font-size: 11px;
+    font-size: 14px;
   }
 `;
 

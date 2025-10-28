@@ -110,6 +110,8 @@ const isSubmitButtonEnabled = (
     '1': !isValidatorLead,
     '2': isValidatorLead,
   };
+  console.log('🐸 Pepe said >> isSubmitButtonEnabled >> conditions:', conditions);
+
 
   return conditions[activeTab] ?? false;
 };
@@ -387,8 +389,11 @@ export const DeleteModelForm = ({
 
   const renderFooter = useCallback(() => {
     const modelStatus = values?.status?.value || initialRow?.status;
-    const isEnabled =
-      NO_ROLES || isSubmitButtonEnabled(activeTab, isValidatorLead, modelStatus as ModelStatus);
+    const isEnabled = isSubmitButtonEnabled(activeTab, isValidatorLead, modelStatus as ModelStatus);
+    console.log('🐸 Pepe said >> DeleteModelForm >> modelStatus:', modelStatus);
+    console.log('🐸 Pepe said >> DeleteModelForm >> isValidatorLead:', isValidatorLead);
+    console.log('🐸 Pepe said >> DeleteModelForm >> activeTab:', activeTab);
+
 
     return (
       <>
