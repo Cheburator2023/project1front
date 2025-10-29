@@ -61,14 +61,13 @@ export const ModelForm = ({
   onSubmit,
   onClose,
 }: ModelFormProps) => {
-    const {
-    setRows,
-    modelsParams,
-  } = useModelsStore();
+  const { setRows, modelsParams } = useModelsStore();
 
   const updateModelsMutation: any = useModelsControllerUpdateModels();
   const createModelMutation: any = useModelsControllerCreateModel();
-  const { data: _modelsData, refetch: refetchModels } = useModelsControllerGetModels(modelsParams);
+  const { data: _modelsData, refetch: refetchModels } = useModelsControllerGetModels(modelsParams, {
+    query: { enabled: false },
+  });
 
   const modelsData = _modelsData as ModelsResponseType | undefined;
 

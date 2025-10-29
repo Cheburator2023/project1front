@@ -112,7 +112,6 @@ const isSubmitButtonEnabled = (
   };
   console.log('🐸 Pepe said >> isSubmitButtonEnabled >> conditions:', conditions);
 
-
   return conditions[activeTab] ?? false;
 };
 
@@ -123,6 +122,8 @@ export const DeleteModelForm = ({
   onSubmit,
   onClose,
 }: DeleteModelFormProps) => {
+  console.log('🐸 Pepe said >> DeleteModelForm >> activeRow:', activeRow);
+
   const updateModelsMutation = useModelsControllerUpdateModels();
   const { currentCustomer } = useGlobalStore();
 
@@ -143,7 +144,10 @@ export const DeleteModelForm = ({
 
   const { setRows, modelsParams } = useModelsStore();
 
-  const { data: _modelsData, refetch: refetchModels } = useModelsControllerGetModels(modelsParams);
+  const { data: _modelsData, refetch: refetchModels } = useModelsControllerGetModels(modelsParams, {
+    query: { enabled: false },
+  });
+  console.log('🐸 Pepe said >> DeleteModelForm >> _modelsData:', _modelsData);
 
   const modelsData = _modelsData as ModelsResponseType | undefined;
 
@@ -291,6 +295,8 @@ export const DeleteModelForm = ({
               {
                 onSuccess: (data) => {
                   refetchModels();
+                  console.log('🐸 Pepe said >> !!! >> DeleteModelForm >> onSuccess:', data);
+
                   return resolve({ data: { data: { cards: [data] } }, error: false });
                 },
                 onError: () => resolve({ error: true }),
@@ -386,6 +392,7 @@ export const DeleteModelForm = ({
       setInvalidFields(newInvalidFields);
     }
   }, [values, dirtyFields, deleteFormSchema, wasPreviouslyActiveModel, fields]);
+  console.log('🐸 Pepe said >> DeleteModelForm >> values:', values);
 
   const renderFooter = useCallback(() => {
     const modelStatus = values?.status?.value || initialRow?.status;
@@ -393,7 +400,6 @@ export const DeleteModelForm = ({
     console.log('🐸 Pepe said >> DeleteModelForm >> modelStatus:', modelStatus);
     console.log('🐸 Pepe said >> DeleteModelForm >> isValidatorLead:', isValidatorLead);
     console.log('🐸 Pepe said >> DeleteModelForm >> activeTab:', activeTab);
-
 
     return (
       <>
