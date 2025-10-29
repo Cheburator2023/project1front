@@ -611,13 +611,8 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
                   />
                   <IconButton
                     icon={<BrokerOutlineIcon />}
-                    tooltip="Графики (живые данные)"
+                    tooltip="Графики"
                     onClick={() => navigate('charts')}
-                  />
-                  <IconButton
-                    icon={<BrokerOutlineIcon />}
-                    tooltip="Графики (BI витрины)"
-                    onClick={() => navigate('charts_bi')}
                   />
                   {/* <IconButton icon={<MenuOutline />} tooltip="Меню" onClick={() => null} /> */}
                   {/* <IconButton icon={<SettingsOutline />} tooltip="Настройки" onClick={() => null} /> */}

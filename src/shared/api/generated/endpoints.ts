@@ -52,35 +52,37 @@ export const modelsControllerGetModels = (
     params: ModelsControllerGetModelsParams,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return customInstance<null>(
       {url: `/models`, method: 'GET',
         params, signal
     },
       );
     }
-  
+
 
 export const getModelsControllerGetModelsQueryKey = (params?: ModelsControllerGetModelsParams,) => {
     return [`/models`, ...(params ? [params]: [])] as const;
     }
 
-    
+
 export const getModelsControllerGetModelsQueryOptions = <TData = Awaited<ReturnType<typeof modelsControllerGetModels>>, TError = ErrorType<null>>(params: ModelsControllerGetModelsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof modelsControllerGetModels>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getModelsControllerGetModelsQueryKey(params);
+  console.log('🐸 Pepe said >> getModelsControllerGetModelsQueryOptions >> queryKey:', queryKey);
 
-  
+
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof modelsControllerGetModels>>> = ({ signal }) => modelsControllerGetModels(params, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof modelsControllerGetModels>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -119,7 +121,7 @@ export function useModelsControllerGetModels<TData = Awaited<ReturnType<typeof m
 
 export function useModelsControllerGetModels<TData = Awaited<ReturnType<typeof modelsControllerGetModels>>, TError = ErrorType<null>>(
  params: ModelsControllerGetModelsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof modelsControllerGetModels>>, TError, TData>>, }
- , queryClient?: QueryClient 
+ , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getModelsControllerGetModelsQueryOptions(params,options)
@@ -142,21 +144,21 @@ export const modelsControllerCompareModels = (
     params?: ModelsControllerCompareModelsParams,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return customInstance<null>(
       {url: `/models/compare`, method: 'GET',
         params, signal
     },
       );
     }
-  
+
 
 export const getModelsControllerCompareModelsQueryKey = (params?: ModelsControllerCompareModelsParams,) => {
     return [`/models/compare`, ...(params ? [params]: [])] as const;
     }
 
-    
+
 export const getModelsControllerCompareModelsQueryOptions = <TData = Awaited<ReturnType<typeof modelsControllerCompareModels>>, TError = ErrorType<null>>(params?: ModelsControllerCompareModelsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof modelsControllerCompareModels>>, TError, TData>>, }
 ) => {
 
@@ -164,13 +166,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getModelsControllerCompareModelsQueryKey(params);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof modelsControllerCompareModels>>> = ({ signal }) => modelsControllerCompareModels(params, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof modelsControllerCompareModels>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -209,7 +211,7 @@ export function useModelsControllerCompareModels<TData = Awaited<ReturnType<type
 
 export function useModelsControllerCompareModels<TData = Awaited<ReturnType<typeof modelsControllerCompareModels>>, TError = ErrorType<null>>(
  params?: ModelsControllerCompareModelsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof modelsControllerCompareModels>>, TError, TData>>, }
- , queryClient?: QueryClient 
+ , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getModelsControllerCompareModelsQueryOptions(params,options)
@@ -232,8 +234,8 @@ export const modelsControllerCreateModel = (
     modelCreateDto: BodyType<ModelCreateDto[]>,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return customInstance<null>(
       {url: `/models/create`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
@@ -241,7 +243,7 @@ export const modelsControllerCreateModel = (
     },
       );
     }
-  
+
 
 
 export const getModelsControllerCreateModelMutationOptions = <TError = ErrorType<null | null>,
@@ -255,7 +257,7 @@ const {mutation: mutationOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }};
 
-      
+
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof modelsControllerCreateModel>>, {data: BodyType<ModelCreateDto[]>}> = (props) => {
@@ -264,7 +266,7 @@ const {mutation: mutationOptions} = options ?
           return  modelsControllerCreateModel(data,)
         }
 
-        
+
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -289,7 +291,7 @@ export const useModelsControllerCreateModel = <TError = ErrorType<null | null>,
 
       return useMutation(mutationOptions , queryClient);
     }
-    
+
 /**
  * Обновляет существующие модели с новыми значениями артефактов
  * @summary Обновить модели
@@ -297,8 +299,8 @@ export const useModelsControllerCreateModel = <TError = ErrorType<null | null>,
 export const modelsControllerUpdateModels = (
     modelsUpdateDto: BodyType<ModelsUpdateDto[]>,
  ) => {
-      
-      
+
+
       return customInstance<null>(
       {url: `/models/update`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
@@ -306,7 +308,7 @@ export const modelsControllerUpdateModels = (
     },
       );
     }
-  
+
 
 
 export const getModelsControllerUpdateModelsMutationOptions = <TError = ErrorType<null | null>,
@@ -320,7 +322,7 @@ const {mutation: mutationOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }};
 
-      
+
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof modelsControllerUpdateModels>>, {data: BodyType<ModelsUpdateDto[]>}> = (props) => {
@@ -329,7 +331,7 @@ const {mutation: mutationOptions} = options ?
           return  modelsControllerUpdateModels(data,)
         }
 
-        
+
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -354,7 +356,7 @@ export const useModelsControllerUpdateModels = <TError = ErrorType<null | null>,
 
       return useMutation(mutationOptions , queryClient);
     }
-    
+
 /**
  * Возвращает информацию о связях указанной модели с другими объектами системы
  * @summary Получить связи модели
@@ -363,21 +365,21 @@ export const modelsControllerGetModelWithRelations = (
     params: ModelsControllerGetModelWithRelationsParams,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return customInstance<null>(
       {url: `/models/relations`, method: 'GET',
         params, signal
     },
       );
     }
-  
+
 
 export const getModelsControllerGetModelWithRelationsQueryKey = (params?: ModelsControllerGetModelWithRelationsParams,) => {
     return [`/models/relations`, ...(params ? [params]: [])] as const;
     }
 
-    
+
 export const getModelsControllerGetModelWithRelationsQueryOptions = <TData = Awaited<ReturnType<typeof modelsControllerGetModelWithRelations>>, TError = ErrorType<null>>(params: ModelsControllerGetModelWithRelationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof modelsControllerGetModelWithRelations>>, TError, TData>>, }
 ) => {
 
@@ -385,13 +387,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getModelsControllerGetModelWithRelationsQueryKey(params);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof modelsControllerGetModelWithRelations>>> = ({ signal }) => modelsControllerGetModelWithRelations(params, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof modelsControllerGetModelWithRelations>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -430,7 +432,7 @@ export function useModelsControllerGetModelWithRelations<TData = Awaited<ReturnT
 
 export function useModelsControllerGetModelWithRelations<TData = Awaited<ReturnType<typeof modelsControllerGetModelWithRelations>>, TError = ErrorType<null>>(
  params: ModelsControllerGetModelWithRelationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof modelsControllerGetModelWithRelations>>, TError, TData>>, }
- , queryClient?: QueryClient 
+ , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getModelsControllerGetModelWithRelationsQueryOptions(params,options)
@@ -453,21 +455,21 @@ export const modelsControllerGetModelHistory = (
     params: ModelsControllerGetModelHistoryParams,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return customInstance<null>(
       {url: `/models/artefact/history`, method: 'GET',
         params, signal
     },
       );
     }
-  
+
 
 export const getModelsControllerGetModelHistoryQueryKey = (params?: ModelsControllerGetModelHistoryParams,) => {
     return [`/models/artefact/history`, ...(params ? [params]: [])] as const;
     }
 
-    
+
 export const getModelsControllerGetModelHistoryQueryOptions = <TData = Awaited<ReturnType<typeof modelsControllerGetModelHistory>>, TError = ErrorType<null>>(params: ModelsControllerGetModelHistoryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof modelsControllerGetModelHistory>>, TError, TData>>, }
 ) => {
 
@@ -475,13 +477,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getModelsControllerGetModelHistoryQueryKey(params);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof modelsControllerGetModelHistory>>> = ({ signal }) => modelsControllerGetModelHistory(params, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof modelsControllerGetModelHistory>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -520,7 +522,7 @@ export function useModelsControllerGetModelHistory<TData = Awaited<ReturnType<ty
 
 export function useModelsControllerGetModelHistory<TData = Awaited<ReturnType<typeof modelsControllerGetModelHistory>>, TError = ErrorType<null>>(
  params: ModelsControllerGetModelHistoryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof modelsControllerGetModelHistory>>, TError, TData>>, }
- , queryClient?: QueryClient 
+ , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getModelsControllerGetModelHistoryQueryOptions(params,options)
@@ -540,23 +542,23 @@ export function useModelsControllerGetModelHistory<TData = Awaited<ReturnType<ty
  * @summary Получить список шаблонов
  */
 export const templatesControllerGetTemplates = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return customInstance<null>(
       {url: `/templates`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getTemplatesControllerGetTemplatesQueryKey = () => {
     return [`/templates`] as const;
     }
 
-    
+
 export const getTemplatesControllerGetTemplatesQueryOptions = <TData = Awaited<ReturnType<typeof templatesControllerGetTemplates>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof templatesControllerGetTemplates>>, TError, TData>>, }
 ) => {
 
@@ -564,13 +566,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getTemplatesControllerGetTemplatesQueryKey();
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof templatesControllerGetTemplates>>> = ({ signal }) => templatesControllerGetTemplates(signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof templatesControllerGetTemplates>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -609,7 +611,7 @@ export function useTemplatesControllerGetTemplates<TData = Awaited<ReturnType<ty
 
 export function useTemplatesControllerGetTemplates<TData = Awaited<ReturnType<typeof templatesControllerGetTemplates>>, TError = ErrorType<unknown>>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof templatesControllerGetTemplates>>, TError, TData>>, }
- , queryClient?: QueryClient 
+ , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getTemplatesControllerGetTemplatesQueryOptions(options)
@@ -632,20 +634,20 @@ export const templatesControllerGetTemplate = (
     id: number,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return customInstance<null>(
       {url: `/templates/${id}`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getTemplatesControllerGetTemplateQueryKey = (id?: number,) => {
     return [`/templates/${id}`] as const;
     }
 
-    
+
 export const getTemplatesControllerGetTemplateQueryOptions = <TData = Awaited<ReturnType<typeof templatesControllerGetTemplate>>, TError = ErrorType<null>>(id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof templatesControllerGetTemplate>>, TError, TData>>, }
 ) => {
 
@@ -653,13 +655,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getTemplatesControllerGetTemplateQueryKey(id);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof templatesControllerGetTemplate>>> = ({ signal }) => templatesControllerGetTemplate(id, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof templatesControllerGetTemplate>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -698,7 +700,7 @@ export function useTemplatesControllerGetTemplate<TData = Awaited<ReturnType<typ
 
 export function useTemplatesControllerGetTemplate<TData = Awaited<ReturnType<typeof templatesControllerGetTemplate>>, TError = ErrorType<null>>(
  id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof templatesControllerGetTemplate>>, TError, TData>>, }
- , queryClient?: QueryClient 
+ , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getTemplatesControllerGetTemplateQueryOptions(id,options)
@@ -720,14 +722,14 @@ export function useTemplatesControllerGetTemplate<TData = Awaited<ReturnType<typ
 export const templatesControllerDeleteTemplate = (
     id: number,
  ) => {
-      
-      
+
+
       return customInstance<null>(
       {url: `/templates/${id}`, method: 'DELETE'
     },
       );
     }
-  
+
 
 
 export const getTemplatesControllerDeleteTemplateMutationOptions = <TError = ErrorType<null>,
@@ -741,7 +743,7 @@ const {mutation: mutationOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }};
 
-      
+
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof templatesControllerDeleteTemplate>>, {id: number}> = (props) => {
@@ -750,13 +752,13 @@ const {mutation: mutationOptions} = options ?
           return  templatesControllerDeleteTemplate(id,)
         }
 
-        
+
 
 
   return  { mutationFn, ...mutationOptions }}
 
     export type TemplatesControllerDeleteTemplateMutationResult = NonNullable<Awaited<ReturnType<typeof templatesControllerDeleteTemplate>>>
-    
+
     export type TemplatesControllerDeleteTemplateMutationError = ErrorType<null>
 
     /**
@@ -775,7 +777,7 @@ export const useTemplatesControllerDeleteTemplate = <TError = ErrorType<null>,
 
       return useMutation(mutationOptions , queryClient);
     }
-    
+
 /**
  * Создает новый шаблон в системе
  * @summary Создать новый шаблон
@@ -784,8 +786,8 @@ export const templatesControllerCreateTemplate = (
     templateCreateDto: BodyType<TemplateCreateDto>,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return customInstance<null>(
       {url: `/templates/create`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
@@ -793,7 +795,7 @@ export const templatesControllerCreateTemplate = (
     },
       );
     }
-  
+
 
 
 export const getTemplatesControllerCreateTemplateMutationOptions = <TError = ErrorType<null | null>,
@@ -807,7 +809,7 @@ const {mutation: mutationOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }};
 
-      
+
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof templatesControllerCreateTemplate>>, {data: BodyType<TemplateCreateDto>}> = (props) => {
@@ -816,7 +818,7 @@ const {mutation: mutationOptions} = options ?
           return  templatesControllerCreateTemplate(data,)
         }
 
-        
+
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -841,7 +843,7 @@ export const useTemplatesControllerCreateTemplate = <TError = ErrorType<null | n
 
       return useMutation(mutationOptions , queryClient);
     }
-    
+
 /**
  * Обновляет существующий шаблон
  * @summary Обновить шаблон
@@ -849,8 +851,8 @@ export const useTemplatesControllerCreateTemplate = <TError = ErrorType<null | n
 export const templatesControllerUpdateTemplate = (
     templateUpdateDto: BodyType<TemplateUpdateDto>,
  ) => {
-      
-      
+
+
       return customInstance<null>(
       {url: `/templates/update`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
@@ -858,7 +860,7 @@ export const templatesControllerUpdateTemplate = (
     },
       );
     }
-  
+
 
 
 export const getTemplatesControllerUpdateTemplateMutationOptions = <TError = ErrorType<null>,
@@ -872,7 +874,7 @@ const {mutation: mutationOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }};
 
-      
+
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof templatesControllerUpdateTemplate>>, {data: BodyType<TemplateUpdateDto>}> = (props) => {
@@ -881,7 +883,7 @@ const {mutation: mutationOptions} = options ?
           return  templatesControllerUpdateTemplate(data,)
         }
 
-        
+
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -906,7 +908,7 @@ export const useTemplatesControllerUpdateTemplate = <TError = ErrorType<null>,
 
       return useMutation(mutationOptions , queryClient);
     }
-    
+
 /**
  * Возвращает метрики системы за указанный период с возможностью использования BI витрин
  * @summary Получить метрики
@@ -915,21 +917,21 @@ export const metricsControllerGetMetrics = (
     params?: MetricsControllerGetMetricsParams,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return customInstance<null>(
       {url: `/metrics`, method: 'GET',
         params, signal
     },
       );
     }
-  
+
 
 export const getMetricsControllerGetMetricsQueryKey = (params?: MetricsControllerGetMetricsParams,) => {
     return [`/metrics`, ...(params ? [params]: [])] as const;
     }
 
-    
+
 export const getMetricsControllerGetMetricsQueryOptions = <TData = Awaited<ReturnType<typeof metricsControllerGetMetrics>>, TError = ErrorType<null>>(params?: MetricsControllerGetMetricsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetMetrics>>, TError, TData>>, }
 ) => {
 
@@ -937,13 +939,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getMetricsControllerGetMetricsQueryKey(params);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof metricsControllerGetMetrics>>> = ({ signal }) => metricsControllerGetMetrics(params, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetMetrics>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -982,7 +984,7 @@ export function useMetricsControllerGetMetrics<TData = Awaited<ReturnType<typeof
 
 export function useMetricsControllerGetMetrics<TData = Awaited<ReturnType<typeof metricsControllerGetMetrics>>, TError = ErrorType<null>>(
  params?: MetricsControllerGetMetricsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetMetrics>>, TError, TData>>, }
- , queryClient?: QueryClient 
+ , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getMetricsControllerGetMetricsQueryOptions(params,options)
@@ -1005,8 +1007,8 @@ export const metricsControllerExportMetricsToExcel = (
     params?: MetricsControllerExportMetricsToExcelParams,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return customInstance<Blob>(
       {url: `/metrics/export`, method: 'GET',
         params,
@@ -1014,13 +1016,13 @@ export const metricsControllerExportMetricsToExcel = (
     },
       );
     }
-  
+
 
 export const getMetricsControllerExportMetricsToExcelQueryKey = (params?: MetricsControllerExportMetricsToExcelParams,) => {
     return [`/metrics/export`, ...(params ? [params]: [])] as const;
     }
 
-    
+
 export const getMetricsControllerExportMetricsToExcelQueryOptions = <TData = Awaited<ReturnType<typeof metricsControllerExportMetricsToExcel>>, TError = ErrorType<null | null | null>>(params?: MetricsControllerExportMetricsToExcelParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerExportMetricsToExcel>>, TError, TData>>, }
 ) => {
 
@@ -1028,13 +1030,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getMetricsControllerExportMetricsToExcelQueryKey(params);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof metricsControllerExportMetricsToExcel>>> = ({ signal }) => metricsControllerExportMetricsToExcel(params, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof metricsControllerExportMetricsToExcel>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -1073,7 +1075,7 @@ export function useMetricsControllerExportMetricsToExcel<TData = Awaited<ReturnT
 
 export function useMetricsControllerExportMetricsToExcel<TData = Awaited<ReturnType<typeof metricsControllerExportMetricsToExcel>>, TError = ErrorType<null | null | null>>(
  params?: MetricsControllerExportMetricsToExcelParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerExportMetricsToExcel>>, TError, TData>>, }
- , queryClient?: QueryClient 
+ , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getMetricsControllerExportMetricsToExcelQueryOptions(params,options)
@@ -1093,23 +1095,23 @@ export function useMetricsControllerExportMetricsToExcel<TData = Awaited<ReturnT
  * @summary Получить статус кеша моделей
  */
 export const cacheControllerGetModelsCacheStatus = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return customInstance<null>(
       {url: `/cache/models/status`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getCacheControllerGetModelsCacheStatusQueryKey = () => {
     return [`/cache/models/status`] as const;
     }
 
-    
+
 export const getCacheControllerGetModelsCacheStatusQueryOptions = <TData = Awaited<ReturnType<typeof cacheControllerGetModelsCacheStatus>>, TError = ErrorType<null>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof cacheControllerGetModelsCacheStatus>>, TError, TData>>, }
 ) => {
 
@@ -1117,13 +1119,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getCacheControllerGetModelsCacheStatusQueryKey();
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof cacheControllerGetModelsCacheStatus>>> = ({ signal }) => cacheControllerGetModelsCacheStatus(signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof cacheControllerGetModelsCacheStatus>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -1162,7 +1164,7 @@ export function useCacheControllerGetModelsCacheStatus<TData = Awaited<ReturnTyp
 
 export function useCacheControllerGetModelsCacheStatus<TData = Awaited<ReturnType<typeof cacheControllerGetModelsCacheStatus>>, TError = ErrorType<null>>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof cacheControllerGetModelsCacheStatus>>, TError, TData>>, }
- , queryClient?: QueryClient 
+ , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getCacheControllerGetModelsCacheStatusQueryOptions(options)
@@ -1182,17 +1184,17 @@ export function useCacheControllerGetModelsCacheStatus<TData = Awaited<ReturnTyp
  * @summary Обновить кеш моделей
  */
 export const cacheControllerRefreshModelsCache = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return customInstance<null>(
       {url: `/cache/models/refresh`, method: 'POST', signal
     },
       );
     }
-  
+
 
 
 export const getCacheControllerRefreshModelsCacheMutationOptions = <TError = ErrorType<null>,
@@ -1206,22 +1208,22 @@ const {mutation: mutationOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }};
 
-      
+
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof cacheControllerRefreshModelsCache>>, void> = () => {
-          
+
 
           return  cacheControllerRefreshModelsCache()
         }
 
-        
+
 
 
   return  { mutationFn, ...mutationOptions }}
 
     export type CacheControllerRefreshModelsCacheMutationResult = NonNullable<Awaited<ReturnType<typeof cacheControllerRefreshModelsCache>>>
-    
+
     export type CacheControllerRefreshModelsCacheMutationError = ErrorType<null>
 
     /**
@@ -1240,7 +1242,7 @@ export const useCacheControllerRefreshModelsCache = <TError = ErrorType<null>,
 
       return useMutation(mutationOptions , queryClient);
     }
-    
+
 /**
  * Возвращает уникальные значения указанной колонки из кеша моделей
  * @summary Получить значения колонки из кеша
@@ -1249,20 +1251,20 @@ export const cacheControllerGetColumnValuesFromCache = (
     columnName: string,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return customInstance<null>(
       {url: `/cache/models/column-values/${columnName}`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getCacheControllerGetColumnValuesFromCacheQueryKey = (columnName?: string,) => {
     return [`/cache/models/column-values/${columnName}`] as const;
     }
 
-    
+
 export const getCacheControllerGetColumnValuesFromCacheQueryOptions = <TData = Awaited<ReturnType<typeof cacheControllerGetColumnValuesFromCache>>, TError = ErrorType<null>>(columnName: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof cacheControllerGetColumnValuesFromCache>>, TError, TData>>, }
 ) => {
 
@@ -1270,13 +1272,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getCacheControllerGetColumnValuesFromCacheQueryKey(columnName);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof cacheControllerGetColumnValuesFromCache>>> = ({ signal }) => cacheControllerGetColumnValuesFromCache(columnName, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, enabled: !!(columnName), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof cacheControllerGetColumnValuesFromCache>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -1315,7 +1317,7 @@ export function useCacheControllerGetColumnValuesFromCache<TData = Awaited<Retur
 
 export function useCacheControllerGetColumnValuesFromCache<TData = Awaited<ReturnType<typeof cacheControllerGetColumnValuesFromCache>>, TError = ErrorType<null>>(
  columnName: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof cacheControllerGetColumnValuesFromCache>>, TError, TData>>, }
- , queryClient?: QueryClient 
+ , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getCacheControllerGetColumnValuesFromCacheQueryOptions(columnName,options)
@@ -1335,23 +1337,23 @@ export function useCacheControllerGetColumnValuesFromCache<TData = Awaited<Retur
  * @summary Получить содержимое всех кешей
  */
 export const cacheControllerGetAllCacheContents = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return customInstance<null>(
       {url: `/cache/all`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getCacheControllerGetAllCacheContentsQueryKey = () => {
     return [`/cache/all`] as const;
     }
 
-    
+
 export const getCacheControllerGetAllCacheContentsQueryOptions = <TData = Awaited<ReturnType<typeof cacheControllerGetAllCacheContents>>, TError = ErrorType<null>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof cacheControllerGetAllCacheContents>>, TError, TData>>, }
 ) => {
 
@@ -1359,13 +1361,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getCacheControllerGetAllCacheContentsQueryKey();
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof cacheControllerGetAllCacheContents>>> = ({ signal }) => cacheControllerGetAllCacheContents(signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof cacheControllerGetAllCacheContents>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -1404,7 +1406,7 @@ export function useCacheControllerGetAllCacheContents<TData = Awaited<ReturnType
 
 export function useCacheControllerGetAllCacheContents<TData = Awaited<ReturnType<typeof cacheControllerGetAllCacheContents>>, TError = ErrorType<null>>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof cacheControllerGetAllCacheContents>>, TError, TData>>, }
- , queryClient?: QueryClient 
+ , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getCacheControllerGetAllCacheContentsQueryOptions(options)
@@ -1427,20 +1429,20 @@ export const cacheControllerGetCacheByKey = (
     key: string,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return customInstance<null>(
       {url: `/cache/${key}`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getCacheControllerGetCacheByKeyQueryKey = (key?: string,) => {
     return [`/cache/${key}`] as const;
     }
 
-    
+
 export const getCacheControllerGetCacheByKeyQueryOptions = <TData = Awaited<ReturnType<typeof cacheControllerGetCacheByKey>>, TError = ErrorType<null | null>>(key: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof cacheControllerGetCacheByKey>>, TError, TData>>, }
 ) => {
 
@@ -1448,13 +1450,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getCacheControllerGetCacheByKeyQueryKey(key);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof cacheControllerGetCacheByKey>>> = ({ signal }) => cacheControllerGetCacheByKey(key, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, enabled: !!(key), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof cacheControllerGetCacheByKey>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -1493,7 +1495,7 @@ export function useCacheControllerGetCacheByKey<TData = Awaited<ReturnType<typeo
 
 export function useCacheControllerGetCacheByKey<TData = Awaited<ReturnType<typeof cacheControllerGetCacheByKey>>, TError = ErrorType<null | null>>(
  key: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof cacheControllerGetCacheByKey>>, TError, TData>>, }
- , queryClient?: QueryClient 
+ , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getCacheControllerGetCacheByKeyQueryOptions(key,options)
@@ -1513,23 +1515,23 @@ export function useCacheControllerGetCacheByKey<TData = Awaited<ReturnType<typeo
  * @summary Получить системную информацию
  */
 export const monitoringControllerGetSystemMonitoring = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return customInstance<null>(
       {url: `/monitoring/system`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getMonitoringControllerGetSystemMonitoringQueryKey = () => {
     return [`/monitoring/system`] as const;
     }
 
-    
+
 export const getMonitoringControllerGetSystemMonitoringQueryOptions = <TData = Awaited<ReturnType<typeof monitoringControllerGetSystemMonitoring>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof monitoringControllerGetSystemMonitoring>>, TError, TData>>, }
 ) => {
 
@@ -1537,13 +1539,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getMonitoringControllerGetSystemMonitoringQueryKey();
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof monitoringControllerGetSystemMonitoring>>> = ({ signal }) => monitoringControllerGetSystemMonitoring(signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof monitoringControllerGetSystemMonitoring>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -1582,7 +1584,7 @@ export function useMonitoringControllerGetSystemMonitoring<TData = Awaited<Retur
 
 export function useMonitoringControllerGetSystemMonitoring<TData = Awaited<ReturnType<typeof monitoringControllerGetSystemMonitoring>>, TError = ErrorType<unknown>>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof monitoringControllerGetSystemMonitoring>>, TError, TData>>, }
- , queryClient?: QueryClient 
+ , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getMonitoringControllerGetSystemMonitoringQueryOptions(options)
@@ -1602,23 +1604,23 @@ export function useMonitoringControllerGetSystemMonitoring<TData = Awaited<Retur
  * @summary Получить список артефактов
  */
 export const artefactsControllerGetArtefacts = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return customInstance<null>(
       {url: `/artefacts`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getArtefactsControllerGetArtefactsQueryKey = () => {
     return [`/artefacts`] as const;
     }
 
-    
+
 export const getArtefactsControllerGetArtefactsQueryOptions = <TData = Awaited<ReturnType<typeof artefactsControllerGetArtefacts>>, TError = ErrorType<null>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof artefactsControllerGetArtefacts>>, TError, TData>>, }
 ) => {
 
@@ -1626,13 +1628,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getArtefactsControllerGetArtefactsQueryKey();
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof artefactsControllerGetArtefacts>>> = ({ signal }) => artefactsControllerGetArtefacts(signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof artefactsControllerGetArtefacts>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -1671,7 +1673,7 @@ export function useArtefactsControllerGetArtefacts<TData = Awaited<ReturnType<ty
 
 export function useArtefactsControllerGetArtefacts<TData = Awaited<ReturnType<typeof artefactsControllerGetArtefacts>>, TError = ErrorType<null>>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof artefactsControllerGetArtefacts>>, TError, TData>>, }
- , queryClient?: QueryClient 
+ , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getArtefactsControllerGetArtefactsQueryOptions(options)
@@ -1694,8 +1696,8 @@ export const reportsControllerGetReport = (
     filterDto: BodyType<FilterDto>,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return customInstance<Blob>(
       {url: `/reports`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
@@ -1704,7 +1706,7 @@ export const reportsControllerGetReport = (
     },
       );
     }
-  
+
 
 
 export const getReportsControllerGetReportMutationOptions = <TError = ErrorType<unknown>,
@@ -1718,7 +1720,7 @@ const {mutation: mutationOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }};
 
-      
+
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof reportsControllerGetReport>>, {data: BodyType<FilterDto>}> = (props) => {
@@ -1727,7 +1729,7 @@ const {mutation: mutationOptions} = options ?
           return  reportsControllerGetReport(data,)
         }
 
-        
+
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -1752,23 +1754,23 @@ export const useReportsControllerGetReport = <TError = ErrorType<unknown>,
 
       return useMutation(mutationOptions , queryClient);
     }
-    
+
 /**
  * Синхронизирует все модели с BI витриной данных
  * @summary Синхронизировать витрину моделей
  */
 export const biDatamartControllerSyncModelsDatamart = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return customInstance<null>(
       {url: `/bi-datamart/sync/models`, method: 'POST', signal
     },
       );
     }
-  
+
 
 
 export const getBiDatamartControllerSyncModelsDatamartMutationOptions = <TError = ErrorType<unknown>,
@@ -1782,22 +1784,22 @@ const {mutation: mutationOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }};
 
-      
+
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof biDatamartControllerSyncModelsDatamart>>, void> = () => {
-          
+
 
           return  biDatamartControllerSyncModelsDatamart()
         }
 
-        
+
 
 
   return  { mutationFn, ...mutationOptions }}
 
     export type BiDatamartControllerSyncModelsDatamartMutationResult = NonNullable<Awaited<ReturnType<typeof biDatamartControllerSyncModelsDatamart>>>
-    
+
     export type BiDatamartControllerSyncModelsDatamartMutationError = ErrorType<unknown>
 
     /**
@@ -1816,23 +1818,23 @@ export const useBiDatamartControllerSyncModelsDatamart = <TError = ErrorType<unk
 
       return useMutation(mutationOptions , queryClient);
     }
-    
+
 /**
  * Синхронизирует все задачи с BI витриной данных
  * @summary Синхронизировать витрину задач
  */
 export const biDatamartControllerSyncTasksDatamart = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return customInstance<null>(
       {url: `/bi-datamart/sync/tasks`, method: 'POST', signal
     },
       );
     }
-  
+
 
 
 export const getBiDatamartControllerSyncTasksDatamartMutationOptions = <TError = ErrorType<unknown>,
@@ -1846,22 +1848,22 @@ const {mutation: mutationOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }};
 
-      
+
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof biDatamartControllerSyncTasksDatamart>>, void> = () => {
-          
+
 
           return  biDatamartControllerSyncTasksDatamart()
         }
 
-        
+
 
 
   return  { mutationFn, ...mutationOptions }}
 
     export type BiDatamartControllerSyncTasksDatamartMutationResult = NonNullable<Awaited<ReturnType<typeof biDatamartControllerSyncTasksDatamart>>>
-    
+
     export type BiDatamartControllerSyncTasksDatamartMutationError = ErrorType<unknown>
 
     /**
@@ -1880,26 +1882,26 @@ export const useBiDatamartControllerSyncTasksDatamart = <TError = ErrorType<unkn
 
       return useMutation(mutationOptions , queryClient);
     }
-    
+
 export const artefactRealizationsControllerGetByKey = (
     params: ArtefactRealizationsControllerGetByKeyParams,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return customInstance<null>(
       {url: `/artefact-realizations/by-key`, method: 'GET',
         params, signal
     },
       );
     }
-  
+
 
 export const getArtefactRealizationsControllerGetByKeyQueryKey = (params?: ArtefactRealizationsControllerGetByKeyParams,) => {
     return [`/artefact-realizations/by-key`, ...(params ? [params]: [])] as const;
     }
 
-    
+
 export const getArtefactRealizationsControllerGetByKeyQueryOptions = <TData = Awaited<ReturnType<typeof artefactRealizationsControllerGetByKey>>, TError = ErrorType<unknown>>(params: ArtefactRealizationsControllerGetByKeyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof artefactRealizationsControllerGetByKey>>, TError, TData>>, }
 ) => {
 
@@ -1907,13 +1909,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getArtefactRealizationsControllerGetByKeyQueryKey(params);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof artefactRealizationsControllerGetByKey>>> = ({ signal }) => artefactRealizationsControllerGetByKey(params, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof artefactRealizationsControllerGetByKey>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -1949,7 +1951,7 @@ export function useArtefactRealizationsControllerGetByKey<TData = Awaited<Return
 
 export function useArtefactRealizationsControllerGetByKey<TData = Awaited<ReturnType<typeof artefactRealizationsControllerGetByKey>>, TError = ErrorType<unknown>>(
  params: ArtefactRealizationsControllerGetByKeyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof artefactRealizationsControllerGetByKey>>, TError, TData>>, }
- , queryClient?: QueryClient 
+ , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getArtefactRealizationsControllerGetByKeyQueryOptions(params,options)
@@ -1965,17 +1967,17 @@ export function useArtefactRealizationsControllerGetByKey<TData = Awaited<Return
 
 
 export const artefactRealizationsControllerQuery = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return customInstance<null>(
       {url: `/artefact-realizations/query`, method: 'POST', signal
     },
       );
     }
-  
+
 
 
 export const getArtefactRealizationsControllerQueryMutationOptions = <TError = ErrorType<unknown>,
@@ -1989,22 +1991,22 @@ const {mutation: mutationOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }};
 
-      
+
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof artefactRealizationsControllerQuery>>, void> = () => {
-          
+
 
           return  artefactRealizationsControllerQuery()
         }
 
-        
+
 
 
   return  { mutationFn, ...mutationOptions }}
 
     export type ArtefactRealizationsControllerQueryMutationResult = NonNullable<Awaited<ReturnType<typeof artefactRealizationsControllerQuery>>>
-    
+
     export type ArtefactRealizationsControllerQueryMutationError = ErrorType<unknown>
 
     export const useArtefactRealizationsControllerQuery = <TError = ErrorType<unknown>,
@@ -2020,4 +2022,4 @@ const {mutation: mutationOptions} = options ?
 
       return useMutation(mutationOptions , queryClient);
     }
-    
+

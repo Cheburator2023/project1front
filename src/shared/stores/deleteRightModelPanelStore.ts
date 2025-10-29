@@ -45,15 +45,13 @@ export const useDeleteRightModelPanelStore = create<DeleteRightModelPanelStoreSt
     const isValidatorLead = hasRole(Role.VALIDATOR_LEAD);
 
     const isDeleteButtonEnabled =
-
-      (count === 1 &&
-        source === 'sum-rm' &&
-        (NO_ROLES === 'true' || isAdmin || userMatches || (isValidatorLead && !!status)));
-        console.log('🐸 Pepe said >> status:', status);
-        console.log('🐸 Pepe said >> isValidatorLead:', isValidatorLead);
-        console.log('🐸 Pepe said >> userMatches:', userMatches);
-        console.log('🐸 Pepe said >> isAdmin:', isAdmin);
-
+      count === 1 &&
+      source === 'sum-rm' &&
+      (NO_ROLES === 'true' || isAdmin || userMatches || isValidatorLead);
+    console.log('🐸 Pepe said >> status:', status);
+    console.log('🐸 Pepe said >> isValidatorLead:', isValidatorLead);
+    console.log('🐸 Pepe said >> userMatches:', userMatches);
+    console.log('🐸 Pepe said >> isAdmin:', isAdmin);
 
     set({
       modelsCount: count,

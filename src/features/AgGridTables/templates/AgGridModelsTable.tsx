@@ -52,7 +52,7 @@ export const AgGridModelsTable = (props: {
     isFetching: fetchingModels,
     error: modelsError,
     refetch: refetchModels,
-  } = useModelsControllerGetModels(modelsParams, {
+  } = useModelsControllerGetModels({ ...modelsParams, useCache: false }, {
     query: {
       enabled: false,
       staleTime: 0,

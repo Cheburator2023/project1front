@@ -34,7 +34,7 @@ import {
   metricLabelMap,
 } from './constants';
 import MetricDisplay from './MetricDisplay';
-import { BiSyncInterface } from './BiSyncInterface';
+// import { BiSyncInterface } from './BiSyncInterface';
 import './styles.css';
 import {
   Column,
@@ -65,9 +65,9 @@ const getQueryParams = (filters: {
   startDate?: string;
   endDate?: string;
   selectedStreams?: string[];
-  useDatamart?: boolean;
-  metric?: string;
-  dataType?: string;
+  // useDatamart?: boolean;
+  // metric?: string;
+  // dataType?: string;
 }) => {
   const params: Record<string, any> = {};
 
@@ -93,22 +93,22 @@ const getQueryParams = (filters: {
     });
   }
 
-  if (filters.useDatamart !== undefined) {
-    params.useDatamart = filters.useDatamart;
-  }
+  // if (filters.useDatamart !== undefined) {
+  //   params.useDatamart = filters.useDatamart;
+  // }
 
-  if (filters.metric) {
-    params.metric = filters.metric;
-  }
+  // if (filters.metric) {
+  //   params.metric = filters.metric;
+  // }
 
-  if (filters.dataType) {
-    params.dataType = filters.dataType;
-  }
+  // if (filters.dataType) {
+  //   params.dataType = filters.dataType;
+  // }
 
   return params;
 };
 
-const ChartsDashboard: React.FC<ChartsDashboardProps> = ({ useDatamart = false }) => {
+const ChartsDashboard: React.FC<ChartsDashboardProps> = () => {
   const [filters, setFilters] = useState({
     startDate: undefined as string | undefined,
     endDate: undefined as string | undefined,
@@ -124,7 +124,6 @@ const ChartsDashboard: React.FC<ChartsDashboardProps> = ({ useDatamart = false }
   const [metricsParams, setMetricsParams] = useState(
     getQueryParams({
       ...filters,
-      useDatamart,
     }),
   );
 
@@ -138,16 +137,17 @@ const ChartsDashboard: React.FC<ChartsDashboardProps> = ({ useDatamart = false }
   const typedMetricsData = metricsData as MetricsResponseType | undefined;
 
   const errorMetrics = metricsError ? String(metricsError) : undefined;
-  
+
   const [exportParams, setExportParams] = useState<Record<string, string> | undefined>(undefined);
-  const {isSuccess: isExportSuccess, data: exportData, error: exportError} = useMetricsControllerExportMetricsToExcel(
-    exportParams,
-    {
-      query: {
-        enabled: !!exportParams,
-      },
-    }
-  );
+  const {
+    isSuccess: isExportSuccess,
+    data: exportData,
+    error: exportError,
+  } = useMetricsControllerExportMetricsToExcel(exportParams, {
+    query: {
+      enabled: !!exportParams,
+    },
+  });
 
   const [totalModels, setTotalModels] = useState(initialTotalModels);
   const [implementedModels, setImplementedModels] = useState(initialImplementedModels);
@@ -381,7 +381,6 @@ const ChartsDashboard: React.FC<ChartsDashboardProps> = ({ useDatamart = false }
 
     const newParams = getQueryParams({
       ...filters,
-      useDatamart,
     });
     setMetricsParams(newParams);
     refetchMetrics();
@@ -407,7 +406,6 @@ const ChartsDashboard: React.FC<ChartsDashboardProps> = ({ useDatamart = false }
       startDate: undefined,
       endDate: undefined,
       selectedStreams: [],
-      useDatamart,
     });
     setMetricsParams(newParams);
     refetchMetrics();
@@ -636,7 +634,7 @@ const ChartsDashboard: React.FC<ChartsDashboardProps> = ({ useDatamart = false }
             </ButtonContainer>
           </FlexContainerFilter>
 
-          <BiSyncInterface useDatamart={useDatamart} onSyncComplete={refetchMetrics} />
+          {/* <BiSyncInterface useDatamart={useDatamart} onSyncComplete={refetchMetrics} /> */}
         </Container>
       </WrapperFilter>
 
@@ -644,7 +642,7 @@ const ChartsDashboard: React.FC<ChartsDashboardProps> = ({ useDatamart = false }
         <Container>
           <FlexContainerExport>
             <Title font="Additional/M" color="Neutral/Neutral 90">
-              Графики и диаграмы {useDatamart ? '(BI витрины)' : '(живые данные)'}
+              Графики и диаграмы
             </Title>
 
             <div style={{ position: 'relative', right: '60px' }}>

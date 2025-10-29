@@ -23,6 +23,7 @@ import { useGlobalStore } from '@shared/stores/globalStore';
 import { useDeleteRightModelPanelStore, useModelsStore } from '@src/shared/stores';
 import { useScrollTo } from '@src/shared/hooks/useScrollTo';
 import { useRoles } from '@src/shared/hooks';
+import { useQueryClient } from '@tanstack/react-query';
 import { FormValues } from '../types';
 import { getArtifactApiItems, getInputValuesFromRow, getInvalidFields } from '../helpers';
 import { ButtonContainer, FormContainer } from '../ModelForm/styles';
@@ -141,12 +142,16 @@ export const DeleteModelForm = ({
   const [activeTab, setActiveTab] = useState<string>('1');
   const { formMode, setFormMode } = useDeleteRightModelPanelStore();
   const { isValidatorLead } = useRoles();
+  const queryClient = useQueryClient();
 
   const { setRows, modelsParams } = useModelsStore();
 
-  const { data: _modelsData, refetch: refetchModels } = useModelsControllerGetModels(modelsParams, {
-    query: { enabled: false },
-  });
+  const { data: _modelsData, refetch: refetchModels } = useModelsControllerGetModels(
+    { ...modelsParams, useCache: false },
+    {
+      query: { enabled: false },
+    },
+  );
   console.log('🐸 Pepe said >> DeleteModelForm >> _modelsData:', _modelsData);
 
   const modelsData = _modelsData as ModelsResponseType | undefined;
@@ -294,8 +299,10 @@ export const DeleteModelForm = ({
               },
               {
                 onSuccess: (data) => {
-                  refetchModels();
-                  console.log('🐸 Pepe said >> !!! >> DeleteModelForm >> onSuccess:', data);
+                  setTimeout(() => {
+                    refetchModels();
+                    queryClient.invalidateQueries({ queryKey: ['/models'] });
+                  }, 1000);
 
                   return resolve({ data: { data: { cards: [data] } }, error: false });
                 },

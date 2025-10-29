@@ -9,5 +9,6 @@ export type ModelsControllerGetModelsParams = {
   date?: string;
   model_id?: string;
   mode?: string[];
+  useCache?: boolean;
 };
 
