@@ -389,7 +389,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
 
       if (selectedRows.length === 1) {
         const _userMatches =
-          !!process.env.NO_ROLES ||
+          process.env.NO_ROLES === 'true' ||
           isModelCreator(selectedRow) ||
           isInBusinessCustomers(selectedRow);
 
