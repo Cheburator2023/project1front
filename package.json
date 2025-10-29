@@ -5,16 +5,11 @@
   "private": true,
   "release_stats": {
     "features": [
-      "feat/ag_grid_overhaul"
+      "feat/grand_logic_refactor",
+      "feat/q2_edit_november"
     ],
-    "fixes": [
-      "fix/ds_lead_ds_active_model",
-      "fix/new_table_qa_fixes"
-    ],
-    "refactors": [
-      "refactor/data-test-ids-added",
-      "refactor/rc_stats_parsing_webpack_vite"
-    ],
+    "fixes": [],
+    "refactors": [],
     "hotfixes": []
   },
   "engines": {
