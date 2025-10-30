@@ -96,7 +96,7 @@ const Header = ({ user, downloadReportStatus, onLogout }: HeaderProps) => {
 
   return (
     <Container>
-      <Link to="/sum-rm">
+      <Link to="/">
         <Logo>
           <LogoIcon />
           <CustomLabel font="Caption/Caption 1">Реестр моделей</CustomLabel>
