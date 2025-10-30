@@ -24,21 +24,11 @@ export const AgGridModelsTable = (props: {
   overrideRowList?: Partial<Row>[];
   overlayNoRowsTemplate?: string;
 }) => {
-  const {
-    setRows,
-    modelsParams,
-    setModelsParams,
-  } = useModelsStore();
+  const { setRows, modelsParams, setModelsParams } = useModelsStore();
 
-  const {
-    modelsDownloadingDate,
-  } = useFiltersStore();
+  const { modelsDownloadingDate } = useFiltersStore();
 
-  const {
-    openEditModelPanel,
-    openHistoryChangesPanel,
-  } = usePanelsStore();
-
+  const { openEditModelPanel, openHistoryChangesPanel } = usePanelsStore();
 
   const { templates, setTemplates } = useTemplatesStore();
   const _selectedExploitationModes = useExploitationModeStore(
@@ -52,16 +42,16 @@ export const AgGridModelsTable = (props: {
     isFetching: fetchingModels,
     error: modelsError,
     refetch: refetchModels,
-  } = useModelsControllerGetModels({ ...modelsParams, useCache: false }, {
-    query: {
-      enabled: false,
-      staleTime: 0,
-      gcTime: 0,
-
-      refetchOnMount: true,
-      refetchOnWindowFocus: false,
+  } = useModelsControllerGetModels(
+    { ...modelsParams, useCache: true },
+    {
+      query: {
+        enabled: true,
+        refetchOnMount: true,
+        refetchOnWindowFocus: false,
+      },
     },
-  });
+  );
 
   const modelsData = _modelsData as ModelsResponseType | undefined;
 
@@ -105,11 +95,7 @@ export const AgGridModelsTable = (props: {
   }, [modelsData?.data?.cards]);
 
   const handleClickOnActionCell = useCallback(
-    (
-      action: 'edit' | 'history',
-      rowId: string,
-      cellName: keyof Row,
-    ) => {
+    (action: 'edit' | 'history', rowId: string, cellName: keyof Row) => {
       if (action === 'edit') {
         openEditModelPanel(rowId, cellName);
       } else if (action === 'history') {
