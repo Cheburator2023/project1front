@@ -8,6 +8,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useCallback, useMemo } from 'react';
 import { useModelsControllerGetModels } from '@shared/api/generated/endpoints';
 import { getISODateFormat } from '@shared/helpers';
+import { useQueryClient } from '@tanstack/react-query';
 import { Container, CustomDateField, FiltersDivider, FilterButton, FiltersBox } from '../styles';
 import { useGlobalStore } from '../../../shared/stores/globalStore';
 import { TemplatesPanel } from '../../TemplatesPanel/organisms/TemplatesPanel';
@@ -33,6 +34,7 @@ export const FiltersPanel = ({
   const { setPendingTemplate } = useTemplatesStore();
   const { templates } = useTemplatesStore();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const { compareMode, setCompareMode, modelsParams, setModelsParams } = useModelsStore();
 
@@ -84,6 +86,7 @@ export const FiltersPanel = ({
 
       setTimeout(() => {
         refetchModels();
+        queryClient.invalidateQueries({ queryKey: ['/models'] });
       }, 100);
     },
     [setModelsDownloadingDate, refetchModels],

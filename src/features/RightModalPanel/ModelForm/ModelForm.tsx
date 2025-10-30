@@ -23,6 +23,7 @@ import { Artifact, ModelsResponseType } from '@shared/api/types';
 import { useGlobalStore } from '@shared/stores/globalStore';
 import { useScrollTo } from '@src/shared/hooks/useScrollTo';
 import { useDeepEffect } from '@src/shared/hooks/useDeepEffect';
+import { useQueryClient } from '@tanstack/react-query';
 import { FormValues } from '../types';
 import {
   getFormMode,
@@ -80,6 +81,7 @@ export const ModelForm = ({
   const formMode = getFormMode(mode);
   const { currentCustomer } = useGlobalStore();
   const { isEditAllocationEnabled } = usePermissions();
+  const queryClient = useQueryClient();
 
   const [values, setValues] = useState<FormValues | undefined>();
   const [invalidFields, setInvalidFields] = useState<Array<keyof Row>>([]);
@@ -481,7 +483,10 @@ export const ModelForm = ({
     if (isUpdateSuccess && updateModelsMutation.data) {
       const newRow = updateModelsMutation.data as Row;
       console.log('📝 FORM LOGS: ~ newRow:', newRow);
-      refetchModels();
+      setTimeout(() => {
+        refetchModels();
+        queryClient.invalidateQueries({ queryKey: ['/models'] });
+      }, 1000);
       if (formMode) {
         onSubmit(newRow, formMode);
         setSubmitLoading(false);
