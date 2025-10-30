@@ -41,6 +41,12 @@ const MfeRoot = (props: MFProps) => {
     }
   }, [props, setProtectedFetch]);
 
+  useDeepEffect(() => {
+    if (props?.urlConfig) {
+      (window as any).urlConfig = props.urlConfig;
+    }
+  }, [props?.urlConfig]);
+
   useEffect(() => {
     // DEV
     const currentCustomerLS = localStorage.getItem('currentCustomer');

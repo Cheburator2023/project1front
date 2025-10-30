@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { ErrorResponse, SuccessResponse } from '@shared/api/types';
+import { T_CONFIG_MAP } from '../types/infra';
 
 const IS_DEV = process.env.NODE_ENV === 'development';
 const API_BASE_URL = process.env.API_BASE_URL || '';
@@ -62,7 +63,12 @@ export const useFetchStore = create<FetchStore>((set, get) => ({
       setLoading(true);
       setError(null);
 
-      const url = new URL(routeUrl, API_BASE_URL);
+      const urlConfig: T_CONFIG_MAP = (window as any)?.urlConfig;
+      console.log('🐸 Pepe said >> urlConfig:', urlConfig);
+
+      const url = new URL(routeUrl, API_BASE_URL || urlConfig.SUM_RM_API);
+      console.log('🐸 Pepe said >> routeUrl:', routeUrl);
+      console.log('🐸 Pepe said >> url:', url);
 
       if (params) {
         Object.entries(params).forEach(([key, value]) => {
