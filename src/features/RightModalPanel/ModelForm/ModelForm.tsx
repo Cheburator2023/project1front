@@ -488,7 +488,12 @@ export const ModelForm = ({
         await refetchModels();
 
         setTimeout(() => {
-          queryClient.invalidateQueries({ queryKey: ['/models'] });
+          // Invalidate all queries that start with '/models' to ensure all instances get fresh data
+          queryClient.invalidateQueries({ 
+            predicate: (query) => {
+              return Array.isArray(query.queryKey) && query.queryKey[0] === '/models';
+            }
+          });
 
           if (formMode) {
             onSubmit(newRow, formMode);

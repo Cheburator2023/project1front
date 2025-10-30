@@ -301,7 +301,13 @@ export const DeleteModelForm = ({
                 onSuccess: (data) => {
                   setTimeout(() => {
                     refetchModels();
-                    queryClient.invalidateQueries({ queryKey: ['/models'] });
+                    // Invalidate all queries that start with '/models' to ensure all instances get fresh data
+                    queryClient.invalidateQueries({
+                      predicate: (query) => {
+                        const queryKey = query.queryKey;
+                        return Array.isArray(queryKey) && queryKey[0] === '/models';
+                      },
+                    });
                   }, 1000);
 
                   return resolve({ data: { data: { cards: [data] } }, error: false });

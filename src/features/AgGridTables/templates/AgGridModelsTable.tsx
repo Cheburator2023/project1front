@@ -57,6 +57,7 @@ export const AgGridModelsTable = (props: {
       enabled: false,
       staleTime: 0,
       gcTime: 0,
+
       refetchOnMount: true,
       refetchOnWindowFocus: false,
     },
