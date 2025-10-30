@@ -15,6 +15,11 @@ const NO_ROLES = process.env.NO_ROLES;
 
 module.exports = merge(common, {
   mode: 'production',
+  devtool: 'cheap-module-source-map',
+  cache: false,
+  optimization: {
+    minimize: false,
+  },
   plugins: [
     new DefinePlugin({
       'process.env.MOCKED_REQUESTS': JSON.stringify(process.env.MOCKED_REQUESTS || ''),
