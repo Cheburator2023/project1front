@@ -1,3 +1,4 @@
+/* eslint-disable default-param-last */
 import { useFetchStore } from '@shared/stores/fetchStore';
 
 const IS_DEV = process.env.NODE_ENV === 'development';
@@ -31,7 +32,16 @@ const createProductionFetchWrapper = (originalFetch: any) => {
           body: body ? JSON.stringify(body) : undefined,
         });
 
+        console.log('🐸 Pepe said >> Direct fetch response:', {
+          status: directResponse.status,
+          statusText: directResponse.statusText,
+          contentType: directResponse.headers.get('content-type'),
+          url: url.toString(),
+        });
+
         if (!directResponse.ok) {
+          const errorText = await directResponse.text();
+          console.log('🐸 Pepe said >> Error response body:', errorText);
           return {
             error: true,
             data: {
@@ -41,7 +51,25 @@ const createProductionFetchWrapper = (originalFetch: any) => {
           };
         }
 
+        // Check if the response is actually an Excel file
+        const contentType = directResponse.headers.get('content-type');
+        console.log('🐸 Pepe said >> Response content-type:', contentType);
+
+        if (contentType && contentType.includes('text/html')) {
+          // If we got HTML instead of Excel, log it and return an error
+          const htmlContent = await directResponse.text();
+          console.log('🐸 Pepe said >> Got HTML instead of Excel:', htmlContent.substring(0, 500));
+          return {
+            error: true,
+            data: {
+              statusCode: 400,
+              message: 'Сервер вернул HTML вместо Excel файла',
+            },
+          };
+        }
+
         const blobData = await directResponse.blob();
+        console.log('🐸 Pepe said >> Blob data:', { size: blobData.size, type: blobData.type });
         return { error: false, data: blobData as T };
       } catch (error) {
         console.log('🐸 Pepe said >> createProductionFetchWrapper >> blob error:', error);
@@ -83,9 +111,6 @@ export const customInstance = async <T>(config: {
 }): Promise<T> => {
   const { protectedFetch, protectedFetchDev } = useFetchStore.getState();
 
-  // Use the development fetch directly, or wrap the production fetch
-  const fetchFn = IS_DEV ? protectedFetchDev : createProductionFetchWrapper(protectedFetch);
-
   const queryParams = config.params
     ? Object.fromEntries(
         Object.entries(config.params).map(([key, value]) => {
@@ -99,6 +124,11 @@ export const customInstance = async <T>(config: {
 
   // For blob responses, we need to pass a hint to the fetch function
   const fileName = config.responseType === 'blob' ? 'export.xlsx' : undefined;
+  console.log('🐸 Pepe said >> customInstance >> fileName:', fileName);
+
+  // Use the development fetch directly, or wrap the production fetch
+  const fetchFn =
+    fileName || IS_DEV ? protectedFetchDev : createProductionFetchWrapper(protectedFetch);
 
   const response = await fetchFn<T>(
     `${API_PREFIX}${config.url}`,
