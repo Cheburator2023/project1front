@@ -483,15 +483,22 @@ export const ModelForm = ({
     if (isUpdateSuccess && updateModelsMutation.data) {
       const newRow = updateModelsMutation.data as Row;
       console.log('📝 FORM LOGS: ~ newRow:', newRow);
-      setTimeout(() => {
-        refetchModels();
-        queryClient.invalidateQueries({ queryKey: ['/models'] });
-      }, 1000);
-      if (formMode) {
-        onSubmit(newRow, formMode);
-        setSubmitLoading(false);
-        setSubmitError('');
-      }
+
+      const getModelsAndSubmit = async () => {
+        await refetchModels();
+
+        setTimeout(() => {
+          queryClient.invalidateQueries({ queryKey: ['/models'] });
+
+          if (formMode) {
+            onSubmit(newRow, formMode);
+            setSubmitLoading(false);
+            setSubmitError('');
+          }
+        }, 300);
+      };
+
+      getModelsAndSubmit();
     }
   }, [isUpdateSuccess, updateModelsMutation.data, formMode, onSubmit, refetchModels]);
 
