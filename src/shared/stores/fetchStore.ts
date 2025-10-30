@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { ErrorResponse, SuccessResponse } from '@shared/api/types';
 
 const IS_DEV = process.env.NODE_ENV === 'development';
+const API_BASE_URL = process.env.API_BASE_URL || '';
 
 interface FetchState {
   isLoading: boolean;
@@ -61,33 +62,29 @@ export const useFetchStore = create<FetchStore>((set, get) => ({
       setLoading(true);
       setError(null);
 
-      const url = new URL(routeUrl, 'http://localhost:3000');
+      const url = new URL(routeUrl, API_BASE_URL);
 
       if (params) {
         Object.entries(params).forEach(([key, value]) => {
-          url.searchParams.append(key, value);
+          url.searchParams.set(key, value);
         });
       }
 
-      const headers: HeadersInit = {
-        'Content-Type': 'application/json',
-      };
-
-      const config: RequestInit = {
-        method,
-        headers,
-      };
-
-      if (body && method !== 'GET') {
-        config.body = JSON.stringify(body);
-      }
-
-      const response = await fetch(url.toString(), config);
+      const response = await fetch(url.toString(), {
+        method: method || 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: body ? JSON.stringify(body) : undefined,
+      });
 
       if (!response.ok) {
-        const errorData = await response
-          .json()
-          .catch(() => ({ statusCode: response.status, message: 'Ошибка сети' }));
+        let errorData: any = { message: 'Ошибка запроса', statusCode: response.status };
+        try {
+          errorData = await response.json();
+        } catch {
+          // If we can't parse error as JSON, use default message
+        }
         setError(errorData.message || 'Ошибка запроса');
         return {
           error: true,
@@ -98,27 +95,33 @@ export const useFetchStore = create<FetchStore>((set, get) => ({
         };
       }
 
-      // Check content type to determine how to parse the response
+      // Check if this is a blob response (Excel file export)
       const contentType = response.headers.get('content-type');
       let data: T;
-      
-      if (contentType && contentType.includes('application/json')) {
-        data = await response.json();
-      } else if (contentType && (
-        contentType.includes('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') ||
-        contentType.includes('application/vnd.ms-excel') ||
-        contentType.includes('application/octet-stream')
-      )) {
+
+      if (
+        fileName ||
+        (contentType &&
+          (contentType.includes(
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          ) ||
+            contentType.includes('application/vnd.ms-excel') ||
+            contentType.includes('application/octet-stream')))
+      ) {
         // Handle Excel/binary files as blob
-        data = await response.blob() as T;
+        data = (await response.blob()) as T;
+      } else if (contentType && contentType.includes('application/json')) {
+        data = await response.json();
       } else {
         // Default to text for other content types
-        data = await response.text() as T;
+        data = (await response.text()) as T;
       }
-      
+
       setLoading(false);
       return { error: false, data };
     } catch (error) {
+      console.log('🐸 Pepe said >> error:', error);
+
       const errorMessage = error instanceof Error ? error.message : 'Неизвестная ошибка';
       setError(errorMessage);
       setLoading(false);

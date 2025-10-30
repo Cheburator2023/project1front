@@ -26,6 +26,7 @@ module.exports = merge(common, {
       'process.env.RC_STATS': JSON.stringify(RC_STATS || ''),
       'process.env.GIT_REVISION': JSON.stringify(git_revision || ''),
       'process.env.NO_ROLES': JSON.stringify(NO_ROLES || ''),
+      'process.env.API_BASE_URL': JSON.stringify(''),
     }),
   ],
 });
