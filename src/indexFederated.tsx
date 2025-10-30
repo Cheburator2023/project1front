@@ -36,16 +36,12 @@ const MfeRoot = (props: MFProps) => {
   const { setProtectedFetch, protectedFetch: protectedFetchFromStore } = useFetchStore();
 
   useDeepEffect(() => {
-    if (protectedFetch) {
+    if (protectedFetch && props?.urlConfig) {
+      (window as any).urlConfig = props.urlConfig;
+
       setProtectedFetch(protectedFetch);
     }
   }, [props, setProtectedFetch]);
-
-  useDeepEffect(() => {
-    if (props?.urlConfig) {
-      (window as any).urlConfig = props.urlConfig;
-    }
-  }, [props?.urlConfig]);
 
   useEffect(() => {
     // DEV

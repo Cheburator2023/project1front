@@ -76,7 +76,13 @@ export const useFetchStore = create<FetchStore>((set, get) => ({
         });
       }
 
-      const response = await fetch(url.toString(), {
+      const prodUrl = `${urlConfig.SUM_RM_API.replace('/api/rest/v1', '')}/api/rest/v1${routeUrl.replace(
+        '/api/rest/v1',
+        '',
+      )}`;
+      console.log('🐸 Pepe said >> prodUrl:', prodUrl);
+
+      const response = await fetch(IS_DEV ? url.toString() : prodUrl, {
         method: method || 'GET',
         headers: {
           'Content-Type': 'application/json',

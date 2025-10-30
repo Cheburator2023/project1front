@@ -12,6 +12,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 import { Header } from './Header';
 import RoutesComponent from './Routes';
+import { useDeepEffect } from '../shared/hooks/useDeepEffect';
 
 const GIT_REVISION = process.env.GIT_REVISION;
 const RC_STATS = process.env.RC_STATS;
@@ -61,6 +62,8 @@ const App = ({ user, onLogout, keycloak }: AppProps) => {
     }
     localStorage.removeItem('currentCustomer');
   };
+
+  useDeepEffect(() => {}, []);
 
   return (
     <div>
