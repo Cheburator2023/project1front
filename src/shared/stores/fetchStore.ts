@@ -98,7 +98,24 @@ export const useFetchStore = create<FetchStore>((set, get) => ({
         };
       }
 
-      const data = await response.json();
+      // Check content type to determine how to parse the response
+      const contentType = response.headers.get('content-type');
+      let data: T;
+      
+      if (contentType && contentType.includes('application/json')) {
+        data = await response.json();
+      } else if (contentType && (
+        contentType.includes('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') ||
+        contentType.includes('application/vnd.ms-excel') ||
+        contentType.includes('application/octet-stream')
+      )) {
+        // Handle Excel/binary files as blob
+        data = await response.blob() as T;
+      } else {
+        // Default to text for other content types
+        data = await response.text() as T;
+      }
+      
       setLoading(false);
       return { error: false, data };
     } catch (error) {

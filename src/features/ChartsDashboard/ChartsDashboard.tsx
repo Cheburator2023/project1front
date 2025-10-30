@@ -34,7 +34,7 @@ import {
   metricLabelMap,
 } from './constants';
 import MetricDisplay from './MetricDisplay';
-// import { BiSyncInterface } from './BiSyncInterface';
+import { BiSyncInterface } from './BiSyncInterface';
 import './styles.css';
 import {
   Column,
@@ -65,9 +65,9 @@ const getQueryParams = (filters: {
   startDate?: string;
   endDate?: string;
   selectedStreams?: string[];
-  // useDatamart?: boolean;
-  // metric?: string;
-  // dataType?: string;
+  useDatamart?: boolean;
+  metric?: string;
+  dataType?: string;
 }) => {
   const params: Record<string, any> = {};
 
@@ -93,22 +93,22 @@ const getQueryParams = (filters: {
     });
   }
 
-  // if (filters.useDatamart !== undefined) {
-  //   params.useDatamart = filters.useDatamart;
-  // }
+  if (filters.useDatamart !== undefined) {
+    params.useDatamart = filters.useDatamart;
+  }
 
-  // if (filters.metric) {
-  //   params.metric = filters.metric;
-  // }
+  if (filters.metric) {
+    params.metric = filters.metric;
+  }
 
-  // if (filters.dataType) {
-  //   params.dataType = filters.dataType;
-  // }
+  if (filters.dataType) {
+    params.dataType = filters.dataType;
+  }
 
   return params;
 };
 
-const ChartsDashboard: React.FC<ChartsDashboardProps> = () => {
+const ChartsDashboard: React.FC<ChartsDashboardProps> = ({ useDatamart = false }) => {
   const [filters, setFilters] = useState({
     startDate: undefined as string | undefined,
     endDate: undefined as string | undefined,
@@ -124,6 +124,7 @@ const ChartsDashboard: React.FC<ChartsDashboardProps> = () => {
   const [metricsParams, setMetricsParams] = useState(
     getQueryParams({
       ...filters,
+      useDatamart,
     }),
   );
 
@@ -381,6 +382,7 @@ const ChartsDashboard: React.FC<ChartsDashboardProps> = () => {
 
     const newParams = getQueryParams({
       ...filters,
+      useDatamart,
     });
     setMetricsParams(newParams);
     refetchMetrics();
@@ -406,6 +408,7 @@ const ChartsDashboard: React.FC<ChartsDashboardProps> = () => {
       startDate: undefined,
       endDate: undefined,
       selectedStreams: [],
+      useDatamart,
     });
     setMetricsParams(newParams);
     refetchMetrics();
