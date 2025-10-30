@@ -96,10 +96,12 @@ const Header = ({ user, downloadReportStatus, onLogout }: HeaderProps) => {
 
   return (
     <Container>
-      <Logo>
-        <LogoIcon />
-        <CustomLabel font="Caption/Caption 1">Реестр моделей</CustomLabel>
-      </Logo>
+      <Link to="/sum-rm">
+        <Logo>
+          <LogoIcon />
+          <CustomLabel font="Caption/Caption 1">Реестр моделей</CustomLabel>
+        </Logo>
+      </Link>
 
       <ActionsGroup>
         <CustomButton

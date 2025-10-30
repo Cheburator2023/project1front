@@ -110,6 +110,14 @@ const GlobalStyle = createGlobalStyle`
     background-color: aliceblue ;
   }
 
+  div.ag-label {
+    white-space: break-spaces;
+  }
+
+  .ag-filter-virtual-list-container .ag-virtual-list-item {
+    overflow: visible;
+  }
+
   & .ag-custom-cell-value {
     position: relative;
   }

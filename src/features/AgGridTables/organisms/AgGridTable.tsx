@@ -133,6 +133,30 @@ const dateFilterParams: IDateFilterParams = {
 const setFilterParams: ISetFilterParams = {
   buttons: ['clear'],
   refreshValuesOnOpen: true,
+  cellHeight: 30,
+  cellRenderer: (props) => {
+  console.log('🐸 Pepe said >> props:', props);
+
+
+    const text = props.value === null ? '(Пустые)' : props.value || '';
+    const maxLength = 80; // Fallback character limit
+    const truncatedText = text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
+
+    return (
+      <div
+        style={{
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+          maxWidth: '100%',
+          minWidth: 0 // Ensures flex shrinking works
+        }}
+        title={text} // Tooltip shows full text on hover
+      >
+        {truncatedText}
+      </div>
+    );
+  }
 };
 
 const autoGroupColumnDefProps: ColDef = {
