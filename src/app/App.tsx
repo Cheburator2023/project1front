@@ -13,6 +13,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { Header } from './Header';
 import RoutesComponent from './Routes';
 import { useDeepEffect } from '../shared/hooks/useDeepEffect';
+import { ToastProvider } from '../shared/ui/atoms';
 
 const GIT_REVISION = process.env.GIT_REVISION;
 const RC_STATS = process.env.RC_STATS;
@@ -73,10 +74,12 @@ const App = ({ user, onLogout, keycloak }: AppProps) => {
         <QueryClientProvider client={queryClient}>
           <GlobalStyle />
           <Container>
-            <Header user={user} onLogout={onLogoutHandler} />
-            <RoutesWrapper>
-              <RoutesComponent />
-            </RoutesWrapper>
+            <ToastProvider>
+              <Header user={user} onLogout={onLogoutHandler} />
+              <RoutesWrapper>
+                <RoutesComponent />
+              </RoutesWrapper>
+            </ToastProvider>
           </Container>
         </QueryClientProvider>
       </BrowserRouter>

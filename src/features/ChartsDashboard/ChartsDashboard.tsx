@@ -4,7 +4,7 @@ import JS_PDF from 'jspdf';
 import { Button, Spinner } from '@admiral-ds/react-ui';
 import { ReactComponent as DownloadOutline } from '@admiral-ds/icons/build/system/DownloadOutline.svg';
 
-import { ErrorStatus, Loading } from '@src/shared/ui/atoms';
+import { ErrorStatus, Loading, ToastProvider, useToast } from '@src/shared/ui/atoms';
 import { MetricsResponseType } from '@src/shared/api/types';
 import {
   useMetricsControllerGetMetrics,
@@ -108,7 +108,9 @@ const getQueryParams = (filters: {
   return params;
 };
 
-const ChartsDashboard: React.FC<ChartsDashboardProps> = ({ useDatamart = false }) => {
+const ChartsDashboardContent: React.FC<ChartsDashboardProps> = ({ useDatamart = false }) => {
+  const { showToast } = useToast();
+
   const [filters, setFilters] = useState({
     startDate: undefined as string | undefined,
     endDate: undefined as string | undefined,
@@ -322,12 +324,16 @@ const ChartsDashboard: React.FC<ChartsDashboardProps> = ({ useDatamart = false }
 
   useEffect(() => {
     if (exportError) {
-      console.error('Ошибка экспорта:', exportError);
+      showToast({
+        message: `Ошибка экспорта: ${exportError}`,
+        type: 'error',
+        duration: 5000,
+      });
       setIsExportingMetric(false);
       setExportParams(undefined);
       setCurrentExportLabel('');
     }
-  }, [exportError]);
+  }, [exportError, showToast]);
 
   const handleDateChange = (newDateRange: string | undefined) => {
     if (newDateRange) {
@@ -865,6 +871,10 @@ const ChartsDashboard: React.FC<ChartsDashboardProps> = ({ useDatamart = false }
       </>
     </>
   );
+};
+
+const ChartsDashboard: React.FC<ChartsDashboardProps> = (props) => {
+  return <ChartsDashboardContent {...props} />;
 };
 
 export { ChartsDashboard };
