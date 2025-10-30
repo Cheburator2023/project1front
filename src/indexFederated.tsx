@@ -20,6 +20,7 @@ export type MFProps = {
   urlConfig?: T_CONFIG_MAP;
   token?: string;
   user?: T_KEYCLOAK_USER;
+  keycloak?: any;
   userPermissions?: string[];
   navigate?: (to: string) => void;
   protectedFetch?: any;
@@ -29,19 +30,21 @@ export type MFProps = {
 
 const MfeRoot = (props: MFProps) => {
   console.log('MfeRoot >> props:', props);
-  const { user, protectedFetch, onLogout } = props;
+  const { user, protectedFetch, onLogout, keycloak } = props;
 
   const { setCurrentCustomer } = useGlobalStore();
   const { setUsername, setGroups, setRoles, setPermissions } = useUserStore();
   const { setProtectedFetch, protectedFetch: protectedFetchFromStore } = useFetchStore();
 
   useDeepEffect(() => {
-    if (protectedFetch && props?.urlConfig) {
+    if (protectedFetch && props?.urlConfig && props?.token && keycloak) {
       (window as any).urlConfig = props.urlConfig;
+      (window as any).token = props.token;
+      (window as any).keycloak = keycloak;
 
       setProtectedFetch(protectedFetch);
     }
-  }, [props, setProtectedFetch]);
+  }, [props, setProtectedFetch, keycloak]);
 
   useEffect(() => {
     // DEV

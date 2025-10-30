@@ -76,19 +76,38 @@ export const useFetchStore = create<FetchStore>((set, get) => ({
         });
       }
 
-      const prodUrl = `${urlConfig.SUM_RM_API.replace('/api/rest/v1', '')}/api/rest/v1${routeUrl.replace(
+      const prodUrl = `${urlConfig.SUM_RM_API.replace(
         '/api/rest/v1',
         '',
-      )}`;
+      )}/api/rest/v1${routeUrl.replace('/api/rest/v1', '')}`;
       console.log('🐸 Pepe said >> prodUrl:', prodUrl);
 
       const response = await fetch(IS_DEV ? url.toString() : prodUrl, {
         method: method || 'GET',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${(window as any)?.token}`,
         },
         body: body ? JSON.stringify(body) : undefined,
-      });
+      })
+        .then((res) => {
+          if (res.status === 401) {
+            (window as any).keycloak.logout();
+          }
+          return res;
+        })
+        .catch((e) => {
+          if (e.response && [401, 403].includes(e.response.status)) {
+            (window as any).keycloak.logout();
+          }
+
+          if (e.response?.errors[0].extensions.exception.status === 401) {
+            (window as any).keycloak.logout();
+            (window as any).keycloak.login();
+          }
+
+          throw Error(e);
+        });
 
       if (!response.ok) {
         let errorData: any = { message: 'Ошибка запроса', statusCode: response.status };

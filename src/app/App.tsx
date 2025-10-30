@@ -34,6 +34,7 @@ const queryClient = new QueryClient({
 
 interface AppProps {
   bridged?: boolean;
+  token?: string;
   keycloak?: any;
   downloadReportStatus?: boolean;
   columnsFilters?: ColumnsFilter[];
