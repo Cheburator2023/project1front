@@ -64,11 +64,8 @@ export const useFetchStore = create<FetchStore>((set, get) => ({
       setError(null);
 
       const urlConfig: T_CONFIG_MAP = (window as any)?.urlConfig;
-      console.log('🐸 Pepe said >> urlConfig:', urlConfig);
 
       const url = new URL(routeUrl, API_BASE_URL || urlConfig.SUM_RM_API);
-      console.log('🐸 Pepe said >> routeUrl:', routeUrl);
-      console.log('🐸 Pepe said >> url:', url);
 
       if (params) {
         Object.entries(params).forEach(([key, value]) => {
@@ -79,7 +76,12 @@ export const useFetchStore = create<FetchStore>((set, get) => ({
       const prodUrl = `${urlConfig.SUM_RM_API.replace(
         '/api/rest/v1',
         '',
-      )}/api/rest/v1${routeUrl.replace('/api/rest/v1', '')}`;
+      )}/api/rest/v1${routeUrl.replace('/api/rest/v1', '')}${
+        url.searchParams.toString() ? `?${url.searchParams.toString()}` : ''
+      }`;
+
+      console.log('🐸 Pepe said >> url:', url);
+
       console.log('🐸 Pepe said >> prodUrl:', prodUrl);
 
       const response = await fetch(IS_DEV ? url.toString() : prodUrl, {
