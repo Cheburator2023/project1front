@@ -2,8 +2,7 @@
 // @ts-ignore
 import { createBridgeComponent } from '@module-federation/bridge-react/v18';
 
-import { useCallback, useEffect, useState } from 'react';
-import { CircularProgress } from '@mui/material';
+import { useEffect } from 'react';
 import { ThemeProvider } from 'styled-components';
 import { DropdownProvider } from '@admiral-ds/react-ui';
 import App from './app/App';
@@ -38,9 +37,9 @@ const MfeRoot = (props: MFProps) => {
 
   useDeepEffect(() => {
     if (protectedFetch && props?.urlConfig && props?.token && keycloak) {
-      (window as any).urlConfig = props.urlConfig;
-      (window as any).token = props.token;
-      (window as any).keycloak = keycloak;
+      window.urlConfig = props.urlConfig;
+      window.token = props.token;
+      window.keycloak = keycloak;
 
       setProtectedFetch(protectedFetch);
     }

@@ -27,18 +27,17 @@ export const customInstance = async <T>(config: {
     : undefined;
 
   // For blob responses, we need to pass a hint to the fetch function
-  const fileName = config.responseType === 'blob' ? 'export.xlsx' : undefined;
-  console.log('🐸 Pepe said >> customInstance >> fileName:', fileName);
+  const isBlob = config.responseType === 'blob';
 
   // Use the development fetch directly, or wrap the production fetch
-  const fetchFn = fileName || IS_DEV ? protectedFetchDev : protectedFetch;
+  const fetchFn = isBlob || IS_DEV ? protectedFetchDev : protectedFetch;
 
   const response = await fetchFn<T>(
     `${API_PREFIX}${config.url}`,
     queryParams,
     config.data as any,
     config.method,
-    fileName,
+    isBlob ? 'file' : undefined,
   );
 
   if (response.error) {

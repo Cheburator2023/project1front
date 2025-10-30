@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { ErrorResponse, SuccessResponse } from '@shared/api/types';
-import { T_CONFIG_MAP } from '../types/infra';
+import { T_CONFIG_MAP } from '@shared/types/infra';
 
 const IS_DEV = process.env.NODE_ENV === 'development';
 const API_BASE_URL = process.env.API_BASE_URL || '';
@@ -63,9 +63,9 @@ export const useFetchStore = create<FetchStore>((set, get) => ({
       setLoading(true);
       setError(null);
 
-      const urlConfig: T_CONFIG_MAP = (window as any)?.urlConfig;
-
-      const url = new URL(routeUrl, API_BASE_URL || urlConfig.SUM_RM_API);
+      const urlConfig: T_CONFIG_MAP | undefined = window.urlConfig;
+      const base = API_BASE_URL || urlConfig?.SUM_RM_API || '';
+      const url = new URL(routeUrl, base);
 
       if (params) {
         Object.entries(params).forEach(([key, value]) => {
@@ -73,92 +73,67 @@ export const useFetchStore = create<FetchStore>((set, get) => ({
         });
       }
 
-      const prodUrl = `${urlConfig.SUM_RM_API.replace(
-        '/api/rest/v1',
-        '',
-      )}/api/rest/v1${routeUrl.replace('/api/rest/v1', '')}${
-        url.searchParams.toString() ? `?${url.searchParams.toString()}` : ''
-      }`;
-
-      console.log('🐸 Pepe said >> url:', url);
-
-      console.log('🐸 Pepe said >> prodUrl:', prodUrl);
+      const prodUrl = urlConfig
+        ? `${urlConfig.SUM_RM_API.replace('/api/rest/v1', '')}/api/rest/v1${routeUrl.replace(
+            '/api/rest/v1',
+            '',
+          )}${url.searchParams.toString() ? `?${url.searchParams.toString()}` : ''}`
+        : url.toString();
 
       const response = await fetch(IS_DEV ? url.toString() : prodUrl, {
         method: method || 'GET',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${(window as any)?.token}`,
+          Authorization: `Bearer ${window.token ?? ''}`,
         },
         body: body ? JSON.stringify(body) : undefined,
-      })
-        .then((res) => {
-          if (res.status === 401) {
-            (window as any).keycloak.logout();
-          }
-          return res;
-        })
-        .catch((e) => {
-          if (e.response && [401, 403].includes(e.response.status)) {
-            (window as any).keycloak.logout();
-          }
+      });
 
-          if (e.response?.errors[0].extensions.exception.status === 401) {
-            (window as any).keycloak.logout();
-            (window as any).keycloak.login();
-          }
-
-          throw Error(e);
-        });
-
-      if (!response.ok) {
-        let errorData: any = { message: 'Ошибка запроса', statusCode: response.status };
-        try {
-          errorData = await response.json();
-        } catch {
-          // If we can't parse error as JSON, use default message
-        }
-        setError(errorData.message || 'Ошибка запроса');
-        return {
-          error: true,
-          data: {
-            statusCode: errorData.statusCode || response.status,
-            message: errorData.message || 'Ошибка запроса',
-          },
-        };
+      if (response.status === 401) {
+        window.keycloak?.logout?.();
       }
 
-      // Check if this is a blob response (Excel file export)
-      const contentType = response.headers.get('content-type');
-      let data: T;
+      if (!response.ok) {
+        const contentType = response.headers.get('content-type') || '';
+        let message = 'Ошибка запроса';
+        let statusCode = response.status;
+        if (contentType.includes('application/json')) {
+          try {
+            const err = await response.json();
+            message = err?.message || message;
+            statusCode = err?.statusCode || statusCode;
+          } catch {
+            // ignore json parse errors
+          }
+        }
 
-      if (
-        fileName ||
-        (contentType &&
-          (contentType.includes(
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-          ) ||
-            contentType.includes('application/vnd.ms-excel') ||
-            contentType.includes('application/octet-stream')))
-      ) {
-        // Handle Excel/binary files as blob
+        setError(message);
+        return { error: true, data: { statusCode, message } };
+      }
+
+      const contentType = response.headers.get('content-type') || '';
+      let data: T;
+      const isBlob =
+        !!fileName ||
+        contentType.includes('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') ||
+        contentType.includes('application/vnd.ms-excel') ||
+        contentType.includes('application/octet-stream');
+
+      if (isBlob) {
         data = (await response.blob()) as T;
-      } else if (contentType && contentType.includes('application/json')) {
-        data = await response.json();
+      } else if (contentType.includes('application/json')) {
+        data = (await response.json()) as T;
       } else {
-        // Default to text for other content types
         data = (await response.text()) as T;
       }
 
-      setLoading(false);
       return { error: false, data };
-    } catch (error) {
-      console.log('🐸 Pepe said >> error:', error);
-
-      const errorMessage = error instanceof Error ? error.message : 'Неизвестная ошибка';
-      setError(errorMessage);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Неизвестная ошибка';
+      setError(message);
+      return { error: true, data: { statusCode: 500, message } };
+    } finally {
       setLoading(false);
-      return { error: true, data: { statusCode: 500, message: errorMessage } };
     }
   },
 }));
