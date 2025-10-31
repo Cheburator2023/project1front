@@ -108,15 +108,24 @@ const Header = ({ user, downloadReportStatus, onLogout }: HeaderProps) => {
           dimension="s"
           disabled={!agGridApi}
           onClick={() => {
-            // @ts-ignore
-            const columnKeys = agGridApi
-              ?.getColumns()
+            if (!agGridApi) return;
+
+            // Get only visible columns in their current display order
+            const visibleColumns = agGridApi.getAllDisplayedColumns();
+
+            const columnKeys = visibleColumns
               .filter((col) => col.getColId() !== 'ag-Grid-ControlsColumn')
               .map((col) => col.getColId());
 
-            return agGridApi?.exportDataAsExcel({
+            return agGridApi.exportDataAsExcel({
               columnKeys,
               fileName: `Отчет ${format(new Date(), 'dd.MM.yyyy')}.xlsx`,
+              // Export only filtered data if filters are applied
+              onlySelected: false,
+              // Include column headers
+              skipColumnHeaders: false,
+              // Use current column widths and order
+              allColumns: false,
             });
           }}
         >

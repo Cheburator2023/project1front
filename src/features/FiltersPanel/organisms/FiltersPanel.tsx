@@ -6,7 +6,7 @@ import { modelsSelectOptions } from '@shared/constants';
 
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useCallback, useMemo } from 'react';
-import { useModelsControllerGetModels } from '@shared/api/generated/endpoints';
+import { useModelsControllerGetModels, useTemplatesControllerGetTemplates } from '@shared/api/generated/endpoints';
 import { getISODateFormat } from '@shared/helpers';
 import { useQueryClient } from '@tanstack/react-query';
 import { Container, CustomDateField, FiltersDivider, FilterButton, FiltersBox } from '../styles';
@@ -31,8 +31,7 @@ export const FiltersPanel = ({
   handleUpdateCompareList = () => null,
   handleCompareOnlyChanged = () => null,
 }: FiltersPanelProps) => {
-  const { setPendingTemplate } = useTemplatesStore();
-  const { templates } = useTemplatesStore();
+  const { setPendingTemplate, templates } = useTemplatesStore();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -63,6 +62,9 @@ export const FiltersPanel = ({
 
   const { exploitationModeOptions, selectedExploitationModes, updateSelectedExploitationModes } =
     useExploitationModeStore();
+
+  // Get templates loading state
+  const { isLoading: isTemplatesLoading } = useTemplatesControllerGetTemplates();
 
   const fetchModelsByDate = useCallback(
     (date: string) => {
@@ -153,7 +155,7 @@ export const FiltersPanel = ({
           selectedValues={topFilters.objectTypeRegistry}
           onChange={handleChange}
         />
-        <TemplatesFilterInput activeTemplate={activeTemplate} templates={templates} />
+        <TemplatesFilterInput activeTemplate={activeTemplate} templates={templates} loading={isTemplatesLoading} />
         {compareMode ? (
           <>
             <CustomDateField

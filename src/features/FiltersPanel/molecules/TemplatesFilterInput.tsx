@@ -42,8 +42,6 @@ export const TemplatesFilterInput = ({
   const resetState = useTemplateFiltersModalStoreSelected.use.resetState();
   const setResetInitialized = useTemplateFiltersModalStoreSelected.use.setResetInitialized();
 
-
-
   const groupedOptions = useMemo(() => {
     if (templates) {
       return getGroupsOptions(templates);
