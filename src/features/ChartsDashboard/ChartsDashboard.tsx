@@ -4,7 +4,7 @@ import JS_PDF from 'jspdf';
 import { Button, Spinner } from '@admiral-ds/react-ui';
 import { ReactComponent as DownloadOutline } from '@admiral-ds/icons/build/system/DownloadOutline.svg';
 
-import { ErrorStatus, Loading, ToastProvider, useToast } from '@src/shared/ui/atoms';
+import { ErrorStatus, Loading, useToast } from '@src/shared/ui/atoms';
 import { MetricsResponseType } from '@src/shared/api/types';
 import {
   useMetricsControllerGetMetrics,
@@ -135,7 +135,11 @@ const ChartsDashboardContent: React.FC<ChartsDashboardProps> = ({ useDatamart = 
     isLoading: loadingMetrics,
     error: metricsError,
     refetch: refetchMetrics,
-  } = useMetricsControllerGetMetrics(metricsParams);
+  } = useMetricsControllerGetMetrics(metricsParams, {
+    query: {
+      enabled: false,
+    },
+  });
 
   const typedMetricsData = metricsData as MetricsResponseType | undefined;
 
@@ -146,9 +150,10 @@ const ChartsDashboardContent: React.FC<ChartsDashboardProps> = ({ useDatamart = 
     isSuccess: isExportSuccess,
     data: exportData,
     error: exportError,
+    refetch: refetchExportMetricsToExcel,
   } = useMetricsControllerExportMetricsToExcel(exportParams, {
     query: {
-      enabled: !!exportParams,
+      enabled: false,
     },
   });
 
@@ -189,6 +194,10 @@ const ChartsDashboardContent: React.FC<ChartsDashboardProps> = ({ useDatamart = 
   const [selectedMetric, setSelectedMetric] = useState<string | undefined>();
   const [isExportingMetric, setIsExportingMetric] = useState(false);
   const [currentExportLabel, setCurrentExportLabel] = useState<string>('');
+
+  useEffect(() => {
+    refetchMetrics();
+  }, []);
 
   useEffect(() => {
     if (!typedMetricsData) return;
@@ -307,19 +316,24 @@ const ChartsDashboardContent: React.FC<ChartsDashboardProps> = ({ useDatamart = 
   }, [typedMetricsData]);
 
   useEffect(() => {
-    if (isExportSuccess && exportData && currentExportLabel) {
-      const url = window.URL.createObjectURL(exportData);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = currentExportLabel;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-      setIsExportingMetric(false);
-      setExportParams(undefined);
-      setCurrentExportLabel('');
-    }
+    const exportFileAsync = async () => {
+      setTimeout(() => {
+        if (isExportSuccess && exportData && currentExportLabel) {
+          const url = window.URL.createObjectURL(exportData);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = currentExportLabel;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(url);
+          setIsExportingMetric(false);
+          setExportParams(undefined);
+          setCurrentExportLabel('');
+        }
+      }, 500);
+    };
+    exportFileAsync();
   }, [isExportSuccess, exportData, currentExportLabel]);
 
   useEffect(() => {
@@ -388,10 +402,13 @@ const ChartsDashboardContent: React.FC<ChartsDashboardProps> = ({ useDatamart = 
 
     const newParams = getQueryParams({
       ...filters,
+      metric: selectedMetric,
       useDatamart,
     });
     setMetricsParams(newParams);
-    refetchMetrics();
+    setTimeout(() => {
+      refetchMetrics();
+    }, 500);
   };
 
   const handleResetFilters = () => {
@@ -560,6 +577,10 @@ const ChartsDashboardContent: React.FC<ChartsDashboardProps> = ({ useDatamart = 
 
     setCurrentExportLabel(fileName);
     setExportParams(newExportParams);
+
+    setTimeout(() => {
+      refetchExportMetricsToExcel();
+    }, 500);
   };
 
   if (errorMetrics) {
@@ -609,7 +630,9 @@ const ChartsDashboardContent: React.FC<ChartsDashboardProps> = ({ useDatamart = 
               selectAllEnabled={false}
               selectEmptyEnabled={false}
               selectedValues={selectedMetric ? [selectedMetric] : []}
-              onChange={(_, [value]) => setSelectedMetric(value)}
+              onChange={(_, [value]) => {
+                return setSelectedMetric(value);
+              }}
             />
 
             <ButtonContainer>
