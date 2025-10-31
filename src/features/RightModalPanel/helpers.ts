@@ -502,7 +502,7 @@ const mapArtifactToField = (
   activeRow?: Partial<Row>,
   values?: FormValues,
 ): InputFactoryProps<keyof Row> => {
-  const canEdit = canEditArtefact(artifact, activeRow);
+  const canEdit = process.env.NO_ROLES === 'true' || canEditArtefact(artifact, activeRow);
 
   const isDisabled = isFieldDisabled(values, fieldSchema, artifact, activeRow, canEdit);
 

@@ -85,7 +85,6 @@ export const FiltersPanel = ({
       }
 
       setTimeout(() => {
-        refetchModels();
         // Invalidate all queries that start with '/models' to ensure all instances get fresh data
         queryClient.invalidateQueries({
           predicate: (query) => {
@@ -95,7 +94,7 @@ export const FiltersPanel = ({
         });
       }, 100);
     },
-    [setModelsDownloadingDate, refetchModels],
+    [setModelsDownloadingDate],
   );
 
   const handleChange = useCallback(

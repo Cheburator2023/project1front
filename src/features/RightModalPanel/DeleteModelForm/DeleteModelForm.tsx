@@ -152,7 +152,6 @@ export const DeleteModelForm = ({
       query: { enabled: false },
     },
   );
-  console.log('🐸 Pepe said >> DeleteModelForm >> _modelsData:', _modelsData);
 
   const modelsData = _modelsData as ModelsResponseType | undefined;
 
@@ -298,18 +297,13 @@ export const DeleteModelForm = ({
                 ],
               },
               {
-                onSuccess: (data) => {
-                  setTimeout(() => {
-                    refetchModels();
-                    // Invalidate all queries that start with '/models' to ensure all instances get fresh data
-                    queryClient.invalidateQueries({
-                      predicate: (query) => {
-                        const queryKey = query.queryKey;
-                        return Array.isArray(queryKey) && queryKey[0] === '/models';
-                      },
-                    });
-                  }, 1000);
-
+                onSuccess: async (data) => {
+                  await queryClient.invalidateQueries({
+                    predicate: (query) => {
+                      const queryKey = query.queryKey;
+                      return Array.isArray(queryKey) && queryKey[0] === '/models';
+                    },
+                  });
                   return resolve({ data: { data: { cards: [data] } }, error: false });
                 },
                 onError: () => resolve({ error: true }),

@@ -485,22 +485,19 @@ export const ModelForm = ({
       console.log('📝 FORM LOGS: ~ newRow:', newRow);
 
       const getModelsAndSubmit = async () => {
-        await refetchModels();
+        // await refetchModels();
 
-        setTimeout(() => {
-          // Invalidate all queries that start with '/models' to ensure all instances get fresh data
-          queryClient.invalidateQueries({ 
-            predicate: (query) => {
-              return Array.isArray(query.queryKey) && query.queryKey[0] === '/models';
-            }
-          });
+        await queryClient.invalidateQueries({
+          predicate: (query) => {
+            return Array.isArray(query.queryKey) && query.queryKey[0] === '/models';
+          },
+        });
 
-          if (formMode) {
-            onSubmit(newRow, formMode);
-            setSubmitLoading(false);
-            setSubmitError('');
-          }
-        }, 300);
+        if (formMode) {
+          onSubmit(newRow, formMode);
+          setSubmitLoading(false);
+          setSubmitError('');
+        }
       };
 
       getModelsAndSubmit();
