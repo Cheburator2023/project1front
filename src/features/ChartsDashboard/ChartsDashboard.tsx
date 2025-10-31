@@ -132,7 +132,7 @@ const ChartsDashboardContent: React.FC<ChartsDashboardProps> = ({ useDatamart = 
 
   const {
     data: metricsData,
-    isLoading: loadingMetrics,
+    isFetching: loadingMetrics,
     error: metricsError,
     refetch: refetchMetrics,
   } = useMetricsControllerGetMetrics(metricsParams, {
@@ -642,12 +642,13 @@ const ChartsDashboardContent: React.FC<ChartsDashboardProps> = ({ useDatamart = 
                 value="Submit"
                 type="submit"
                 disabled={dateError}
+                loading={loadingMetrics}
               >
                 Применить
               </Button>
               <Button
                 dimension="s"
-                appearance="primary"
+                appearance={selectedMetric ? 'primary' : 'secondary'}
                 onClick={handleExportSelectedMetric}
                 disabled={!selectedMetric}
                 loading={isExportingMetric}
