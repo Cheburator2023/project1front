@@ -12,6 +12,7 @@ interface ModelsState {
   selectedDate: string | undefined;
   colOptionsMap: Record<string, string[]>;
   hasEmptyValues: boolean;
+  refetchModels?: () => void | any;
 }
 
 interface ModelsActions {
@@ -25,6 +26,7 @@ interface ModelsActions {
   handleSubmit: (newRow?: Row | CustomError | ArtifactApi[], formMode?: MODEL_FORM_MODE) => void;
   initColOptionsMap: (rows?: Partial<Row>[]) => void;
   setHasEmptyValues: (hasEmpty: boolean) => void;
+  setRefetchModels: any;
 }
 
 export type ModelsStore = ModelsState & ModelsActions;
@@ -37,10 +39,12 @@ const initialState: ModelsState = {
   selectedDate: undefined,
   colOptionsMap: {},
   hasEmptyValues: false,
+  refetchModels: undefined,
 };
 
 export const useModelsStore = create<ModelsStore>((set, get) => ({
   ...initialState,
+  setRefetchModels: (refetchModels: () => void | any) => set({ refetchModels }),
   setSelectedDate: (selectedDate) => set({ selectedDate }),
   setCompareMode: (newCompareMode: boolean) => set({ compareMode: newCompareMode }),
   setIsLoading: (loading: boolean) => set({ isLoading: loading }),
@@ -103,7 +107,9 @@ export const useModelsStore = create<ModelsStore>((set, get) => ({
           });
 
           const sortedValues = Array.from(uniqueValues).sort();
-          colOptionsMap[colId] = hasEmptyValues ? ['(Пустые значения)', ...sortedValues] : sortedValues;
+          colOptionsMap[colId] = hasEmptyValues
+            ? ['(Пустые значения)', ...sortedValues]
+            : sortedValues;
         });
       }
     }

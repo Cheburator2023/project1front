@@ -62,11 +62,11 @@ export const ModelForm = ({
   onSubmit,
   onClose,
 }: ModelFormProps) => {
-  const { setRows, modelsParams } = useModelsStore();
+  const { setRows, modelsParams, refetchModels } = useModelsStore();
 
   const updateModelsMutation: any = useModelsControllerUpdateModels();
   const createModelMutation: any = useModelsControllerCreateModel();
-  const { data: _modelsData, refetch: refetchModels } = useModelsControllerGetModels(modelsParams, {
+  const { data: _modelsData } = useModelsControllerGetModels(modelsParams, {
     query: { enabled: false },
   });
 
@@ -485,13 +485,7 @@ export const ModelForm = ({
       console.log('📝 FORM LOGS: ~ newRow:', newRow);
 
       const getModelsAndSubmit = async () => {
-        // await refetchModels();
-
-        await queryClient.invalidateQueries({
-          predicate: (query) => {
-            return Array.isArray(query.queryKey) && query.queryKey[0] === '/models';
-          },
-        });
+        refetchModels?.();
 
         if (formMode) {
           onSubmit(newRow, formMode);
@@ -502,19 +496,24 @@ export const ModelForm = ({
 
       getModelsAndSubmit();
     }
-  }, [isUpdateSuccess, updateModelsMutation.data, formMode, onSubmit, refetchModels]);
+  }, [isUpdateSuccess, updateModelsMutation.data, formMode, onSubmit]);
 
   useEffect(() => {
-    if (isCreateSuccess && createModelMutation.data) {
-      const newRow = createModelMutation.data as Row;
-      refetchModels();
-      if (formMode) {
-        onSubmit(newRow, formMode);
-        setSubmitLoading(false);
-        setSubmitError('');
+    const refetchModelsEffect = async () => {
+      if (isCreateSuccess && createModelMutation.data) {
+        const newRow = createModelMutation.data as Row;
+
+        refetchModels?.();
+
+        if (formMode) {
+          onSubmit(newRow, formMode);
+          setSubmitLoading(false);
+          setSubmitError('');
+        }
       }
-    }
-  }, [isCreateSuccess, createModelMutation.data, formMode, onSubmit, refetchModels]);
+    };
+    refetchModelsEffect();
+  }, [isCreateSuccess, createModelMutation.data, formMode, onSubmit]);
 
   useEffect(() => {
     if (!hasNoAccessToActiveModel) {

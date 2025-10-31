@@ -75,7 +75,6 @@ interface IAgGridTableProps {
   noCustomCells?: boolean;
   pivot?: boolean;
   overlayNoRowsTemplate?: string;
-  refetchModels?: () => void;
 }
 
 const sideBarProps: SideBarDef | string | string[] | boolean | null = {
@@ -135,8 +134,7 @@ const setFilterParams: ISetFilterParams = {
   refreshValuesOnOpen: true,
   cellHeight: 30,
   cellRenderer: (props) => {
-  console.log('🐸 Pepe said >> props:', props);
-
+    console.log('🐸 Pepe said >> props:', props);
 
     const text = props.value === null ? '(Пустые)' : props.value || '';
     const maxLength = 80; // Fallback character limit
@@ -149,14 +147,14 @@ const setFilterParams: ISetFilterParams = {
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
           maxWidth: '100%',
-          minWidth: 0 // Ensures flex shrinking works
+          minWidth: 0, // Ensures flex shrinking works
         }}
         title={text} // Tooltip shows full text on hover
       >
         {truncatedText}
       </div>
     );
-  }
+  },
 };
 
 const autoGroupColumnDefProps: ColDef = {
@@ -200,7 +198,6 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       pivot = false,
       noCustomCells = false,
       overlayNoRowsTemplate,
-      refetchModels,
     }: IAgGridTableProps,
     ref: any,
   ) => {

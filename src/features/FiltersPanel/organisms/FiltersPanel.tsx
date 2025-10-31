@@ -38,10 +38,6 @@ export const FiltersPanel = ({
 
   const { compareMode, setCompareMode, modelsParams, setModelsParams } = useModelsStore();
 
-  const { refetch: refetchModels } = useModelsControllerGetModels(modelsParams, {
-    query: { enabled: false },
-  });
-
   const {
     topFilters,
     modelsDownloadingDate,

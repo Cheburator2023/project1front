@@ -24,7 +24,7 @@ export const AgGridModelsTable = (props: {
   overrideRowList?: Partial<Row>[];
   overlayNoRowsTemplate?: string;
 }) => {
-  const { setRows, modelsParams, setModelsParams } = useModelsStore();
+  const { setRows, modelsParams, setModelsParams, setRefetchModels } = useModelsStore();
 
   const { modelsDownloadingDate } = useFiltersStore();
 
@@ -43,10 +43,10 @@ export const AgGridModelsTable = (props: {
     error: modelsError,
     refetch: refetchModels,
   } = useModelsControllerGetModels(
-    { ...modelsParams, useCache: true },
+    { ...modelsParams },
     {
       query: {
-        enabled: true,
+        enabled: false,
         refetchOnMount: true,
         refetchOnWindowFocus: false,
       },
@@ -82,6 +82,10 @@ export const AgGridModelsTable = (props: {
     fetchModels();
   }, [fetchModels, _selectedExploitationModes]);
 
+  useEffect(() => {
+    setRefetchModels(refetchModels);
+  }, [refetchModels, setRefetchModels]);
+
   useDeepEffect(() => {
     if (templateData) {
       setTemplates(templateData);
@@ -115,7 +119,6 @@ export const AgGridModelsTable = (props: {
       error={modelsError && 'Ошибка загрузки моделей'}
       loading={loadingModels || fetchingModels}
       overlayNoRowsTemplate={props.overlayNoRowsTemplate}
-      refetchModels={refetchModels}
     />
   );
 };

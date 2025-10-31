@@ -144,9 +144,9 @@ export const DeleteModelForm = ({
   const { isValidatorLead } = useRoles();
   const queryClient = useQueryClient();
 
-  const { setRows, modelsParams } = useModelsStore();
+  const { setRows, modelsParams, refetchModels } = useModelsStore();
 
-  const { data: _modelsData, refetch: refetchModels } = useModelsControllerGetModels(
+  const { data: _modelsData } = useModelsControllerGetModels(
     { ...modelsParams, useCache: false },
     {
       query: { enabled: false },
@@ -298,12 +298,8 @@ export const DeleteModelForm = ({
               },
               {
                 onSuccess: async (data) => {
-                  await queryClient.invalidateQueries({
-                    predicate: (query) => {
-                      const queryKey = query.queryKey;
-                      return Array.isArray(queryKey) && queryKey[0] === '/models';
-                    },
-                  });
+                  await         refetchModels?.();
+
                   return resolve({ data: { data: { cards: [data] } }, error: false });
                 },
                 onError: () => resolve({ error: true }),
