@@ -26,7 +26,8 @@ type ArtificialRow = {
 
 type Row = ArtificialRow & {
   system_model_id: string;
-  id: string;
+  model_development_results_approving_flg: string | null;
+  // id: string;
   model_source: string;
   rating_model: string | null;
   create_date: string | null;

@@ -4,7 +4,7 @@ import React, { useRef } from 'react';
 import styled from 'styled-components';
 import { Tooltip } from '@shared/ui/atoms';
 
-export const Container = styled.label`
+export const Container = styled('label')`
   display: flex;
   flex-direction: row;
   padding: 6px 0;
@@ -41,18 +41,17 @@ interface OptionProps {
   style?: React.CSSProperties;
 }
 
-export const CustomOption = ({ text, checked, onChange, style }: OptionProps) => {
+export const CustomOption = React.memo(({ text, checked, onChange, style }: OptionProps) => {
   const textRef = useRef(null);
 
   return (
     <Container key={text} style={style}>
       <Checkbox dimension="s" onChange={onChange} checked={checked} />
 
-      <Label ref={textRef} font="Body/Body 2 Long" as="div">
+      <Label ref={textRef} font="Body/Body 2 Long" as="div" title={text}>
         {text}
       </Label>
-      <Tooltip showOnOverflowOnly targetRef={textRef} title={text} />
     </Container>
   );
-};
+});
 

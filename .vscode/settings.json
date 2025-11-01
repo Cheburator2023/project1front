@@ -25,12 +25,41 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },
+  "git.enabled": true,
+  "git.autofetch": true,
+  "git.autorefresh": true,
+  "git.autoRepositoryDetection": true,
+  "scm.autoReveal": true,
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 1000,
   "files.watcherExclude": {
-    "packages/external_modules/**": true
+    "**/node_modules/**": true,
+    "node_modules/**": true,
+    "**/dist/**": true,
+    "dist/**": true,
+    "**/build/**": true,
+    "**/.turbo/**": true,
+    "**/coverage/**": true,
+    "**/.cache/**": true,
+    ".cache/**": true,
+    "**/logs/**": true,
+    ".git/**": true
   },
   "search.exclude": {
     "**/dist/**": true,
+    ".git/**": true,
+    "dist/**": true,
+    "**/node_modules/**": true,
+    "node_modules/**": true,
+    "**/build/**": true,
+    "**/.turbo/**": true,
+    "**/coverage/**": true,
+    "**/.cache/**": true,
+    ".cache/**": true,
+    "**/logs/**": true,
     "**/lib/**": true
   },
-  "Workspace_Formatter.excludePattern": ["**/node_modules/**", "**/.git/**", "dist/**"]
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }

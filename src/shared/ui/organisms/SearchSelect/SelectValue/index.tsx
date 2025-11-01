@@ -12,17 +12,23 @@ import { OptionsFactoryProps, SELECT_TYPE } from '../types';
 
 import { SingleSelectContainer, TagsContainer, CustomTags, MultiSelectContainer } from './styles';
 import { getSelectedValuesString } from './helpers';
+import { Template } from '../../../../api';
+import { useFiltersStore, useTemplatesStore } from '../../../../stores';
+import { useTemplateFiltersModalStoreSelected } from '../../../../../features/TemplatesPanel/stores/templateFiltersModalStore';
 
 interface SelectValueProps {
   options: OptionsFactoryProps;
   selectedAllValues: boolean;
+  pendingTemplate?: Template;
   active?: boolean;
   value?: string | string[];
   modified?: boolean;
 }
 
 export const SelectValue = React.memo(
-  ({ value, selectedAllValues, active, options, modified }: SelectValueProps) => {
+  ({ value, selectedAllValues, active, options, modified, pendingTemplate }: SelectValueProps) => {
+
+
     const isValueArray = Array.isArray(value);
 
     if (!isValueArray) {
@@ -34,6 +40,7 @@ export const SelectValue = React.memo(
         const selectedValueText = options.groups
           .flatMap((group) => group.options)
           .find((option) => option.value === value[0])?.text;
+        console.log('🐸 Pepe said >> selectedValueText:', selectedValueText);
 
         return (
           <SingleSelectContainer>
@@ -46,15 +53,13 @@ export const SelectValue = React.memo(
                 textOverflow: 'ellipsis',
               }}
             >
-              {active ? selectedValueText : 'Не активен'}
+              {active && selectedValueText
+                ? selectedValueText
+                : active || pendingTemplate
+                ? 'Не активен'
+                : 'Не активен'}
             </div>
-            {active && modified ? (
-              <IconButton
-                tooltip="Фильтры шаблона были изменены"
-                color="#0062FF"
-                icon={<InfoSolid />}
-              />
-            ) : active ? (
+            {active ? (
               <IconButton tooltip="Шаблон активен" color="#0062FF" icon={<CheckSolid />} />
             ) : (
               <IconButton tooltip="Шаблон не активен" color="#0062FF" icon={<InfoSolid />} />

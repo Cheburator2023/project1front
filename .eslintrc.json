@@ -86,12 +86,5 @@
       "presets": ["@babel/preset-react"]
     }
   },
-  "ignorePatterns": [
-    "webpack.*.js",
-    "jest-setup.ts",
-    "**/*.spec.*",
-    "**/*.test.*",
-    "src/shared/ui/Table"
-  ]
+  "ignorePatterns": ["webpack.*.js", "jest-setup.ts", "**/*.spec.*", "**/*.test.*"]
 }
-

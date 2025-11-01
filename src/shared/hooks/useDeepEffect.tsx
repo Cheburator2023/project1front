@@ -17,10 +17,10 @@ const warnDeps = (dependencies: any[]) => {
 };
 
 const getTriggerDeps = (dependencies: any[], comparisonFn: Function): number[] => {
-  const ref = useRef<React.DependencyList>();
+  const ref = useRef<React.DependencyList>(undefined);
   const triggerDeps = useRef<number>(0);
 
-  if (!comparisonFn(dependencies, ref.current)) {
+  if (!comparisonFn(dependencies, ref?.current)) {
     ref.current = dependencies;
     triggerDeps.current = Math.random();
   }

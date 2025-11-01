@@ -1,6 +1,6 @@
 import styled, { css } from 'styled-components';
 
-export const StatusWrapper = styled.div`
+export const StatusWrapper = styled('div')`
   display: flex;
   width: 100%;
   padding: 50px 0;

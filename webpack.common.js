@@ -2,7 +2,6 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ModuleFederationPlugin = require('webpack').container.ModuleFederationPlugin;
 
-const federationConfig = require('./federation.config.json');
 const deps = require('./package.json').dependencies;
 
 const SRC_DIR = path.join(__dirname, './src');
@@ -25,46 +24,12 @@ module.exports = {
   },
   plugins: [
     new ModuleFederationPlugin({
-      ...federationConfig,
-      filename: 'remoteEntry.js',
-      shared: {
-        ...deps,
-        react: {
-          singleton: true,
-          eager: true,
-          requiredVersion: deps.react,
-        },
-        'react-dom': {
-          singleton: true,
-          eager: true,
-          requiredVersion: deps['react-dom'],
-        },
-        'react-router-dom': {
-          singleton: true,
-          eager: true,
-          requiredVersion: deps['react-router-dom'],
-        },
-        '@mui/material': {
-          singleton: true,
-          eager: true,
-          requiredVersion: deps['@mui/material'],
-        },
-        '@admiral-ds/icons': {
-          singleton: true,
-          eager: true,
-          requiredVersion: deps['@admiral-ds/icons'],
-        },
-        '@admiral-ds/react-ui': {
-          singleton: true,
-          eager: true,
-          requiredVersion: deps['@admiral-ds/react-ui'],
-        },
-        'styled-components': {
-          singleton: true,
-          eager: true,
-          requiredVersion: deps['styled-components'],
-        },
+      name: 'sumRM',
+      exposes: {
+        './App': './src/indexFederated',
       },
+      filename: 'remoteEntry.js',
+      shared: {},
     }),
     new HtmlWebpackPlugin({
       template: './public/index.html',
@@ -87,13 +52,13 @@ module.exports = {
   },
   module: {
     rules: [
-      {
-        test: /bootstrap\.tsx$/,
-        loader: 'bundle-loader',
-        options: {
-          lazy: true,
-        },
-      },
+      // {
+      //   test: /bootstrap\.tsx$/,
+      //   loader: 'bundle-loader',
+      //   options: {
+      //     lazy: true,
+      //   },
+      // },
       {
         test: /\.tsx?$/,
         loader: 'babel-loader',

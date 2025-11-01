@@ -67,7 +67,7 @@ export const MenuIconSelect: React.FC<MenuIconSelectProps> = ({ items, icon, onS
           targetElement={buttonRef.current as Element | undefined}
           onClickOutside={clickOutside}
           className="dropContainerClass"
-          targetRef={buttonRef}
+          targetRef={buttonRef as any}
         >
           <Menu
             model={model}

@@ -1,6 +1,8 @@
 import { StoreApi, UseBoundStore, create } from 'zustand';
 import { Permission, UserPermissions, Role, UserRoles } from '../types';
 
+const NO_ROLES = process.env.NO_ROLES;
+
 interface UserStoreState {
   username: string | null;
   groups: string[];
@@ -30,7 +32,7 @@ export const useUserStore: UseBoundStore<StoreApi<UserStoreState>> = create<User
     },
     hasPermission: (permission: Permission) => {
       const { permissions } = useUserStore.getState();
-      return permissions.includes(permission);
+      return NO_ROLES ? true : permissions.includes(permission);
     },
   }),
 );

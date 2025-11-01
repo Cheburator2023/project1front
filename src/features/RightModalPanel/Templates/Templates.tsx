@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   T,
   TextInput,
@@ -15,16 +15,15 @@ import { ReactComponent as UnlockOutline } from '@admiral-ds/icons/build/securit
 import { ReactComponent as SearchIcon } from '@admiral-ds/icons/build/system/SearchOutline.svg';
 
 import {
-  useFetch,
-  API_ROUTES,
-  MutationProtectedFetchProps,
-  Template,
-  TemplateAddApi,
-  TemplateUpdateApi,
-  FiltersContext,
-} from '@shared/api';
+  useTemplatesControllerCreateTemplate,
+  useTemplatesControllerUpdateTemplate,
+  useTemplatesControllerDeleteTemplate,
+  useTemplatesControllerGetTemplates,
+} from '@shared/api/generated/endpoints';
+import { Template } from '@shared/api';
 import { StatusScreen } from '@shared/ui/molecules';
 import { RightPanel } from '@shared/ui/organisms';
+import { useFiltersStore } from '@shared/stores/filtersStore';
 
 import { TemplateItem } from './TemplateItem';
 import {
@@ -35,7 +34,10 @@ import {
   TemplatesGroupLabel,
   TemplatesGroupWrapper,
 } from './styles';
-
+import { TemplateCreateDto, TemplateUpdateDto } from '../../../shared/api/generated/models';
+import { useGlobalStore } from '../../../shared/stores/globalStore';
+import { useTemplatesStore } from '../../../shared/stores/templatesStore';
+import { initialTopFilters } from '../../../shared/constants';
 
 const options = [
   {
@@ -57,11 +59,18 @@ export interface TemplatesProps {
 }
 
 export const Templates = ({ templates, onClose, updateTemplates }: TemplatesProps) => {
-  const { columnsFilters } = useContext(FiltersContext);
+  const { sortState, selectedIds, setTopFilters } = useFiltersStore();
+
+  const { agGridApi } = useGlobalStore();
+  const { setPendingTemplate } = useTemplatesStore();
 
   const { isAddPublicTemplateEnabled } = usePermissions();
-
-  const { mutationProtectedFetch } = useFetch({});
+  const createTemplateMutation = useTemplatesControllerCreateTemplate();
+  const updateTemplateMutation = useTemplatesControllerUpdateTemplate();
+  const deleteTemplateMutation = useTemplatesControllerDeleteTemplate();
+  const getTemplatesQuery = useTemplatesControllerGetTemplates({
+    query: { enabled: false },
+  });
 
   const [filteredTemplates, setFilteredTemplates] = useState<Template[]>([]);
 
@@ -94,100 +103,136 @@ export const Templates = ({ templates, onClose, updateTemplates }: TemplatesProp
     [templates],
   );
 
-  async function runTemplateAction<T>({
-    fetchParams,
-    getNewTemplates,
-  }: {
-    fetchParams: MutationProtectedFetchProps<T, Template>;
-    getNewTemplates?: (templates: Template[], responseTemplate?: Template) => Template[];
-  }) {
-    setSubmitLoading(true);
-    setError('');
+  const handleMutationSuccess = (
+    responseTemplate: Template,
+    getNewTemplates?: (templates: Template[], responseTemplate?: Template) => Template[],
+  ) => {
+    if (getNewTemplates) {
+      updateTemplates((prevTemplates: Template[]) => {
+        const newTemplates = getNewTemplates?.(prevTemplates, responseTemplate);
 
-    try {
-      // @ts-ignore TODO: fix types
-      const res: any = await mutationProtectedFetch<T, Template>(fetchParams);
+        const result = {
+          ...initialTopFilters,
+          templates: [String(responseTemplate?.template_id)],
+        };
 
-      if (!res || res.error) {
-        const errorMessage = res?.data?.message || 'Ошибка';
+        setTopFilters(result);
 
-        setError(errorMessage);
-        setFilteredTemplates(templates);
-      } else {
-        if (getNewTemplates) {
-          updateTemplates((prevTemplates: Template[]) => getNewTemplates(prevTemplates, res.data));
-          setFilteredTemplates(() => getNewTemplates(templates, res.data));
-        }
-      }
-    } catch (error) {
-      setError('Ошибка');
+        return newTemplates;
+      });
+      setFilteredTemplates(() => getNewTemplates(templates, responseTemplate));
     }
-
     setValue('');
     setIsOpened(false);
     setSubmitLoading(false);
-  }
+  };
+
+  const handleMutationError = (error: any) => {
+    const errorMessage = error?.message || 'Ошибка';
+    setError(errorMessage);
+    setFilteredTemplates(templates);
+    setSubmitLoading(false);
+  };
 
   const handleOnAddTemplate = (id: string) => {
     if (!value) {
       return;
     }
 
-    runTemplateAction<TemplateAddApi>({
-      fetchParams: {
-        body: {
-          template_name: value,
-          public: id === 'public',
-          template_value: columnsFilters,
+    setSubmitLoading(true);
+    setError('');
+
+    const columnState = agGridApi?.getColumnState();
+    const filterModel: any = agGridApi?.getFilterModel();
+  
+    const templateData: TemplateCreateDto = {
+      template_name: value,
+      public: id === 'public',
+      filterModel,
+      columnState: columnState
+        ?.filter((item) => item.colId !== 'ag-Grid-ControlsColumn')
+        ?.map((item) => ({ colId: item.colId, hide: item.hide })),
+      selectedIds,
+    };
+
+    createTemplateMutation.mutate(
+      { data: templateData },
+      {
+        onSuccess: (responseTemplate) => {
+          if (responseTemplate) {
+            handleMutationSuccess(responseTemplate, (prevTemplates, responseTemplate) => {
+              if (responseTemplate) {
+                return [...prevTemplates, responseTemplate];
+              }
+              return prevTemplates;
+            });
+          }
+          setPendingTemplate(undefined);
+          getTemplatesQuery.refetch();
         },
-        fetchApiRoute: API_ROUTES.TEMPLATE_ADD,
-        fetchMethod: 'POST',
+        onError: handleMutationError,
       },
-      getNewTemplates: (prevTemplates, responseTemplate) => {
-        if (responseTemplate) {
-          return [...prevTemplates, responseTemplate];
-        }
-        return prevTemplates;
-      },
-    });
+    );
   };
 
   const handleOnEditTemplate = (templateId: number, newValue: string, isPublic?: boolean) => {
-    runTemplateAction<TemplateUpdateApi>({
-      fetchParams: {
-        body: {
-          template_id: templateId,
-          template_name: newValue,
-          public: !!isPublic,
-          template_value: columnsFilters,
-        },
-        fetchApiRoute: API_ROUTES.TEMPLATE_EDIT,
-        fetchMethod: 'PUT',
-      },
-      getNewTemplates: (prevTemplates, responseTemplate) =>
-        prevTemplates.map((template) => {
-          if (template.template_id === responseTemplate?.template_id) {
-            return responseTemplate;
-          }
+    setSubmitLoading(true);
+    setError('');
 
-          return template;
-        }),
-    });
+    const columnState = agGridApi?.getColumnState();
+    const filterModel: any = agGridApi?.getFilterModel();
+
+    const templateData: TemplateUpdateDto = {
+      template_id: templateId,
+      template_name: newValue,
+      public: !!isPublic,
+      filterModel,
+      columnState: columnState
+        ?.filter((item) => item.colId !== 'ag-Grid-ControlsColumn')
+        ?.map((item) => ({ colId: item.colId, hide: item.hide })),
+      selectedIds,
+    };
+
+    updateTemplateMutation.mutate(
+      { data: templateData },
+      {
+        onSuccess: (responseTemplate) => {
+          if (responseTemplate) {
+            handleMutationSuccess(responseTemplate, (prevTemplates, responseTemplate) =>
+              prevTemplates.map((template) => {
+                if (template.template_id === responseTemplate?.template_id) {
+                  return responseTemplate;
+                }
+                return template;
+              }),
+            );
+          }
+          setPendingTemplate(undefined);
+        },
+        onError: handleMutationError,
+      },
+    );
   };
 
   const handleOnDeleteTemplate = (templateId: number) => {
-    runTemplateAction<{ template_id: number }>({
-      fetchParams: {
-        body: {
-          template_id: templateId,
+    setSubmitLoading(true);
+    setError('');
+
+    deleteTemplateMutation.mutate(
+      { id: templateId },
+      {
+        onSuccess: () => {
+          updateTemplates((prevTemplates: Template[]) =>
+            prevTemplates.filter(({ template_id }) => template_id !== templateId),
+          );
+          setFilteredTemplates((prevTemplates: Template[]) =>
+            prevTemplates.filter(({ template_id }) => template_id !== templateId),
+          );
+          setSubmitLoading(false);
         },
-        fetchApiRoute: API_ROUTES.TEMPLATE_DELETE,
-        fetchMethod: 'DELETE',
-        routeParam: templateId,
+        onError: handleMutationError,
       },
-      getNewTemplates: (prevTemplates: Template[]) =>
-        prevTemplates.filter(({ template_id }) => template_id !== templateId),
-    });
+    );
   };
 
   const model = useMemo(
@@ -203,11 +248,11 @@ export const Templates = ({ templates, onClose, updateTemplates }: TemplatesProp
         .map(({ id, label, icon }) => ({
           id,
           render: (options: RenderOptionProps) => (
-            <StyledMenuItem key={ id } dimension="s" data-dimension="s" { ...options }>
-              <IconWrapper>{ icon }</IconWrapper>
-              { label }
+            <StyledMenuItem key={id} dimension="s" data-dimension="s" {...options}>
+              <IconWrapper>{icon}</IconWrapper>
+              {label}
             </StyledMenuItem>
-          )
+          ),
         })),
     [],
   );
@@ -268,7 +313,10 @@ export const Templates = ({ templates, onClose, updateTemplates }: TemplatesProp
           }
         >
           {isOpened && (
-            <StyledDropdownContainer targetRef={inputRef} onClickOutside={() => setIsOpened(false)}>
+            <StyledDropdownContainer
+              targetRef={inputRef as any}
+              onClickOutside={() => setIsOpened(false)}
+            >
               <Menu selected={value} model={model} onSelectItem={handleOnAddTemplate} />
             </StyledDropdownContainer>
           )}

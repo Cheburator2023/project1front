@@ -19,25 +19,25 @@ const TextProps = css<TProps>`
   ${(p) => typography[p.font]};
 `;
 
-export const Row = styled.div<{ css?: any }>`
+export const Row = styled('div')<{ css?: any }>`
   display: flex;
   // flex-flow: row wrap;
   ${(p) => p.css};
 `;
 
-export const GridRow = styled.div<{ css?: any }>`
+export const GridRow = styled('div')<{ css?: any }>`
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   ${(p) => p.css};
 `;
 
-export const Column = styled.div<{ css?: any }>`
+export const Column = styled('div')<{ css?: any }>`
   display: flex;
   flex-flow: column nowrap;
   ${(p) => p.css};
 `;
 
-export const Frame = styled.div<{
+export const Frame = styled('div')<{
   size: FrameSizeType;
   withBorder?: boolean;
   css?: any;
@@ -116,7 +116,7 @@ export const Delta = styled(T)`
   line-height: 18px;
 `;
 
-export const StatusWrapper = styled.div`
+export const StatusWrapper = styled('div')`
   display: flex;
   width: 100%;
   padding: 50px 0;
@@ -131,17 +131,18 @@ export const CustomSelectField = styled(Select)`
   width: 320px;
 `;
 
-export const WrapperFilter = styled.div`
-  height: 80px;
+export const WrapperFilter = styled('div')`
+  min-height: 80px;
   background: var(--neutral-neutral-10, #e5e7eb);
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: flex-start;
   justify-content: flex-start;
   box-sizing: border-box;
+  padding: 8px 0;
 `;
 
-export const WrapperTitle = styled.div`
+export const WrapperTitle = styled('div')`
   height: 40px;
   background: var(--neutral-neutral-05, #f3f4f6);
   display: flex;
@@ -152,25 +153,38 @@ export const WrapperTitle = styled.div`
   border: 1px solid #eee;
 `;
 
-export const Container = styled.div`
+export const Container = styled('div')`
   width: 100%;
   max-width: 1600px;
   margin: 0 auto;
   padding: 0 16px;
 `;
 
-export const ButtonContainer = styled.div`
+export const ButtonContainer = styled('div')`
   display: flex;
   gap: 10px;
 `;
 
-export const FlexContainerFilter = styled.div`
+export const FlexContainerFilter = styled('div')`
   display: flex;
   align-items: end;
   gap: 16px;
+  flex-wrap: wrap;
+  padding: 16px 0;
+
+  /* Улучшаем выравнивание для мобильных устройств */
+  @media (max-width: 1200px) {
+    gap: 12px;
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
 `;
 
-export const Cover = styled.div`
+export const Cover = styled('div')`
   z-index: 5;
   background: ${({ theme }) => theme.color['Foundation/Blue/B50']};
   padding: 22px 0;
@@ -178,7 +192,7 @@ export const Cover = styled.div`
   flex-flow: row nowrap;
 `;
 
-export const Back = styled.div`
+export const Back = styled('div')`
   z-index: 4;
   background: ${({ theme }) => theme.color['Foundation/Blue/B50']};
   display: flex;
@@ -186,7 +200,7 @@ export const Back = styled.div`
   height: calc(100vh - 184px);
 `;
 
-export const FlexContainerExport = styled.div`
+export const FlexContainerExport = styled('div')`
   display: flex;
   align-items: center;
 `;
@@ -202,7 +216,7 @@ export const CustomSearchSelect = styled(SearchSelect)`
   }
 `;
 
-export const DisabledMetricWrapper = styled.div`
+export const DisabledMetricWrapper = styled('div')`
   position: relative;
   opacity: 0.4;
   pointer-events: none;

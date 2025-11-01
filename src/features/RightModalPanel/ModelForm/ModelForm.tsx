@@ -6,18 +6,24 @@ import { format } from 'date-fns';
 
 import { Row } from '@shared/types';
 import { StatusScreen } from '@shared/ui/molecules';
-import { RIGHT_PANEL_TYPE, MODEL_FORM_MODE, initialColumns } from '@shared/constants';
+import { MODEL_FORM_MODE, initialColumns } from '@shared/constants';
 import { INPUT_TYPE, InputFactory, InputValue, RightPanel } from '@shared/ui/organisms';
-import { API_ROUTES, useFetch, ArtifactApi, ModelEditApi } from '@shared/api';
+import { ArtifactApi, ModelEditApi } from '@shared/api';
+import {
+  useModelsControllerUpdateModels,
+  useModelsControllerCreateModel,
+  useModelsControllerGetModels,
+} from '@shared/api/generated/endpoints';
 import { usePermissions, useRoles } from '@src/shared/hooks';
 
 import { groupBy, isEqual, omit, sortBy, uniqBy } from 'lodash';
 import { Flexbox, Spacer } from '@shared/ui/atoms';
-import { Artifact } from '@shared/api/types';
+import { Artifact, ModelsResponseType } from '@shared/api/types';
 
-import { useAppInjectStore } from '@shared/stores/appInjectStore';
+import { useGlobalStore } from '@shared/stores/globalStore';
 import { useScrollTo } from '@src/shared/hooks/useScrollTo';
 import { useDeepEffect } from '@src/shared/hooks/useDeepEffect';
+import { useQueryClient } from '@tanstack/react-query';
 import { FormValues } from '../types';
 import {
   getFormMode,
@@ -32,11 +38,12 @@ import { useActiveFormSchema } from './useActiveFormSchema';
 import { useFormFields } from './useFormFields';
 import { ALLOCATION_FIELDS_NAMES_USAGE, SCHEMA_NAME_MAP } from './constants';
 import { ModelFormDotMenu } from './ModelFormDotMenu';
+import { useModelsStore } from '../../../shared/stores';
 
 type SubmitType = { checkOnly?: boolean };
 
 export interface ModelFormProps {
-  mode: RIGHT_PANEL_TYPE.ADD_MODEL | RIGHT_PANEL_TYPE.EDIT_MODEL;
+  mode: 'add' | 'edit';
   artifacts: Artifact[];
   editCellName?: keyof Row;
   rows: Partial<Row>[];
@@ -55,10 +62,26 @@ export const ModelForm = ({
   onSubmit,
   onClose,
 }: ModelFormProps) => {
-  const { mutationProtectedFetch } = useFetch({});
+  const { setRows, modelsParams, refetchModels } = useModelsStore();
+
+  const updateModelsMutation: any = useModelsControllerUpdateModels();
+  const createModelMutation: any = useModelsControllerCreateModel();
+  const { data: _modelsData } = useModelsControllerGetModels(modelsParams, {
+    query: { enabled: false },
+  });
+
+  const modelsData = _modelsData as ModelsResponseType | undefined;
+
+  const isUpdateLoading = updateModelsMutation.isPending;
+  const isCreateLoading = createModelMutation.isPending;
+  const isUpdateError = updateModelsMutation.isError;
+  const isCreateError = createModelMutation.isError;
+  const isUpdateSuccess = updateModelsMutation.isSuccess;
+  const isCreateSuccess = createModelMutation.isSuccess;
   const formMode = getFormMode(mode);
-  const { setCurrentCustomer, currentCustomer } = useAppInjectStore();
+  const { currentCustomer } = useGlobalStore();
   const { isEditAllocationEnabled } = usePermissions();
+  const queryClient = useQueryClient();
 
   const [values, setValues] = useState<FormValues | undefined>();
   const [invalidFields, setInvalidFields] = useState<Array<keyof Row>>([]);
@@ -374,7 +397,9 @@ export const ModelForm = ({
       // TODO: check this type
       let newRow: Row | undefined;
 
-      setSubmitLoading(checkOnly ? false : true);
+      if (!checkOnly) {
+        setSubmitLoading(true);
+      }
 
       if (!IS_FORM_MODE_ADD && initialRow && !checkOnly) {
         const { system_model_id, model_source } = initialRow;
@@ -387,52 +412,22 @@ export const ModelForm = ({
         );
 
         if (system_model_id && model_source) {
-          // TODO: fix response type and structure and input type ModelEditApi[]
-          const res: any = await mutationProtectedFetch<ModelEditApi[], { data: { cards: Row[] } }>(
-            {
-              body: [
-                {
-                  model_id: system_model_id,
-                  artefacts: artifactApiItems,
-                  model_source,
-                },
-              ],
-              fetchApiRoute: API_ROUTES.MODELS_EDIT,
-              fetchMethod: 'PUT',
-            },
-          );
-
-          if (!res || res.error) {
-            setSubmitError('Произошла ошибка при обновлении модели');
-            return;
-          }
-
-          if (res?.data?.data?.cards && res.data.data.cards[0]) {
-            newRow = res.data.data.cards[0];
-            console.log('📝 FORM LOGS: ~ newRow:', newRow);
-          }
+          updateModelsMutation.mutate({
+            data: [
+              {
+                model_id: system_model_id,
+                artefacts: artifactApiItems as any,
+                model_source,
+              } as any,
+            ],
+          });
         }
       }
 
       if (IS_FORM_MODE_ADD && !checkOnly) {
-        const res = await mutationProtectedFetch<ArtifactApi[], Row>({
-          body: artifactApiItems,
-          fetchApiRoute: API_ROUTES.MODEL_ADD,
-          fetchMethod: 'POST',
+        createModelMutation.mutate({
+          data: artifactApiItems as any,
         });
-
-        if (!res || res.error) {
-          setSubmitError('Произошла ошибка при добавлении модели');
-          return;
-        }
-
-        newRow = res.data as Row;
-      }
-
-      if (formMode) {
-        onSubmit(newRow, formMode);
-        setSubmitLoading(false);
-        setSubmitError('');
       }
     },
     [values, formSchema, formMode, activeModelByDefault, hasNoAccessToActiveModel, fields],
@@ -478,6 +473,60 @@ export const ModelForm = ({
   }, [initialRow, artifacts]);
 
   useEffect(() => {
+    setSubmitLoading(isUpdateLoading || isCreateLoading);
+  }, [isUpdateLoading, isCreateLoading]);
+
+  useEffect(() => {
+    if (isUpdateError) {
+      setSubmitError('Произошла ошибка при обновлении модели');
+      setSubmitLoading(false);
+    }
+  }, [isUpdateError]);
+
+  useEffect(() => {
+    if (isCreateError) {
+      setSubmitError('Произошла ошибка при добавлении модели');
+      setSubmitLoading(false);
+    }
+  }, [isCreateError]);
+
+  useEffect(() => {
+    if (isUpdateSuccess && updateModelsMutation.data) {
+      const newRow = updateModelsMutation.data as Row;
+      console.log('📝 FORM LOGS: ~ newRow:', newRow);
+
+      const getModelsAndSubmit = async () => {
+        refetchModels?.();
+
+        if (formMode) {
+          onSubmit(newRow, formMode);
+          setSubmitLoading(false);
+          setSubmitError('');
+        }
+      };
+
+      getModelsAndSubmit();
+    }
+  }, [isUpdateSuccess, updateModelsMutation.data, formMode, onSubmit]);
+
+  useEffect(() => {
+    const refetchModelsEffect = async () => {
+      if (isCreateSuccess && createModelMutation.data) {
+        const newRow = createModelMutation.data as Row;
+
+        refetchModels?.();
+
+        if (formMode) {
+          onSubmit(newRow, formMode);
+          setSubmitLoading(false);
+          setSubmitError('');
+        }
+      }
+    };
+    refetchModelsEffect();
+  }, [isCreateSuccess, createModelMutation.data, formMode, onSubmit]);
+
+  useEffect(() => {
     if (!hasNoAccessToActiveModel) {
       if (!isEditByRatingModel) {
         setActiveModelByDefault(false);
@@ -510,6 +559,12 @@ export const ModelForm = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editCellName, formRef.current]);
+
+  useDeepEffect(() => {
+    if (modelsData?.data?.cards) {
+      setRows(modelsData.data.cards);
+    }
+  }, [modelsData?.data?.cards]);
 
   useDeepEffect(() => {
     if (dirtyFields.length) {
@@ -572,7 +627,7 @@ export const ModelForm = ({
           apiLoading={submitLoading}
           onFinished={handleOnClose}
         >
-          <FormContainer ref={formRef} id="model_form_parent_container">
+          <FormContainer ref={formRef as any} id="model_form_parent_container">
             {Object.keys(groupedFieldsBySchemaName).map((schemaKey) => {
               const fieldsByGroup = groupedFieldsBySchemaName[schemaKey || 'Аллокация'];
               const fieldsByGroupSorted = sortBy(fieldsByGroup, (v) =>

@@ -13,7 +13,7 @@ import {
 
 import { ArtifactType, type Artifact, type ArtifactApi, type ArtifactValue } from '@shared/api';
 import { Column, COLUMN_TYPE, ModelSource, Role, Row } from '@shared/types';
-import { initialColumns, RIGHT_PANEL_TYPE, MODEL_FORM_MODE } from '@shared/constants';
+import { initialColumns, MODEL_FORM_MODE } from '@shared/constants';
 import {
   CommonInputProps,
   INPUT_TYPE,
@@ -365,6 +365,7 @@ export const getStartDateInCurrentYear = (startDate: Date) => {
 const ENABLE_FEBRUARY_EXTENSION = false;
 const ENABLE_MARCH_EXTENSION = false;
 const ENABLE_4Q_EXTENSION_UNTIL_APRIL_13 = true;
+const ENABLE_2Q_EXTENSION_UNTIL_NOVEMBER_30 = true;
 
 const getDateLimits = (quarter: number) => {
   const currentDate = new Date();
@@ -377,6 +378,12 @@ const getDateLimits = (quarter: number) => {
   const firstDateOfEffectiveYear = startOfYear(new Date(effectiveYear, 0, 1)); // TODO: Получаем 1 января effectiveYear
   const minDate = addMonths(firstDateOfEffectiveYear, (quarter - 1) * 3); // TODO: Старт квартала
   let maxDate = endOfQuarter(minDate); // TODO: По умолчанию — конец квартала
+
+  if (quarter === 2) {
+    if (ENABLE_2Q_EXTENSION_UNTIL_NOVEMBER_30) {
+      maxDate = new Date(`${effectiveYear}-11-30T23:59:59`);
+    }
+  }
 
   // TODO: Специальная логика продления срока редактирования для 4 квартала
   if (quarter === 4) {
@@ -403,6 +410,13 @@ const getDisabledStatus = (minDate: Date, maxDate: Date, quarter: number, canEdi
 
   const currentDate = new Date();
   const currentQuarter = Math.floor((currentDate.getMonth() + 3) / 3); // TODO: Вычисляем текущий квартал
+
+  if (quarter === 2) {
+    // TODO: Для 2 квартала разрешаем редактирование до 30 ноября (в зависимости от флага)
+    if (ENABLE_2Q_EXTENSION_UNTIL_NOVEMBER_30) {
+      return !isWithinInterval(currentDate, { start: minDate, end: maxDate });
+    }
+  }
 
   if (quarter === 4) {
     // TODO: Для 4 квартала в Q1 и Q2 разрешаем редактирование до maxDate (в зависимости от флагов)
@@ -488,7 +502,7 @@ const mapArtifactToField = (
   activeRow?: Partial<Row>,
   values?: FormValues,
 ): InputFactoryProps<keyof Row> => {
-  const canEdit = canEditArtefact(artifact, activeRow);
+  const canEdit = process.env.NO_ROLES === 'true' || canEditArtefact(artifact, activeRow);
 
   const isDisabled = isFieldDisabled(values, fieldSchema, artifact, activeRow, canEdit);
 
@@ -1150,8 +1164,8 @@ const getParentModelOptions = (rows: Partial<Row>[]) =>
     return options;
   }, [] as SelectStringOptions);
 
-const getFormMode = (activePanelType: RIGHT_PANEL_TYPE) => {
-  if (activePanelType === RIGHT_PANEL_TYPE.EDIT_MODEL) {
+const getFormMode = (activePanelType: 'edit' | 'add') => {
+  if (activePanelType === 'edit') {
     return MODEL_FORM_MODE.EDIT;
   }
 

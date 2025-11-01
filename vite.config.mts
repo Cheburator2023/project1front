@@ -11,12 +11,16 @@ import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import browserslistToEsbuild from 'browserslist-to-esbuild';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import svgr from '@svgr/rollup';
+import packageJSON from './package.json';
 
 const publicEnvVars = ['MOCKED_REQUESTS'];
 const { STAGE } = process.env;
 const IS_DEV = process.env.NODE_ENV === 'development';
+const NO_ROLES = process.env.NO_ROLES;
+
 const ROOT_DIR = path.resolve(__dirname, './');
 const DIST_DIR = path.resolve(ROOT_DIR, './dist');
+const RC_STATS = (packageJSON as any)?.release_stats;
 
 const proxyList = {
   dev: 'https://example.com',
@@ -76,9 +80,6 @@ export const viteCommonConfig = ({ appName, base = '/' }: { appName?: string; ba
         react({
           // jsxImportSource: '@emotion/react',
           // extra babel plugins
-          // babel: {
-          //   plugins: ['@emotion/babel-plugin'],
-          // },
         }),
         svgr({
           dimensions: false,
@@ -92,6 +93,9 @@ export const viteCommonConfig = ({ appName, base = '/' }: { appName?: string; ba
         checker(
           IS_DEV
             ? {
+                overlay: {
+                  initialIsOpen: false,
+                },
                 typescript: true,
                 eslint: {
                   lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
@@ -109,6 +113,10 @@ export const viteCommonConfig = ({ appName, base = '/' }: { appName?: string; ba
       define: {
         'process.env.MOCKED_REQUESTS': JSON.stringify(process.env.MOCKED_REQUESTS),
         'process.env.GIT_REVISION': JSON.stringify(git_revision),
+        'process.env.RC_STATS': JSON.stringify(RC_STATS),
+        'process.env.IS_DEV': JSON.stringify(IS_DEV),
+        'process.env.NO_ROLES': JSON.stringify(NO_ROLES),
+        'process.env.API_BASE_URL': JSON.stringify('http://localhost:3000'),
       },
 
       // resolve: {

@@ -1,7 +1,7 @@
 import { Tags } from '@admiral-ds/react-ui';
 import styled from 'styled-components';
 
-const TagsContainer = styled.div`
+const TagsContainer = styled('div')`
   display: flex;
   flex-direction: row;
   overflow: hidden;
@@ -12,7 +12,7 @@ const TagsContainer = styled.div`
   }
 `;
 
-const MultiSelectContainer = styled.div`
+const MultiSelectContainer = styled('div')`
   display: block;
   flex-wrap: nowrap;
   white-space: nowrap;
@@ -21,7 +21,7 @@ const MultiSelectContainer = styled.div`
   margin-left: 0;
 `;
 
-const SingleSelectContainer = styled.div`
+const SingleSelectContainer = styled('div')`
   display: flex;
   flex-direction: row;
   white-space: nowrap;

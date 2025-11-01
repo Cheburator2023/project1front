@@ -1,4 +1,5 @@
-import { format, isAfter, isValid, parse } from 'date-fns';
+import { format, isValid, parse } from 'date-fns';
+import { dsStreamArtifactOptions } from './constants';
 
 const generateChartData = (delta: number): number[] => {
   const metricValue = Math.abs(delta);
@@ -44,5 +45,7 @@ const validateDateRange = (startDate: string, endDate: string): boolean => {
     parsedStartDate <= parsedEndDate
   );
 };
+
 export { generateChartData, switchDateFormat, validateDateRange };
+
 

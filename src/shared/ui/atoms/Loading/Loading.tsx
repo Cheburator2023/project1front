@@ -7,7 +7,7 @@ export interface LoadingProps {
   spinnerSize?: Dimension;
 }
 
-const Wrapper = styled.div`
+const Wrapper = styled('div')`
   display: flex;
   flex-direction: row;
 

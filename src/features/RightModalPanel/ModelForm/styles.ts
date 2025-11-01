@@ -15,7 +15,7 @@ const CustomSearchSelect = styled(SearchSelect)`
   padding-right: 12px;
 `;
 
-const FormContainer = styled.form`
+const FormContainer = styled('form')`
   padding: 16px 24px;
   box-sizing: border-box;
 
@@ -28,7 +28,7 @@ const FormContainer = styled.form`
   }
 `;
 
-const ButtonContainer = styled.div`
+const ButtonContainer = styled('div')`
   display: flex;
   flex-direction: row;
   justify-content: space-between;

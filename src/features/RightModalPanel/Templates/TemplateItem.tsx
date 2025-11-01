@@ -18,12 +18,12 @@ import { Template } from '@shared/api';
 import styled from 'styled-components';
 import { IconButton } from '@shared/ui/molecules';
 
-const Wrapper = styled.div`
+const Wrapper = styled('div')`
   display: flex;
   flex-direction: row;
   margin-bottom: 15px;
 `;
-const Content = styled.div`
+const Content = styled('div')`
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -31,7 +31,7 @@ const Content = styled.div`
   width: 100%;
 `;
 
-const IconWrapper = styled.div`
+const IconWrapper = styled('div')`
   width: 20px;
   height: 20px;
   margin-right: 8px;
@@ -120,7 +120,11 @@ export const TemplateItem = ({
             onChange={handleChangeEditedTemplateValue}
           />
           <IconButton icon={<CloseOutline />} onClick={() => setIsEditMode(false)} />
-          <IconButton icon={<SaveOutline />} onClick={handleOnSave} />
+          <IconButton
+            icon={<SaveOutline />}
+            onClick={handleOnSave}
+            disabled={!editedTemplateValue}
+          />
         </div>
       ) : (
         <>
@@ -128,8 +132,9 @@ export const TemplateItem = ({
           <Content>
             <T font="Body/Body 2 Short">{template.template_name}</T>
             <T font="Caption/Caption 1" color="Neutral/Neutral 50">
-              Фильтров:{' '}
-              {template.template_value ? Object.values(template.template_value).length : 0}
+              Фильтров: {Object.values(template.filterModel ? template.filterModel : {}).length};
+              Активных колонок:{' '}
+              {template.columnState ? template.columnState.filter((col) => !col.hide).length : 0}
             </T>
           </Content>
           {editable && (

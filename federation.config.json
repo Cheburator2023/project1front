@@ -1,7 +1,0 @@
-{
-  "name": "sumRM",
-  "exposes": {
-    "./Routes": "./src/app/Routes",
-    "./Layout": "./src/app/Layout"
-  }
-}

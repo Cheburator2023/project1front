@@ -1,3 +1,5 @@
+/* eslint-disable object-shorthand */
+/* eslint-disable func-names */
 import { SELECT_TYPE, SelectStringProps } from '@src/shared/ui/organisms';
 import * as Highcharts from 'highcharts';
 import { MetricsCaption, MetricsEnum } from './types';
@@ -680,6 +682,7 @@ const initialChartDistributionByLifecycleStageModels = (): Highcharts.Options & 
       color: 'var(--neutral-neutral-00, #ffffff)',
     },
     hideDelay: 500,
+    // eslint-disable-next-line object-shorthand
     formatter: function (this: any) {
       const point = this.point;
       const value = point.y;

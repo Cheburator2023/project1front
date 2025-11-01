@@ -48,7 +48,7 @@ export const ModelFormDotMenu: React.FC<ModelFormDotMenuProps> = ({
           targetElement={buttonRef.current as Element | undefined}
           onClickOutside={clickOutside}
           className="dropContainerClass"
-          targetRef={buttonRef}
+          targetRef={buttonRef as any}
         >
           <PaperWrapper>
             {expandedPanel && (
@@ -79,7 +79,7 @@ export const ModelFormDotMenu: React.FC<ModelFormDotMenuProps> = ({
   );
 };
 
-const PaperWrapper = styled.div`
+const PaperWrapper = styled('div')`
   padding: 20px;
   border-radius: 8px;
   background: #ffffff;

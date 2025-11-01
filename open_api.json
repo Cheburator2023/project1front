@@ -1,0 +1,694 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/api/rest/v1/models": {
+      "get": {
+        "operationId": "ModelsController_getModels",
+        "summary": "Получить список моделей",
+        "description": "Возвращает список всех доступных моделей с возможностью фильтрации. Использует кеширование для повышения производительности.",
+        "parameters": [
+          {
+            "name": "date",
+            "required": false,
+            "in": "query",
+            "example": "YYYY-MM-DD",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "model_id",
+            "required": true,
+            "in": "query",
+            "example": "3009b53c-507d-11ed-9b68-0a5801020704",
+            "schema": { "format": "uuid", "type": "string" }
+          },
+          {
+            "name": "mode",
+            "required": false,
+            "in": "query",
+            "example": ["Архив", "Разработка"],
+            "schema": { "type": "array", "items": { "type": "string" } }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Список моделей успешно получен" },
+          "500": { "description": "Внутренняя ошибка сервера" }
+        },
+        "tags": ["Модели"]
+      }
+    },
+    "/api/rest/v1/models/compare": {
+      "get": {
+        "operationId": "ModelsController_compareModels",
+        "summary": "Сравнить модели по датам",
+        "description": "Сравнивает состояние моделей между двумя указанными датами",
+        "parameters": [
+          {
+            "name": "firstDate",
+            "required": false,
+            "in": "query",
+            "example": "YYYY-MM-DD",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "secondDate",
+            "required": false,
+            "in": "query",
+            "example": "YYYY-MM-DD",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "mode",
+            "required": false,
+            "in": "query",
+            "example": ["Архив", "Разработка"],
+            "schema": { "type": "array", "items": { "type": "string" } }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Сравнение моделей выполнено успешно" },
+          "400": { "description": "Некорректные параметры запроса" }
+        },
+        "tags": ["Модели"]
+      }
+    },
+    "/api/rest/v1/models/create": {
+      "post": {
+        "operationId": "ModelsController_createModel",
+        "summary": "Создать новую модель",
+        "description": "Создает новую модель в системе с указанными артефактами",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "Массив артефактов для создания модели",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": { "$ref": "#/components/schemas/ModelCreateDto" }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Модель успешно создана" },
+          "400": { "description": "Некорректные данные для создания модели" },
+          "500": { "description": "Внутренняя ошибка сервера" }
+        },
+        "tags": ["Модели"]
+      }
+    },
+    "/api/rest/v1/models/update": {
+      "put": {
+        "operationId": "ModelsController_updateModels",
+        "summary": "Обновить модели",
+        "description": "Обновляет существующие модели с новыми значениями артефактов",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "Массив обновлений для моделей",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": { "$ref": "#/components/schemas/ModelsUpdateDto" }
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": { "description": "Модели успешно обновлены" },
+          "400": { "description": "Некорректные данные для обновления" },
+          "500": { "description": "Внутренняя ошибка сервера" }
+        },
+        "tags": ["Модели"]
+      }
+    },
+    "/api/rest/v1/models/relations": {
+      "get": {
+        "operationId": "ModelsController_getModelWithRelations",
+        "summary": "Получить связи модели",
+        "description": "Возвращает информацию о связях указанной модели с другими объектами системы",
+        "parameters": [
+          {
+            "name": "model_id",
+            "required": true,
+            "in": "query",
+            "example": "3009b53c-507d-11ed-9b68-0a5801020704",
+            "schema": { "format": "uuid", "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Связи модели успешно получены" },
+          "400": { "description": "Некорректные параметры запроса" }
+        },
+        "tags": ["Модели"]
+      }
+    },
+    "/api/rest/v1/models/artefact/history": {
+      "get": {
+        "operationId": "ModelsController_getModelHistory",
+        "summary": "Получить историю артефактов модели",
+        "description": "Возвращает историю изменений артефактов для указанной модели",
+        "parameters": [
+          {
+            "name": "artefact_tech_label",
+            "required": true,
+            "in": "query",
+            "example": "record_id",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "model_id",
+            "required": true,
+            "in": "query",
+            "example": "3009b53c-507d-11ed-9b68-0a5801020704",
+            "schema": { "format": "uuid", "type": "string" }
+          }
+        ],
+        "responses": {
+          "202": { "description": "История артефактов успешно получена" },
+          "400": { "description": "Некорректные параметры запроса" }
+        },
+        "tags": ["Модели"]
+      }
+    },
+    "/api/rest/v1/templates": {
+      "get": {
+        "operationId": "TemplatesController_getTemplates",
+        "summary": "Получить список шаблонов",
+        "description": "Возвращает список всех доступных шаблонов для текущего пользователя",
+        "parameters": [],
+        "responses": { "202": { "description": "Список шаблонов успешно получен" } },
+        "tags": ["Шаблоны"]
+      }
+    },
+    "/api/rest/v1/templates/{id}": {
+      "get": {
+        "operationId": "TemplatesController_getTemplate",
+        "summary": "Получить шаблон по ID",
+        "description": "Возвращает информацию о конкретном шаблоне по его идентификатору",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Идентификатор шаблона",
+            "schema": { "type": "number" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Шаблон найден и возвращен" },
+          "404": { "description": "Шаблон не найден" }
+        },
+        "tags": ["Шаблоны"]
+      },
+      "delete": {
+        "operationId": "TemplatesController_deleteTemplate",
+        "summary": "Удалить шаблон",
+        "description": "Удаляет шаблон из системы по его идентификатору",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Идентификатор шаблона",
+            "schema": { "type": "number" }
+          }
+        ],
+        "responses": {
+          "202": { "description": "Шаблон успешно удален" },
+          "404": { "description": "Шаблон не найден" }
+        },
+        "tags": ["Шаблоны"]
+      }
+    },
+    "/api/rest/v1/templates/create": {
+      "post": {
+        "operationId": "TemplatesController_createTemplate",
+        "summary": "Создать новый шаблон",
+        "description": "Создает новый шаблон в системе",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "Данные для создания шаблона",
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/TemplateCreateDto" } }
+          }
+        },
+        "responses": {
+          "200": { "description": "Шаблон успешно создан" },
+          "409": { "description": "Шаблон с таким названием уже существует" },
+          "500": { "description": "Внутренняя ошибка сервера" }
+        },
+        "tags": ["Шаблоны"]
+      }
+    },
+    "/api/rest/v1/templates/update": {
+      "put": {
+        "operationId": "TemplatesController_updateTemplate",
+        "summary": "Обновить шаблон",
+        "description": "Обновляет существующий шаблон",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "Данные для обновления шаблона",
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/TemplateUpdateDto" } }
+          }
+        },
+        "responses": {
+          "200": { "description": "Шаблон успешно обновлен" },
+          "409": { "description": "Конфликт при обновлении шаблона" }
+        },
+        "tags": ["Шаблоны"]
+      }
+    },
+    "/api/rest/v1/metrics": {
+      "get": {
+        "operationId": "MetricsController_getMetrics",
+        "summary": "Получить метрики",
+        "description": "Возвращает метрики системы за указанный период с возможностью использования BI витрин",
+        "parameters": [
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "example": "YYYY-MM-DD",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "example": "YYYY-MM-DD",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "stream",
+            "required": false,
+            "in": "query",
+            "example": ["stream_name1", "stream_name2"],
+            "schema": { "type": "array", "items": { "type": "string" } }
+          },
+          {
+            "name": "metric",
+            "required": false,
+            "in": "query",
+            "example": "developedModels",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "dataType",
+            "required": false,
+            "in": "query",
+            "example": "current",
+            "description": "Тип данных для экспорта: current или delta",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Метрики успешно получены" },
+          "500": { "description": "Внутренняя ошибка сервера" }
+        },
+        "tags": ["Метрики"]
+      }
+    },
+    "/api/rest/v1/metrics/export": {
+      "get": {
+        "operationId": "MetricsController_exportMetricsToExcel",
+        "summary": "Экспорт метрик в Excel",
+        "description": "Экспортирует метрики в Excel файл для скачивания",
+        "parameters": [
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "example": "YYYY-MM-DD",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "example": "YYYY-MM-DD",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "stream",
+            "required": false,
+            "in": "query",
+            "example": ["stream_name1", "stream_name2"],
+            "schema": { "type": "array", "items": { "type": "string" } }
+          },
+          {
+            "name": "metric",
+            "required": false,
+            "in": "query",
+            "example": "developedModels",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "dataType",
+            "required": false,
+            "in": "query",
+            "example": "current",
+            "description": "Тип данных для экспорта: current или delta",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Excel файл успешно сгенерирован",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": { "type": "string", "format": "binary" }
+              }
+            }
+          },
+          "400": { "description": "Метрика обязательна для экспорта" },
+          "404": { "description": "Метрика не найдена" },
+          "500": { "description": "Ошибка при формировании Excel-файла" }
+        },
+        "tags": ["Метрики"]
+      }
+    },
+    "/api/rest/v1/cache/models/status": {
+      "get": {
+        "operationId": "CacheController_getModelsCacheStatus",
+        "summary": "Получить статус кеша моделей",
+        "description": "Возвращает информацию о состоянии кеша моделей",
+        "parameters": [],
+        "responses": {
+          "200": { "description": "Статус кеша успешно получен" },
+          "500": { "description": "Внутренняя ошибка сервера" }
+        },
+        "tags": ["Кеширование"]
+      }
+    },
+    "/api/rest/v1/cache/models/refresh": {
+      "post": {
+        "operationId": "CacheController_refreshModelsCache",
+        "summary": "Обновить кеш моделей",
+        "description": "Принудительно обновляет кеш моделей",
+        "parameters": [],
+        "responses": {
+          "200": { "description": "Кеш моделей успешно обновлен" },
+          "500": { "description": "Внутренняя ошибка сервера" }
+        },
+        "tags": ["Кеширование"]
+      }
+    },
+    "/api/rest/v1/cache/models/column-values/{columnName}": {
+      "get": {
+        "operationId": "CacheController_getColumnValuesFromCache",
+        "summary": "Получить значения колонки из кеша",
+        "description": "Возвращает уникальные значения указанной колонки из кеша моделей",
+        "parameters": [
+          {
+            "name": "columnName",
+            "required": true,
+            "in": "path",
+            "description": "Название колонки",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Значения колонки успешно получены" },
+          "500": { "description": "Внутренняя ошибка сервера" }
+        },
+        "tags": ["Кеширование"]
+      }
+    },
+    "/api/rest/v1/cache/all": {
+      "get": {
+        "operationId": "CacheController_getAllCacheContents",
+        "summary": "Получить содержимое всех кешей",
+        "description": "Возвращает информацию о всех активных кешах в системе с превью данных",
+        "parameters": [],
+        "responses": {
+          "200": { "description": "Содержимое кешей успешно получено" },
+          "500": { "description": "Внутренняя ошибка сервера" }
+        },
+        "tags": ["Кеширование"]
+      }
+    },
+    "/api/rest/v1/cache/{key}": {
+      "get": {
+        "operationId": "CacheController_getCacheByKey",
+        "summary": "Получить кеш по ключу",
+        "description": "Возвращает полное содержимое кеша по указанному ключу",
+        "parameters": [
+          {
+            "name": "key",
+            "required": true,
+            "in": "path",
+            "description": "Ключ кеша",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Кеш найден и возвращен" },
+          "404": { "description": "Кеш с указанным ключом не найден" },
+          "500": { "description": "Внутренняя ошибка сервера" }
+        },
+        "tags": ["Кеширование"]
+      }
+    },
+    "/api/rest/v1/monitoring/system": {
+      "get": {
+        "operationId": "MonitoringController_getSystemMonitoring",
+        "summary": "Получить системную информацию",
+        "description": "Возвращает информацию о состоянии системы: использование памяти, CPU, время работы",
+        "parameters": [],
+        "responses": { "200": { "description": "Системная информация успешно получена" } },
+        "tags": ["Мониторинг"]
+      }
+    },
+    "/api/rest/v1/artefacts": {
+      "get": {
+        "operationId": "ArtefactsController_getArtefacts",
+        "summary": "Получить список артефактов",
+        "description": "Возвращает список всех доступных артефактов для текущего пользователя",
+        "parameters": [],
+        "responses": {
+          "200": { "description": "Список артефактов успешно получен" },
+          "500": { "description": "Внутренняя ошибка сервера" }
+        },
+        "tags": ["Артефакты"]
+      }
+    },
+    "/api/rest/v1/reports": {
+      "post": {
+        "operationId": "ReportsController_getReport",
+        "summary": "Сгенерировать отчет",
+        "description": "Генерирует Excel отчет на основе указанных фильтров",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "Фильтры для генерации отчета",
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/FilterDto" } }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Отчет успешно сгенерирован",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": { "type": "string", "format": "binary" }
+              }
+            }
+          }
+        },
+        "tags": ["Отчеты"]
+      }
+    },
+    "/api/rest/v1/bi-datamart/sync/models": {
+      "post": {
+        "operationId": "BiDatamartController_syncModelsDatamart",
+        "summary": "Синхронизировать витрину моделей",
+        "description": "Синхронизирует все модели с BI витриной данных",
+        "parameters": [],
+        "responses": { "200": { "description": "Синхронизация витрины моделей завершена" } },
+        "tags": ["BI Витрины"]
+      }
+    },
+    "/api/rest/v1/bi-datamart/sync/tasks": {
+      "post": {
+        "operationId": "BiDatamartController_syncTasksDatamart",
+        "summary": "Синхронизировать витрину задач",
+        "description": "Синхронизирует все задачи с BI витриной данных",
+        "parameters": [],
+        "responses": { "200": { "description": "Синхронизация витрины задач завершена" } },
+        "tags": ["BI Витрины"]
+      }
+    },
+    "/api/rest/v1/artefact-realizations/by-key": {
+      "get": {
+        "operationId": "ArtefactRealizationsController_getByKey",
+        "parameters": [
+          { "name": "model_id", "required": true, "in": "query", "schema": { "type": "string" } },
+          {
+            "name": "artefact_id",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          { "name": "as_of", "required": true, "in": "query", "schema": { "type": "string" } },
+          {
+            "name": "include_history",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "" } }
+      }
+    },
+    "/api/rest/v1/artefact-realizations/query": {
+      "post": {
+        "operationId": "ArtefactRealizationsController_query",
+        "parameters": [],
+        "responses": { "201": { "description": "" } }
+      }
+    }
+  },
+  "info": { "title": "SUM RM API", "description": "", "version": "1.0", "contact": {} },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "schemas": {
+      "ModelCreateDto": {
+        "type": "object",
+        "properties": {
+          "artefact_tech_label": { "type": "string", "example": "record_id" },
+          "artefact_value_id": { "type": "number", "nullable": true, "example": null },
+          "artefact_string_value": { "type": "string", "example": "new value" }
+        },
+        "required": ["artefact_tech_label", "artefact_value_id", "artefact_string_value"]
+      },
+      "ArtefactDto": {
+        "type": "object",
+        "properties": {
+          "artefact_tech_label": { "type": "string", "example": "record_id" },
+          "artefact_value_id": { "type": "number", "nullable": true, "example": null },
+          "artefact_string_value": { "type": "string", "example": "new value" }
+        },
+        "required": ["artefact_tech_label", "artefact_value_id", "artefact_string_value"]
+      },
+      "ModelsUpdateDto": {
+        "type": "object",
+        "properties": {
+          "model_id": {
+            "type": "string",
+            "example": "3009b53c-507d-11ed-9b68-0a5801020704",
+            "format": "uuid"
+          },
+          "artefacts": { "$ref": "#/components/schemas/ArtefactDto" }
+        },
+        "required": ["model_id", "artefacts"]
+      },
+      "TemplateCreateDto": {
+        "type": "object",
+        "properties": {
+          "template_name": { "type": "string", "example": "Название шаблона" },
+          "public": { "type": "boolean", "example": true },
+          "filterModel": {
+            "type": "object",
+            "example": {
+              "record_id": { "values": ["value1", "value2"], "filterType": "set" },
+              "created_date": {
+                "dateFrom": "2024-01-01",
+                "dateTo": "2024-12-31",
+                "filterType": "date",
+                "type": "inRange"
+              }
+            }
+          },
+          "sortState": {
+            "example": [{ "colId": "record_id", "sort": "asc", "sortIndex": 0 }],
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "columnState": {
+            "example": [{ "colId": "model_desc", "hide": true }],
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "selectedIds": {
+            "example": ["model-1", "model-2"],
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "required": [
+          "template_name",
+          "public",
+          "filterModel",
+          "sortState",
+          "columnState",
+          "selectedIds"
+        ]
+      },
+      "TemplateUpdateDto": {
+        "type": "object",
+        "properties": {
+          "template_id": { "type": "number", "example": 1 },
+          "template_name": { "type": "string", "example": "Название шаблона" },
+          "public": { "type": "boolean", "example": true },
+          "filterModel": {
+            "type": "object",
+            "example": {
+              "record_id": { "values": ["value1", "value2"], "filterType": "set" },
+              "created_date": {
+                "dateFrom": "2024-01-01",
+                "dateTo": "2024-12-31",
+                "filterType": "date",
+                "type": "inRange"
+              }
+            }
+          },
+          "sortState": {
+            "example": [{ "colId": "record_id", "sort": "asc", "sortIndex": 0 }],
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "columnState": {
+            "example": [{ "colId": "model_desc", "hide": true }],
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "selectedIds": {
+            "example": ["model-1", "model-2"],
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "required": ["template_id"]
+      },
+      "FilterDto": {
+        "type": "object",
+        "properties": {
+          "filters": {
+            "type": "object",
+            "example": {
+              "record_id": { "values": ["value1", "value2"], "filterType": "set" },
+              "created_date": {
+                "dateFrom": "2024-01-01",
+                "dateTo": "2024-12-31",
+                "filterType": "date",
+                "type": "inRange"
+              }
+            }
+          },
+          "mode": {
+            "example": ["Архив", "Разработка"],
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "required": ["filters"]
+      }
+    }
+  }
+}

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { format } from 'date-fns';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Keycloak from 'keycloak-js';
 import styled from 'styled-components';
 
@@ -11,14 +11,16 @@ import { ReactComponent as PersonSolid } from '@admiral-ds/icons/build/system/Pe
 
 import { Loading, Tooltip } from '@shared/ui/atoms';
 import { IconButton } from '@shared/ui/molecules';
-import { API_ROUTES, useFetch, ReportApi } from '@shared/api';
+import { ReportApi } from '@shared/api';
+import { useReportsControllerGetReport } from '@shared/api/generated/endpoints';
 
 import { useExploitationModeStore } from '@src/shared/stores';
 import { ReactComponent as LogoIcon } from './logo.svg';
 import { ColumnsFilter } from '../shared/types';
 import { ROUTES } from './Routes';
+import { useGlobalStore } from '../shared/stores/globalStore';
 
-const Container = styled.div`
+const Container = styled('div')`
   width: 100%;
   height: 64px;
   background: #0132b0;
@@ -30,7 +32,7 @@ const Container = styled.div`
   justify-content: space-between;
 `;
 
-const Logo = styled.div`
+const Logo = styled('div')`
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -58,19 +60,18 @@ const CustomButton = styled(Button)`
   }
 `;
 
-const LoadingWrapper = styled.div`
+const LoadingWrapper = styled('div')`
   margin-right: 65px;
 `;
 
-const ActionsGroup = styled.div`
+const ActionsGroup = styled('div')`
   display: flex;
   flex-direction: row;
   align-items: center;
 `;
 
 interface HeaderProps {
-  columnsFilters?: Partial<ColumnsFilter>;
-  downloadReportStatus: boolean;
+  downloadReportStatus?: boolean;
   user?: Keycloak.KeycloakTokenParsed & {
     family_name: string;
     given_name: string;
@@ -79,41 +80,14 @@ interface HeaderProps {
     };
     roles: string[];
   };
-  updateColumnsFilters: (newColumnsFilters?: Partial<ColumnsFilter>) => void;
-  updateDownloadReportStatus: React.Dispatch<React.SetStateAction<boolean>>;
   onLogout?: () => void;
-  goToSum?: () => void;
 }
 
-const Header = ({
-  columnsFilters,
-  user,
-  downloadReportStatus,
-  updateColumnsFilters,
-  updateDownloadReportStatus,
-  onLogout,
-  goToSum,
-}: HeaderProps) => {
-  const sumBtnRef = useRef(null);
-  const { mutationProtectedFetch } = useFetch({});
-  const { selectedExploitationModes } = useExploitationModeStore();
-
-  useEffect(() => {
-    if (columnsFilters && downloadReportStatus) {
-      mutationProtectedFetch<ReportApi, Blob>({
-        body: {
-          filters: columnsFilters,
-          mode: selectedExploitationModes,
-        },
-        fetchApiRoute: API_ROUTES.REPORT,
-        fetchMethod: 'POST',
-        fileName: `Отчёт ${format(new Date(), 'dd.MM.yyyy')}`,
-      })?.then(() => {
-        updateDownloadReportStatus(false);
-        updateColumnsFilters(undefined);
-      });
-    }
-  }, [columnsFilters, downloadReportStatus, selectedExploitationModes]);
+const Header = ({ user, downloadReportStatus, onLogout }: HeaderProps) => {
+  const { agGridApi } = useGlobalStore();
+  const selectedExploitationModes = useExploitationModeStore(
+    (state) => state.selectedExploitationModes,
+  );
 
   const userName =
     user?.family_name && user?.given_name
@@ -122,25 +96,47 @@ const Header = ({
 
   return (
     <Container>
-      <Link to={ROUTES.MF_HOME_ROUTE}>
+      <Link to="/">
         <Logo>
           <LogoIcon />
           <CustomLabel font="Caption/Caption 1">Реестр моделей</CustomLabel>
         </Logo>
       </Link>
+
       <ActionsGroup>
-        {downloadReportStatus ? (
-          <LoadingWrapper>
-            <Loading text="" spinnerSize="s" />
-          </LoadingWrapper>
-        ) : (
-          <CustomButton dimension="s" onClick={() => updateDownloadReportStatus(true)}>
-            <T font="Button/Button 2">Выгрузить отчет</T>
-          </CustomButton>
-        )}
         <CustomButton
-          ref={sumBtnRef}
-          onClick={goToSum}
+          dimension="s"
+          disabled={!agGridApi}
+          onClick={() => {
+            if (!agGridApi) return;
+
+            // Get only visible columns in their current display order
+            const visibleColumns = agGridApi.getAllDisplayedColumns();
+
+            const columnKeys = visibleColumns
+              .filter((col) => col.getColId() !== 'ag-Grid-ControlsColumn')
+              .map((col) => col.getColId());
+
+            return agGridApi.exportDataAsExcel({
+              columnKeys,
+              fileName: `Отчет ${format(new Date(), 'dd.MM.yyyy')}.xlsx`,
+              // Export only filtered data if filters are applied
+              onlySelected: false,
+              // Include column headers
+              skipColumnHeaders: false,
+              // Use current column widths and order
+              allColumns: false,
+            });
+          }}
+        >
+          <T font="Button/Button 2">Выгрузить отчет</T>
+        </CustomButton>
+
+        <CustomButton
+          title="Перейти в СУМ"
+          onClick={() => {
+            window.location.href = '/sum';
+          }}
           dimension="m"
           appearance="ghost"
           iconPlace="right"
@@ -148,7 +144,6 @@ const Header = ({
         >
           <T font="Button/Button 2">СУМ</T>
         </CustomButton>
-        <Tooltip targetRef={sumBtnRef} title="Перейти в СУМ" />
         <Avatar
           dimension="xs"
           showTooltip

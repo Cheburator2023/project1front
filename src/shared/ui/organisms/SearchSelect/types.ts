@@ -18,7 +18,7 @@ type SelectOption = {
 
 type SelectTemplatesOptions = Array<{
   text: string;
-  options: Array<SelectOption & { filtersCount: number }>;
+  options: Array<SelectOption & { filtersCount: number; activeCols: number }>;
 }>;
 
 type SelectTemplatesProps = {

@@ -9,22 +9,29 @@ import { Row } from '@shared/types';
 import { StatusScreen } from '@shared/ui/molecules';
 import { MODEL_FORM_MODE } from '@shared/constants';
 import { INPUT_TYPE, InputFactory, InputValue, RightPanel } from '@shared/ui/organisms';
-import { API_ROUTES, ArtifactApi, useFetch } from '@shared/api';
+import { ArtifactApi } from '@shared/api';
+import {
+  useModelsControllerGetModels,
+  useModelsControllerUpdateModels,
+} from '@shared/api/generated/endpoints';
 import { groupBy } from 'lodash';
 import { Flexbox, Spacer } from '@shared/ui/atoms';
-import { Artifact, CustomError, ModelEditApi } from '@shared/api/types';
+import { Artifact, CustomError, ModelEditApi, ModelsResponseType } from '@shared/api/types';
 import { useDeepEffect } from '@src/shared/hooks/useDeepEffect';
 
-import { useAppInjectStore } from '@shared/stores/appInjectStore';
-import { useDeleteRightModelPanelStore } from '@src/shared/stores';
+import { useGlobalStore } from '@shared/stores/globalStore';
+import { useDeleteRightModelPanelStore, useModelsStore } from '@src/shared/stores';
 import { useScrollTo } from '@src/shared/hooks/useScrollTo';
 import { useRoles } from '@src/shared/hooks';
+import { useQueryClient } from '@tanstack/react-query';
 import { FormValues } from '../types';
 import { getArtifactApiItems, getInputValuesFromRow, getInvalidFields } from '../helpers';
 import { ButtonContainer, FormContainer } from '../ModelForm/styles';
 import { useFormFields } from '../ModelForm/useFormFields';
 import { DELETE_CONFIRM_MODEL_SCHEMA, DELETE_MODEL_SCHEMA, SCHEMA_NAME_MAP } from './constants';
 import { useActiveDeleteFormSchema } from './useActiveDeleteFormSchema';
+
+const NO_ROLES = process.env.NO_ROLES === 'true';
 
 const StyledTabMenu = styled(TabMenu)`
   display: flex;
@@ -104,6 +111,7 @@ const isSubmitButtonEnabled = (
     '1': !isValidatorLead,
     '2': isValidatorLead,
   };
+  console.log('🐸 Pepe said >> isSubmitButtonEnabled >> conditions:', conditions);
 
   return conditions[activeTab] ?? false;
 };
@@ -115,8 +123,10 @@ export const DeleteModelForm = ({
   onSubmit,
   onClose,
 }: DeleteModelFormProps) => {
-  const { mutationProtectedFetch } = useFetch({});
-  const { currentCustomer } = useAppInjectStore();
+  console.log('🐸 Pepe said >> DeleteModelForm >> activeRow:', activeRow);
+
+  const updateModelsMutation = useModelsControllerUpdateModels();
+  const { currentCustomer } = useGlobalStore();
 
   const [values, setValues] = useState<FormValues | undefined>();
   const [invalidFields, setInvalidFields] = useState<Array<keyof Row>>([]);
@@ -132,6 +142,18 @@ export const DeleteModelForm = ({
   const [activeTab, setActiveTab] = useState<string>('1');
   const { formMode, setFormMode } = useDeleteRightModelPanelStore();
   const { isValidatorLead } = useRoles();
+  const queryClient = useQueryClient();
+
+  const { setRows, modelsParams, refetchModels } = useModelsStore();
+
+  const { data: _modelsData } = useModelsControllerGetModels(
+    { ...modelsParams, useCache: false },
+    {
+      query: { enabled: false },
+    },
+  );
+
+  const modelsData = _modelsData as ModelsResponseType | undefined;
 
   const resolutionValue = values?.lead_validator_resolution_model_delete?.value as ResolutionValue;
   const modelStatusValue = values?.status?.value as ModelStatus;
@@ -263,19 +285,27 @@ export const DeleteModelForm = ({
         const { system_model_id, model_source } = initialRow;
 
         if (system_model_id && model_source) {
-          const res: any = await mutationProtectedFetch<ModelEditApi[], { data: { cards: Row[] } }>(
-            {
-              body: [
-                {
-                  model_id: system_model_id,
-                  artefacts: artifactApiItems,
-                  model_source,
+          const res: any = await new Promise((resolve) => {
+            updateModelsMutation.mutate(
+              {
+                data: [
+                  {
+                    model_id: system_model_id,
+                    artefacts: artifactApiItems as any,
+                    model_source,
+                  } as any,
+                ],
+              },
+              {
+                onSuccess: async (data) => {
+                  await         refetchModels?.();
+
+                  return resolve({ data: { data: { cards: [data] } }, error: false });
                 },
-              ],
-              fetchApiRoute: API_ROUTES.MODELS_EDIT,
-              fetchMethod: 'PUT',
-            },
-          );
+                onError: () => resolve({ error: true }),
+              },
+            );
+          });
 
           if (!res || res.error) {
             setSubmitError('Произошла ошибка при удалении модели');
@@ -304,6 +334,12 @@ export const DeleteModelForm = ({
 
     onClose();
   }, [onClose]);
+
+  useDeepEffect(() => {
+    if (modelsData?.data?.cards) {
+      setRows(modelsData.data.cards);
+    }
+  }, [modelsData?.data?.cards]);
 
   useEffect(() => {
     if (modelStatusValue === ModelStatus.AWAITING_DELETION) {
@@ -359,10 +395,14 @@ export const DeleteModelForm = ({
       setInvalidFields(newInvalidFields);
     }
   }, [values, dirtyFields, deleteFormSchema, wasPreviouslyActiveModel, fields]);
+  console.log('🐸 Pepe said >> DeleteModelForm >> values:', values);
 
   const renderFooter = useCallback(() => {
     const modelStatus = values?.status?.value || initialRow?.status;
     const isEnabled = isSubmitButtonEnabled(activeTab, isValidatorLead, modelStatus as ModelStatus);
+    console.log('🐸 Pepe said >> DeleteModelForm >> modelStatus:', modelStatus);
+    console.log('🐸 Pepe said >> DeleteModelForm >> isValidatorLead:', isValidatorLead);
+    console.log('🐸 Pepe said >> DeleteModelForm >> activeTab:', activeTab);
 
     return (
       <>

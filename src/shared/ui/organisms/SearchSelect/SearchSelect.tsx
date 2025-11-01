@@ -22,6 +22,8 @@ import {
 import { CustomOption } from './CustomOption';
 import { EMPTY_OPTION, NOT_NULL_OPTION } from './constants';
 import { INPUT_TYPE } from '../InputFactory';
+import { useDeepEffect } from '../../../hooks/useDeepEffect';
+import { Template } from '../../../api';
 
 export interface SearchSelectProps {
   name: string;
@@ -51,11 +53,15 @@ export interface SearchSelectProps {
   onAddNewOption?: (newOptionValue: string) => void;
   modified?: boolean;
   selectType?: INPUT_TYPE;
+  pendingTemplate?: Template;
+  onChangeDropDownState?: (isOpen: boolean) => void;
+  forcedOpen?: boolean;
 }
 
 export const SearchSelect = ({
   name,
   onChange,
+  forcedOpen: _forcedOpen,
   options: initialOptions,
   autoFocus,
   className,
@@ -80,6 +86,8 @@ export const SearchSelect = ({
   selectType,
   renderDropDownBottomPanel,
   onAddNewOption,
+  pendingTemplate,
+  onChangeDropDownState,
 }: SearchSelectProps) => {
   const [addedOptions, setAddedOptions] = useState<SelectOption[]>([]);
 
@@ -110,18 +118,18 @@ export const SearchSelect = ({
 
   const [searchValue, setSearchValue] = useState('');
 
-  const [forcedOpen, setForcedOpen] = useState(false);
+  const [forcedOpen, setForcedOpen] = useState(_forcedOpen);
 
-  useEffect(() => {
+  useDeepEffect(() => {
     let newOptions = options;
 
     if (searchValue) {
       newOptions = getFilteredOptionsBySearch(options, searchValue);
     }
     setSelectOptions(newOptions);
-  }, [options]);
+  }, [options, searchValue]);
 
-  useEffect(() => {
+  useDeepEffect(() => {
     if (selectedValues?.length) {
       const isSelectAll = unionOptionsValues.length === selectedValues.length;
 
@@ -149,7 +157,8 @@ export const SearchSelect = ({
       }
 
       // Add selected options that are out of the scope of the search
-      if (searchValue) {
+      // Only for multiple select - single select should replace the selection
+      if (searchValue && multiple) {
         const selectOptionsValues = getOptionsValues(selectOptions);
 
         const prevSelectedValues =
@@ -262,12 +271,17 @@ export const SearchSelect = ({
     }
   };
 
+  const selectedValueText = (options as any)?.groups
+    ?.flatMap((group) => group?.options)
+    ?.find((option) => option?.value === selectedValues?.[0])?.text;
+
   return (
     <div
       className={className}
       onClick={handlePreventEvent}
       onKeyDown={handlePreventEvent}
       role="presentation"
+      title={selectedValueText}
     >
       <Field
         required={required}
@@ -282,7 +296,7 @@ export const SearchSelect = ({
           autoFocus={autoFocus}
           maxRowCount={maxRowCount}
           className="searchSelect"
-          forcedOpen={forcedOpen}
+          forcedOpen={_forcedOpen ?? forcedOpen}
           value={selectedValues || ''}
           multiple={multiple}
           onChange={handleChange}
@@ -292,7 +306,10 @@ export const SearchSelect = ({
           isLoading={loading}
           status={error ? 'error' : undefined}
           readOnly={loading}
-          onChangeDropDownState={setForcedOpen}
+          onChangeDropDownState={(isOpen) => {
+            setForcedOpen(isOpen);
+            onChangeDropDownState?.(isOpen);
+          }}
           placeholder={getPlaceholder(loading, error)}
           dropContainerCssMixin={DropContainerCssMixin}
           showCheckbox={false}
@@ -303,6 +320,7 @@ export const SearchSelect = ({
               !loading && (
                 <SelectValue
                   options={options}
+                  pendingTemplate={pendingTemplate}
                   active={active}
                   selectedAllValues={selectedAllValues}
                   value={value}
