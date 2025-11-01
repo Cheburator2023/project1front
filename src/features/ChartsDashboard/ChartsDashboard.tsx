@@ -382,33 +382,40 @@ const ChartsDashboardContent: React.FC<ChartsDashboardProps> = ({ useDatamart = 
 
   const handleApplyFilters = () => {
     const { tempStartDate, tempEndDate, tempSelectedStreams } = tempFilters;
+    let _filters = {} as any;
 
     if (tempStartDate && tempEndDate) {
       const formattedStartDate = tempStartDate && switchDateFormat(tempStartDate);
       const formattedEndDate = tempEndDate && switchDateFormat(tempEndDate);
 
-      setFilters({
+      _filters = {
         startDate: formattedStartDate,
         endDate: formattedEndDate,
         selectedStreams: tempSelectedStreams,
-      });
+      }
+
+      setFilters(_filters);
     } else {
-      setFilters({
+
+
+      _filters = {
         startDate: undefined,
         endDate: undefined,
         selectedStreams: tempSelectedStreams,
-      });
+      }
+      setFilters(_filters);
     }
 
     const newParams = getQueryParams({
-      ...filters,
+      ..._filters,
       metric: selectedMetric,
       useDatamart,
     });
     setMetricsParams(newParams);
+
     setTimeout(() => {
       refetchMetrics();
-    }, 500);
+    }, 100);
   };
 
   const handleResetFilters = () => {
