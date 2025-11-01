@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.51.3](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.51.2...v1.51.3) (2025-11-01)
+
+
+### Bug Fixes
+
+* metrics ui and data fixed ([7f1fb5d](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/7f1fb5de4e3864494b9a15aca2bdf2eab137968a))
+
 ## [1.51.2](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.51.1...v1.51.2) (2025-10-31)
 
 
