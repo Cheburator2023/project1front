@@ -148,8 +148,13 @@ const getInputValue = (artifact: Artifact, rowValue: string) => {
       return validInitialValue ? { type, value: Number(rowValue) } : undefined;
     }
     case ArtifactType.PERCENTAGE: {
-      const type = INPUT_TYPE.PERCENT;
+      // Special handling for model_risk field
+      if (artifact.artefact_tech_label === 'model_risk') {
+        const type = INPUT_TYPE.MODEL_RISK;
+        return rowValue ? { type, value: rowValue } : undefined;
+      }
 
+      const type = INPUT_TYPE.PERCENT;
       return rowValue ? { type, value: rowValue } : undefined;
     }
     case ArtifactType.RFD: {
@@ -501,10 +506,15 @@ const mapArtifactToField = (
   fieldSchema?: FormFieldsSchema[number],
   activeRow?: Partial<Row>,
   values?: FormValues,
+  canEditModelRiskByRole?: boolean,
 ): InputFactoryProps<keyof Row> => {
   const canEdit = process.env.NO_ROLES === 'true' || canEditArtefact(artifact, activeRow);
+  let isDisabled = isFieldDisabled(values, fieldSchema, artifact, activeRow, canEdit);
 
-  const isDisabled = isFieldDisabled(values, fieldSchema, artifact, activeRow, canEdit);
+  // Extra gating: only validators can edit model_risk in UI
+  if (artifact.artefact_tech_label === 'model_risk' && canEditModelRiskByRole === false) {
+    isDisabled = true;
+  }
 
   const commonAttributes: CommonInputProps<keyof Row> = {
     id: artifact.artefact_id.toString(),
@@ -603,6 +613,14 @@ const mapArtifactToField = (
     }
 
     case ArtifactType.PERCENTAGE: {
+      // Special handling for model_risk field
+      if (artifact.artefact_tech_label === 'model_risk') {
+        return {
+          ...commonAttributes,
+          type: INPUT_TYPE.MODEL_RISK,
+        };
+      }
+
       const type = INPUT_TYPE.PERCENT;
 
       return {
@@ -747,6 +765,7 @@ const getFormFields = ({
   currentFormSchema,
   showAllFields = false,
   currentCustomer = CUSTOMER_MAP.EVERY_CUSTOMER,
+  canEditModelRiskByRole,
 }: {
   artifacts: Artifact[];
   values?: FormValues;
@@ -755,6 +774,7 @@ const getFormFields = ({
   initialRow?: Partial<Row>;
   showAllFields?: boolean;
   currentCustomer: CUSTOMER_TYPE;
+  canEditModelRiskByRole?: boolean;
 }) => {
   const isActive = currentFormSchema.some(
     ({ schemaKey }) => schemaKey === SCHEMA_NAME_MAP.ACTIVE_MODEL_SCHEMA.key,
@@ -873,6 +893,7 @@ const getFormFields = ({
         fieldSchema,
         initialRow,
         values,
+        canEditModelRiskByRole,
       );
       return [...fields, field];
     }
@@ -1084,6 +1105,11 @@ const getProperFormatValueForSubmit = (inputValue: InputValue) => {
     case INPUT_TYPE.RFD:
       return {
         artefact_string_value: String(value),
+        artefact_value_id: null,
+      };
+    case INPUT_TYPE.MODEL_RISK:
+      return {
+        artefact_string_value: value == null ? '' : String(value),
         artefact_value_id: null,
       };
     default:

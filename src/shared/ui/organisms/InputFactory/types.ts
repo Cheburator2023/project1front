@@ -21,6 +21,7 @@ enum INPUT_TYPE {
   SELECT = 'SELECT',
   MULTI_SELECT = 'MULTI_SELECT',
   RFD = 'RFD',
+  MODEL_RISK = 'MODEL_RISK',
 }
 
 type SelectInputValue = {
@@ -93,6 +94,11 @@ type PercentInputValue = {
   value: string | null;
 };
 
+type ModelRiskInputValue = {
+  type: INPUT_TYPE.MODEL_RISK;
+  value: string | null;
+};
+
 type QuarterlyPercentGroupInputValue = {
   type: INPUT_TYPE.PERCENT_GROUP;
   value: PercentInputValue[];
@@ -126,7 +132,8 @@ type InputValue =
   | QuarterlyDateGroupInputValue
   | StringGroupInputValue
   | QuarterlyDropdownInputValue
-  | QuarterlyDropdownGroupInputValue;
+  | QuarterlyDropdownGroupInputValue
+  | ModelRiskInputValue;
 
 type CommonInputProps<T extends string> = {
   id: string;
@@ -234,6 +241,10 @@ type RFDInputProps<T extends string> = CommonInputProps<T> & {
   type: INPUT_TYPE.RFD;
 };
 
+type ModelRiskInput<T extends string> = CommonInputProps<T> & {
+  type: INPUT_TYPE.MODEL_RISK;
+};
+
 type InputFactoryProps<T extends string> =
   | StringInput<T>
   | DateInput<T>
@@ -249,7 +260,8 @@ type InputFactoryProps<T extends string> =
   | TextAreaInput<T>
   | SelectInput<T>
   | MultiSelectInput<T>
-  | RFDInputProps<T>;
+  | RFDInputProps<T>
+  | ModelRiskInput<T>;
 
 // TODO: refactor
 type GroupFieldProps<T extends string> = {
@@ -292,5 +304,7 @@ export {
   SelectInput,
   MultiSelectInput,
   RFDInputProps,
+  ModelRiskInput,
+  ModelRiskInputValue,
   InputFactoryProps,
 };

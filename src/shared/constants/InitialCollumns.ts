@@ -719,6 +719,11 @@ export const initialColumns: Array<Column> = [
     title: 'Аналитический мониторинг',
     type: COLUMN_TYPE.STRING,
   },
+  {
+    name: 'model_risk_coefficient',
+    title: 'Коэффициент модельного риска',
+    type: COLUMN_TYPE.STRING,
+  },
 ];
 
 export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
@@ -880,5 +885,6 @@ export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
   bpmn_key: [],
   operational_monitoring: [],
   analytical_monitoring: [],
+  model_risk_coefficient: [],
 };
 
