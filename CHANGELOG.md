@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.51.4](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.51.3...v1.51.4) (2025-11-12)
+
+
+### Bug Fixes
+
+* enable model usage editing for 3Q and 4Q ([c0270c4](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/c0270c44a61777721f8fc111f8a7c9e651c4e2f9))
+
 ## [1.51.3](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.51.2...v1.51.3) (2025-11-01)
 
 
