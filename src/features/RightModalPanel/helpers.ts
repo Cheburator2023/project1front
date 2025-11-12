@@ -2,6 +2,7 @@
 /* eslint-disable default-param-last */
 /* eslint-disable no-use-before-define */
 import {
+  addDays,
   addMonths,
   addYears,
   differenceInYears,
@@ -366,6 +367,8 @@ const ENABLE_FEBRUARY_EXTENSION = false;
 const ENABLE_MARCH_EXTENSION = false;
 const ENABLE_4Q_EXTENSION_UNTIL_APRIL_13 = true;
 const ENABLE_2Q_EXTENSION_UNTIL_NOVEMBER_30 = true;
+const QUARTER_EDIT_PERIOD_MONTHS = 3;
+const QUARTER_EDIT_PERIOD_DAYS = 13;
 
 const getDateLimits = (quarter: number) => {
   const currentDate = new Date();
@@ -377,7 +380,7 @@ const getDateLimits = (quarter: number) => {
 
   const firstDateOfEffectiveYear = startOfYear(new Date(effectiveYear, 0, 1)); // TODO: Получаем 1 января effectiveYear
   const minDate = addMonths(firstDateOfEffectiveYear, (quarter - 1) * 3); // TODO: Старт квартала
-  let maxDate = endOfQuarter(minDate); // TODO: По умолчанию — конец квартала
+  let maxDate = addDays(addMonths(endOfQuarter(minDate), QUARTER_EDIT_PERIOD_MONTHS), QUARTER_EDIT_PERIOD_DAYS); // TODO: По умолчанию — конец квартала + QUARTER_EDIT_PERIOD_MONTHS + QUARTER_EDIT_PERIOD_DAYS
 
   if (quarter === 2) {
     if (ENABLE_2Q_EXTENSION_UNTIL_NOVEMBER_30) {
@@ -425,7 +428,7 @@ const getDisabledStatus = (minDate: Date, maxDate: Date, quarter: number, canEdi
     }
 
     // TODO: В остальных случаях редактирование запрещено
-    return true;
+    // return true;
   }
 
   // TODO: Нельзя редактировать будущие кварталы
