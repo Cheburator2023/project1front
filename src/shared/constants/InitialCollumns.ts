@@ -719,6 +719,36 @@ export const initialColumns: Array<Column> = [
     title: 'Аналитический мониторинг',
     type: COLUMN_TYPE.STRING,
   },
+  {
+    name: 'project_ref',
+    title: 'Проект, в рамках которого реализуется задача по построению модели',
+    type: COLUMN_TYPE.STRING,
+  },
+  {
+    name: 'dev_team',
+    title: 'Название команды, ответственной за разработку',
+    type: COLUMN_TYPE.STRING,
+  },
+  {
+    name: 'deploy_team',
+    title: 'Команда, которая внедряла модель',
+    type: COLUMN_TYPE.STRING,
+  },
+  {
+    name: 'runtime_subsystem',
+    title: 'Подсистема реализации модели',
+    type: COLUMN_TYPE.STRING,
+  },
+  {
+    name: 'buiseness_process_name',
+    title: 'Бизнес-процесс',
+    type: COLUMN_TYPE.STRING,
+  },
+  {
+    name: 'prom_datamart_name',
+    title: 'Название промышленной витрины',
+    type: COLUMN_TYPE.STRING,
+  },
 ];
 
 export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
@@ -880,5 +910,11 @@ export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
   bpmn_key: [],
   operational_monitoring: [],
   analytical_monitoring: [],
+  project_ref: [],
+  dev_team: [],
+  deploy_team: [],
+  runtime_subsystem: [],
+  buiseness_process_name: [],
+  prom_datamart_name: [],
 };
 

@@ -183,6 +183,12 @@ type Row = ArtificialRow & {
   allocation_assessment_parameters: string | null;
   operational_monitoring: string | null;
   analytical_monitoring: string | null;
+  project_ref: string | null;
+  dev_team: string | null;
+  deploy_team: string | null;
+  runtime_subsystem: string | null;
+  buiseness_process_name: string | null;
+  prom_datamart_name: string | null;
 };
 
 type ColumnsFilter = Record<keyof Row, Array<string>>;
