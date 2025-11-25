@@ -13,6 +13,7 @@ import { Loading, Tooltip } from '@shared/ui/atoms';
 import { IconButton } from '@shared/ui/molecules';
 import { ReportApi } from '@shared/api';
 import { useReportsControllerGetReport } from '@shared/api/generated/endpoints';
+import { useModelRiskReport } from '@shared/hooks';
 
 import { useExploitationModeStore } from '@src/shared/stores';
 import { ReactComponent as LogoIcon } from './logo.svg';
@@ -89,10 +90,21 @@ const Header = ({ user, downloadReportStatus, onLogout }: HeaderProps) => {
     (state) => state.selectedExploitationModes,
   );
 
+  const { downloadReport: downloadModelRiskReport, isDownloading: isDownloadingKMR } =
+    useModelRiskReport();
+
   const userName =
     user?.family_name && user?.given_name
       ? `${user.family_name} ${user.given_name}`
       : 'Анонимный пользователь';
+
+  // Helper to extract filters from agGrid
+  const getFiltersFromAgGrid = (): Partial<ColumnsFilter> => {
+    if (!agGridApi) return {};
+
+    const filterModel = agGridApi.getFilterModel();
+    return filterModel as Partial<ColumnsFilter>;
+  };
 
   return (
     <Container>
@@ -104,6 +116,19 @@ const Header = ({ user, downloadReportStatus, onLogout }: HeaderProps) => {
       </Link>
 
       <ActionsGroup>
+        {/* <CustomButton
+          dimension="s"
+          disabled={!agGridApi || isDownloadingKMR}
+          onClick={() => {
+            const filters = getFiltersFromAgGrid();
+            downloadModelRiskReport(filters);
+          }}
+        >
+          <T font="Button/Button 2">
+            {isDownloadingKMR ? 'Выгружается...' : 'Отчет КМР'}
+          </T>
+        </CustomButton> */}
+
         <CustomButton
           dimension="s"
           disabled={!agGridApi}

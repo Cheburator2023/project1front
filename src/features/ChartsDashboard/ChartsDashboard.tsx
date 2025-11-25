@@ -392,17 +392,15 @@ const ChartsDashboardContent: React.FC<ChartsDashboardProps> = ({ useDatamart = 
         startDate: formattedStartDate,
         endDate: formattedEndDate,
         selectedStreams: tempSelectedStreams,
-      }
+      };
 
       setFilters(_filters);
     } else {
-
-
       _filters = {
         startDate: undefined,
         endDate: undefined,
         selectedStreams: tempSelectedStreams,
-      }
+      };
       setFilters(_filters);
     }
 
@@ -434,6 +432,7 @@ const ChartsDashboardContent: React.FC<ChartsDashboardProps> = ({ useDatamart = 
     setSelectedMetric(undefined);
 
     setDateError(false);
+
     const newParams = getQueryParams({
       startDate: undefined,
       endDate: undefined,
@@ -441,7 +440,10 @@ const ChartsDashboardContent: React.FC<ChartsDashboardProps> = ({ useDatamart = 
       useDatamart,
     });
     setMetricsParams(newParams);
-    refetchMetrics();
+
+    setTimeout(() => {
+      refetchMetrics();
+    }, 400);
   };
 
   const exportToPDF = () => {

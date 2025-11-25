@@ -749,6 +749,11 @@ export const initialColumns: Array<Column> = [
     title: 'Название промышленной витрины',
     type: COLUMN_TYPE.STRING,
   },
+  {
+    name: 'model_risk_coefficient',
+    title: 'Коэффициент модельного риска',
+    type: COLUMN_TYPE.STRING,
+  },
 ];
 
 export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
@@ -916,5 +921,6 @@ export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
   runtime_subsystem: [],
   buiseness_process_name: [],
   prom_datamart_name: [],
+  model_risk_coefficient: [],
 };
 

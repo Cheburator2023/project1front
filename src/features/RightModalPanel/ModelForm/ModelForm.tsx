@@ -156,6 +156,8 @@ export const ModelForm = ({
   const title = IS_FORM_MODE_ADD ? 'Новая модель' : 'Редактирование модели';
 
   const groupedFieldsBySchemaName = groupBy(fields, 'schemaKey');
+  console.log('🐸 Pepe said >> ModelForm >> groupedFieldsBySchemaName:', groupedFieldsBySchemaName);
+
 
   const handleChange = (name: keyof Row, value: InputValue) => {
     const newValues = { [name]: value };

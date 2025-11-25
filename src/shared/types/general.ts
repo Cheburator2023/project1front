@@ -134,6 +134,7 @@ type Row = ArtificialRow & {
   validation_result: string | null;
   model_name_dadm: string | null;
   validation_result_approve_date: string | null;
+  model_risk_coefficient: string | null;
   importance_changes: string | null;
   approve_importance: string | null;
   approve_importance_changes: string | null;
