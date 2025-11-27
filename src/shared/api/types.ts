@@ -175,6 +175,7 @@ export enum ArtifactType {
   NUMBER = 'number',
   USER = 'user',
   RFD = 'rfd',
+  MODEL_RISK_COEFFICIENT = 'model_risk_coefficient',
 }
 
 export type ArtifactTypeUnion = `${ArtifactType}`;
