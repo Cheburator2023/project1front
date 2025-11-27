@@ -148,17 +148,17 @@ const getInputValue = (artifact: Artifact, rowValue: string) => {
       return validInitialValue ? { type, value: Number(rowValue) } : undefined;
     }
     case ArtifactType.PERCENTAGE: {
-      // Special handling for model_risk field
-      if (artifact.artefact_tech_label === 'model_risk') {
-        const type = INPUT_TYPE.MODEL_RISK;
-        return rowValue ? { type, value: rowValue } : undefined;
-      }
-
       const type = INPUT_TYPE.PERCENT;
+
       return rowValue ? { type, value: rowValue } : undefined;
     }
     case ArtifactType.RFD: {
       const type = INPUT_TYPE.RFD;
+
+      return rowValue ? { type, value: rowValue } : undefined;
+    }
+    case ArtifactType.MODEL_RISK_COEFFICIENT: {
+      const type = INPUT_TYPE.MODEL_RISK;
 
       return rowValue ? { type, value: rowValue } : undefined;
     }
@@ -613,14 +613,6 @@ const mapArtifactToField = (
     }
 
     case ArtifactType.PERCENTAGE: {
-      // Special handling for model_risk field
-      if (artifact.artefact_tech_label === 'model_risk') {
-        return {
-          ...commonAttributes,
-          type: INPUT_TYPE.MODEL_RISK,
-        };
-      }
-
       const type = INPUT_TYPE.PERCENT;
 
       return {
@@ -694,6 +686,13 @@ const mapArtifactToField = (
       return {
         ...commonAttributes,
         type: INPUT_TYPE.RFD,
+      };
+    }
+
+    case ArtifactType.MODEL_RISK_COEFFICIENT: {
+      return {
+        ...commonAttributes,
+        type: INPUT_TYPE.MODEL_RISK,
       };
     }
 

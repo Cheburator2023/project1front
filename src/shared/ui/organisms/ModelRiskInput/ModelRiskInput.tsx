@@ -109,22 +109,26 @@ interface ModelRiskInputProps {
  */
 const createInputChangeHandler =
   (setInputValue: Dispatch<SetStateAction<string>>, onChange: (value: string | null) => void) =>
-  (e: ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const raw = e.target.value;
+      const cleaned = raw.replace(/\D+/g, '');
 
-    // Allow only numbers and empty string
-    if (newValue === '' || /^\d*\.?\d*$/.test(newValue)) {
-      setInputValue(newValue);
+      setInputValue(cleaned);
 
-      // Validate range 0-100
-      const numValue = parseFloat(newValue);
-      if (newValue === '' || Number.isNaN(numValue)) {
+      if (cleaned === '') {
         onChange(null);
-      } else if (numValue >= 0 && numValue <= 100) {
-        onChange(newValue);
+        return;
       }
-    }
-  };
+
+      let num = Number(cleaned);
+
+      if (num < 0) num = 0;
+      if (num > 100) num = 100;
+
+      const result = String(num);
+      setInputValue(result);
+      onChange(result);
+    };
 
 const createSelectChangeHandler =
   (
@@ -198,7 +202,7 @@ export const ModelRiskInput = ({
             placeholder={selectValue === 'special' ? '200%' : 'Введите значение от 0 до 100'}
             min={0}
             max={100}
-            step={0.01}
+            step={1}
             className={error ? 'error' : ''}
           />
           <HintText>
