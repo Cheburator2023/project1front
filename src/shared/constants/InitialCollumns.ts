@@ -812,7 +812,7 @@ export const initialColumns: Array<Column> = [
   {
     name: 'check_objects_count',
     title: 'Количество объектов проверки',
-    type: COLUMN_TYPE.DATE,
+    type: COLUMN_TYPE.STRING,
   },
 ];
 
