@@ -754,6 +754,66 @@ export const initialColumns: Array<Column> = [
     title: 'Коэффициент модельного риска',
     type: COLUMN_TYPE.STRING,
   },
+  {
+    name: 'operational_control_epic',
+    title: 'Эпик / фича Оперативного контроля',
+    type: COLUMN_TYPE.STRING,
+  },
+  {
+    name: 'operational_control_date',
+    title: 'Дата (реализации) оперативного контроля',
+    type: COLUMN_TYPE.DATE,
+  },
+  {
+    name: 'analytical_control_epic',
+    title: 'Эпик / фича Аналитического контроля',
+    type: COLUMN_TYPE.STRING,
+  },
+  {
+    name: 'analytical_control_date',
+    title: 'Дата (реализации) аналитического контроля',
+    type: COLUMN_TYPE.DATE,
+  },
+  {
+    name: 'model_values_control_epic',
+    title: 'Эпик / фича для контроля модельных значений',
+    type: COLUMN_TYPE.STRING,
+  },
+  {
+    name: 'model_values_control_date',
+    title: 'Дата (реализации) контроля модельных значений',
+    type: COLUMN_TYPE.DATE,
+  },
+  {
+    name: 'impact_assessment_epic',
+    title: 'Эпик / фича для оценки влияния',
+    type: COLUMN_TYPE.STRING,
+  },
+  {
+    name: 'impact_assessment_date',
+    title: 'Дата (реализации) оценки влияния',
+    type: COLUMN_TYPE.DATE,
+  },
+  {
+    name: 'model_data_07k_control',
+    title: 'Контроль модельных данных (07К)',
+    type: COLUMN_TYPE.STRING,
+  },
+  {
+    name: 'model_data_07k_control_epic',
+    title: 'Эпик / фича для контроля модельных данных (07К)',
+    type: COLUMN_TYPE.STRING,
+  },
+  {
+    name: 'model_data_control_date',
+    title: 'Дата (реализации) контроля модельных данных',
+    type: COLUMN_TYPE.DATE,
+  },
+  {
+    name: 'check_objects_count',
+    title: 'Количество объектов проверки',
+    type: COLUMN_TYPE.DATE,
+  },
 ];
 
 export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
@@ -922,5 +982,17 @@ export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
   buiseness_process_name: [],
   prom_datamart_name: [],
   model_risk_coefficient: [],
+  operational_control_epic: [],
+  operational_control_date: [],
+  analytical_control_epic: [],
+  analytical_control_date: [],
+  model_values_control_epic: [],
+  model_values_control_date: [],
+  impact_assessment_epic: [],
+  impact_assessment_date: [],
+  model_data_07k_control: [],
+  model_data_07k_control_epic: [],
+  model_data_control_date: [],
+  check_objects_count: [],
 };
 

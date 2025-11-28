@@ -190,6 +190,18 @@ type Row = ArtificialRow & {
   runtime_subsystem: string | null;
   buiseness_process_name: string | null;
   prom_datamart_name: string | null;
+  operational_control_epic: string | null;
+  operational_control_date: string | null;
+  analytical_control_epic: string | null;
+  analytical_control_date: string | null;
+  model_values_control_epic: string | null;
+  model_values_control_date: string | null;
+  impact_assessment_epic: string | null;
+  impact_assessment_date: string | null;
+  model_data_07k_control: string | null;
+  model_data_07k_control_epic: string | null;
+  model_data_control_date: string | null;
+  check_objects_count: string | null;
 };
 
 type ColumnsFilter = Record<keyof Row, Array<string>>;
