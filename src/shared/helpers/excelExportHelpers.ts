@@ -14,7 +14,7 @@ const createProcessCellCallback = (
 
 const excelProcessCellCallback = createProcessCellCallback({
   model_risk_coefficient: (params) => {
-    return params.value === null || params.value === undefined ? '100' : params.value
+    return /^\d+$/.test(params.value) ? params.value : '100'
   },
   // artefact_tech_label: ...,
   // artefact_tech_label: ...,
