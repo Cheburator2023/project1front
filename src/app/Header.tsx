@@ -20,6 +20,7 @@ import { ReactComponent as LogoIcon } from './logo.svg';
 import { ColumnsFilter } from '../shared/types';
 import { ROUTES } from './Routes';
 import { useGlobalStore } from '../shared/stores/globalStore';
+import { defaultExcelExportParams } from '../shared/helpers/excelExportHelpers';
 
 const Container = styled('div')`
   width: 100%;
@@ -151,6 +152,7 @@ const Header = ({ user, downloadReportStatus, onLogout }: HeaderProps) => {
               skipColumnHeaders: false,
               // Use current column widths and order
               allColumns: false,
+              ...defaultExcelExportParams
             });
           }}
         >

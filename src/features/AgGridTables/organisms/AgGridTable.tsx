@@ -46,6 +46,7 @@ import { useGlobalStore } from '../../../shared/stores/globalStore';
 import { useFiltersStore } from '../../../shared/stores/filtersStore';
 import { useTemplatesStore } from '../../../shared/stores/templatesStore';
 import { convertFilterModelToColumnsFilters } from '../../../shared/helpers/filterModelConverter';
+import { defaultExcelExportParams } from '../../../shared/helpers/excelExportHelpers'
 
 interface IAgGridTableProps {
   templates?: Template[];
@@ -678,6 +679,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
               onColumnMoved={handleColumnMoved}
               loading={loading}
               overlayNoRowsTemplate={overlayNoRowsTemplate}
+              defaultExcelExportParams={defaultExcelExportParams}
             />
           </GridWrapper>
         </div>
