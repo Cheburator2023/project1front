@@ -27,6 +27,7 @@ import {
 import { Artifact } from '../../../api';
 import { InputFactoryExtraText } from './InputFactoryExtraText';
 import { InputFactoryDateField } from './InputFactoryDateField';
+import { ModelRiskInput } from '../ModelRiskInput';
 
 interface InputFactoryI<T extends string> {
   inputFactory: InputFactoryProps<T>;
@@ -92,7 +93,11 @@ function InputFactorySwitcher<T extends string>({
   ) : (
     'Обязательное поле'
   );
+
+    console.log('🐸 Pepe said >> InputFactorySwitcher >> type:', type, name);
+
   switch (type) {
+
     case INPUT_TYPE.NUMBER: {
       const {
         maxValue,
@@ -634,14 +639,14 @@ function InputFactorySwitcher<T extends string>({
         if (requireConditions) {
           if (valueConditions) {
             // Both requireConditions and valueConditions are true
-            conditionText = "Есть условия для заполнения";
+            conditionText = 'Есть условия для заполнения';
           } else {
             // Only requireConditions is true
-            conditionText = "Есть условия для обязательного заполнения";
+            conditionText = 'Есть условия для обязательного заполнения';
           }
         } else {
           // Only valueConditions is true
-          conditionText = "Есть условия для обязательного значения";
+          conditionText = 'Есть условия для обязательного значения';
         }
 
         return (
@@ -690,14 +695,14 @@ function InputFactorySwitcher<T extends string>({
         if (requireConditions) {
           if (valueConditions) {
             // Both requireConditions and valueConditions are true
-            conditionText = "Есть условия для заполнения";
+            conditionText = 'Есть условия для заполнения';
           } else {
             // Only requireConditions is true
-            conditionText = "Есть условия для обязательного заполнения";
+            conditionText = 'Есть условия для обязательного заполнения';
           }
         } else {
           // Only valueConditions is true
-          conditionText = "Есть условия для обязательного значения";
+          conditionText = 'Есть условия для обязательного значения';
         }
 
         return (
@@ -719,6 +724,22 @@ function InputFactorySwitcher<T extends string>({
           error={error}
           autoFocus={autoFocus}
           extraText={getExtraText()}
+        />
+      );
+    }
+
+    case INPUT_TYPE.MODEL_RISK: {
+      const formattedValue = getStringValue(value);
+
+      return (
+        <ModelRiskInput
+          id={id}
+          label={label}
+          value={formattedValue || null}
+          onChange={(newValue) => onChange?.(name, { type, value: newValue })}
+          disabled={disabled}
+          required={required}
+          error={!!error}
         />
       );
     }

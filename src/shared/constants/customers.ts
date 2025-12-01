@@ -11,6 +11,10 @@ export const CUSTOMER_MAP = {
     name: 'DADM',
     id: 2,
   },
+  DIUR: {
+    name: 'ДИУР',
+    id: 3,
+  },
 };
 
 export const DEFAULT_CUSTOMER = CUSTOMER_MAP.EVERY_CUSTOMER;

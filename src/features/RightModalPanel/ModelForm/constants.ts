@@ -902,6 +902,11 @@ export const VALIDATION_MODEL_SCHEMA: FormFieldsSchema = [
     required: false,
     customers: [CUSTOMER_MAP.UMRV],
   },
+  {
+    name: 'model_risk_coefficient',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DIUR, CUSTOMER_MAP.DADM],
+  },
 ];
 
 const REST_MODEL_SCHEMA_BASE: FormFieldsSchema = [
