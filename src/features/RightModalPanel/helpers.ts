@@ -371,9 +371,9 @@ export const getStartDateInCurrentYear = (startDate: Date) => {
 const ENABLE_FEBRUARY_EXTENSION = false;
 const ENABLE_MARCH_EXTENSION = false;
 const ENABLE_4Q_EXTENSION_UNTIL_APRIL_13 = true;
-const ENABLE_2Q_EXTENSION_UNTIL_NOVEMBER_30 = true;
-const QUARTER_EDIT_PERIOD_MONTHS = 3;
-const QUARTER_EDIT_PERIOD_DAYS = 13;
+const ENABLE_2Q_EXTENSION_UNTIL_NOVEMBER_30 = false;
+const QUARTER_EDIT_PERIOD_MONTHS = 1;
+const QUARTER_EDIT_PERIOD_DAYS = 0;
 
 const getDateLimits = (quarter: number) => {
   const currentDate = new Date();
