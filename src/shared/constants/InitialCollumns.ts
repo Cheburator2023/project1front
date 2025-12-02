@@ -751,7 +751,7 @@ export const initialColumns: Array<Column> = [
   },
   {
     name: 'model_risk_coefficient',
-    title: 'Коэффициент модельного риска',
+    title: 'Коэффициент модельного риска (КМР), %',
     type: COLUMN_TYPE.STRING,
   },
   {
