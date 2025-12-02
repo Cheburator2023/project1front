@@ -1,5 +1,24 @@
 # Semantic Versioning Changelog
 
+# [1.52.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.51.4...v1.52.0) (2025-12-01)
+
+
+### Bug Fixes
+
+* metrics ui and data fixed ([a543383](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/a54338355135fb4b60804d25b5be850b7ab69796))
+* update excelProcessCellCallback for model_risk_coefficient ([8f6d0fb](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/8f6d0fbfe222033b12a4f2d5b128d8e422b240da))
+
+
+### Features
+
+* add global excel export helper ([d12c9c1](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/d12c9c1a55c84f66cf9740dabaac0ee2c2f65763))
+* add new artefacts for monitoring to initialComuns ([09ddd7e](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/09ddd7e40edeaf5162319a9e77a76d0e07df6a3b))
+* add new artefacts to initialColumns ([71a9850](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/71a9850091d46317dc00b82ee46a566a914722bb))
+* update column type for check_objects_count ([927c587](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/927c58797bead4ea6599e7a8b9f8a5def797c5ff))
+* update model usage edit period params ([8c92d00](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/8c92d0008913dc4ac2929edff5d59ba91da466cf))
+* **model-risk:** implement model risk coefficient feature ([3ba7396](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/3ba7396e11f6b80bb9efeaedf461d94d004715f8))
+* **model-risk:** update model risk coef. artefact_type cast; improve model risk coef. input change logic ([e19c520](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/e19c5205e4cd99862ca32ba13098612b08adf883))
+
 ## [1.51.4](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.51.3...v1.51.4) (2025-11-12)
 
 
