@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.52.1](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.52.0...v1.52.1) (2025-12-02)
+
+
+### Bug Fixes
+
+* update model_risk_coefficient column title ([c32edbb](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/c32edbbd6178b874da6c52786415ea0a16594eed))
+
 # [1.52.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.51.4...v1.52.0) (2025-12-01)
 
 
