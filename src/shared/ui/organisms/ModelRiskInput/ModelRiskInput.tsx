@@ -111,7 +111,7 @@ const createInputChangeHandler =
   (setInputValue: Dispatch<SetStateAction<string>>, onChange: (value: string | null) => void) =>
     (e: ChangeEvent<HTMLInputElement>) => {
       const raw = e.target.value;
-      const cleaned = raw.replace(/\D+/g, '');
+      const cleaned = raw.replace(/[^\d.,]/g, '');
 
       setInputValue(cleaned);
 
@@ -202,7 +202,7 @@ export const ModelRiskInput = ({
             placeholder={selectValue === 'special' ? '200%' : 'Введите значение от 0 до 100'}
             min={0}
             max={100}
-            step={1}
+            step={0.01}
             className={error ? 'error' : ''}
           />
           <HintText>
