@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.52.2](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.52.1...v1.52.2) (2025-12-08)
+
+
+### Bug Fixes
+
+* update step param for model risk input; update xlxs cell process for model risk column ([6d56fca](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/6d56fcad2ca5ee24181607a3fdea379cddb163c9))
+
 ## [1.52.1](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.52.0...v1.52.1) (2025-12-02)
 
 
