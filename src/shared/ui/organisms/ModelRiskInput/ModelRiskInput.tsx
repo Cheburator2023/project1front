@@ -111,7 +111,7 @@ const createInputChangeHandler =
   (setInputValue: Dispatch<SetStateAction<string>>, onChange: (value: string | null) => void) =>
     (e: ChangeEvent<HTMLInputElement>) => {
       const raw = e.target.value;
-      const cleaned = raw.replace(/[^\d.,]/g, '');
+      let cleaned = raw.replace(/[^\d.,]/g, '');
 
       setInputValue(cleaned);
 
@@ -120,14 +120,13 @@ const createInputChangeHandler =
         return;
       }
 
-      let num = Number(cleaned);
+      const num = Number(cleaned);
 
-      if (num < 0) num = 0;
-      if (num > 100) num = 100;
+      if (num < 0) cleaned = '0';
+      if (num > 100) cleaned = '100';
 
-      const result = String(num);
-      setInputValue(result);
-      onChange(result);
+      setInputValue(cleaned);
+      onChange(cleaned);
     };
 
 const createSelectChangeHandler =
