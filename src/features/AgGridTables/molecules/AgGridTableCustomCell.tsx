@@ -11,6 +11,7 @@ import { COLUMN_TYPE } from '@src/shared/types';
 import { Tooltip } from '@src/shared/ui/atoms';
 import { usePermissions } from '@src/shared/hooks';
 import { usePanelsStore } from '@src/shared/stores/panelsStore';
+import { highlightText } from '@src/shared/helpers/highlightHelpers';
 
 const NO_ROLES = process.env.NO_ROLES;
 
@@ -18,46 +19,57 @@ interface AgGridTableCustomCellParams extends CustomCellRendererProps {
   onAction: (action: any, row_system_model_id: any, columnName: any) => any;
   noCustomCells?: boolean;
   isCompare?: boolean;
+  searchString?: string;
 }
 
 interface CellContentFactoryProps {
   value: any;
   column: any;
   isCompare?: boolean;
+  searchString?: string;
 }
 
 const valueFactory = ({
   value,
   column: { type, name },
   isCompare = false,
+  searchString,
 }: CellContentFactoryProps) => {
   const emptyValue = isCompare ? '-' : '';
 
-  switch (type) {
-    case COLUMN_TYPE.LINK: {
-      const href = getLink(name, value);
+  const displayValue = (() => {
+    switch (type) {
+      case COLUMN_TYPE.LINK: {
+        const href = getLink(name, value);
+        return <a href={href}>{value ?? emptyValue}</a>;
+      }
+      case COLUMN_TYPE.QUARTERLY_DATE:
+      case COLUMN_TYPE.DATE: {
+        if (!value || value === 'invalid date') {
+          return emptyValue;
+        }
 
-      return <a href={href}>{value ?? emptyValue}</a>;
-    }
-    case COLUMN_TYPE.QUARTERLY_DATE:
-    case COLUMN_TYPE.DATE: {
-      if (!value || value === 'invalid date') {
-        return emptyValue;
+        const date = new Date(value);
+
+        if (date.toString() === 'Invalid Date') {
+          return emptyValue;
+        }
+
+        // return format(date, 'yyyy-MM-dd');
+        return date.toLocaleDateString();
       }
 
-      const date = new Date(value);
-
-      if (date.toString() === 'Invalid Date') {
-        return emptyValue;
-      }
-
-      // return format(date, 'yyyy-MM-dd');
-      return date.toLocaleDateString();
+      default:
+        return value ?? emptyValue;
     }
+  })();
 
-    default:
-      return value ?? emptyValue;
+  // Apply highlighting if search string is provided
+  if (searchString && typeof displayValue === 'string') {
+    return highlightText(displayValue, searchString);
   }
+
+  return displayValue;
 };
 
 export const AgGridTableCustomCell = (params: AgGridTableCustomCellParams) => {
@@ -110,6 +122,7 @@ export const AgGridTableCustomCell = (params: AgGridTableCustomCellParams) => {
     value: params.value,
     column: params.colDef,
     isCompare: params?.isCompare,
+    searchString: params?.searchString,
   });
 
   const editable =

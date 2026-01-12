@@ -514,8 +514,8 @@ const mapArtifactToField = (
   const canEdit = process.env.NO_ROLES === 'true' || canEditArtefact(artifact, activeRow);
   let isDisabled = isFieldDisabled(values, fieldSchema, artifact, activeRow, canEdit);
 
-  // Extra gating: only validators can edit model_risk in UI
-  if (artifact.artefact_tech_label === 'model_risk' && canEditModelRiskByRole === false) {
+  // Extra gating: only validators can edit model_risk_type in UI
+  if (artifact.artefact_tech_label === 'model_risk_type' && canEditModelRiskByRole === false) {
     isDisabled = true;
   }
 

@@ -28,6 +28,7 @@ import { ReactComponent as BrokerOutlineIcon } from '@admiral-ds/icons/build/fin
 import { ReactComponent as PlusCircleSolid } from '@admiral-ds/icons/build/service/PlusCircleSolid.svg';
 import { ReactComponent as SearchOutline } from '@admiral-ds/icons/build/system/SearchOutline.svg';
 import { ReactComponent as DeleteSolid } from '@admiral-ds/icons/build/system/DeleteSolid.svg';
+import { ReactComponent as CalendarOutline } from '@admiral-ds/icons/build/system/CalendarOutline.svg';
 import { InputField } from '@admiral-ds/react-ui';
 import { ErrorStatus, Flexbox, Spacer } from '@src/shared/ui/atoms';
 import { IconButton } from '@shared/ui/molecules';
@@ -46,7 +47,8 @@ import { useGlobalStore } from '../../../shared/stores/globalStore';
 import { useFiltersStore } from '../../../shared/stores/filtersStore';
 import { useTemplatesStore } from '../../../shared/stores/templatesStore';
 import { convertFilterModelToColumnsFilters } from '../../../shared/helpers/filterModelConverter';
-import { defaultExcelExportParams } from '../../../shared/helpers/excelExportHelpers'
+import { defaultExcelExportParams } from '../../../shared/helpers/excelExportHelpers';
+import { isCellMatched } from '../../../shared/helpers/highlightHelpers';
 
 interface IAgGridTableProps {
   templates?: Template[];
@@ -204,7 +206,8 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
   ) => {
     const { openAddModelPanel, openDeleteModelPanel } = usePanelsStore();
     const handleClickOnActionCellFromProps = handleClickOnActionCell || (() => {});
-    const { filtersResetCount, setAgGridApi, agGridApi } = useGlobalStore();
+    const { filtersResetCount, setAgGridApi, agGridApi, searchString, setSearchString } =
+      useGlobalStore();
     const { filterModel, topFilters, setTopFilters, setFilterModel, setColumnsFilters } =
       useFiltersStore();
     const { setPendingTemplate } = useTemplatesStore();
@@ -218,6 +221,9 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     const gridRefInner = useRef<AgGridReact>(null);
     const gridRef = ref || gridRefInner;
     const [activeRows, setActiveRows] = useState<Partial<Row>[]>([]);
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+    const searchBeforeDatePickerRef = useRef<string>('');
 
     const columnDefs: ColDef[] = useMemo(() => {
       return columnList
@@ -267,6 +273,8 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
               data.type === COLUMN_TYPE.DATE ? dateFilterParams : dynamicSetFilterParams,
             cellRenderer: data.cellRenderer,
             cellClass: (params) => {
+              const classes: string[] = [];
+
               if (isCompared) {
                 const rowIndex = params.node.rowIndex;
                 const prevRow = params.api.getDisplayedRowAtIndex(Number(rowIndex) - 1);
@@ -276,16 +284,23 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
                 const sameId = params?.data?.id?.split(':')[0] === prevRow?.data?.id?.split(':')[0];
 
                 if (prevRow && sameId && prevRowSameCellValue !== cellValue) {
-                  return 'ag-custom-cell-value-changed';
+                  classes.push('ag-custom-cell-value-changed');
                 }
               } else {
-                return `data-tech-label_${data.name}`;
+                classes.push(`data-tech-label_${data.name}`);
               }
+
+              // Add highlight class if cell matches search
+              if (searchString && isCellMatched(params.value, searchString)) {
+                classes.push('search-highlight-cell');
+              }
+
+              return classes.length > 0 ? classes.join(' ') : undefined;
             },
           };
         })
         .filter((col) => col.name !== 'relations') as ColDef[];
-    }, [columnList, rowDragManaged, isCompared]);
+    }, [columnList, rowDragManaged, isCompared, searchString]);
 
     const defaultColDef = useMemo<ColDef>(() => {
       return {
@@ -358,12 +373,13 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
         cellRenderer: AgGridTableCustomCell,
         cellRendererParams: {
           noCustomCells,
+          searchString,
           onAction: (action: any, row_system_model_id: any, columnName: any): any => {
             handleClickOnActionCellFromProps?.(action, row_system_model_id, columnName);
           },
         },
       };
-    }, []);
+    }, [searchString]);
 
     const rowSelection = useMemo<RowSelectionOptions | 'single' | 'multiple'>(() => {
       return {
@@ -375,11 +391,68 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     }, []);
 
     const onFilterTextBoxChanged = useCallback(() => {
-      gridRef.current!.api.setGridOption(
-        'quickFilterText',
-        (document.getElementById('filter-text-box') as HTMLInputElement).value,
-      );
+      const searchValue = (document.getElementById('filter-text-box') as HTMLInputElement).value;
+      gridRef.current!.api.setGridOption('quickFilterText', searchValue);
+      setSearchString(searchValue);
+    }, [setSearchString]);
+
+    const handleDateSelect = useCallback((date: Date) => {
+      if (!date || Number.isNaN(date.getTime())) return;
+      setSelectedDate(date);
     }, []);
+
+    const formatDateToYYYYMMDD = useCallback((date: Date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }, []);
+
+    const handleApplyDatePicker = useCallback(() => {
+      if (!selectedDate) return;
+
+      const formattedDate = formatDateToYYYYMMDD(selectedDate);
+      const searchInput = document.getElementById('filter-text-box') as HTMLInputElement;
+
+      if (searchInput) {
+        searchInput.value = formattedDate;
+      }
+
+      setSearchString(formattedDate);
+      gridRef.current!.api.setGridOption('quickFilterText', formattedDate);
+      setShowDatePicker(false);
+    }, [formatDateToYYYYMMDD, selectedDate, setSearchString]);
+
+    const handleCancelDatePicker = useCallback(() => {
+      const searchInput = document.getElementById('filter-text-box') as HTMLInputElement;
+
+      if (searchInput) {
+        searchInput.value = searchBeforeDatePickerRef.current;
+      }
+
+      setSelectedDate(null);
+      setShowDatePicker(false);
+    }, []);
+
+    const handleToggleDatePicker = useCallback(() => {
+      if (showDatePicker) {
+        handleCancelDatePicker();
+        return;
+      }
+
+      const searchInput = document.getElementById('filter-text-box') as HTMLInputElement;
+      const currentValue = searchInput?.value ?? searchString ?? '';
+      searchBeforeDatePickerRef.current = currentValue;
+
+      if (/^\d{4}-\d{2}-\d{2}$/.test(currentValue)) {
+        const parsed = new Date(currentValue);
+        setSelectedDate(Number.isNaN(parsed.getTime()) ? null : parsed);
+      } else {
+        setSelectedDate(null);
+      }
+
+      setShowDatePicker(true);
+    }, [handleCancelDatePicker, searchString, showDatePicker]);
 
     const paginationPageSizeSelector = useMemo<number[] | boolean>(() => {
       return [20, 100, 200, 500, 1000];
@@ -526,6 +599,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       if (api) {
         api?.setFilterModel(null);
         api?.setGridOption('quickFilterText', '');
+        setSearchString('');
       }
     };
 
@@ -533,7 +607,33 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       if (filtersResetCount) {
         clearFilters();
       }
-    }, [filtersResetCount]);
+    }, [filtersResetCount, setSearchString]);
+
+    // Sync search input with global store
+    useEffect(() => {
+      const searchInput = document.getElementById('filter-text-box') as HTMLInputElement;
+      if (searchInput && searchInput.value !== searchString) {
+        searchInput.value = searchString;
+      }
+    }, [searchString]);
+
+    // Close date picker when clicking outside
+    useEffect(() => {
+      const handleClickOutside = (event: MouseEvent) => {
+        if (showDatePicker) {
+          const target = event.target as Element;
+          const datePickerElement = target.closest('[data-date-picker]');
+          if (!datePickerElement) {
+            handleCancelDatePicker();
+          }
+        }
+      };
+
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }, [handleCancelDatePicker, showDatePicker]);
 
     useDeepEffect(() => {
       if (rowList?.length) {
@@ -604,13 +704,110 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
                   gap={20}
                   key={filtersResetCount}
                 >
-                  <InputField
-                    id="filter-text-box"
-                    onChange={onFilterTextBoxChanged}
-                    placeholder="Поиск"
-                    dimension="s"
-                    icons={<SearchOutline />}
-                  />
+                  <div
+                    style={{
+                      position: 'relative',
+                      display: 'flex',
+                      alignItems: 'center',
+                      flex: 1,
+                      width: '555px',
+                    }}
+                  >
+                    <InputField
+                      id="filter-text-box"
+                      onChange={onFilterTextBoxChanged}
+                      defaultValue={searchString}
+                      placeholder="Поиск"
+                      style={{
+                        width: '555px',
+                      }}
+                      dimension="s"
+                      icons={
+                        <Flexbox width="60px">
+                          <IconButton
+                            icon={<CalendarOutline />}
+                            tooltip="Выбрать дату"
+                            color="#0062FF"
+                            onClick={handleToggleDatePicker}
+                          />
+                          <SearchOutline />
+                        </Flexbox>
+                      }
+                    />
+
+                    {showDatePicker && (
+                      <div
+                        data-date-picker
+                        style={{
+                          position: 'absolute',
+                          top: '100%',
+                          left: '0',
+                          zIndex: 1000,
+                          background: 'white',
+                          border: '1px solid #ccc',
+                          borderRadius: '4px',
+                          padding: '8px',
+                          marginTop: '4px',
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                        }}
+                      >
+                        <input
+                          type="date"
+                          value={selectedDate ? formatDateToYYYYMMDD(selectedDate) : ''}
+                          onChange={(e) => {
+                            const date = new Date(e.target.value);
+                            handleDateSelect(date);
+                          }}
+                          style={{
+                            border: 'none',
+                            outline: 'none',
+                            fontSize: '14px',
+                          }}
+                        />
+
+                        <div
+                          style={{
+                            display: 'flex',
+                            gap: '8px',
+                            marginTop: '8px',
+                            justifyContent: 'flex-end',
+                          }}
+                        >
+                          <button
+                            type="button"
+                            onClick={handleCancelDatePicker}
+                            style={{
+                              padding: '6px 10px',
+                              borderRadius: '4px',
+                              border: '1px solid #ccc',
+                              background: 'white',
+                              cursor: 'pointer',
+                              fontSize: '12px',
+                            }}
+                          >
+                            Отменить
+                          </button>
+                          <button
+                            type="button"
+                            onClick={handleApplyDatePicker}
+                            disabled={!selectedDate}
+                            style={{
+                              padding: '6px 10px',
+                              borderRadius: '4px',
+                              border: '1px solid #0062FF',
+                              background: '#0062FF',
+                              color: 'white',
+                              cursor: selectedDate ? 'pointer' : 'not-allowed',
+                              fontSize: '12px',
+                              opacity: selectedDate ? 1 : 0.5,
+                            }}
+                          >
+                            Применить
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </Flexbox>
 
                 <div>
@@ -698,6 +895,20 @@ const GridWrapper = styled('div')`
   }
 
   & .ag-popup {
+  }
+
+  /* Search highlighting styles */
+  & .search-highlight {
+    background-color: #ffeb3b;
+    color: #000;
+    padding: 1px 2px;
+    border-radius: 2px;
+    font-weight: 500;
+  }
+
+  & .search-highlight-cell {
+    background-color: #fff8e1;
+    border: 1px solid #ffeb3b;
   }
 `;
 
