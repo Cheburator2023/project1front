@@ -36,7 +36,7 @@ import { useNavigate } from 'react-router-dom';
 import { Column, COLUMN_TYPE, Row } from '@src/shared/types';
 import { Template } from '@src/shared/api/types';
 import styled from 'styled-components';
-import { isEmpty } from 'lodash';
+import { debounce, isEmpty } from 'lodash';
 import { AgGridTableCustomCell } from '../molecules/AgGridTableCustomCell';
 import { AG_GRID_LOCALE_RU } from '../../../app/agGridLocale.ru';
 import { useDeleteRightModelPanelStore, usePanelsStore } from '../../../shared/stores';
@@ -390,11 +390,29 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       };
     }, []);
 
-    const onFilterTextBoxChanged = useCallback(() => {
-      const searchValue = (document.getElementById('filter-text-box') as HTMLInputElement).value;
-      gridRef.current!.api.setGridOption('quickFilterText', searchValue);
-      setSearchString(searchValue);
+    const debouncedQuickFilterUpdate = useMemo(() => {
+      return debounce((searchValue: string) => {
+        gridRef.current?.api.setGridOption('quickFilterText', searchValue);
+        setSearchString(searchValue);
+      }, 700);
     }, [setSearchString]);
+
+    useEffect(() => {
+      return () => {
+        debouncedQuickFilterUpdate.cancel();
+      };
+    }, [debouncedQuickFilterUpdate]);
+
+    const onFilterTextBoxChanged = useCallback(
+      (e: any) => {
+        const searchValue =
+          e?.target?.value ??
+          (document.getElementById('filter-text-box') as HTMLInputElement | null)?.value ??
+          '';
+        debouncedQuickFilterUpdate(searchValue);
+      },
+      [debouncedQuickFilterUpdate],
+    );
 
     const handleDateSelect = useCallback((date: Date) => {
       if (!date || Number.isNaN(date.getTime())) return;
@@ -688,6 +706,8 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       onRowDragEnd?.(e);
     };
 
+    const quickFilterParser = (quickFilter: string) => quickFilter.split('🐸');
+
     return (
       <Flexbox height="calc(100vh - 220px)">
         {error ? (
@@ -725,7 +745,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
                       icons={<SearchOutline />}
                     />
 
-                    {showDatePicker && (
+                    {/* {showDatePicker && (
                       <div
                         data-date-picker
                         style={{
@@ -796,7 +816,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
                           </button>
                         </div>
                       </div>
-                    )}
+                    )} */}
                   </div>
                 </Flexbox>
 
@@ -834,6 +854,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
 
           <GridWrapper style={gridStyle} className="ag-theme-quartz">
             <AgGridReact
+              quickFilterParser={quickFilterParser}
               pagination={pagination}
               rowDragManaged={rowDragManaged}
               ref={gridRef || gridRefInner}
