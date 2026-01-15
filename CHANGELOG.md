@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.53.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.52.3...v1.53.0) (2026-01-15)
+
+
+### Features
+
+* add role based exploitation mode options ([2073aea](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/2073aea7ba48d53c9a0d2eda4d0637fef3c24c6a))
+
 ## [1.52.3](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.52.2...v1.52.3) (2025-12-10)
 
 
