@@ -291,7 +291,8 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
               }
 
               // Add highlight class if cell matches search
-              if (searchString && isCellMatched(params.value, searchString)) {
+              const currentSearchString = useGlobalStore.getState().searchString;
+              if (currentSearchString && isCellMatched(params.value, currentSearchString)) {
                 classes.push('search-highlight-cell');
               }
 
@@ -300,7 +301,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
           };
         })
         .filter((col) => col.name !== 'relations') as ColDef[];
-    }, [columnList, rowDragManaged, isCompared, searchString]);
+    }, [columnList, rowDragManaged, isCompared]);
 
     const defaultColDef = useMemo<ColDef>(() => {
       return {
@@ -373,13 +374,12 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
         cellRenderer: AgGridTableCustomCell,
         cellRendererParams: {
           noCustomCells,
-          searchString,
           onAction: (action: any, row_system_model_id: any, columnName: any): any => {
             handleClickOnActionCellFromProps?.(action, row_system_model_id, columnName);
           },
         },
       };
-    }, [searchString]);
+    }, [handleClickOnActionCellFromProps, noCustomCells, pivot]);
 
     const rowSelection = useMemo<RowSelectionOptions | 'single' | 'multiple'>(() => {
       return {
@@ -392,8 +392,16 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
 
     const debouncedQuickFilterUpdate = useMemo(() => {
       return debounce((searchValue: string) => {
-        gridRef.current?.api.setGridOption('quickFilterText', searchValue);
         setSearchString(searchValue);
+
+        const api = gridRef.current?.api;
+        api?.setGridOption('quickFilterText', searchValue);
+
+        // Ensure cellClass / renderers see the latest searchString from the store
+        // before the grid repaints.
+        setTimeout(() => {
+          api?.refreshCells({ force: true });
+        }, 0);
       }, 700);
     }, [setSearchString]);
 
@@ -438,6 +446,9 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
 
       setSearchString(formattedDate);
       gridRef.current!.api.setGridOption('quickFilterText', formattedDate);
+      setTimeout(() => {
+        gridRef.current?.api.refreshCells({ force: true });
+      }, 0);
       setShowDatePicker(false);
     }, [formatDateToYYYYMMDD, selectedDate, setSearchString]);
 
@@ -527,7 +538,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     const handleColumnMoved = (event: ColumnMovedEvent) => {
       if (event.source === 'api') return;
 
-      // * Если есть изменение порядка столбцов (главная талица, панель шаблонов после сохранения pending шаблона), то шаблон сбрасывается до “Шаблон не активен”
+      // * Если есть изменение порядка столбцов (главная талица, панель шаблонов после сохранения pending шаблона), то шаблон сбрасывается до "Шаблон не активен"
       setTopFilters?.({ ...topFilters, templates: [] });
 
       handleColumnStateChange();
@@ -553,6 +564,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
 
     const handleFilterChange = async (event: FilterChangedEvent): Promise<void> => {
       if (event.source === 'api') return;
+      if (event.source === 'quickFilter') return;
 
       const filterModelPending = event.api.getFilterModel();
       const filterModelCountPending = Object.keys(filterModelPending).length;
@@ -594,7 +606,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
         return undefined;
       }
 
-      // * Если я удаляю атрибут из набора фильтра (в таблице или после применения шаблона через панель фильтров), который входит в шаблон, то шаблон сбрасывается до “Шаблон не активен”
+      // * Если я удаляю атрибут из набора фильтра (в таблице или после применения шаблона через панель фильтров), который входит в шаблон, то шаблон сбрасывается до "Шаблон не активен"
       if (hasRemovedColInFilter) {
         console.log('🐸 Pepe said -- 3.');
         setTopFilters?.({ ...topFilters, templates: [] });
@@ -602,7 +614,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
         return undefined;
       }
 
-      // * Если я добавляю сортировку/фильтрацию на атрибут в шаблоне, на котором уже есть сортировка или фильтрация, шаблон сбрасывается до “Шаблон не активен”
+      // * Если я добавляю сортировку/фильтрацию на атрибут в шаблоне, на котором уже есть сортировка или фильтрация, шаблон сбрасывается до "Шаблон не активен"
       if (wasInitialyFiltered && hasChangesInFilter) {
         console.log('🐸 Pepe said -- 4.');
         setTopFilters?.({ ...topFilters, templates: [] });
