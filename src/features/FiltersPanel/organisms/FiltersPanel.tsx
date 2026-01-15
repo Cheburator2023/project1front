@@ -9,6 +9,7 @@ import { useEffect, useCallback, useMemo } from 'react';
 import { useModelsControllerGetModels, useTemplatesControllerGetTemplates } from '@shared/api/generated/endpoints';
 import { getISODateFormat } from '@shared/helpers';
 import { useQueryClient } from '@tanstack/react-query';
+import { useRoles } from '@shared/hooks';
 import { Container, CustomDateField, FiltersDivider, FilterButton, FiltersBox } from '../styles';
 import { useGlobalStore } from '../../../shared/stores/globalStore';
 import { TemplatesPanel } from '../../TemplatesPanel/organisms/TemplatesPanel';
@@ -60,8 +61,20 @@ export const FiltersPanel = ({
     return Boolean(firstDate && secondDate);
   }, [firstDate, secondDate]);
 
-  const { exploitationModeOptions, selectedExploitationModes, updateSelectedExploitationModes } =
+  const rolesRaw: any = useRoles();
+  const roles = useMemo(() => {
+    const r = Array.isArray(rolesRaw) ? rolesRaw : (rolesRaw?.roles ?? rolesRaw?.roleNames ?? []);
+    const arr = Array.isArray(r) ? r.slice() : [];
+    arr.sort();
+    return arr;
+  }, [Array.isArray(rolesRaw) ? rolesRaw.join('|') : JSON.stringify(rolesRaw)]);
+
+  const { exploitationModeOptions, selectedExploitationModes, updateSelectedExploitationModes, setRoles } =
     useExploitationModeStore();
+
+  useEffect(() => {
+    setRoles(roles);
+  }, [setRoles, roles]);
 
   // Get templates loading state
   const { isLoading: isTemplatesLoading } = useTemplatesControllerGetTemplates();
