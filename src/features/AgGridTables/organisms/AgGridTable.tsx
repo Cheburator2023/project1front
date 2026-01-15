@@ -722,17 +722,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
                         width: '555px',
                       }}
                       dimension="s"
-                      icons={
-                        <Flexbox width="60px">
-                          <IconButton
-                            icon={<CalendarOutline />}
-                            tooltip="Выбрать дату"
-                            color="#0062FF"
-                            onClick={handleToggleDatePicker}
-                          />
-                          <SearchOutline />
-                        </Flexbox>
-                      }
+                      icons={<SearchOutline />}
                     />
 
                     {showDatePicker && (
