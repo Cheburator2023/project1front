@@ -35,7 +35,10 @@ export const AgGridModelsTable = (props: {
     (state) => state.selectedExploitationModes,
   );
 
-  const { data: templateData } = useTemplatesControllerGetTemplates({ query: { enabled: true } });
+  const { data: templateData } = useTemplatesControllerGetTemplates(
+    { mode: _selectedExploitationModes },
+    { query: { enabled: true } },
+  );
   const {
     data: _modelsData,
     isLoading: loadingModels,

@@ -6,7 +6,10 @@ import { modelsSelectOptions } from '@shared/constants';
 
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useCallback, useMemo } from 'react';
-import { useModelsControllerGetModels, useTemplatesControllerGetTemplates } from '@shared/api/generated/endpoints';
+import {
+  useModelsControllerGetModels,
+  useTemplatesControllerGetTemplates,
+} from '@shared/api/generated/endpoints';
 import { getISODateFormat } from '@shared/helpers';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRoles } from '@shared/hooks';
@@ -63,21 +66,27 @@ export const FiltersPanel = ({
 
   const rolesRaw: any = useRoles();
   const roles = useMemo(() => {
-    const r = Array.isArray(rolesRaw) ? rolesRaw : (rolesRaw?.roles ?? rolesRaw?.roleNames ?? []);
+    const r = Array.isArray(rolesRaw) ? rolesRaw : rolesRaw?.roles ?? rolesRaw?.roleNames ?? [];
     const arr = Array.isArray(r) ? r.slice() : [];
     arr.sort();
     return arr;
   }, [Array.isArray(rolesRaw) ? rolesRaw.join('|') : JSON.stringify(rolesRaw)]);
 
-  const { exploitationModeOptions, selectedExploitationModes, updateSelectedExploitationModes, setRoles } =
-    useExploitationModeStore();
+  const {
+    exploitationModeOptions,
+    selectedExploitationModes,
+    updateSelectedExploitationModes,
+    setRoles,
+  } = useExploitationModeStore();
 
   useEffect(() => {
     setRoles(roles);
   }, [setRoles, roles]);
 
   // Get templates loading state
-  const { isLoading: isTemplatesLoading } = useTemplatesControllerGetTemplates();
+  const { isLoading: isTemplatesLoading } = useTemplatesControllerGetTemplates({
+    mode: selectedExploitationModes,
+  });
 
   const fetchModelsByDate = useCallback(
     (date: string) => {
@@ -168,7 +177,11 @@ export const FiltersPanel = ({
           selectedValues={topFilters.objectTypeRegistry}
           onChange={handleChange}
         />
-        <TemplatesFilterInput activeTemplate={activeTemplate} templates={templates} loading={isTemplatesLoading} />
+        <TemplatesFilterInput
+          activeTemplate={activeTemplate}
+          templates={templates}
+          loading={isTemplatesLoading}
+        />
         {compareMode ? (
           <>
             <CustomDateField

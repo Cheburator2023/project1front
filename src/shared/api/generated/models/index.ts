@@ -18,6 +18,7 @@ export * from './modelsControllerGetModelWithRelationsParams';
 export * from './modelsControllerGetModelsParams';
 export * from './modelsUpdateDto';
 export * from './templateCreateDto';
+export * from './templatesControllerGetTemplatesParams';
 export * from './templateCreateDtoFilterModel';
 export * from './templateUpdateDto';
 export * from './templateUpdateDtoFilterModel';

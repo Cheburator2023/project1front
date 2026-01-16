@@ -24,6 +24,7 @@ import { Template } from '@shared/api';
 import { StatusScreen } from '@shared/ui/molecules';
 import { RightPanel } from '@shared/ui/organisms';
 import { useFiltersStore } from '@shared/stores/filtersStore';
+import { useExploitationModeStore } from '@src/shared/stores';
 
 import { TemplateItem } from './TemplateItem';
 import {
@@ -63,14 +64,18 @@ export const Templates = ({ templates, onClose, updateTemplates }: TemplatesProp
 
   const { agGridApi } = useGlobalStore();
   const { setPendingTemplate } = useTemplatesStore();
+  const selectedExploitationModes = useExploitationModeStore(
+    (state) => state.selectedExploitationModes,
+  );
 
   const { isAddPublicTemplateEnabled } = usePermissions();
   const createTemplateMutation = useTemplatesControllerCreateTemplate();
   const updateTemplateMutation = useTemplatesControllerUpdateTemplate();
   const deleteTemplateMutation = useTemplatesControllerDeleteTemplate();
-  const getTemplatesQuery = useTemplatesControllerGetTemplates({
-    query: { enabled: false },
-  });
+  const getTemplatesQuery = useTemplatesControllerGetTemplates(
+    { mode: selectedExploitationModes },
+    { query: { enabled: false } },
+  );
 
   const [filteredTemplates, setFilteredTemplates] = useState<Template[]>([]);
 
@@ -144,7 +149,7 @@ export const Templates = ({ templates, onClose, updateTemplates }: TemplatesProp
 
     const columnState = agGridApi?.getColumnState();
     const filterModel: any = agGridApi?.getFilterModel();
-  
+
     const templateData: TemplateCreateDto = {
       template_name: value,
       public: id === 'public',
