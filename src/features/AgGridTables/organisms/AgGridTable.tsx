@@ -630,6 +630,8 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
         api?.setFilterModel(null);
         api?.setGridOption('quickFilterText', '');
         setSearchString('');
+        api?.refreshCells({ force: true });
+        api?.redrawRows();
       }
     };
 
