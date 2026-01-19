@@ -224,6 +224,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
     const searchBeforeDatePickerRef = useRef<string>('');
+    const lastUserColumnStateRef = useRef<any[] | null>(null);
 
     const columnDefs: ColDef[] = useMemo(() => {
       return columnList
@@ -537,12 +538,27 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
 
     const handleColumnMoved = (event: ColumnMovedEvent) => {
       if (event.source === 'api') return;
+      if (event.source !== 'uiColumnDragged' && event.source !== 'toolPanelUi') return;
 
       // * Если есть изменение порядка столбцов (главная талица, панель шаблонов после сохранения pending шаблона), то шаблон сбрасывается до "Шаблон не активен"
       setTopFilters?.({ ...topFilters, templates: [] });
+      lastUserColumnStateRef.current = event.api.getColumnState();
 
       handleColumnStateChange();
     };
+
+    useEffect(() => {
+      if (!agGridApi) return;
+      if (filterModel && Object.keys(filterModel).length > 0) {
+        agGridApi.setFilterModel(filterModel);
+      }
+      if (lastUserColumnStateRef.current?.length) {
+        agGridApi.applyColumnState({
+          state: lastUserColumnStateRef.current,
+          applyOrder: true,
+        });
+      }
+    }, [agGridApi, columnDefs, filterModel]);
 
     const handleSortChanged = (event: SortChangedEvent) => {
       // // Проверяем, нужно ли сбросить активный шаблон при изменении сортировки
@@ -869,6 +885,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
           <GridWrapper style={gridStyle} className="ag-theme-quartz">
             <AgGridReact
               quickFilterParser={quickFilterParser}
+              maintainColumnOrder
               pagination={pagination}
               rowDragManaged={rowDragManaged}
               ref={gridRef || gridRefInner}
