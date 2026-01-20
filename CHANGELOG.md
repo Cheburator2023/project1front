@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.55.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.54.0...v1.55.0) (2026-01-20)
+
+
+### Features
+
+* add deploy system artefact to initial columns ([11d233b](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/11d233bdefcc16b32edd58e0c5466934ba2a9fd4))
+
 # [1.54.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.53.0...v1.54.0) (2026-01-19)
 
 
