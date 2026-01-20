@@ -1,10 +1,11 @@
-import { ReactNode, useEffect } from 'react';
+import { ReactNode, useEffect, useMemo } from 'react';
 import {
   Modal,
   ModalTitle,
   Button,
   Select,
   Option,
+  OptionGroup,
   TextField,
   InputField,
   Field,
@@ -123,7 +124,6 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
           initializeFromTemplate(undefined);
           setPendingTemplate(undefined);
           console.log('🐸 AAA 1', setPendingTemplate);
-
         }
       } else {
         // Apply the same reset logic as in TemplatesFilterInput (full reset)
@@ -133,8 +133,7 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
         resetState();
         initializeFromTemplate(undefined);
         setPendingTemplate(undefined);
-          console.log('🐸 AAA 2', setPendingTemplate);
-
+        console.log('🐸 AAA 2', setPendingTemplate);
       }
 
       // Reset the resetInitialized flag
@@ -216,7 +215,7 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
           columnState,
           isPending: true,
         };
-          console.log('🐸 AAA 4', setPendingTemplate);
+        console.log('🐸 AAA 4', setPendingTemplate);
         setPendingTemplate(savedTemplate);
         agGridApiGlobal.setFilterModel(newFilterModel);
         console.log('🐸 Pepe said >> handleSave >> columnState 222:', columnState);
@@ -245,15 +244,25 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
     closeModal();
   };
 
-  const templateOptions = [
-    { value: 'new', label: 'Не активен' },
-    ...templates
-      .filter((template) => template.template_id > 0)
-      .map((template) => ({
-        value: template.template_id.toString(),
-        label: template.template_name,
-      })),
-  ];
+  const systemTemplateOptions = useMemo(
+    () =>
+      templates
+        .filter((t) => t.user_id === null)
+        .filter((t) => typeof t.template_id === 'number' && t.template_id > 0)
+        .sort((a, b) => a.template_name.localeCompare(b.template_name, 'ru'))
+        .map((t) => ({ value: String(t.template_id), label: t.template_name })),
+    [templates],
+  );
+
+  const userTemplateOptions = useMemo(
+    () =>
+      templates
+        .filter((t) => t.user_id !== null)
+        .filter((t) => typeof t.template_id === 'number' && t.template_id > 0)
+        .sort((a, b) => a.template_name.localeCompare(b.template_name, 'ru'))
+        .map((t) => ({ value: String(t.template_id), label: t.template_name })),
+    [templates],
+  );
 
   return (
     <Modal
@@ -294,11 +303,32 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
               onChange={(e) => handleTemplateChange(e.target.value)}
               style={{ minWidth: '300px' }}
             >
-              {templateOptions.map((option) => (
-                <Option key={option.value} value={option.value}>
-                  {option.label}
-                </Option>
-              ))}
+              <Option key="new" value="new">
+                Не активен
+              </Option>
+
+              {!!systemTemplateOptions.length && (
+                <OptionGroup style={{ fontSize: '12px', opacity: 0.5 }} label="Системные шаблоны">
+                  {systemTemplateOptions.map((option) => (
+                    <Option key={option.value} value={option.value}>
+                      {option.label}
+                    </Option>
+                  ))}
+                </OptionGroup>
+              )}
+
+              {!!userTemplateOptions.length && (
+                <OptionGroup
+                  style={{ fontSize: '12px', opacity: 0.5 }}
+                  label="Пользовательские шаблоны"
+                >
+                  {userTemplateOptions.map((option) => (
+                    <Option key={option.value} value={option.value}>
+                      {option.label}
+                    </Option>
+                  ))}
+                </OptionGroup>
+              )}
             </Select>
           </Field>
 
@@ -334,12 +364,7 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
           <Button appearance="secondary" dimension="s" onClick={handleCancel}>
             Отмена
           </Button>
-          <Button
-            appearance="primary"
-            dimension="s"
-            onClick={handleSave}
-            disabled={!hasChanges()}
-          >
+          <Button appearance="primary" dimension="s" onClick={handleSave} disabled={!hasChanges()}>
             Применить
           </Button>
         </div>
