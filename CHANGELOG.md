@@ -1,5 +1,29 @@
 # Semantic Versioning Changelog
 
+# [1.55.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.54.0...v1.55.0) (2026-01-20)
+
+
+### Features
+
+* add deploy system artefact to initial columns ([11d233b](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/11d233bdefcc16b32edd58e0c5466934ba2a9fd4))
+
+# [1.54.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.53.0...v1.54.0) (2026-01-19)
+
+
+### Bug Fixes
+
+* added mode param to templates ([1c1ec07](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/1c1ec07563e2ae46cc26474fde68f5b26a18cd0b))
+* date search removed from searchbar ([28aa780](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/28aa780975db345d9a8e3e91801d3272033d6208))
+* hilight reset fix ([77c8cdf](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/77c8cdfe4d6deec66dbdda1bcf82bed91555db62))
+
+
+### Features
+
+* new filter menu added ([53e207a](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/53e207ac75c85509e7907e94dd55625d41735e4d))
+* new filter menu added ([20a594f](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/20a594fdf3bb4ee52efd235d3b4ff3016c7e2259))
+* new filter menu added ([f718f90](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/f718f908d94e3400267f014e7216fb684fc63bf6))
+* search highlight added ([97aa445](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/97aa445aa45387eacbe2215e874a87a98f76afcf))
+
 # [1.53.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.52.3...v1.53.0) (2026-01-15)
 
 
