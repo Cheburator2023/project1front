@@ -202,6 +202,7 @@ type Row = ArtificialRow & {
   model_data_07k_control_epic: string | null;
   model_data_control_date: string | null;
   check_objects_count: string | null;
+  deploy_system: string | null;
 };
 
 type ColumnsFilter = Record<keyof Row, Array<string>>;

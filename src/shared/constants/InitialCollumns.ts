@@ -814,6 +814,11 @@ export const initialColumns: Array<Column> = [
     title: 'Количество объектов проверки',
     type: COLUMN_TYPE.STRING,
   },
+  {
+    name: 'deploy_system',
+    title: 'Система внедрения',
+    type: COLUMN_TYPE.STRING,
+  },
 ];
 
 export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
@@ -994,5 +999,6 @@ export const initialColumnsFilters: Omit<ColumnsFilter, keyof ArtificialRow> = {
   model_data_07k_control_epic: [],
   model_data_control_date: [],
   check_objects_count: [],
+  deploy_system: [],
 };
 
