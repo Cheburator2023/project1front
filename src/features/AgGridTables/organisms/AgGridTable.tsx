@@ -30,7 +30,7 @@ import { ReactComponent as SearchOutline } from '@admiral-ds/icons/build/system/
 import { ReactComponent as DeleteSolid } from '@admiral-ds/icons/build/system/DeleteSolid.svg';
 import { ReactComponent as CalendarOutline } from '@admiral-ds/icons/build/system/CalendarOutline.svg';
 import { InputField } from '@admiral-ds/react-ui';
-import { ErrorStatus, Flexbox, Spacer } from '@src/shared/ui/atoms';
+import { ErrorStatus, Flexbox, Spacer, useToast } from '@src/shared/ui/atoms';
 import { IconButton } from '@shared/ui/molecules';
 import { useNavigate } from 'react-router-dom';
 import { Column, COLUMN_TYPE, Row } from '@src/shared/types';
@@ -216,6 +216,17 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       useDeleteRightModelPanelStore();
     const { isAdmin, isValidatorLead } = useRoles();
     const { isAddModelEnabled } = usePermissions();
+    const { showToast } = useToast();
+
+    useEffect(() => {
+      if (error) {
+        showToast({
+          message: `Ошибка загрузки моделей: ${error}`,
+          type: 'error',
+          duration: 5000,
+        });
+      }
+    }, [error, showToast]);
 
     const navigate = useNavigate();
     const gridRefInner = useRef<AgGridReact>(null);
@@ -740,9 +751,6 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
 
     return (
       <Flexbox height="calc(100vh - 220px)">
-        {error ? (
-          <StatusWrapper>{error ? <ErrorStatus text={error} /> : null}</StatusWrapper>
-        ) : null}
         <div style={containerStyle}>
           {actionPanel && (
             <>
