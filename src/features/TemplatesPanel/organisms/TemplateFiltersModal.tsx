@@ -77,6 +77,10 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
     // Set dirty flag to indicate that user performed an action
     setIsDirty(true);
 
+    if (templateId !== 'new' && resetInitialized) {
+      setResetInitialized(false);
+    }
+
     if (id) {
       const template = templates.find((t) => t.template_id === id);
       if (template) {
@@ -89,7 +93,7 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
 
   const handleSave = () => {
     // Check if reset was initiated and apply reset logic
-    if (resetInitialized) {
+    if (resetInitialized && selectedTemplateId === null) {
       // Check if columns were modified after reset
       const hasColumnsChanged = hasColumnsChangedAfterReset();
 
