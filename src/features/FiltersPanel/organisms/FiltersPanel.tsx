@@ -6,6 +6,7 @@ import { modelsSelectOptions } from '@shared/constants';
 
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useCallback, useMemo } from 'react';
+import { parse, isValid } from 'date-fns';
 import {
   useModelsControllerGetModels,
   useTemplatesControllerGetTemplates,
@@ -92,6 +93,18 @@ export const FiltersPanel = ({
     (date: string) => {
       const { selectedExploitationModes } = useExploitationModeStore.getState();
       setModelsDownloadingDate(date);
+
+      const isCompleteDate = (value: string) => {
+        if (!value) return false;
+        if (value.includes('_')) return false;
+        if (value.length !== 10) return false;
+        const parsed = parse(value, 'dd.MM.yyyy', new Date());
+        return isValid(parsed);
+      };
+
+      if (date && !isCompleteDate(date)) {
+        return;
+      }
 
       if (date) {
         setModelsParams({
@@ -228,6 +241,7 @@ export const FiltersPanel = ({
               label="Выгрузка на определенную дату:"
               placeholder="Введите дату"
               dropContainerClassName="dropContainerClass"
+              displayClearIcon
               onChange={(e) => fetchModelsByDate(e.target.value)}
             />
           </>

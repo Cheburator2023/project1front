@@ -4,6 +4,8 @@ import { Column, Row } from '@src/shared/types';
 import { getISODateFormat } from '@shared/helpers';
 import { initialColumns } from '@shared/constants';
 import { useDeepEffect } from '@shared/hooks/useDeepEffect';
+import { parse, isValid } from 'date-fns';
+import { useToast } from '@src/shared/ui/atoms';
 import {
   useFiltersStore,
   useModelsStore,
@@ -25,6 +27,8 @@ export const AgGridModelsTable = (props: {
   overlayNoRowsTemplate?: string;
 }) => {
   const { setRows, modelsParams, setModelsParams, setRefetchModels } = useModelsStore();
+
+  const { showToast } = useToast();
 
   const { modelsDownloadingDate } = useFiltersStore();
 
@@ -63,6 +67,27 @@ export const AgGridModelsTable = (props: {
       const { selectedExploitationModes } = useExploitationModeStore.getState();
       const dateToUse = date || modelsDownloadingDate;
 
+      const isFilledDate = (value: string) => {
+        if (!value) return false;
+        if (value.includes('_')) return false;
+        if (value.length !== 10) return false;
+        return true;
+      };
+
+      if (dateToUse) {
+        if (!isFilledDate(dateToUse)) return;
+
+        const parsed = parse(dateToUse, 'dd.MM.yyyy', new Date());
+        if (!isValid(parsed)) {
+          showToast({
+            message: 'Некорректная дата',
+            type: 'error',
+            duration: 5000,
+          });
+          return;
+        }
+      }
+
       if (dateToUse) {
         setModelsParams({
           date: getISODateFormat(dateToUse),
@@ -78,7 +103,7 @@ export const AgGridModelsTable = (props: {
         refetchModels();
       }, 100);
     },
-    [modelsDownloadingDate, refetchModels, setModelsParams],
+    [modelsDownloadingDate, refetchModels, setModelsParams, showToast],
   );
 
   useEffect(() => {

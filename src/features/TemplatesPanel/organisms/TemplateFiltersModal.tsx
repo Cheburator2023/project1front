@@ -244,25 +244,56 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
     closeModal();
   };
 
-  const systemTemplateOptions = useMemo(
-    () =>
-      templates
-        .filter((t) => t.user_id === null)
-        .filter((t) => typeof t.template_id === 'number' && t.template_id > 0)
-        .sort((a, b) => a.template_name.localeCompare(b.template_name, 'ru'))
-        .map((t) => ({ value: String(t.template_id), label: t.template_name })),
-    [templates],
-  );
+  const systemTemplateOptions = useMemo(() => {
+    const normalize = (value: string) => value.toLocaleLowerCase().replace(/\s+/g, ' ').trim();
 
-  const userTemplateOptions = useMemo(
-    () =>
-      templates
-        .filter((t) => t.user_id !== null)
-        .filter((t) => typeof t.template_id === 'number' && t.template_id > 0)
-        .sort((a, b) => a.template_name.localeCompare(b.template_name, 'ru'))
-        .map((t) => ({ value: String(t.template_id), label: t.template_name })),
-    [templates],
-  );
+    const systemPriorityMatchers: Array<(name: string) => boolean> = [
+      (name) =>
+        name.includes('реестр рейтинговых систем') &&
+        (name.includes('пурср') || name.includes('пурс')),
+      (name) =>
+        name.includes('реестр действующих моделей') &&
+        (name.includes('пумр') || name.includes('пумрр')),
+      (name) => name.includes('реестр моделей дадм'),
+      (name) => name.includes('реестр моделей') && name.includes('rwa'),
+    ];
+
+    const getSystemPriorityIndex = (template: Template) => {
+      const name = normalize(template.template_name);
+      const idx = systemPriorityMatchers.findIndex((matcher) => matcher(name));
+      return idx === -1 ? Number.MAX_SAFE_INTEGER : idx;
+    };
+
+    return templates
+      .filter((t) => t.user_id === null)
+      .filter((t) => typeof t.template_id === 'number' && t.template_id > 0)
+      .sort((a, b) => {
+        const pa = getSystemPriorityIndex(a);
+        const pb = getSystemPriorityIndex(b);
+        if (pa !== pb) return pa - pb;
+        return a.template_name.localeCompare(b.template_name, 'ru');
+      })
+      .map((t) => ({ value: String(t.template_id), label: t.template_name }));
+  }, [templates]);
+
+  const userTemplateOptions = useMemo(() => {
+    const all = templates
+      .filter((t) => t.user_id !== null)
+      .filter((t) => typeof t.template_id === 'number' && t.template_id > 0);
+
+    const mine = all
+      .filter((t) => !!t.isOwner)
+      .sort((a, b) => a.template_name.localeCompare(b.template_name, 'ru'));
+
+    const others = all
+      .filter((t) => !t.isOwner)
+      .sort((a, b) => a.template_name.localeCompare(b.template_name, 'ru'));
+
+    return [...mine, ...others].map((t) => ({
+      value: String(t.template_id),
+      label: t.template_name,
+    }));
+  }, [templates]);
 
   return (
     <Modal

@@ -221,7 +221,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     useEffect(() => {
       if (error) {
         showToast({
-          message: `Ошибка загрузки моделей: ${error}`,
+          message: `Ошибка загрузки моделей`,
           type: 'error',
           duration: 5000,
         });
