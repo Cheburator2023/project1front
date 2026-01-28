@@ -28,6 +28,8 @@ export const TemplatesFilterInput = ({
   error = '',
 }: TemplatesFilterInputProps) => {
   const { topFilters, setTopFilters, setFilterModel, resetFilters } = useFiltersStore();
+  console.log('🐸 Pepe said >> TemplatesFilterInput >> topFilters:', topFilters);
+
 
   const { openAddTemplatePanel } = usePanelsStore();
 

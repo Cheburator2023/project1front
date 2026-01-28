@@ -236,6 +236,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
     const searchBeforeDatePickerRef = useRef<string>('');
     const lastUserColumnStateRef = useRef<any[] | null>(null);
+    const suppressTemplateResetRef = useRef(false);
 
     const columnDefs: ColDef[] = useMemo(() => {
       return columnList
@@ -594,32 +595,50 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       if (event.source === 'quickFilter') return;
 
       const filterModelPending = event.api.getFilterModel();
-      const filterModelCountPending = Object.keys(filterModelPending).length;
-      const filterModelCount = Object.keys(currentTemplate?.filterModel || {}).length;
-      const colName: string = event?.columns[0]?.getColId();
-      const colDef: any = event.api.getColumnFilterModel(colName);
-      const isDate = colDef?.filterType === 'date';
-      // @ts-ignore
-      const currentTempleteFilterVals = currentTemplate?.filterModel?.[colName]?.values;
-      const allColDataFromRows = rowList.map((row) => row[colName]);
-      const isColDefaultNonFiltered =
-        JSON.stringify(allColDataFromRows) === JSON.stringify(currentTempleteFilterVals) ||
-        isEmpty(currentTempleteFilterVals);
+      const hasSameFilterModel = JSON.stringify(filterModelPending) === JSON.stringify(filterModel);
 
-      const wasInitialyFiltered =
-        !isColDefaultNonFiltered && colName in (currentTemplate?.filterModel || {});
+      if (hasSameFilterModel) {
+        if (suppressTemplateResetRef.current) {
+          suppressTemplateResetRef.current = false;
+        }
+        return;
+      }
 
-      const hasNewColInFilter = filterModelCountPending > filterModelCount;
-      const hasSameColNumberInFilter = filterModelCountPending === filterModelCount;
-      const hasRemovedColInFilter = filterModelCountPending < filterModelCount;
-      const hasChangesInFilter =
-        JSON.stringify(filterModelPending) !== JSON.stringify(currentTemplate?.filterModel || {});
+      const colName: string | undefined = event?.columns?.[0]?.getColId();
 
       setFilterModel(filterModelPending);
 
       // Convert filterModel to columnsFilters format and update the store
       const newColumnsFilters = convertFilterModelToColumnsFilters(filterModelPending);
       setColumnsFilters(newColumnsFilters);
+
+      if (suppressTemplateResetRef.current && topFilters?.templates?.length) {
+        suppressTemplateResetRef.current = false;
+        return;
+      }
+
+      if (suppressTemplateResetRef.current) {
+        suppressTemplateResetRef.current = false;
+      }
+
+      if (!colName) {
+        return;
+      }
+
+      const filterModelCountPending = Object.keys(filterModelPending).length;
+      const filterModelCount = Object.keys(currentTemplate?.filterModel || {}).length;
+      const colDef: any = colName ? event.api.getColumnFilterModel(colName) : undefined;
+      const isDate = colDef?.filterType === 'date';
+      // @ts-ignore
+      const currentTempleteFilterVals = currentTemplate?.filterModel?.[colName]?.values;
+
+      const wasInitialyFiltered = colName in (currentTemplate?.filterModel || {});
+
+      const hasNewColInFilter = filterModelCountPending > filterModelCount;
+      const hasSameColNumberInFilter = filterModelCountPending === filterModelCount;
+      const hasRemovedColInFilter = filterModelCountPending < filterModelCount;
+      const hasChangesInFilter =
+        JSON.stringify(filterModelPending) !== JSON.stringify(currentTemplate?.filterModel || {});
 
       // * Если я добавляю новый атрибут в набор фильтра, то шаблон остается активным
       if (hasNewColInFilter) {
@@ -699,6 +718,10 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
         setTotalRows?.(rowList.length);
       }
     }, [rowList, setTotalRows]);
+
+    useEffect(() => {
+      suppressTemplateResetRef.current = true;
+    }, [rowList]);
 
     useDeepEffect(() => {
       if (agGridApi && templates && topFilters?.templates?.[0]) {

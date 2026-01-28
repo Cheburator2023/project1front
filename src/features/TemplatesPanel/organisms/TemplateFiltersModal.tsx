@@ -41,7 +41,7 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
   const setIsDirty = useTemplateFiltersModalStoreSelected.use.setIsDirty();
 
   const { templates, pendingTemplate, setPendingTemplate } = useTemplatesStore();
-  const { topFilters, setTopFilters, resetFilters } = useFiltersStore();
+  const { topFilters, setTopFilters, resetFiltersKeepModelsDownloadingDate } = useFiltersStore();
   const { filtersResetCount, setFiltersResetCount, agGridApi: agGridApiGlobal } = useGlobalStore();
 
   useDeepEffect(() => {
@@ -114,7 +114,7 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
           });
 
           // Reset filters first (this will show all columns)
-          resetFilters();
+          resetFiltersKeepModelsDownloadingDate();
 
           // Then apply the modified column state to override the reset column visibility
           agGridApiGlobal.applyColumnState({
@@ -131,7 +131,7 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
         }
       } else {
         // Apply the same reset logic as in TemplatesFilterInput (full reset)
-        resetFilters();
+        resetFiltersKeepModelsDownloadingDate();
         setTopFilters({ ...topFilters, templates: [] });
         setFiltersResetCount();
         resetState();
