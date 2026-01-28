@@ -1,5 +1,22 @@
 # Semantic Versioning Changelog
 
+# [1.56.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.55.0...v1.56.0) (2026-01-28)
+
+
+### Bug Fixes
+
+* error toast added ([dfe5ab0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/dfe5ab05f8fe104b38bf72dbf17eae69eafae394))
+* improved date validation and template sorting ([2ac1f15](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/2ac1f153b1b06ce1015ae5b17d388753b7e781c6))
+* prevent reset flag from persisting when switching templates ([a20befe](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/a20befe2ec0c849dba6583a21f69fa258d12c40f))
+* prevent template reset when rowList updates and improve filter change handling ([775225b](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/775225bad2403ebf56210578b169940a9a89564a))
+* tfilter fixed ([42b369e](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/42b369e67ab91e87264bc603da5e40e1639bcbe9))
+* увеличен период редактирования квартала с 1 до 2 месяцев ([20666f4](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/20666f45d2a982ccbecbf55ee3a857ef03f624c6))
+
+
+### Features
+
+* added grouping to template filters modal ([2aa8279](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/2aa8279811687ef777cb8767be0db511b161f627))
+
 # [1.55.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.54.0...v1.55.0) (2026-01-20)
 
 
