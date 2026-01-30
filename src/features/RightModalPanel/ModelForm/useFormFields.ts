@@ -7,6 +7,7 @@ import { useDeepEffect } from '@shared/hooks/useDeepEffect';
 import { CUSTOMER_TYPE } from '@shared/constants/customers';
 import { getFormFields } from '../helpers';
 import { FormFields, FormFieldsSchema, FormValues } from '../types';
+import { useRoles } from '../../../shared/hooks';
 
 interface UseFormFieldsProps {
   formSchema: FormFieldsSchema;
@@ -28,6 +29,8 @@ export const useFormFields = ({
   values,
 }: UseFormFieldsProps) => {
   const [fields, setFields] = useState<FormFields>([]);
+  const { isValidator, isValidatorLead } = useRoles();
+  const canEditModelRiskByRole = isValidator || isValidatorLead;
 
   useDeepEffect(() => {
     const newFields = getFormFields({
@@ -38,10 +41,20 @@ export const useFormFields = ({
       currentFormSchema: formSchema,
       showAllFields,
       currentCustomer,
+      canEditModelRiskByRole,
     });
 
     setFields(newFields);
-  }, [artifacts, formSchema, initialRow, mode, showAllFields, currentCustomer, values]);
+  }, [
+    artifacts,
+    formSchema,
+    initialRow,
+    mode,
+    showAllFields,
+    currentCustomer,
+    values,
+    canEditModelRiskByRole,
+  ]);
 
   // order field by schema order prop
   // and filterout active_model checkbox
@@ -51,4 +64,3 @@ export const useFormFields = ({
     fields: orderedFields,
   };
 };
-

@@ -1,5 +1,100 @@
 # Semantic Versioning Changelog
 
+# [1.56.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.55.0...v1.56.0) (2026-01-28)
+
+
+### Bug Fixes
+
+* error toast added ([dfe5ab0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/dfe5ab05f8fe104b38bf72dbf17eae69eafae394))
+* improved date validation and template sorting ([2ac1f15](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/2ac1f153b1b06ce1015ae5b17d388753b7e781c6))
+* prevent reset flag from persisting when switching templates ([a20befe](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/a20befe2ec0c849dba6583a21f69fa258d12c40f))
+* prevent template reset when rowList updates and improve filter change handling ([775225b](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/775225bad2403ebf56210578b169940a9a89564a))
+* tfilter fixed ([42b369e](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/42b369e67ab91e87264bc603da5e40e1639bcbe9))
+* увеличен период редактирования квартала с 1 до 2 месяцев ([20666f4](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/20666f45d2a982ccbecbf55ee3a857ef03f624c6))
+
+
+### Features
+
+* added grouping to template filters modal ([2aa8279](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/2aa8279811687ef777cb8767be0db511b161f627))
+
+# [1.55.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.54.0...v1.55.0) (2026-01-20)
+
+
+### Features
+
+* add deploy system artefact to initial columns ([11d233b](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/11d233bdefcc16b32edd58e0c5466934ba2a9fd4))
+
+# [1.54.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.53.0...v1.54.0) (2026-01-19)
+
+
+### Bug Fixes
+
+* added mode param to templates ([1c1ec07](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/1c1ec07563e2ae46cc26474fde68f5b26a18cd0b))
+* date search removed from searchbar ([28aa780](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/28aa780975db345d9a8e3e91801d3272033d6208))
+* hilight reset fix ([77c8cdf](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/77c8cdfe4d6deec66dbdda1bcf82bed91555db62))
+
+
+### Features
+
+* new filter menu added ([53e207a](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/53e207ac75c85509e7907e94dd55625d41735e4d))
+* new filter menu added ([20a594f](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/20a594fdf3bb4ee52efd235d3b4ff3016c7e2259))
+* new filter menu added ([f718f90](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/f718f908d94e3400267f014e7216fb684fc63bf6))
+* search highlight added ([97aa445](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/97aa445aa45387eacbe2215e874a87a98f76afcf))
+
+# [1.53.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.52.3...v1.53.0) (2026-01-15)
+
+
+### Features
+
+* add role based exploitation mode options ([2073aea](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/2073aea7ba48d53c9a0d2eda4d0637fef3c24c6a))
+
+## [1.52.3](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.52.2...v1.52.3) (2025-12-10)
+
+
+### Bug Fixes
+
+* update input validation for kmr field ([ab7ad11](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/ab7ad11aa7a03ea6cf75920872ec394c22fb13ab))
+
+## [1.52.2](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.52.1...v1.52.2) (2025-12-08)
+
+
+### Bug Fixes
+
+* update step param for model risk input; update xlxs cell process for model risk column ([6d56fca](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/6d56fcad2ca5ee24181607a3fdea379cddb163c9))
+
+## [1.52.1](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.52.0...v1.52.1) (2025-12-02)
+
+
+### Bug Fixes
+
+* update model_risk_coefficient column title ([c32edbb](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/c32edbbd6178b874da6c52786415ea0a16594eed))
+
+# [1.52.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.51.4...v1.52.0) (2025-12-01)
+
+
+### Bug Fixes
+
+* metrics ui and data fixed ([a543383](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/a54338355135fb4b60804d25b5be850b7ab69796))
+* update excelProcessCellCallback for model_risk_coefficient ([8f6d0fb](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/8f6d0fbfe222033b12a4f2d5b128d8e422b240da))
+
+
+### Features
+
+* add global excel export helper ([d12c9c1](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/d12c9c1a55c84f66cf9740dabaac0ee2c2f65763))
+* add new artefacts for monitoring to initialComuns ([09ddd7e](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/09ddd7e40edeaf5162319a9e77a76d0e07df6a3b))
+* add new artefacts to initialColumns ([71a9850](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/71a9850091d46317dc00b82ee46a566a914722bb))
+* update column type for check_objects_count ([927c587](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/927c58797bead4ea6599e7a8b9f8a5def797c5ff))
+* update model usage edit period params ([8c92d00](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/8c92d0008913dc4ac2929edff5d59ba91da466cf))
+* **model-risk:** implement model risk coefficient feature ([3ba7396](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/3ba7396e11f6b80bb9efeaedf461d94d004715f8))
+* **model-risk:** update model risk coef. artefact_type cast; improve model risk coef. input change logic ([e19c520](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/e19c5205e4cd99862ca32ba13098612b08adf883))
+
+## [1.51.4](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.51.3...v1.51.4) (2025-11-12)
+
+
+### Bug Fixes
+
+* enable model usage editing for 3Q and 4Q ([c0270c4](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/c0270c44a61777721f8fc111f8a7c9e651c4e2f9))
+
 ## [1.51.3](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.51.2...v1.51.3) (2025-11-01)
 
 

@@ -56,6 +56,7 @@ export interface SearchSelectProps {
   pendingTemplate?: Template;
   onChangeDropDownState?: (isOpen: boolean) => void;
   forcedOpen?: boolean;
+  fake?: boolean;
 }
 
 export const SearchSelect = ({
@@ -88,6 +89,7 @@ export const SearchSelect = ({
   onAddNewOption,
   pendingTemplate,
   onChangeDropDownState,
+  fake,
 }: SearchSelectProps) => {
   const [addedOptions, setAddedOptions] = useState<SelectOption[]>([]);
 
@@ -383,6 +385,7 @@ export const CustomSearchSelect = styled(SearchSelect)`
     box-sizing: border-box;
     margin-right: 12px;
     align-items: center;
+    pointer-events: ${(props) => (props.fake ? 'none' : 'auto')};
   }
 `;
 

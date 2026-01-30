@@ -134,6 +134,7 @@ type Row = ArtificialRow & {
   validation_result: string | null;
   model_name_dadm: string | null;
   validation_result_approve_date: string | null;
+  model_risk_coefficient: string | null;
   importance_changes: string | null;
   approve_importance: string | null;
   approve_importance_changes: string | null;
@@ -183,6 +184,25 @@ type Row = ArtificialRow & {
   allocation_assessment_parameters: string | null;
   operational_monitoring: string | null;
   analytical_monitoring: string | null;
+  project_ref: string | null;
+  dev_team: string | null;
+  deploy_team: string | null;
+  runtime_subsystem: string | null;
+  buiseness_process_name: string | null;
+  prom_datamart_name: string | null;
+  operational_control_epic: string | null;
+  operational_control_date: string | null;
+  analytical_control_epic: string | null;
+  analytical_control_date: string | null;
+  model_values_control_epic: string | null;
+  model_values_control_date: string | null;
+  impact_assessment_epic: string | null;
+  impact_assessment_date: string | null;
+  model_data_07k_control: string | null;
+  model_data_07k_control_epic: string | null;
+  model_data_control_date: string | null;
+  check_objects_count: string | null;
+  deploy_system: string | null;
 };
 
 type ColumnsFilter = Record<keyof Row, Array<string>>;

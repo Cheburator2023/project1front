@@ -36,6 +36,7 @@ interface FiltersActions {
   setTemplates: (templates: Template[]) => void;
   setColumnsFilters: (filters: Partial<ColumnsFilter>) => void;
   resetFilters: () => void;
+  resetFiltersKeepModelsDownloadingDate: () => void;
   updateModifiedFilters: () => void;
   getActiveTemplate: () => Template | undefined;
   getIsModifiedFilter: () => boolean;
@@ -158,4 +159,30 @@ export const useFiltersStore = create<FiltersStore>((set, get) => ({
       });
     }
   },
+
+  resetFiltersKeepModelsDownloadingDate: () => {
+    const { agGridApi } = useGlobalStore.getState();
+    const { modelsDownloadingDate } = get();
+    set({
+      filterModel: {},
+      sortState: [],
+      selectedIds: [],
+      topFilters: initialTopFilters,
+      firstDate: null,
+      secondDate: null,
+      modelsDownloadingDate,
+      modifiedFilters: new Set<string>(),
+      columnsFilters: {},
+    });
+
+    if (agGridApi) {
+      agGridApi.setFilterModel(null);
+      agGridApi.applyColumnState({
+        state: [],
+        defaultState: { sort: null, hide: false },
+        applyOrder: false,
+      });
+    }
+  },
 }));
+

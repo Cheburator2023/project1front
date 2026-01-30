@@ -6,9 +6,14 @@ import { modelsSelectOptions } from '@shared/constants';
 
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useCallback, useMemo } from 'react';
-import { useModelsControllerGetModels, useTemplatesControllerGetTemplates } from '@shared/api/generated/endpoints';
+import { parse, isValid } from 'date-fns';
+import {
+  useModelsControllerGetModels,
+  useTemplatesControllerGetTemplates,
+} from '@shared/api/generated/endpoints';
 import { getISODateFormat } from '@shared/helpers';
 import { useQueryClient } from '@tanstack/react-query';
+import { useRoles } from '@shared/hooks';
 import { Container, CustomDateField, FiltersDivider, FilterButton, FiltersBox } from '../styles';
 import { useGlobalStore } from '../../../shared/stores/globalStore';
 import { TemplatesPanel } from '../../TemplatesPanel/organisms/TemplatesPanel';
@@ -60,16 +65,46 @@ export const FiltersPanel = ({
     return Boolean(firstDate && secondDate);
   }, [firstDate, secondDate]);
 
-  const { exploitationModeOptions, selectedExploitationModes, updateSelectedExploitationModes } =
-    useExploitationModeStore();
+  const rolesRaw: any = useRoles();
+  const roles = useMemo(() => {
+    const r = Array.isArray(rolesRaw) ? rolesRaw : rolesRaw?.roles ?? rolesRaw?.roleNames ?? [];
+    const arr = Array.isArray(r) ? r.slice() : [];
+    arr.sort();
+    return arr;
+  }, [Array.isArray(rolesRaw) ? rolesRaw.join('|') : JSON.stringify(rolesRaw)]);
+
+  const {
+    exploitationModeOptions,
+    selectedExploitationModes,
+    updateSelectedExploitationModes,
+    setRoles,
+  } = useExploitationModeStore();
+
+  useEffect(() => {
+    setRoles(roles);
+  }, [setRoles, roles]);
 
   // Get templates loading state
-  const { isLoading: isTemplatesLoading } = useTemplatesControllerGetTemplates();
+  const { isLoading: isTemplatesLoading } = useTemplatesControllerGetTemplates({
+    mode: selectedExploitationModes,
+  });
 
   const fetchModelsByDate = useCallback(
     (date: string) => {
       const { selectedExploitationModes } = useExploitationModeStore.getState();
       setModelsDownloadingDate(date);
+
+      const isCompleteDate = (value: string) => {
+        if (!value) return false;
+        if (value.includes('_')) return false;
+        if (value.length !== 10) return false;
+        const parsed = parse(value, 'dd.MM.yyyy', new Date());
+        return isValid(parsed);
+      };
+
+      if (date && !isCompleteDate(date)) {
+        return;
+      }
 
       if (date) {
         setModelsParams({
@@ -155,7 +190,11 @@ export const FiltersPanel = ({
           selectedValues={topFilters.objectTypeRegistry}
           onChange={handleChange}
         />
-        <TemplatesFilterInput activeTemplate={activeTemplate} templates={templates} loading={isTemplatesLoading} />
+        <TemplatesFilterInput
+          activeTemplate={activeTemplate}
+          templates={templates}
+          loading={isTemplatesLoading}
+        />
         {compareMode ? (
           <>
             <CustomDateField
@@ -202,6 +241,7 @@ export const FiltersPanel = ({
               label="Выгрузка на определенную дату:"
               placeholder="Введите дату"
               dropContainerClassName="dropContainerClass"
+              displayClearIcon
               onChange={(e) => fetchModelsByDate(e.target.value)}
             />
           </>

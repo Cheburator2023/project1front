@@ -68,7 +68,8 @@ export const getStringValue = (value?: InputValue): string => {
   if (
     value?.type === INPUT_TYPE.STRING ||
     value?.type === INPUT_TYPE.TEXT_AREA ||
-    value?.type === INPUT_TYPE.PERCENT
+    value?.type === INPUT_TYPE.PERCENT ||
+    value?.type === INPUT_TYPE.MODEL_RISK
   ) {
     return value.value ?? '';
   }

@@ -32,6 +32,7 @@ import type {
   ModelsControllerGetModelsParams,
   ModelsUpdateDto,
   TemplateCreateDto,
+  TemplatesControllerGetTemplatesParams,
   TemplateUpdateDto,
 } from './models';
 
@@ -732,29 +733,37 @@ export function useModelsControllerGetModelHistory<
  * Возвращает список всех доступных шаблонов для текущего пользователя
  * @summary Получить список шаблонов
  */
-export const templatesControllerGetTemplates = (signal?: AbortSignal) => {
-  return customInstance<null>({ url: `/templates`, method: 'GET', signal });
+export const templatesControllerGetTemplates = (
+  params?: TemplatesControllerGetTemplatesParams,
+  signal?: AbortSignal,
+) => {
+  return customInstance<null>({ url: `/templates`, method: 'GET', params, signal });
 };
 
-export const getTemplatesControllerGetTemplatesQueryKey = () => {
-  return [`/templates`] as const;
+export const getTemplatesControllerGetTemplatesQueryKey = (
+  params?: TemplatesControllerGetTemplatesParams,
+) => {
+  return [`/templates`, ...(params ? [params] : [])] as const;
 };
 
 export const getTemplatesControllerGetTemplatesQueryOptions = <
   TData = Awaited<ReturnType<typeof templatesControllerGetTemplates>>,
   TError = ErrorType<unknown>,
->(options?: {
-  query?: Partial<
-    UseQueryOptions<Awaited<ReturnType<typeof templatesControllerGetTemplates>>, TError, TData>
-  >;
-}) => {
+>(
+  params?: TemplatesControllerGetTemplatesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof templatesControllerGetTemplates>>, TError, TData>
+    >;
+  },
+) => {
   const { query: queryOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getTemplatesControllerGetTemplatesQueryKey();
+  const queryKey = queryOptions?.queryKey ?? getTemplatesControllerGetTemplatesQueryKey(params);
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof templatesControllerGetTemplates>>> = ({
     signal,
-  }) => templatesControllerGetTemplates(signal);
+  }) => templatesControllerGetTemplates(params, signal);
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof templatesControllerGetTemplates>>,
@@ -772,6 +781,7 @@ export function useTemplatesControllerGetTemplates<
   TData = Awaited<ReturnType<typeof templatesControllerGetTemplates>>,
   TError = ErrorType<unknown>,
 >(
+  params: TemplatesControllerGetTemplatesParams | undefined,
   options: {
     query: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof templatesControllerGetTemplates>>, TError, TData>
@@ -791,6 +801,7 @@ export function useTemplatesControllerGetTemplates<
   TData = Awaited<ReturnType<typeof templatesControllerGetTemplates>>,
   TError = ErrorType<unknown>,
 >(
+  params?: TemplatesControllerGetTemplatesParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof templatesControllerGetTemplates>>, TError, TData>
@@ -810,6 +821,7 @@ export function useTemplatesControllerGetTemplates<
   TData = Awaited<ReturnType<typeof templatesControllerGetTemplates>>,
   TError = ErrorType<unknown>,
 >(
+  params?: TemplatesControllerGetTemplatesParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof templatesControllerGetTemplates>>, TError, TData>
@@ -825,6 +837,7 @@ export function useTemplatesControllerGetTemplates<
   TData = Awaited<ReturnType<typeof templatesControllerGetTemplates>>,
   TError = ErrorType<unknown>,
 >(
+  params?: TemplatesControllerGetTemplatesParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof templatesControllerGetTemplates>>, TError, TData>
@@ -832,7 +845,7 @@ export function useTemplatesControllerGetTemplates<
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-  const queryOptions = getTemplatesControllerGetTemplatesQueryOptions(options);
+  const queryOptions = getTemplatesControllerGetTemplatesQueryOptions(params, options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
     queryKey: DataTag<QueryKey, TData, TError>;

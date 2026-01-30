@@ -118,7 +118,7 @@ export type MetricsResponseType = {
 };
 
 export type Template = {
-  template_id: number;
+  template_id: number | string;
   user_id: string | null;
   group_id?: number;
   template_name: string;
@@ -175,6 +175,7 @@ export enum ArtifactType {
   NUMBER = 'number',
   USER = 'user',
   RFD = 'rfd',
+  MODEL_RISK_COEFFICIENT = 'model_risk_coefficient',
 }
 
 export type ArtifactTypeUnion = `${ArtifactType}`;
