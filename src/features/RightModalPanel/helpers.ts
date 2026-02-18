@@ -1122,10 +1122,20 @@ const getProperFormatValueForSubmit = (inputValue: InputValue) => {
   }
 };
 
-const getArtifactApiItems = (values?: FormValues, parentModelId?: string) => {
-  const artifactApiItems = Object.entries(values ?? {}).reduce(
-    (bodyItems, [fieldName, value]): any => {
-      if (value === null || value === undefined) {
+const getArtifactApiItems = (
+  values?: FormValues, 
+  parentModelId?: string, 
+  changedFields?: Array<keyof Row>
+) => {
+  const fieldsToProcess = changedFields?.length 
+    ? changedFields 
+    : Object.keys(values ?? {}) as Array<keyof Row>;
+
+  const artifactApiItems = fieldsToProcess.reduce(
+    (bodyItems, fieldName): any => {
+      const value = values?.[fieldName];
+      
+      if (!value || (typeof value === 'object' && Object.keys(value).length === 0)) {
         return bodyItems;
       }
 

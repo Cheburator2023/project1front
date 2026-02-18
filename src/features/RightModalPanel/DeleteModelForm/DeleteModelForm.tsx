@@ -275,7 +275,7 @@ export const DeleteModelForm = ({
         return;
       }
 
-      const artifactApiItems = getArtifactApiItems(valuesWithAddedOutsideControls, parentModelId);
+      const artifactApiItems = getArtifactApiItems(valuesWithAddedOutsideControls, parentModelId, []);
 
       let newRow: CustomError | Row | ArtifactApi[] | undefined;
 

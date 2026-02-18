@@ -86,6 +86,7 @@ export const ModelForm = ({
   const [values, setValues] = useState<FormValues | undefined>();
   const [invalidFields, setInvalidFields] = useState<Array<keyof Row>>([]);
   const [dirtyFields, setDirtyFields] = useState<Array<keyof Row>>([]);
+  const [changedFields, setChangedFields] = useState<Array<keyof Row>>([]);
   const [parentModelId, setParentModelId] = useState<string>();
   const [selectedColSize, setSelectedColSize] = useState<string>('2');
   const [submitLoading, setSubmitLoading] = useState(false);
@@ -246,6 +247,14 @@ export const ModelForm = ({
     });
 
     setDirtyFields((prevDirtyFields) => [...prevDirtyFields, name]);
+    
+    // Отслеживаем измененные поля
+    setChangedFields((prevChangedFields) => {
+      if (!prevChangedFields.includes(name)) {
+        return [...prevChangedFields, name];
+      }
+      return prevChangedFields;
+    });
 
     setValues((prevValues) => ({ ...prevValues, ...newValues }));
   };
@@ -384,6 +393,7 @@ export const ModelForm = ({
       const artifactApiItems = getArtifactApiItems(
         valuesWithAddedOutsideControls as any,
         parentModelId,
+        changedFields,
       );
 
       // TODO: check this type
@@ -446,6 +456,7 @@ export const ModelForm = ({
   const handleOnClose = useCallback(() => {
     setValues({});
     setInvalidFields([]);
+    setChangedFields([]);
     setParentModelId(undefined);
 
     onClose();
