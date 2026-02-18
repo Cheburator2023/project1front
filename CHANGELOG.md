@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.57.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.56.0...v1.57.0) (2026-02-18)
+
+
+### Features
+
+* оптимизация отправки данных модели ([83aa0b3](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/83aa0b3d2b71445cf1a4af67230df056e6b1f384))
+
 # [1.56.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.55.0...v1.56.0) (2026-01-28)
 
 
