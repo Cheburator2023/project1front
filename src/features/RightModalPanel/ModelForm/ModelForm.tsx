@@ -8,11 +8,12 @@ import { Row } from '@shared/types';
 import { StatusScreen } from '@shared/ui/molecules';
 import { MODEL_FORM_MODE, initialColumns } from '@shared/constants';
 import { INPUT_TYPE, InputFactory, InputValue, RightPanel } from '@shared/ui/organisms';
-import { ArtifactApi, ModelEditApi } from '@shared/api';
+import { ArtifactApi, ModelEditApi, ArtifactBlockListResponse } from '@shared/api';
 import {
   useModelsControllerUpdateModels,
   useModelsControllerCreateModel,
   useModelsControllerGetModels,
+  useArtefactsControllerGetBlockList,
 } from '@shared/api/generated/endpoints';
 import { usePermissions, useRoles } from '@src/shared/hooks';
 
@@ -71,6 +72,9 @@ export const ModelForm = ({
   });
 
   const modelsData = _modelsData as ModelsResponseType | undefined;
+
+  const { data: blockedArtifactsResponse } = useArtefactsControllerGetBlockList(activeRow?.system_model_id ?? '');
+  const _blockedArtifactsList = blockedArtifactsResponse as ArtifactBlockListResponse | undefined;
 
   const isUpdateLoading = updateModelsMutation.isPending;
   const isCreateLoading = createModelMutation.isPending;
@@ -156,7 +160,14 @@ export const ModelForm = ({
   const IS_FORM_MODE_ADD = formMode === MODEL_FORM_MODE.ADD;
   const title = IS_FORM_MODE_ADD ? 'Новая модель' : 'Редактирование модели';
 
-  const groupedFieldsBySchemaName = groupBy(fields, 'schemaKey');
+  const refinedFields = fields.map((field) => {
+    if (_blockedArtifactsList?.data?.includes(field.name)) {
+      field.disabled = true;
+    }
+    return field;
+  });
+
+  const groupedFieldsBySchemaName = groupBy(refinedFields, 'schemaKey');
   console.log('🐸 Pepe said >> ModelForm >> groupedFieldsBySchemaName:', groupedFieldsBySchemaName);
 
 
@@ -265,7 +276,7 @@ export const ModelForm = ({
         if (completesConditionField?.connectedName) {
           let autoCompletedField = {};
 
-          const connectedField = fields.find((_field) => {
+          const connectedField = refinedFields.find((_field) => {
             return _field.name === completesConditionField?.connectedName;
           });
 
@@ -300,7 +311,7 @@ export const ModelForm = ({
         }
       });
     }, 100);
-  }, [completesConditionFields, fields]);
+  }, [completesConditionFields, refinedFields]);
 
   const checkAllocationFieldsChanged = () => {
     const fieldsChanged = ALLOCATION_FIELDS_NAMES_USAGE.some((fieldName) => {
@@ -361,7 +372,8 @@ export const ModelForm = ({
         formSchema,
         valuesWithAddedOutsideControls as any,
         wasPreviouslyActiveModel,
-        fields,
+        refinedFields,
+        initialRow
       );
 
       const { fieldsChanged, sumValid } = checkAllocationFieldsChanged();
@@ -377,7 +389,7 @@ export const ModelForm = ({
 
       setInvalidFields(fieldsChanged ? [] : newInvalidFields);
       scrollToActiveError();
-      setDirtyFields((prevDirtyFields) => [...prevDirtyFields, fields[0].name]);
+      setDirtyFields((prevDirtyFields) => [...prevDirtyFields, refinedFields[0].name]);
 
       console.log('📝 FORM LOGS: >> newInvalidFields:', newInvalidFields);
 
@@ -432,7 +444,7 @@ export const ModelForm = ({
         });
       }
     },
-    [values, formSchema, formMode, activeModelByDefault, hasNoAccessToActiveModel, fields],
+    [values, formSchema, formMode, activeModelByDefault, hasNoAccessToActiveModel, refinedFields, initialRow],
   );
 
   const handleChangeParentModel = useCallback(
@@ -574,11 +586,12 @@ export const ModelForm = ({
         formSchema,
         values,
         wasPreviouslyActiveModel,
-        fields,
+        refinedFields,
+        initialRow
       );
       setInvalidFields(newInvalidFields);
     }
-  }, [values, dirtyFields, formSchema, wasPreviouslyActiveModel, fields]);
+  }, [values, dirtyFields, formSchema, wasPreviouslyActiveModel, refinedFields, initialRow]);
 
   return (
     <RightPanel
