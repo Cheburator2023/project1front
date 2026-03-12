@@ -46,6 +46,7 @@ import {
   RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA,
   REST_MODEL_SCHEMA,
   SCHEMA_NAME_MAP,
+  SUM_ARTEFACTS,
 } from './ModelForm/constants';
 import { DELETE_CONFIRM_MODEL_SCHEMA, DELETE_MODEL_SCHEMA } from './DeleteModelForm/constants';
 
@@ -1033,6 +1034,7 @@ const getInvalidFields = (
   values?: FormValues,
   wasPreviouslyActiveModel?: boolean,
   fields?: FormFields,
+  initialRow?: Partial<Row>
 ) => {
   return activeFormSchema
     .filter((schemaField) => {
@@ -1073,6 +1075,15 @@ const getInvalidFields = (
         return true;
       }
 
+      // Только для СУМ моделей, если значение артефакта из СУМ уже есть и оно не null, запрещаем менять на null
+      if (initialRow?.model_source === ModelSource.SUM 
+        && initialRow[field.name]
+        && SUM_ARTEFACTS.includes(field.name) 
+        && !formValue 
+      ) {
+        return true;
+      }
+      
       return false;
     })
     .map(({ name }) => name);

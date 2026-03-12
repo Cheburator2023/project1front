@@ -281,3 +281,6 @@ export type ReportApi = {
   filters: Partial<ColumnsFilter>;
 };
 
+export type ArtifactBlockListResponse = {
+  data?: Array<string>;
+};
