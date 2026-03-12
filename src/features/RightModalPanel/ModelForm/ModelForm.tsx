@@ -22,11 +22,12 @@ import {
   InputValue,
   RightPanel,
 } from '@shared/ui/organisms';
-import { ArtifactApi, ModelEditApi } from '@shared/api';
+import { ArtifactApi, ModelEditApi, ArtifactBlockListResponse } from '@shared/api';
 import {
   useModelsControllerUpdateModels,
   useModelsControllerCreateModel,
   useModelsControllerGetModels,
+  useArtefactsControllerGetBlockList,
 } from '@shared/api/generated/endpoints';
 import { usePermissions, useRoles } from '@src/shared/hooks';
 
@@ -90,6 +91,9 @@ export const ModelForm = ({
   });
 
   const modelsData = _modelsData as ModelsResponseType | undefined;
+
+  const { data: blockedArtifactsResponse } = useArtefactsControllerGetBlockList(activeRow?.system_model_id ?? '');
+  const _blockedArtifactsList = blockedArtifactsResponse as ArtifactBlockListResponse | undefined;
 
   const isUpdateLoading = updateModelsMutation.isPending;
   const isCreateLoading = createModelMutation.isPending;
@@ -207,7 +211,14 @@ export const ModelForm = ({
   // Раньше здесь был слой applyBlockListRespectingApiFlags + запрос /artefacts/block-list/:id.
   // Эндпоинт был мёртвый (на бэке он только возвращал пустой массив), а update_date уже
   // принудительно disabled в isFieldDisabled (см. helpers.ts). Теперь просто используем fields как есть.
-  const refinedFields = fields;
+  // Вернул обработку списка заблокированных артефактов из сума
+  const refinedFields = fields.map((field) => {
+    if (_blockedArtifactsList?.data?.includes(field.name)) {
+      field.disabled = true;
+    }
+    return field;
+  });
+
 
   const refinedFieldsRef = useRef(refinedFields);
   refinedFieldsRef.current = refinedFields;

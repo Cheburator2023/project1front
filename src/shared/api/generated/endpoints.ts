@@ -2350,6 +2350,132 @@ export function useArtefactsControllerGetArtefacts<
 }
 
 /**
+ * Возвращает список всех заблокированных артефактов для текущей модели
+ * @summary Получить список заблокированных артефактов
+ */
+export const artefactsControllerGetBlockList = (modelId: string, signal?: AbortSignal) => {
+  return customInstance<null>({
+    url: `/artefacts/block-list/${modelId}`,
+    method: 'GET',
+    signal,
+  });
+};
+
+export const getArtefactsControllerGetBlockListQueryKey = (modelId?: string) => {
+  return [`/artefacts/block-list/${modelId}`] as const;
+};
+
+export const getArtefactsControllerGetBlockListQueryOptions = <
+  TData = Awaited<ReturnType<typeof artefactsControllerGetBlockList>>,
+  TError = ErrorType<null>,
+>(
+  modelId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof artefactsControllerGetBlockList>>, TError, TData>
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getArtefactsControllerGetBlockListQueryKey(modelId);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof artefactsControllerGetBlockList>>> = ({
+    signal,
+  }) => artefactsControllerGetBlockList(modelId, signal);
+
+  return { queryKey, queryFn, enabled: !!modelId, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof artefactsControllerGetBlockList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ArtefactsControllerGetBlockListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof artefactsControllerGetBlockList>>
+>;
+export type ArtefactsControllerGetBlockListQueryError = ErrorType<null>;
+
+export function useArtefactsControllerGetBlockList<
+  TData = Awaited<ReturnType<typeof artefactsControllerGetBlockList>>,
+  TError = ErrorType<null>,
+>(
+  modelId: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof artefactsControllerGetBlockList>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof artefactsControllerGetBlockList>>,
+          TError,
+          Awaited<ReturnType<typeof artefactsControllerGetBlockList>>
+        >,
+        'initialData'
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useArtefactsControllerGetBlockList<
+  TData = Awaited<ReturnType<typeof artefactsControllerGetBlockList>>,
+  TError = ErrorType<null>,
+>(
+  modelId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof artefactsControllerGetBlockList>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof artefactsControllerGetBlockList>>,
+          TError,
+          Awaited<ReturnType<typeof artefactsControllerGetBlockList>>
+        >,
+        'initialData'
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useArtefactsControllerGetBlockList<
+  TData = Awaited<ReturnType<typeof artefactsControllerGetBlockList>>,
+  TError = ErrorType<null>,
+>(
+  modelId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof artefactsControllerGetBlockList>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Получить список заблокированных артефактов
+ */
+
+export function useArtefactsControllerGetBlockList<
+  TData = Awaited<ReturnType<typeof artefactsControllerGetBlockList>>,
+  TError = ErrorType<null>,
+>(
+  modelId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof artefactsControllerGetBlockList>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getArtefactsControllerGetBlockListQueryOptions(modelId, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
  * Генерирует Excel отчет на основе указанных фильтров
  * @summary Сгенерировать отчет
  */
