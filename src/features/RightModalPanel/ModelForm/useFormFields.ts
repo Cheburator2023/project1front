@@ -29,8 +29,8 @@ export const useFormFields = ({
   values,
 }: UseFormFieldsProps) => {
   const [fields, setFields] = useState<FormFields>([]);
-  const { isValidator, isValidatorLead } = useRoles();
-  const canEditModelRiskByRole = isValidator || isValidatorLead;
+  const { isValidator, isValidatorLead, isBusinessCustomer } = useRoles();
+  const canEditModelRiskByRole = isValidator || isValidatorLead || isBusinessCustomer;
 
   useDeepEffect(() => {
     const newFields = getFormFields({
@@ -64,3 +64,4 @@ export const useFormFields = ({
     fields: orderedFields,
   };
 };
+
