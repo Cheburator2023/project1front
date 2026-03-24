@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.57.1](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.57.0...v1.57.1) (2026-03-24)
+
+
+### Bug Fixes
+
+* добавлена роль isBusinessCustomer для редактирования модели риска ([36799b2](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/36799b24ffc685ea824c809ceaad32897f0e9a32))
+
 # [1.57.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.56.0...v1.57.0) (2026-02-18)
 
 
