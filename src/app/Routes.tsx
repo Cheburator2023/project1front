@@ -4,10 +4,12 @@ import { Navigate, useRoutes } from 'react-router-dom';
 import { ChartsDashboardPage, ChartsDashboardPageBI, HomePage } from '@pages';
 import { Playground } from '@pages/Playground';
 import { CompareModelsPage } from '../pages/CompareModelsPage/CompareModelsPage';
+import { AllocationConfirmationPage } from '../features/AllocationConfirmation/pages/AllocationConfirmationPage';
 
 export const ROUTES = {
   HOME: '/',
   COMPARE_MODELS: '/compare-models',
+  ALLOCATION_CONFIRMATION: '/allocation-confirmation',
   MF_HOME_ROUTE: '/sum-rm',
   CHARTS: 'charts',
   CHARTS_BI: 'charts_bi',
@@ -39,6 +41,10 @@ const ROUTE_MAP = [
   {
     path: ROUTES.PLAYGROUND,
     element: <Playground />,
+  },
+  {
+    path: ROUTES.ALLOCATION_CONFIRMATION,
+    element: <AllocationConfirmationPage />,
   },
   {
     path: '*',

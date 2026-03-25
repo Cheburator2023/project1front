@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { format } from 'date-fns';
 import { Link, useNavigate } from 'react-router-dom';
 import Keycloak from 'keycloak-js';
@@ -9,13 +9,11 @@ import { ReactComponent as ExitIcon } from '@admiral-ds/icons/build/system/ExitS
 import { ReactComponent as ArrowsHorizontalOutline } from '@admiral-ds/icons/build/system/ArrowsHorizontalOutline.svg';
 import { ReactComponent as PersonSolid } from '@admiral-ds/icons/build/system/PersonSolid.svg';
 
-import { Loading, Tooltip } from '@shared/ui/atoms';
 import { IconButton } from '@shared/ui/molecules';
-import { ReportApi } from '@shared/api';
-import { useReportsControllerGetReport } from '@shared/api/generated/endpoints';
-import { useModelRiskReport } from '@shared/hooks';
+import { useModelRiskReport, useRoles } from '@shared/hooks';
 
 import { useExploitationModeStore } from '@src/shared/stores';
+
 import { ReactComponent as LogoIcon } from './logo.svg';
 import { ColumnsFilter } from '../shared/types';
 import { ROUTES } from './Routes';
@@ -87,9 +85,8 @@ interface HeaderProps {
 
 const Header = ({ user, downloadReportStatus, onLogout }: HeaderProps) => {
   const { agGridApi } = useGlobalStore();
-  const selectedExploitationModes = useExploitationModeStore(
-    (state) => state.selectedExploitationModes,
-  );
+  const { isBusinessCustomer } = useRoles();
+  const navigate = useNavigate();
 
   const { downloadReport: downloadModelRiskReport, isDownloading: isDownloadingKMR } =
     useModelRiskReport();
@@ -152,12 +149,18 @@ const Header = ({ user, downloadReportStatus, onLogout }: HeaderProps) => {
               skipColumnHeaders: false,
               // Use current column widths and order
               allColumns: false,
-              ...defaultExcelExportParams
+              ...defaultExcelExportParams,
             });
           }}
         >
           <T font="Button/Button 2">Выгрузить отчет</T>
         </CustomButton>
+
+        {isBusinessCustomer && (
+          <CustomButton dimension="s" onClick={() => navigate(ROUTES.ALLOCATION_CONFIRMATION)}>
+            <T font="Button/Button 2">Подтвердить аллокацию за квартал</T>
+          </CustomButton>
+        )}
 
         <CustomButton
           title="Перейти в СУМ"
