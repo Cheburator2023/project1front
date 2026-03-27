@@ -280,9 +280,15 @@ export const ModelForm = ({
             !connectedField?.disabled &&
             connectedArtifactOption?.artefact_value === completesConditionField?.connectedValue
           ) {
+            // When connectedField is not rendered (e.g. rating_model in ADD mode with BASE_MODEL_SCHEMA),
+            // infer SELECT type from artefact_value_id presence to avoid String({…}) = '[object Object]'
+            const inferredType =
+              connectedField?.type ??
+              (connectedArtifactOption?.artefact_value_id != null ? INPUT_TYPE.SELECT : undefined);
+
             autoCompletedField = {
               [completesConditionField.connectedName]: {
-                type: connectedField?.type,
+                type: inferredType,
                 value: {
                   id: `${connectedArtifactOption?.artefact_value_id}`,
                   text: `${connectedArtifactOption?.artefact_value}`,
@@ -291,6 +297,11 @@ export const ModelForm = ({
             };
 
             setValues((prevValues) => ({ ...prevValues, ...autoCompletedField }));
+            setChangedFields((prevChangedFields) =>
+              prevChangedFields.includes(completesConditionField.connectedName as keyof Row)
+                ? prevChangedFields
+                : [...prevChangedFields, completesConditionField.connectedName as keyof Row],
+            );
           }
           if (connectedField?.disabled) {
             setValues((prevValues) => ({
@@ -432,7 +443,22 @@ export const ModelForm = ({
         });
       }
     },
-    [values, formSchema, formMode, activeModelByDefault, hasNoAccessToActiveModel, fields],
+    [
+      values,
+      formSchema,
+      activeModelByDefault,
+      hasNoAccessToActiveModel,
+      fields,
+      changedFields,
+      parentModelId,
+      IS_FORM_MODE_ADD,
+      initialRow,
+      onSubmit,
+      scrollToActiveError,
+      wasPreviouslyActiveModel,
+      createModelMutation,
+      updateModelsMutation,
+    ],
   );
 
   const handleChangeParentModel = useCallback(
@@ -464,6 +490,11 @@ export const ModelForm = ({
 
   const activeModelCheckboxHandler = async (e: any) => {
     setActiveModelByDefault(e?.target?.checked);
+    setChangedFields((prevChangedFields) =>
+      prevChangedFields.includes('active_model')
+        ? prevChangedFields
+        : [...prevChangedFields, 'active_model'],
+    );
 
     await handleSubmit({ checkOnly: true });
   };

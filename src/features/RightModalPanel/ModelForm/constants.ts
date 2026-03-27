@@ -321,6 +321,7 @@ export const ACTIVE_MODEL_SCHEMA: FormFieldsSchema = [
   {
     name: 'update_date',
     required: false,
+    alwaysDisabled: true,
     customers: [CUSTOMER_MAP.UMRV],
   },
 ];
@@ -925,6 +926,7 @@ export const REST_MODEL_SCHEMA: FormFieldsSchema = [
   name: item.name,
   maxLength: item.maxLength,
   required: false,
+  alwaysDisabled: item.alwaysDisabled,
   customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
 }));
 

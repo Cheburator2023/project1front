@@ -456,7 +456,9 @@ const getDisabledStatus = (minDate: Date, maxDate: Date, quarter: number, canEdi
 
 const canEditArtefact = (artifact?: Artifact, row?: Partial<Row>): boolean => {
   if (!artifact) return false;
-  if (!row) return true;
+  if (!row) {
+    return artifact.is_editable_by_role_sum_rm === '1';
+  }
 
   const isEditableBySum = artifact.is_editable_by_role_sum === '1';
   const isEditableBySumRm = artifact.is_editable_by_role_sum_rm === '1';
