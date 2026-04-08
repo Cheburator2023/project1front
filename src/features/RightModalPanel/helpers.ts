@@ -462,11 +462,14 @@ const canEditArtefact = (artifact?: Artifact, row?: Partial<Row>): boolean => {
 
   const isEditableBySum = artifact.is_editable_by_role_sum === '1';
   const isEditableBySumRm = artifact.is_editable_by_role_sum_rm === '1';
-
+  
   switch (row.model_source) {
     case ModelSource.SUM:
       return isEditableBySum;
     case ModelSource.SUM_RM:
+    case 'sum_rm':
+    case 'sum-rm':
+    case 'rm':
       return isEditableBySumRm;
     default:
       return false;
