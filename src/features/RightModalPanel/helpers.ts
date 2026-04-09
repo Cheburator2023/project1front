@@ -477,6 +477,48 @@ const canEditArtefact = (artifact?: Artifact, row?: Partial<Row>): boolean => {
   }
 };
 
+const debugFieldAccess = ({
+  artifact,
+  row,
+  canEdit,
+  isDisabled,
+}: {
+  artifact: Artifact;
+  row?: Partial<Row>;
+  canEdit: boolean;
+  isDisabled: boolean | undefined;
+}) => {
+  if (typeof window === 'undefined') return;
+
+  const watchedFieldsRaw = window.localStorage.getItem('rightModalDebugFields');
+  if (!watchedFieldsRaw) return;
+
+  const watchedFields = watchedFieldsRaw
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
+  if (!watchedFields.includes(artifact.artefact_tech_label)) return;
+
+  // eslint-disable-next-line no-console
+  console.log('[RightModalPanel access debug]', {
+    field: artifact.artefact_tech_label,
+    model_source: row?.model_source,
+    is_edit_flg: artifact.is_edit_flg,
+    is_editable_by_role_sum: artifact.is_editable_by_role_sum,
+    is_editable_by_role_sum_rm: artifact.is_editable_by_role_sum_rm,
+    canEdit,
+    disabled: isDisabled,
+  });
+  // eslint-disable-next-line no-console
+  console.log(
+    `[RightModalPanel access debug compact] field=${artifact.artefact_tech_label} source=${
+      row?.model_source || ''
+    } canEdit=${String(canEdit)} disabled=${String(isDisabled)} NO_ROLES=${String(
+      process.env.NO_ROLES,
+    )}`,
+  );
+};
+
 const isFieldDisabled = (
   values?: FormValues,
   fieldSchema?: FormFieldsSchema[number],
@@ -524,6 +566,7 @@ const mapArtifactToField = (
 ): InputFactoryProps<keyof Row> => {
   const canEdit = process.env.NO_ROLES === 'true' || canEditArtefact(artifact, activeRow);
   let isDisabled = isFieldDisabled(values, fieldSchema, artifact, activeRow, canEdit);
+  debugFieldAccess({ artifact, row: activeRow, canEdit, isDisabled });
 
   // Extra gating: only validators can edit model_risk_type in UI
   if (artifact.artefact_tech_label === 'model_risk_type' && canEditModelRiskByRole === false) {

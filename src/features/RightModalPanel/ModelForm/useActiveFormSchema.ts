@@ -39,6 +39,7 @@ const getUnionSchema = (firstSchema: FormFieldsSchema, secondSchema: FormFieldsS
     // push if index not found in first schema from second
     if (indexUnionSchemaItem === -1) {
       unionSchema.push(secondSchemaItem);
+      return;
     }
 
     unionSchema[indexUnionSchemaItem] = secondSchemaItem;
