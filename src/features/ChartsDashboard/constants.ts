@@ -686,9 +686,10 @@ const initialChartDistributionByLifecycleStageModels = (): Highcharts.Options & 
     formatter: function (this: any) {
       const point = this.point;
       const value = point.y;
+      const stageName = point.name || point.key || point.category || 'Нет данных';
       const formattedValue = value.toLocaleString();
 
-      return `<span class="tooltip-key">${point.key}</span><br/>
+      return `<span class="tooltip-key">${stageName}</span><br/>
               <span class="tooltip-value">${formattedValue} моделей</span>`;
     },
   },
@@ -748,4 +749,3 @@ export {
   metricLabelMap,
   metricsOptions,
 };
-
