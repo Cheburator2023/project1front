@@ -405,6 +405,7 @@ export const ModelForm = ({
         valuesWithAddedOutsideControls as any,
         parentModelId,
         changedFields,
+        ['active_model'],
       );
 
       // TODO: check this type

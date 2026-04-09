@@ -483,6 +483,11 @@ const isFieldDisabled = (
   row?: Partial<Row> | undefined,
   canEdit?: boolean,
 ): boolean | undefined => {
+  // Reporting date is system-managed and should never be editable in the form.
+  if (artifact?.artefact_tech_label === 'update_date') {
+    return true;
+  }
+
   if (fieldSchema?.alwaysDisabled) {
     return true;
   }
@@ -1076,6 +1081,26 @@ const getInvalidFields = (
 const getProperFormatValueForSubmit = (inputValue: InputValue) => {
   const { type, value } = inputValue;
 
+  // Defensive fallback for auto-filled select values that can occasionally
+  // lose explicit INPUT_TYPE.SELECT during derived form updates.
+  if (
+    type !== INPUT_TYPE.SELECT &&
+    !Array.isArray(value) &&
+    value &&
+    typeof value === 'object' &&
+    'id' in (value as any) &&
+    'text' in (value as any)
+  ) {
+    const normalizedValue = value as { id?: string | number; text?: string };
+    return {
+      artefact_string_value: normalizedValue.text ?? '',
+      artefact_value_id:
+        normalizedValue.id === undefined || normalizedValue.id === null
+          ? null
+          : Number(normalizedValue.id),
+    };
+  }
+
   switch (type) {
     case INPUT_TYPE.DATE:
     case INPUT_TYPE.QUARTERLY_DATE:
@@ -1130,11 +1155,13 @@ const getProperFormatValueForSubmit = (inputValue: InputValue) => {
 const getArtifactApiItems = (
   values?: FormValues, 
   parentModelId?: string, 
-  changedFields?: Array<keyof Row>
+  changedFields?: Array<keyof Row>,
+  forceIncludeFields: Array<keyof Row> = []
 ) => {
-  const fieldsToProcess = changedFields?.length 
-    ? changedFields 
-    : Object.keys(values ?? {}) as Array<keyof Row>;
+  const baseFieldsToProcess = changedFields?.length
+    ? changedFields
+    : (Object.keys(values ?? {}) as Array<keyof Row>);
+  const fieldsToProcess = uniqBy([...baseFieldsToProcess, ...forceIncludeFields], String);
 
   const artifactApiItems = fieldsToProcess.reduce(
     (bodyItems, fieldName): any => {
