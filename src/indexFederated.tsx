@@ -9,7 +9,8 @@ import App from './app/App';
 import { themes } from './app/theme/theme';
 
 import { T_CONFIG_MAP, T_KEYCLOAK_USER } from './shared/types/infra';
-import { ColumnsFilter, Permission, Role } from './shared/types';
+import { ColumnsFilter, Permission } from './shared/types';
+import { keycloakGroupsToRoles } from './shared/helpers';
 import { useFetchStore, useGlobalStore, useUserStore } from './shared/stores';
 import { CUSTOMER_MAP } from './shared/constants/customers';
 import { Flexbox, Loading } from './shared/ui/atoms';
@@ -55,6 +56,9 @@ const MfeRoot = (props: MFProps) => {
         user?.groups?.toString().includes('ds_validator') ||
         user?.groups?.toString().includes('validator_lead') ||
         user?.groups?.toString().includes('business_customer') ||
+        user?.groups?.toString().includes('test_validator_lead') ||
+        user?.groups?.toString().includes('test_validator') ||
+        user?.groups?.toString().includes('test_business_customer') ||
         user?.groups?.toString().includes('Validator_lead')
       ) {
         setCurrentCustomer(CUSTOMER_MAP.UMRV);
@@ -70,10 +74,7 @@ const MfeRoot = (props: MFProps) => {
     if (user?.groups) {
       setGroups(user.groups);
 
-      const roles = user.groups.filter((group) =>
-        Object.values(Role).includes(group as Role),
-      ) as Role[];
-      setRoles(roles);
+      setRoles(keycloakGroupsToRoles(user.groups));
     }
 
     if (user?.realm_access?.roles) {
