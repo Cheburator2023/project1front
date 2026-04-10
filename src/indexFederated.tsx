@@ -56,9 +56,6 @@ const MfeRoot = (props: MFProps) => {
         user?.groups?.toString().includes('ds_validator') ||
         user?.groups?.toString().includes('validator_lead') ||
         user?.groups?.toString().includes('business_customer') ||
-        user?.groups?.toString().includes('test_validator_lead') ||
-        user?.groups?.toString().includes('test_validator') ||
-        user?.groups?.toString().includes('test_business_customer') ||
         user?.groups?.toString().includes('Validator_lead')
       ) {
         setCurrentCustomer(CUSTOMER_MAP.UMRV);
