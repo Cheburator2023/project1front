@@ -457,13 +457,14 @@ const getDisabledStatus = (minDate: Date, maxDate: Date, quarter: number, canEdi
 
 const canEditArtefact = (artifact?: Artifact, row?: Partial<Row>): boolean => {
   if (!artifact) return false;
-  if (!row) {
-    return artifact.is_editable_by_role_sum_rm === '1';
-  }
 
   const isEditableBySum = artifact.is_editable_by_role_sum === '1';
   const isEditableBySumRm = artifact.is_editable_by_role_sum_rm === '1';
-  
+
+  if (!row) {
+    return isEditableBySumRm || isEditableBySum;
+  }
+
   switch (row.model_source) {
     case ModelSource.SUM:
       return isEditableBySum;
@@ -471,7 +472,9 @@ const canEditArtefact = (artifact?: Artifact, row?: Partial<Row>): boolean => {
     case 'sum_rm':
     case 'sum-rm':
     case 'rm':
-      return isEditableBySumRm;
+      // Бэкенд считает флаги по bucket’ам sum vs sum_rm в artefact_source_roles.
+      // На стендах часто есть только строка model_source=sum без rm/sum_rm — тогда sum_rm-флаг 0, хотя по смыслу поле доступно.
+      return isEditableBySumRm || isEditableBySum;
     default:
       return false;
   }
