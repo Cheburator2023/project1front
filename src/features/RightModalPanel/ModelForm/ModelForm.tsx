@@ -193,15 +193,39 @@ export const ModelForm = ({
   const IS_FORM_MODE_ADD = formMode === MODEL_FORM_MODE.ADD;
   const title = IS_FORM_MODE_ADD ? 'Новая модель' : 'Редактирование модели';
 
-  const refinedFields = fields.map((field) => {
-    if (field.name === 'update_date') {
-      return { ...field, disabled: true };
-    }
-    if (_blockedArtifactsList?.data?.includes(field.name)) {
-      return { ...field, disabled: true };
-    }
-    return field;
-  });
+  const refinedFields = useMemo(
+    () =>
+      fields.map((field) => {
+        if (field.name === 'update_date') {
+          return { ...field, disabled: true };
+        }
+        if (_blockedArtifactsList?.data?.includes(field.name)) {
+          return { ...field, disabled: true };
+        }
+        return field;
+      }),
+    [fields, _blockedArtifactsList?.data],
+  );
+
+  const refinedFieldsRef = useRef(refinedFields);
+  refinedFieldsRef.current = refinedFields;
+
+  const completesConditionFieldsRef = useRef(completesConditionFields);
+  completesConditionFieldsRef.current = completesConditionFields;
+
+  /** Стабильная подпись, иначе новый [] по ссылке на каждом рендере крутит useLayoutEffect бесконечно */
+  const completesConditionSignature = useMemo(
+    () =>
+      completesConditionFields?.length
+        ? JSON.stringify(
+            completesConditionFields.map(({ connectedName, connectedValue }) => ({
+              connectedName,
+              connectedValue,
+            })),
+          )
+        : '',
+    [completesConditionFields],
+  );
 
   const groupedFieldsBySchemaName = groupBy(refinedFields, 'schemaKey');
   console.log('🐸 Pepe said >> ModelForm >> groupedFieldsBySchemaName:', groupedFieldsBySchemaName);
@@ -309,56 +333,81 @@ export const ModelForm = ({
   };
 
   useLayoutEffect(() => {
-    completesConditionFields?.map((completesConditionField) => {
-      if (completesConditionField?.connectedName) {
-        let autoCompletedField = {};
+    const list = completesConditionFieldsRef.current;
+    if (!list?.length) {
+      return;
+    }
 
-        const connectedField = refinedFields.find((_field) => {
-          return _field.name === completesConditionField?.connectedName;
+    const refined = refinedFieldsRef.current;
+
+    list.forEach((completesConditionField) => {
+      if (!completesConditionField?.connectedName) {
+        return;
+      }
+
+      const connectedField = refined.find(
+        (_field) => _field.name === completesConditionField.connectedName,
+      );
+
+      const artifact = artifacts.find(
+        (_artifact) => _artifact.artefact_tech_label === completesConditionField.connectedName,
+      );
+      const connectedArtifactOption = artifact?.values?.find(
+        (option) => option.artefact_value === completesConditionField.connectedValue,
+      );
+
+      if (
+        !connectedField?.disabled &&
+        connectedArtifactOption?.artefact_value === completesConditionField.connectedValue
+      ) {
+        const inferredType = connectedField?.type ?? INPUT_TYPE.SELECT;
+        const key = completesConditionField.connectedName as keyof Row;
+        const nextFieldValue = {
+          type: inferredType,
+          value: {
+            id: `${connectedArtifactOption?.artefact_value_id}`,
+            text: `${connectedArtifactOption?.artefact_value}`,
+          },
+        } as InputValue;
+
+        setValues((prevValues) => {
+          const prev = prevValues?.[key];
+          const pv = prev?.value;
+          const nv = nextFieldValue.value;
+          if (
+            prev?.type === nextFieldValue.type &&
+            pv &&
+            typeof pv === 'object' &&
+            !Array.isArray(pv) &&
+            'id' in pv &&
+            'text' in pv &&
+            typeof nv === 'object' &&
+            !Array.isArray(nv) &&
+            String((pv as { id: string }).id) === String((nv as { id: string }).id) &&
+            (pv as { text: string }).text === (nv as { text: string }).text
+          ) {
+            return prevValues;
+          }
+          return { ...prevValues, [key]: nextFieldValue };
         });
 
-        const artifact = artifacts.find(
-          (_artifact) => _artifact.artefact_tech_label === completesConditionField?.connectedName,
+        setChangedFields((prevChangedFields) =>
+          prevChangedFields.includes(key)
+            ? prevChangedFields
+            : [...prevChangedFields, key],
         );
-        const connectedArtifactOption = artifact?.values?.find(
-          (option) => option.artefact_value === completesConditionField?.connectedValue,
-        );
+      }
 
-        if (
-          !connectedField?.disabled &&
-          connectedArtifactOption?.artefact_value === completesConditionField?.connectedValue
-        ) {
-          // When connectedField is not rendered (e.g. rating_model in ADD mode with BASE_MODEL_SCHEMA),
-          // infer SELECT type from artefact_value_id presence to avoid String({…}) = '[object Object]'
-          const inferredType =
-            connectedField?.type ??
-            (connectedArtifactOption?.artefact_value_id != null ? INPUT_TYPE.SELECT : undefined);
-
-          autoCompletedField = {
-            [completesConditionField.connectedName]: {
-              type: inferredType,
-              value: {
-                id: `${connectedArtifactOption?.artefact_value_id}`,
-                text: `${connectedArtifactOption?.artefact_value}`,
-              },
-            },
-          };
-
-          setValues((prevValues) => ({ ...prevValues, ...autoCompletedField }));
-          setChangedFields((prevChangedFields) =>
-            prevChangedFields.includes(completesConditionField.connectedName as keyof Row)
-              ? prevChangedFields
-              : [...prevChangedFields, completesConditionField.connectedName as keyof Row],
-          );
-        }
-        if (connectedField?.disabled) {
-          setValues((prevValues) => ({
-            ...omit(prevValues, completesConditionField?.connectedName),
-          }));
-        }
+      if (connectedField?.disabled) {
+        setValues((prevValues) => {
+          if (prevValues?.[completesConditionField.connectedName as keyof Row] === undefined) {
+            return prevValues;
+          }
+          return omit(prevValues, completesConditionField.connectedName) as FormValues;
+        });
       }
     });
-  }, [completesConditionFields, refinedFields, artifacts]);
+  }, [completesConditionSignature, artifacts]);
 
   const checkAllocationFieldsChanged = () => {
     const fieldsChanged = ALLOCATION_FIELDS_NAMES_USAGE.some((fieldName) => {
