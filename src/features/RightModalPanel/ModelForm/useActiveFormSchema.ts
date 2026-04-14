@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { MODEL_FORM_MODE } from '@shared/constants';
 import { Row } from '@shared/types';
 import { INPUT_TYPE } from '@shared/ui/organisms';
-import { sortBy, unionBy } from 'lodash';
+import { sortBy } from 'lodash';
 import { useDeepEffect } from '@shared/hooks/useDeepEffect';
 import {
   BASE_MODEL_SCHEMA,
@@ -48,32 +48,37 @@ const getUnionSchema = (firstSchema: FormFieldsSchema, secondSchema: FormFieldsS
   return unionSchema;
 };
 
+/**
+ * Склеивает схемы по `name`: для одного поля побеждает описание из последней схемы в списке.
+ * `unionBy` из lodash оставляет первое вхождение — из‑за этого `required: false` в BASE
+ * перекрывал `required: true` из VALIDATION / других слоёв.
+ */
+const mergeSchemas = (...schemas: FormFieldsSchema[]): FormFieldsSchema => {
+  if (schemas.length === 0) {
+    return [];
+  }
+  return schemas.reduce((acc, schema) => getUnionSchema(acc, schema));
+};
+
 // TODO: Convert data (activeRow and values) to a single format and remove unnecessary conditions
 const getEditSchema = (
   activeRow?: Partial<Row>,
   values?: FormValues,
   activeModelByDefault?: boolean,
 ) => {
-  let formSchema = unionBy(
+  let formSchema = mergeSchemas(
     markSchema(BASE_MODEL_SCHEMA, SCHEMA_NAME_MAP.BASE_MODEL_SCHEMA),
-    markSchema(VALIDATION_MODEL_SCHEMA, SCHEMA_NAME_MAP.VALIDATION_MODEL_SCHEMA),
     markSchema(REST_MODEL_SCHEMA, SCHEMA_NAME_MAP.REST_MODEL_SCHEMA),
-    'name',
+    markSchema(VALIDATION_MODEL_SCHEMA, SCHEMA_NAME_MAP.VALIDATION_MODEL_SCHEMA),
   );
 
   if (values) {
     if (values.active_model?.value || activeModelByDefault) {
-      formSchema = unionBy(
+      formSchema = mergeSchemas(
         markSchema(BASE_MODEL_SCHEMA, SCHEMA_NAME_MAP.BASE_MODEL_SCHEMA),
         markSchema(ACTIVE_MODEL_SCHEMA, SCHEMA_NAME_MAP.ACTIVE_MODEL_SCHEMA),
         markSchema(REST_MODEL_SCHEMA, SCHEMA_NAME_MAP.REST_MODEL_SCHEMA),
-        'name',
-      );
-
-      formSchema = unionBy(
-        formSchema,
         markSchema(VALIDATION_MODEL_SCHEMA, SCHEMA_NAME_MAP.VALIDATION_MODEL_SCHEMA),
-        'name',
       );
 
       // TODO: It is necessary to avoid using string values in conditionals, try to switch them to artifact values (prob need another approach)
@@ -115,15 +120,10 @@ const getEditSchema = (
       (activeRow?.active_model === '1' && !values.active_model?.value) ||
       activeModelByDefault === false
     ) {
-      formSchema = unionBy(
+      formSchema = mergeSchemas(
         markSchema(BASE_MODEL_SCHEMA, SCHEMA_NAME_MAP.BASE_MODEL_SCHEMA),
         markSchema(NOT_ACTIVE_MODEL_SCHEMA, SCHEMA_NAME_MAP.NOT_ACTIVE_MODEL_SCHEMA),
         markSchema(REST_MODEL_SCHEMA, SCHEMA_NAME_MAP.REST_MODEL_SCHEMA),
-        'name',
-      );
-
-      formSchema = getUnionSchema(
-        formSchema,
         markSchema(VALIDATION_MODEL_SCHEMA, SCHEMA_NAME_MAP.VALIDATION_MODEL_SCHEMA),
       );
     }
@@ -188,8 +188,6 @@ const getAddSchema = (
     }
   }
   return formSchema;
-
-  return formSchema;
 };
 
 export const useActiveFormSchema = ({
@@ -200,21 +198,19 @@ export const useActiveFormSchema = ({
 }: UseActiveFormSchemaProps) => {
   console.log('activeModelByDefault:', activeModelByDefault);
 
-  const nonActiveModelSchema = unionBy(
+  const nonActiveModelSchema = mergeSchemas(
     markSchema(BASE_MODEL_SCHEMA, SCHEMA_NAME_MAP.BASE_MODEL_SCHEMA),
-    markSchema(VALIDATION_MODEL_SCHEMA, SCHEMA_NAME_MAP.VALIDATION_MODEL_SCHEMA),
     markSchema(REST_MODEL_SCHEMA, SCHEMA_NAME_MAP.REST_MODEL_SCHEMA),
-    'name',
+    markSchema(VALIDATION_MODEL_SCHEMA, SCHEMA_NAME_MAP.VALIDATION_MODEL_SCHEMA),
   );
 
   const [formSchema, setFormSchema] = useState<FormFieldsSchema>(
     activeModelByDefault
-      ? unionBy(
+      ? mergeSchemas(
           markSchema(BASE_MODEL_SCHEMA, SCHEMA_NAME_MAP.BASE_MODEL_SCHEMA),
           markSchema(ACTIVE_MODEL_SCHEMA, SCHEMA_NAME_MAP.ACTIVE_MODEL_SCHEMA),
-          markSchema(VALIDATION_MODEL_SCHEMA, SCHEMA_NAME_MAP.VALIDATION_MODEL_SCHEMA),
           markSchema(REST_MODEL_SCHEMA, SCHEMA_NAME_MAP.REST_MODEL_SCHEMA),
-          'name',
+          markSchema(VALIDATION_MODEL_SCHEMA, SCHEMA_NAME_MAP.VALIDATION_MODEL_SCHEMA),
         )
       : nonActiveModelSchema,
   );
