@@ -9,7 +9,8 @@ import App from './app/App';
 import { themes } from './app/theme/theme';
 
 import { T_CONFIG_MAP, T_KEYCLOAK_USER } from './shared/types/infra';
-import { ColumnsFilter, Permission, Role } from './shared/types';
+import { ColumnsFilter, Permission } from './shared/types';
+import { keycloakGroupsToRoles } from './shared/helpers';
 import { useFetchStore, useGlobalStore, useUserStore } from './shared/stores';
 import { CUSTOMER_MAP } from './shared/constants/customers';
 import { Flexbox, Loading } from './shared/ui/atoms';
@@ -70,10 +71,7 @@ const MfeRoot = (props: MFProps) => {
     if (user?.groups) {
       setGroups(user.groups);
 
-      const roles = user.groups.filter((group) =>
-        Object.values(Role).includes(group as Role),
-      ) as Role[];
-      setRoles(roles);
+      setRoles(keycloakGroupsToRoles(user.groups));
     }
 
     if (user?.realm_access?.roles) {
