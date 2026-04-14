@@ -1,5 +1,28 @@
 # Semantic Versioning Changelog
 
+# [1.58.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.57.1...v1.58.0) (2026-04-14)
+
+
+### Bug Fixes
+
+* enhance artifact editability checks for additional model source cases ([3616ad5](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/3616ad5abef292c10c652a2d2e25829fb1d07348))
+* enhance artifact editability logic to account for both sum and sum_rm flags ([6c09d25](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/6c09d252820937a0b2ed18d64d2963be73c128f1))
+* ensure safe access to refinedFields in setDirtyFields to prevent potential runtime errors ([afed783](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/afed783df15128e3e341ce8e81f1f89cdf8542bb))
+* improve artifact editability checks and enhance form submission handling ([9ad52aa](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/9ad52aa37ba173ba2404922bdc808f04eeb4eb44))
+* logic fix ([e5949b5](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/e5949b58c01ed0b403a510301c032d54cbb9628e))
+* update artifact editability logic and enhance form field handling ([9fb46ca](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/9fb46ca531d83b0e6997c764eed0f2553612b3fb))
+* update field requirement logic to incorporate conditional checks based on form values ([644f95d](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/644f95d60f789e4ef889eb2e850642b54f29d9c6))
+
+
+### Features
+
+* add keycloakGroupsToRoles helper to map Keycloak groups to application roles ([a8cd7a0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/a8cd7a0e3e90944a8f435c78f7f0c7c5be87b71d))
+* add new fields to BASE_MODEL_SCHEMA for enhanced model data handling ([e3d01c8](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/e3d01c889e1855a8c06e9ba6afa999aa9fc0b26e))
+* enhance HomePage functionality with URL synchronization for edit and delete model panels ([fc9c29d](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/fc9c29d71e84a57eef4e85afe540d3368568777e))
+* implement active model flag handling and update form field requirements ([51f6ae6](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/51f6ae669e3bfdd1359cf8f60771ad1a933f6dc9))
+* implement new form field condition handling and auto-rating model merging logic ([971f52d](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/971f52d85e73eabefdd257b635e92b17c3dc9240))
+* ограничение редактирования атрибутов ([eaa9a8e](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/eaa9a8ed1ced75e94ee2c3e30179e10f42516228))
+
 ## [1.57.1](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.57.0...v1.57.1) (2026-03-24)
 
 
