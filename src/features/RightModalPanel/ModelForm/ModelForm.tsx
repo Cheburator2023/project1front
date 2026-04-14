@@ -1,6 +1,14 @@
 /* eslint-disable array-callback-return */
 /* eslint-disable no-unneeded-ternary */
-import React, { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  ChangeEvent,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { Button, CheckboxField, T } from '@admiral-ds/react-ui';
 import { format } from 'date-fns';
 
@@ -29,9 +37,11 @@ import { FormValues } from '../types';
 import {
   getFormMode,
   getArtifactApiItems,
+  getFormFieldTextForConditions,
   getInvalidFields,
   getInputValuesFromRow,
   getProperFormatValueForSubmit,
+  mergeAutoRatingModelIfEligible,
 } from '../helpers';
 import { ButtonContainer, FormContainer } from './styles';
 import { ParentModelSelect } from './ParentModelSelect';
@@ -115,9 +125,10 @@ export const ModelForm = ({
     isModelOps,
     isModelOpsLead,
     isMIPM,
+    isGod
   } = useRoles();
 
-  const isEditByRatingModel = isValidator || isValidatorLead || isBusinessCustomer;
+  const isEditByRatingModel = isValidator || isValidatorLead || isBusinessCustomer || isGod;
   const hasNoAccessToActiveModel =
     isValidator || isValidatorLead || isBusinessCustomer
       ? false
@@ -209,8 +220,9 @@ export const ModelForm = ({
 
         conditions?.map((condition) => {
           Object.keys(condition).map((fieldName) => {
-            // @ts-ignore
-            const formFieldValue = values?.[fieldName as any]?.value?.text;
+            const formFieldValue = getFormFieldTextForConditions(
+              values?.[fieldName as keyof Row] as InputValue | undefined,
+            );
 
             if (fieldName === name || formFieldValue) {
               // @ts-ignore
@@ -219,8 +231,9 @@ export const ModelForm = ({
                 fieldName === name ? value : values?.[fieldName as any];
 
               connectedValuesToContitions[fieldName] =
-                // @ts-ignore
-                fieldName === name ? value?.value?.text : formFieldValue;
+                fieldName === name
+                  ? getFormFieldTextForConditions(value)
+                  : formFieldValue;
             }
           });
         });
@@ -295,59 +308,57 @@ export const ModelForm = ({
     setValues((prevValues) => ({ ...prevValues, ...newValues }));
   };
 
-  useDeepEffect(() => {
-    setTimeout(() => {
-      completesConditionFields?.map((completesConditionField) => {
-        if (completesConditionField?.connectedName) {
-          let autoCompletedField = {};
+  useLayoutEffect(() => {
+    completesConditionFields?.map((completesConditionField) => {
+      if (completesConditionField?.connectedName) {
+        let autoCompletedField = {};
 
-          const connectedField = refinedFields.find((_field) => {
-            return _field.name === completesConditionField?.connectedName;
-          });
+        const connectedField = refinedFields.find((_field) => {
+          return _field.name === completesConditionField?.connectedName;
+        });
 
-          const artifact = artifacts.find(
-            (_artifact) => _artifact.artefact_tech_label === completesConditionField?.connectedName,
-          );
-          const connectedArtifactOption = artifact?.values?.find(
-            (option) => option.artefact_value === completesConditionField?.connectedValue,
-          );
+        const artifact = artifacts.find(
+          (_artifact) => _artifact.artefact_tech_label === completesConditionField?.connectedName,
+        );
+        const connectedArtifactOption = artifact?.values?.find(
+          (option) => option.artefact_value === completesConditionField?.connectedValue,
+        );
 
-          if (
-            !connectedField?.disabled &&
-            connectedArtifactOption?.artefact_value === completesConditionField?.connectedValue
-          ) {
-            // When connectedField is not rendered (e.g. rating_model in ADD mode with BASE_MODEL_SCHEMA),
-            // infer SELECT type from artefact_value_id presence to avoid String({…}) = '[object Object]'
-            const inferredType =
-              connectedField?.type ??
-              (connectedArtifactOption?.artefact_value_id != null ? INPUT_TYPE.SELECT : undefined);
+        if (
+          !connectedField?.disabled &&
+          connectedArtifactOption?.artefact_value === completesConditionField?.connectedValue
+        ) {
+          // When connectedField is not rendered (e.g. rating_model in ADD mode with BASE_MODEL_SCHEMA),
+          // infer SELECT type from artefact_value_id presence to avoid String({…}) = '[object Object]'
+          const inferredType =
+            connectedField?.type ??
+            (connectedArtifactOption?.artefact_value_id != null ? INPUT_TYPE.SELECT : undefined);
 
-            autoCompletedField = {
-              [completesConditionField.connectedName]: {
-                type: inferredType,
-                value: {
-                  id: `${connectedArtifactOption?.artefact_value_id}`,
-                  text: `${connectedArtifactOption?.artefact_value}`,
-                },
+          autoCompletedField = {
+            [completesConditionField.connectedName]: {
+              type: inferredType,
+              value: {
+                id: `${connectedArtifactOption?.artefact_value_id}`,
+                text: `${connectedArtifactOption?.artefact_value}`,
               },
-            };
+            },
+          };
 
-            setValues((prevValues) => ({ ...prevValues, ...autoCompletedField }));
-            setChangedFields((prevChangedFields) =>
-              prevChangedFields.includes(completesConditionField.connectedName as keyof Row)
-                ? prevChangedFields
-                : [...prevChangedFields, completesConditionField.connectedName as keyof Row],
-            );
-          }
-          if (connectedField?.disabled) {
-            setValues((prevValues) => ({
-              ...omit(prevValues, completesConditionField?.connectedName),
-            }));
-          }
+          setValues((prevValues) => ({ ...prevValues, ...autoCompletedField }));
+          setChangedFields((prevChangedFields) =>
+            prevChangedFields.includes(completesConditionField.connectedName as keyof Row)
+              ? prevChangedFields
+              : [...prevChangedFields, completesConditionField.connectedName as keyof Row],
+          );
         }
-      });
-    }, 100);
-  }, [completesConditionFields, refinedFields]);
+        if (connectedField?.disabled) {
+          setValues((prevValues) => ({
+            ...omit(prevValues, completesConditionField?.connectedName),
+          }));
+        }
+      }
+    });
+  }, [completesConditionFields, refinedFields, artifacts]);
 
   const checkAllocationFieldsChanged = () => {
     const fieldsChanged = ALLOCATION_FIELDS_NAMES_USAGE.some((fieldName) => {
@@ -398,9 +409,14 @@ export const ModelForm = ({
         ...valuesWithActiveModelFlag,
       };
 
+      const valuesForSubmit = mergeAutoRatingModelIfEligible(
+        valuesWithAddedOutsideControls as FormValues,
+        artifacts,
+      ) as typeof valuesWithAddedOutsideControls;
+
       const newInvalidFields = getInvalidFields(
         formSchema,
-        valuesWithAddedOutsideControls as any,
+        valuesForSubmit as any,
         wasPreviouslyActiveModel,
         refinedFields,
         initialRow
@@ -433,7 +449,7 @@ export const ModelForm = ({
       }
 
       const artifactApiItems = getArtifactApiItems(
-        valuesWithAddedOutsideControls as any,
+        valuesForSubmit as any,
         parentModelId,
         changedFields,
         ['rating_model'],
@@ -451,10 +467,7 @@ export const ModelForm = ({
         console.log('📝 FORM LOGS: ~ system_model_id:', system_model_id);
         console.log('📝 FORM LOGS: ~ model_source:', model_source);
         console.log('📝 FORM LOGS: ~ sent artifacts:', artifactApiItems);
-        console.log(
-          '📝 FORM LOGS: ~ sent valuesWithAddedOutsideControls:',
-          valuesWithAddedOutsideControls,
-        );
+        console.log('📝 FORM LOGS: ~ sent valuesForSubmit:', valuesForSubmit);
 
         if (system_model_id && model_source) {
           updateModelsMutation.mutate({
@@ -491,6 +504,7 @@ export const ModelForm = ({
       wasPreviouslyActiveModel,
       createModelMutation,
       updateModelsMutation,
+      artifacts,
     ],
   );
 

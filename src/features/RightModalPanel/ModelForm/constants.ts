@@ -433,8 +433,7 @@ export const ACTIVE_MODEL_SCHEMA: FormFieldsSchema = [
   {
     name: 'ds_department',
     customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
-    required: false,
-    requireConditions: [{ active_model: '1' }],
+    required: true,
     maxLength: 250,
   },
   {
@@ -460,6 +459,7 @@ export const ACTIVE_MODEL_SCHEMA: FormFieldsSchema = [
         model_risk_type: 'Кредитный риск',
       },
     ],
+    // value: подставляется при выполнении conditions (форма: handleChange; сабмит: mergeAutoRatingModelIfEligible в helpers)
     valueConditions: [
       {
         value: 'Да',

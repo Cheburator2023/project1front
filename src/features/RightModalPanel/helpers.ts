@@ -1214,6 +1214,89 @@ const getProperFormatValueForSubmit = (inputValue: InputValue) => {
   }
 };
 
+/** Text used in form condition matching (SELECT uses value.text; plain fields use value). */
+export const getFormFieldTextForConditions = (
+  fieldValue: InputValue | undefined,
+): string | undefined => {
+  if (!fieldValue || fieldValue.value == null) {
+    return undefined;
+  }
+  const v = fieldValue.value as { text?: string } | string | number;
+  if (typeof v === 'object' && v !== null && 'text' in v) {
+    return String((v as { text?: string }).text ?? '');
+  }
+  return String(v);
+};
+
+/**
+ * True when current form values satisfy every key in each row of `conditions`
+ * (same idea as valueConditions / handleChange + isEqual in ModelForm).
+ */
+const formValuesSatisfyConditionRows = (
+  values: FormValues,
+  conditions: FormFieldConditions,
+): boolean =>
+  conditions.every((row) =>
+    (Object.keys(row) as (keyof Row)[]).every((key) => {
+      const expected = row[key];
+      if (expected === undefined) {
+        return true;
+      }
+      return getFormFieldTextForConditions(values[key]) === expected;
+    }),
+  );
+
+/**
+ * When BASE_MODEL_SCHEMA `rating_model` valueConditions (e.g. auto «Да») are met but
+ * `rating_model` is missing from state, merge the SELECT from artifacts before submit.
+ * Rules are read from {@link BASE_MODEL_SCHEMA} — not duplicated here.
+ */
+export const mergeAutoRatingModelIfEligible = (
+  values: FormValues | undefined,
+  artifacts: Artifact[],
+): FormValues | undefined => {
+  if (!values) {
+    return values;
+  }
+
+  const ratingField = BASE_MODEL_SCHEMA.find((f) => f.name === 'rating_model');
+  const matchingRule = ratingField?.valueConditions?.find(
+    (vc) => !!vc.conditions?.length && formValuesSatisfyConditionRows(values, vc.conditions),
+  );
+  if (!matchingRule) {
+    return values;
+  }
+
+  const targetText = matchingRule.value;
+  const artifact = artifacts.find((a) => a.artefact_tech_label === 'rating_model');
+  const targetOption = artifact?.values?.find((o) => o.artefact_value === targetText);
+  if (targetOption == null || targetOption.artefact_value_id == null) {
+    return values;
+  }
+
+  const nextRating: InputValue = {
+    type: INPUT_TYPE.SELECT,
+    value: {
+      id: String(targetOption.artefact_value_id),
+      text: targetOption.artefact_value,
+    },
+  };
+
+  const existing = values.rating_model;
+  if (
+    existing?.type === INPUT_TYPE.SELECT &&
+    existing.value &&
+    typeof existing.value === 'object' &&
+    'text' in existing.value &&
+    (existing.value as { text?: string }).text === targetText &&
+    String((existing.value as { id?: string | number }).id) === String(targetOption.artefact_value_id)
+  ) {
+    return values;
+  }
+
+  return { ...values, rating_model: nextRating };
+};
+
 const getArtifactApiItems = (
   values?: FormValues, 
   parentModelId?: string, 

@@ -1,6 +1,8 @@
 import { useUserStore } from '../stores';
 import { Role } from '../types';
 
+const NO_ROLES = process.env.NO_ROLES;
+
 export const useRoles = () => {
   const { roles } = useUserStore();
   const { hasRole } = useUserStore();
@@ -15,6 +17,7 @@ export const useRoles = () => {
     isModelOps: hasRole(Role.MODEL_OPS),
     isModelOpsLead: hasRole(Role.MODEL_OPS_LEAD),
     isMIPM: hasRole(Role.MIPM),
+    isGod: NO_ROLES === 'true',
     isDsLead: hasRole(Role.DS_LEAD),
     isBICCustomerBroker: hasRole(Role.BI_CUSTOMER_BROKER),
     isValidatorLead: hasRole(Role.VALIDATOR_LEAD),
