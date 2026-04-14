@@ -581,7 +581,9 @@ const mapArtifactToField = (
     name: artifact.artefact_tech_label,
     label: artifact.artefact_label,
     disabled: isDisabled,
-    required: isDisabled ? false : !!fieldSchema?.required,
+    required: isDisabled
+      ? false
+      : checkRequireStatus(values, !!fieldSchema?.required, fieldSchema?.requireConditions),
     addNewOptionEnabled: artifact.can_add_new_option === '1',
     maxLength: fieldSchema?.maxLength,
     requireConditions: fieldSchema?.requireConditions,
