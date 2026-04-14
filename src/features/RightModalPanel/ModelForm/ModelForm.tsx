@@ -484,7 +484,7 @@ export const ModelForm = ({
 
       setInvalidFields(fieldsChanged ? [] : newInvalidFields);
       scrollToActiveError();
-      setDirtyFields((prevDirtyFields) => [...prevDirtyFields, refinedFields[0].name]);
+      setDirtyFields((prevDirtyFields) => [...prevDirtyFields, refinedFields[0]?.name]);
 
       console.log('📝 FORM LOGS: >> newInvalidFields:', newInvalidFields);
 
