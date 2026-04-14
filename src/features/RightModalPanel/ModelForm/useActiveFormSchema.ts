@@ -60,6 +60,13 @@ const mergeSchemas = (...schemas: FormFieldsSchema[]): FormFieldsSchema => {
   return schemas.reduce((acc, schema) => getUnionSchema(acc, schema));
 };
 
+/**
+ * REST_MODEL_SCHEMA включает урезанные копии полей из ACTIVE / RATING (см. constants).
+ * Их нельзя накладывать после полноценных ACTIVE / NOT_ACTIVE — иначе победит REST,
+ * пропадёт schemaKey «активной модели» и requireConditions (см. getFormFields isActive).
+ * Поэтому порядок: … → REST → ACTIVE | NOT_ACTIVE → VALIDATION.
+ */
+
 // TODO: Convert data (activeRow and values) to a single format and remove unnecessary conditions
 const getEditSchema = (
   activeRow?: Partial<Row>,
@@ -76,8 +83,8 @@ const getEditSchema = (
     if (values.active_model?.value || activeModelByDefault) {
       formSchema = mergeSchemas(
         markSchema(BASE_MODEL_SCHEMA, SCHEMA_NAME_MAP.BASE_MODEL_SCHEMA),
-        markSchema(ACTIVE_MODEL_SCHEMA, SCHEMA_NAME_MAP.ACTIVE_MODEL_SCHEMA),
         markSchema(REST_MODEL_SCHEMA, SCHEMA_NAME_MAP.REST_MODEL_SCHEMA),
+        markSchema(ACTIVE_MODEL_SCHEMA, SCHEMA_NAME_MAP.ACTIVE_MODEL_SCHEMA),
         markSchema(VALIDATION_MODEL_SCHEMA, SCHEMA_NAME_MAP.VALIDATION_MODEL_SCHEMA),
       );
 
@@ -122,8 +129,8 @@ const getEditSchema = (
     ) {
       formSchema = mergeSchemas(
         markSchema(BASE_MODEL_SCHEMA, SCHEMA_NAME_MAP.BASE_MODEL_SCHEMA),
-        markSchema(NOT_ACTIVE_MODEL_SCHEMA, SCHEMA_NAME_MAP.NOT_ACTIVE_MODEL_SCHEMA),
         markSchema(REST_MODEL_SCHEMA, SCHEMA_NAME_MAP.REST_MODEL_SCHEMA),
+        markSchema(NOT_ACTIVE_MODEL_SCHEMA, SCHEMA_NAME_MAP.NOT_ACTIVE_MODEL_SCHEMA),
         markSchema(VALIDATION_MODEL_SCHEMA, SCHEMA_NAME_MAP.VALIDATION_MODEL_SCHEMA),
       );
     }
@@ -208,8 +215,8 @@ export const useActiveFormSchema = ({
     activeModelByDefault
       ? mergeSchemas(
           markSchema(BASE_MODEL_SCHEMA, SCHEMA_NAME_MAP.BASE_MODEL_SCHEMA),
-          markSchema(ACTIVE_MODEL_SCHEMA, SCHEMA_NAME_MAP.ACTIVE_MODEL_SCHEMA),
           markSchema(REST_MODEL_SCHEMA, SCHEMA_NAME_MAP.REST_MODEL_SCHEMA),
+          markSchema(ACTIVE_MODEL_SCHEMA, SCHEMA_NAME_MAP.ACTIVE_MODEL_SCHEMA),
           markSchema(VALIDATION_MODEL_SCHEMA, SCHEMA_NAME_MAP.VALIDATION_MODEL_SCHEMA),
         )
       : nonActiveModelSchema,
