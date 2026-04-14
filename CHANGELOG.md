@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.59.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.58.0...v1.59.0) (2026-04-14)
+
+
+### Features
+
+* ver bump ([f6995cc](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/f6995ccee054d30bf42ce1da398aacc533964bcf))
+
 # [1.58.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.57.1...v1.58.0) (2026-04-14)
 
 
