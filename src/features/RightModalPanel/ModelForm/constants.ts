@@ -416,7 +416,8 @@ export const ACTIVE_MODEL_SCHEMA: FormFieldsSchema = [
   {
     name: 'business_customer_departament',
     customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
-    required: true,
+    required: false,
+    requireConditions: [{ active_model: '1' }],
   },
   {
     name: 'implementation_validity',
@@ -432,13 +433,15 @@ export const ACTIVE_MODEL_SCHEMA: FormFieldsSchema = [
   {
     name: 'ds_department',
     customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
-    required: true,
+    required: false,
+    requireConditions: [{ active_model: '1' }],
     maxLength: 250,
   },
   {
     name: 'developing_report',
     customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
-    required: true,
+    required: false,
+    requireConditions: [{ active_model: '1' }],
     maxLength: 250,
   },
   {

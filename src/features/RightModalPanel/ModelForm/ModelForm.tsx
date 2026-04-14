@@ -1,6 +1,6 @@
 /* eslint-disable array-callback-return */
 /* eslint-disable no-unneeded-ternary */
-import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
+import React, { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, CheckboxField, T } from '@admiral-ds/react-ui';
 import { format } from 'date-fns';
 
@@ -135,10 +135,32 @@ export const ModelForm = ({
 
   const scrollToActiveError = useScrollTo(errorElemRef, formRef);
 
+  // Действующая модель в БД: '1' | '0' | '' | null — активна / снята / никогда не активировали.
   const wasPreviouslyActiveModel = activeRow?.active_model === '1';
 
+  const valuesWithActiveModelFlag = useMemo(() => {
+    if (!values) {
+      return values;
+    }
+    const flagFromCheckbox =
+      hasNoAccessToActiveModel && formMode === MODEL_FORM_MODE.EDIT
+        ? wasPreviouslyActiveModel
+        : activeModelByDefault;
+    // Пока чекбокс не трогали (undefined), не подменяем values — сохраняем различие пусто vs '0' из строки.
+    if (flagFromCheckbox === undefined) {
+      return values;
+    }
+    return {
+      ...values,
+      active_model: {
+        type: INPUT_TYPE.FLAG as typeof INPUT_TYPE.FLAG,
+        value: !!flagFromCheckbox,
+      },
+    };
+  }, [values, hasNoAccessToActiveModel, formMode, wasPreviouslyActiveModel, activeModelByDefault]);
+
   const { formSchema } = useActiveFormSchema({
-    values,
+    values: valuesWithActiveModelFlag,
     initialRow,
     mode: formMode,
     activeModelByDefault:
@@ -149,7 +171,7 @@ export const ModelForm = ({
 
   const { fields } = useFormFields({
     formSchema,
-    values,
+    values: valuesWithActiveModelFlag,
     mode: formMode,
     initialRow,
     artifacts,
@@ -161,8 +183,11 @@ export const ModelForm = ({
   const title = IS_FORM_MODE_ADD ? 'Новая модель' : 'Редактирование модели';
 
   const refinedFields = fields.map((field) => {
+    if (field.name === 'update_date') {
+      return { ...field, disabled: true };
+    }
     if (_blockedArtifactsList?.data?.includes(field.name)) {
-      field.disabled = true;
+      return { ...field, disabled: true };
     }
     return field;
   });
@@ -370,13 +395,7 @@ export const ModelForm = ({
   const handleSubmit = useCallback(
     async ({ checkOnly = false }: SubmitType) => {
       const valuesWithAddedOutsideControls = {
-        ...values,
-        active_model: {
-          type: INPUT_TYPE.FLAG,
-          value: hasNoAccessToActiveModel
-            ? wasPreviouslyActiveModel
-            : activeModelByDefault || false,
-        },
+        ...valuesWithActiveModelFlag,
       };
 
       const newInvalidFields = getInvalidFields(
@@ -417,7 +436,7 @@ export const ModelForm = ({
         valuesWithAddedOutsideControls as any,
         parentModelId,
         changedFields,
-        ['active_model'],
+        ['rating_model'],
       );
 
       // TODO: check this type
@@ -457,7 +476,7 @@ export const ModelForm = ({
       }
     },
     [
-      values,
+      valuesWithActiveModelFlag,
       formSchema,
       activeModelByDefault,
       hasNoAccessToActiveModel,
@@ -503,7 +522,15 @@ export const ModelForm = ({
   }, [onClose]);
 
   const activeModelCheckboxHandler = async (e: any) => {
-    setActiveModelByDefault(e?.target?.checked);
+    const checked = Boolean(e?.target?.checked);
+    setActiveModelByDefault(checked);
+    setValues((prev) => ({
+      ...prev,
+      active_model: {
+        type: INPUT_TYPE.FLAG,
+        value: checked,
+      },
+    }));
     setChangedFields((prevChangedFields) =>
       prevChangedFields.includes('active_model')
         ? prevChangedFields
@@ -617,14 +644,14 @@ export const ModelForm = ({
     if (dirtyFields.length) {
       const newInvalidFields = getInvalidFields(
         formSchema,
-        values,
+        valuesWithActiveModelFlag,
         wasPreviouslyActiveModel,
         refinedFields,
         initialRow
       );
       setInvalidFields(newInvalidFields);
     }
-  }, [values, dirtyFields, formSchema, wasPreviouslyActiveModel, refinedFields, initialRow]);
+  }, [valuesWithActiveModelFlag, dirtyFields, formSchema, wasPreviouslyActiveModel, refinedFields, initialRow]);
 
   return (
     <RightPanel

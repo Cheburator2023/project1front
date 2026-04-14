@@ -997,6 +997,9 @@ const getFormValue = (value?: InputValue) => {
     case INPUT_TYPE.MULTI_SELECT: {
       return value?.value?.map(({ text }) => text) || '';
     }
+    case INPUT_TYPE.FLAG: {
+      return value?.value ? '1' : '0';
+    }
     default: {
       return value?.value?.toString() || '';
     }
@@ -1218,7 +1221,16 @@ const getArtifactApiItems = (
   const baseFieldsToProcess = changedFields?.length
     ? changedFields
     : (Object.keys(values ?? {}) as Array<keyof Row>);
-  const fieldsToProcess = uniqBy([...baseFieldsToProcess, ...forceIncludeFields], String);
+  // active_model: в БД три состояния — '1', '0', пусто. Не отправляем, пока пользователь явно не менял
+  // чекбокс (иначе пустое превращалось бы в '0' при любом сохранении).
+  const fieldsToProcess = uniqBy([...baseFieldsToProcess, ...forceIncludeFields], String).filter(
+    (fieldName) => {
+      if (fieldName === 'active_model') {
+        return Boolean(changedFields?.includes('active_model'));
+      }
+      return true;
+    },
+  );
 
   const artifactApiItems = fieldsToProcess.reduce(
     (bodyItems, fieldName): any => {
