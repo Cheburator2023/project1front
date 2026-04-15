@@ -63,7 +63,7 @@ export const SeedPimPanel = ({ quarter, year, onSeed, isSeeding }: SeedPimPanelP
   const [seedIsUsed, setSeedIsUsed] = useState(true);
 
   const { data: modelsData, isLoading } = useModelsControllerGetModels(
-    {},
+    { mode: [ 'Активные','Архив','Ошибка заведения','empty','not-null'] },
     { query: { refetchOnWindowFocus: false } },
   );
   const rows = (modelsData as any)?.data?.cards as Partial<Row>[] | undefined ?? [];

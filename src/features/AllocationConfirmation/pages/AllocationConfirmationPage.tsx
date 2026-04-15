@@ -33,7 +33,7 @@ const ErrorWrapper = styled('div')`
   color: #dc2626;
 `;
 
-const isInnodev = typeof window !== 'undefined' && window.location.hostname.includes('innodev');
+const isInnodev = typeof window !== 'undefined' && window.location.hostname.includes('innodev') || process.env.NO_ROLES === 'true';
 
 export const AllocationConfirmationPage = () => {
   const navigate = useNavigate();

@@ -27,7 +27,7 @@ export const AgGridModelsTable = (props: {
   overlayNoRowsTemplate?: string;
 }) => {
   const { setRows, modelsParams, setModelsParams, setRefetchModels } = useModelsStore();
-
+console.log("🚀 ~ AgGridModelsTable ~ modelsParams:", modelsParams)
   const { showToast } = useToast();
 
   const { modelsDownloadingDate } = useFiltersStore();
