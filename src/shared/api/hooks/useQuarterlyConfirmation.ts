@@ -83,3 +83,42 @@ export const useSaveQuarterlyConfirmation = () => {
     },
   });
 };
+
+export type SeedPimUsagePayload = {
+  quarter: number;
+  year: number;
+  models: {
+    model_id: string;
+    is_used: boolean;
+  }[];
+};
+
+const seedPimUsage = (data: SeedPimUsagePayload) => {
+  return customInstance<{
+    data: {
+      success: boolean;
+      quarter: number;
+      year: number;
+      seeded: { model_id: string; pim_usage_id: number | null; is_used: boolean }[];
+    };
+  }>({
+    url: '/quarterly-confirmation/seed-pim-usage',
+    method: 'POST',
+    data,
+    headers: { 'Content-Type': 'application/json' },
+  });
+};
+
+export const useSeedPimUsage = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: seedPimUsage,
+    onSuccess: (response) => {
+      console.log('[ALLOC_DEBUG] PIM usage seeded:', response.data);
+      queryClient.invalidateQueries({
+        queryKey: ['quarterly-confirmation'],
+      });
+    },
+  });
+};
