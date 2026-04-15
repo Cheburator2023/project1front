@@ -61,6 +61,7 @@ export const AgGridModelsTable = (props: {
   );
 
   const modelsData = _modelsData as ModelsResponseType | undefined;
+  console.log("🚀 ~ AgGridModelsTable ~ modelsData:", modelsData)
 
   const fetchModels = useCallback(
     (date?: string) => {

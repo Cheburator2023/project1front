@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import { T, Button } from '@admiral-ds/react-ui';
+import { T } from '@admiral-ds/react-ui';
 import styled from 'styled-components';
-import { useState } from 'react';
 import {
   useActiveQuarter,
   useModelsForConfirmation,
@@ -10,6 +9,7 @@ import {
 } from '@shared/api/hooks/useQuarterlyConfirmation';
 import type { ConfirmationModelRow } from '@shared/api/hooks/useQuarterlyConfirmation';
 import { AllocationConfirmationTemplate } from '../templates/AllocationConfirmationTemplate';
+import { SeedPimPanel } from '../organisms/SeedPimPanel';
 import { Loading, useToast } from '../../../shared/ui/atoms';
 
 type EditableModel = ConfirmationModelRow & {
@@ -33,47 +33,12 @@ const ErrorWrapper = styled('div')`
   color: #dc2626;
 `;
 
-const SeedPanel = styled('div')`
-  background: #fef9c3;
-  border: 1px dashed #ca8a04;
-  border-radius: 8px;
-  padding: 12px 16px;
-  margin-bottom: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-`;
-
-const SeedRow = styled('div')`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-`;
-
-const SeedInput = styled('input')`
-  border: 1px solid #d1d5db;
-  border-radius: 4px;
-  padding: 4px 8px;
-  font-size: 13px;
-  font-family: inherit;
-  min-width: 220px;
-`;
-
-const SeedLabel = styled('label')`
-  font-size: 12px;
-  font-weight: 600;
-  color: #92400e;
-`;
-
 const isInnodev = typeof window !== 'undefined' && window.location.hostname.includes('innodev');
 
 export const AllocationConfirmationPage = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
 
-  const [seedModelIds, setSeedModelIds] = useState('');
-  const [seedIsUsed, setSeedIsUsed] = useState(true);
   const { mutate: seedPim, isPending: isSeeding } = useSeedPimUsage();
 
   const {
@@ -160,29 +125,15 @@ export const AllocationConfirmationPage = () => {
   const quarterInfo = quarterData?.data ?? null;
   const models = modelsData?.data?.models ?? [];
 
-  const handleSeedPim = () => {
-    if (!quarterInfo || !seedModelIds.trim()) return;
-    const modelIds = seedModelIds
-      .split(/[,\n]+/)
-      .map((s) => s.trim())
-      .filter(Boolean);
-    console.log('[ALLOC_DEBUG] Seeding PIM usage:', { quarter: quarterInfo.quarter, year: quarterInfo.year, modelIds, is_used: seedIsUsed });
-    seedPim(
-      {
-        quarter: quarterInfo.quarter,
-        year: quarterInfo.year,
-        models: modelIds.map((model_id) => ({ model_id, is_used: seedIsUsed })),
+  const handleSeedPim = (payload: Parameters<typeof seedPim>[0]) => {
+    seedPim(payload, {
+      onSuccess: (res) => {
+        showToast({ message: `ПИМ засеян: ${res.data.seeded.length} моделей`, type: 'success', duration: 3000 });
       },
-      {
-        onSuccess: (res) => {
-          showToast({ message: `ПИМ засеян: ${res.data.seeded.length} моделей`, type: 'success', duration: 3000 });
-          setSeedModelIds('');
-        },
-        onError: () => {
-          showToast({ message: 'Ошибка при засеивании ПИМ данных', type: 'error', duration: 4000 });
-        },
+      onError: () => {
+        showToast({ message: 'Ошибка при засеивании ПИМ данных', type: 'error', duration: 4000 });
       },
-    );
+    });
   };
 
   console.log('[ALLOC_DEBUG] quarterInfo:', quarterInfo);
@@ -200,34 +151,12 @@ export const AllocationConfirmationPage = () => {
   })));
 
   const seedPanel = isInnodev && quarterInfo ? (
-    <SeedPanel>
-      <SeedLabel>🧪 [innodev] Засеять данные ПИМ для тестирования приоритетов</SeedLabel>
-      <SeedRow>
-        <SeedInput
-          value={seedModelIds}
-          onChange={(e) => setSeedModelIds(e.target.value)}
-          placeholder="model_id через запятую или с новой строки"
-          title="Введите model_id через запятую или с новой строки"
-        />
-        <SeedLabel style={{ fontWeight: 400 }}>
-          <input
-            type="checkbox"
-            checked={seedIsUsed}
-            onChange={(e) => setSeedIsUsed(e.target.checked)}
-            style={{ marginRight: 4 }}
-          />
-          is_used = {seedIsUsed ? 'true' : 'false'}
-        </SeedLabel>
-        <Button
-          dimension="s"
-          appearance="secondary"
-          onClick={handleSeedPim}
-          disabled={isSeeding || !seedModelIds.trim()}
-        >
-          <T font="Button/Button 2">{isSeeding ? 'Засевается...' : 'Засеять ПИМ'}</T>
-        </Button>
-      </SeedRow>
-    </SeedPanel>
+    <SeedPimPanel
+      quarter={quarterInfo.quarter}
+      year={quarterInfo.year}
+      onSeed={handleSeedPim}
+      isSeeding={isSeeding}
+    />
   ) : null;
 
   if (!quarterInfo) {
