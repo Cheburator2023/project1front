@@ -39,12 +39,15 @@ const fetchActiveQuarter = (signal?: AbortSignal) => {
   });
 };
 
-const fetchModelsForConfirmation = (signal?: AbortSignal) => {
-  return customInstance<{ data: { models: ConfirmationModelRow[] } }>({
+const fetchModelsForConfirmation = async (signal?: AbortSignal) => {
+  const res = await customInstance<{ data: { models: ConfirmationModelRow[]; _debug?: Record<string, unknown> } }>({
     url: '/quarterly-confirmation/models',
     method: 'GET',
     signal,
   });
+  console.log('[ALLOC_DEBUG] /models raw response _debug:', res?.data?._debug);
+  console.log('[ALLOC_DEBUG] /models raw response models count:', res?.data?.models?.length);
+  return res;
 };
 
 const saveQuarterlyConfirmation = (data: SaveQuarterlyConfirmationPayload) => {
