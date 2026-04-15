@@ -7,6 +7,9 @@ import { useModelsControllerGetModels } from '@shared/api/generated/endpoints';
 import type { Row } from '@src/shared/types';
 import type { SeedPimUsagePayload } from '@shared/api/hooks/useQuarterlyConfirmation';
 
+const getCurrentUsername = (): string =>
+  window.keycloak?.tokenParsed?.preferred_username ?? '';
+
 const Panel = styled('div')`
   background: #fef9c3;
   border: 1px dashed #ca8a04;
@@ -50,6 +53,14 @@ const SelectedCount = styled('span')`
   color: #78350f;
 `;
 
+const UserTag = styled('span')`
+  font-size: 12px;
+  color: #78350f;
+  background: #fde68a;
+  border-radius: 4px;
+  padding: 2px 6px;
+`;
+
 type SeedPimPanelProps = {
   quarter: number;
   year: number;
@@ -61,12 +72,20 @@ export const SeedPimPanel = ({ quarter, year, onSeed, isSeeding }: SeedPimPanelP
   const gridRef = useRef<AgGridReact>(null);
   const [selectedModelIds, setSelectedModelIds] = useState<string[]>([]);
   const [seedIsUsed, setSeedIsUsed] = useState(true);
+  const [filterByCurrentUser, setFilterByCurrentUser] = useState(false);
+
+  const currentUsername = useMemo(() => getCurrentUsername(), []);
 
   const { data: modelsData, isLoading } = useModelsControllerGetModels(
-    { mode: [ 'Активные','Архив','Ошибка заведения','empty','not-null'] },
+    { mode: ['Активные', 'Архив', 'Ошибка заведения', 'empty', 'not-null'] },
     { query: { refetchOnWindowFocus: false } },
   );
-  const rows = (modelsData as any)?.data?.cards as Partial<Row>[] | undefined ?? [];
+  const allRows = (modelsData as any)?.data?.cards as Partial<Row>[] | undefined ?? [];
+
+  const rows = useMemo(() => {
+    if (!filterByCurrentUser || !currentUsername) return allRows;
+    return allRows.filter((r) => r.model_creator === currentUsername);
+  }, [allRows, filterByCurrentUser, currentUsername]);
 
   const columnDefs = useMemo<ColDef[]>(() => [
     {
@@ -79,10 +98,10 @@ export const SeedPimPanel = ({ quarter, year, onSeed, isSeeding }: SeedPimPanelP
       suppressHeaderMenuButton: true,
       resizable: false,
     },
+    { field: 'business_customer', headerName: 'Владелец модели', flex: 1, minWidth: 160, pinned: 'left' },
     { field: 'model_id', headerName: 'Идентификатор', flex: 1, minWidth: 160 },
     { field: 'model_alias', headerName: 'Алиас', flex: 1, minWidth: 130 },
     { field: 'model_name', headerName: 'Название', flex: 2, minWidth: 200 },
-    { field: 'business_customer', headerName: 'Владелец', flex: 1, minWidth: 160 },
     { field: 'business_customer_departament', headerName: 'Подразделение', flex: 1, minWidth: 180 },
   ], []);
 
@@ -116,7 +135,25 @@ export const SeedPimPanel = ({ quarter, year, onSeed, isSeeding }: SeedPimPanelP
 
   return (
     <Panel>
-      <PanelTitle>🧪 [innodev] Засеять данные ПИМ для тестирования приоритетов</PanelTitle>
+      <ControlRow>
+        <PanelTitle>🧪 [innodev] Засеять данные ПИМ для тестирования приоритетов</PanelTitle>
+        {currentUsername && <UserTag>Я: {currentUsername}</UserTag>}
+      </ControlRow>
+      <ControlRow>
+        <CheckboxLabel>
+          <input
+            type="checkbox"
+            checked={filterByCurrentUser}
+            onChange={(e) => {
+              setFilterByCurrentUser(e.target.checked);
+              gridRef.current?.api?.deselectAll();
+              setSelectedModelIds([]);
+            }}
+            disabled={!currentUsername}
+          />
+          Только мои модели ({filterByCurrentUser ? rows.length : allRows.length} из {allRows.length})
+        </CheckboxLabel>
+      </ControlRow>
       <GridWrapper className="ag-theme-quartz">
         <AgGridReact
           ref={gridRef}

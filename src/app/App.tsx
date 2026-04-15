@@ -1,7 +1,7 @@
 import React from 'react';
 import styled, { createGlobalStyle, ThemeProvider } from 'styled-components';
 import { DropdownProvider } from '@admiral-ds/react-ui';
-import Keycloak from 'keycloak-js';
+import type { T_KEYCLOAK_INSTANCE, T_KEYCLOAK_USER } from '@shared/types/infra';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 import 'ag-grid-enterprise';
@@ -36,21 +36,12 @@ const queryClient = new QueryClient({
 interface AppProps {
   bridged?: boolean;
   token?: string;
-  keycloak?: any;
+  keycloak?: T_KEYCLOAK_INSTANCE;
   downloadReportStatus?: boolean;
   columnsFilters?: ColumnsFilter[];
   updateColumnsFilters?: (filters: ColumnsFilter[]) => void;
   setDownloadReportStatus?: (status: boolean) => void;
-  user?: Keycloak.KeycloakTokenParsed & {
-    family_name: string;
-    given_name: string;
-    realm_access: {
-      roles: string[];
-    };
-    groups: string[];
-    roles: string[];
-    preferred_username: string;
-  };
+  user?: T_KEYCLOAK_USER;
   onLogout?: () => void;
 }
 
@@ -59,7 +50,7 @@ const IS_DEV = process.env.NODE_ENV === 'development';
 const App = ({ user, onLogout, keycloak }: AppProps) => {
   const onLogoutHandler = () => {
     if (onLogout || keycloak) {
-      keycloak.logout({ redirectUri: window.location.origin });
+      keycloak?.logout({ redirectUri: window.location.origin });
       onLogout?.();
     }
     localStorage.removeItem('currentCustomer');
