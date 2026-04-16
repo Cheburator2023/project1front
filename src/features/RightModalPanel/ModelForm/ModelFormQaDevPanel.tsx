@@ -6,6 +6,7 @@ import { InputFactoryProps } from '@shared/ui/organisms';
 import { useUserStore } from '@shared/stores';
 
 import {
+  formatQaMatrixValidationReport,
   parseQaEditMatrixMarkdown,
   validateQaMatrixAgainstFormFields,
   type QaMatrixRuleLine,
@@ -55,7 +56,9 @@ export const ModelFormQaDevPanel = ({ fields, modelSource }: ModelFormQaDevPanel
   const [open, setOpen] = useState(true);
   const [input, setInput] = useState('');
   const [results, setResults] = useState<QaMatrixValidationItem[] | null>(null);
+  const [skippedSectionsByLogin, setSkippedSectionsByLogin] = useState(0);
   const [parseNote, setParseNote] = useState<string | null>(null);
+  const [copyHint, setCopyHint] = useState<string | null>(null);
 
   const username = useUserStore((s) => s.username);
   const groups = useUserStore((s) => s.groups);
@@ -69,13 +72,13 @@ export const ModelFormQaDevPanel = ({ fields, modelSource }: ModelFormQaDevPanel
         ? 'Не найдено строк с «⊖» и блоком «в требованиях:» — вставьте текст как в qa_edit_matrix.md'
         : null,
     );
-    setResults(
-      validateQaMatrixAgainstFormFields(parsed, fields, {
-        username,
-        groups,
-        modelSource,
-      }),
-    );
+    const outcome = validateQaMatrixAgainstFormFields(parsed, fields, {
+      username,
+      groups,
+      modelSource,
+    });
+    setResults(outcome.items);
+    setSkippedSectionsByLogin(outcome.skippedSectionsByLogin);
   }, [input, fields, username, groups, modelSource]);
 
   const summary = useMemo(() => {
@@ -99,6 +102,42 @@ export const ModelFormQaDevPanel = ({ fields, modelSource }: ModelFormQaDevPanel
     }
     return parts.length ? parts.join(' · ') : null;
   }, [username, groups, modelSource]);
+
+  const copyReport = useCallback(async () => {
+    if (!results?.length) {
+      return;
+    }
+    const headerLines = [
+      sessionHint ? `Сессия: ${sessionHint}` : null,
+      skippedSectionsByLogin > 0
+        ? `Пропущено секций (другой «Пользователь:»): ${skippedSectionsByLogin}`
+        : null,
+    ].filter(Boolean);
+    const body = formatQaMatrixValidationReport(results);
+    const text = headerLines.length ? `${headerLines.join('\n')}\n\n${body}` : body;
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopyHint('Отчёт скопирован');
+      window.setTimeout(() => setCopyHint(null), 2000);
+    } catch {
+      setCopyHint('Не удалось скопировать');
+      window.setTimeout(() => setCopyHint(null), 2000);
+    }
+  }, [results, sessionHint, skippedSectionsByLogin]);
+
+  const copyInput = useCallback(async () => {
+    if (!input.trim()) {
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(input);
+      setCopyHint('Текст вставки скопирован');
+      window.setTimeout(() => setCopyHint(null), 2000);
+    } catch {
+      setCopyHint('Не удалось скопировать');
+      window.setTimeout(() => setCopyHint(null), 2000);
+    }
+  }, [input]);
 
   if (!open) {
     return (
@@ -136,8 +175,8 @@ export const ModelFormQaDevPanel = ({ fields, modelSource }: ModelFormQaDevPanel
 
       <div style={{ padding: 10, overflow: 'auto', flex: 1, minHeight: 0 }}>
         <T font="Caption/Caption 1" color="Neutral/Neutral 50" as="div" style={{ marginBottom: 6 }}>
-          Вставьте фрагмент из tasks/qa_edit_matrix.md (секции с «Пользователь:», «Модель создана в:», строки ⊖).
-          Проверка: поля формы, а также логин и groups (Keycloak), model_source модели.
+          Вставьте фрагмент из tasks/qa_edit_matrix.md. Секции с «Пользователь:» учитываются только если логин
+          совпадает с текущим; иначе секция пропускается. Без «Пользователь:» проверяются только поля формы.
         </T>
         {sessionHint ? (
           <T
@@ -162,10 +201,33 @@ export const ModelFormQaDevPanel = ({ fields, modelSource }: ModelFormQaDevPanel
             marginBottom: 8,
           }}
         />
-        <div style={{ display: 'flex', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 8, marginBottom: 8, flexWrap: 'wrap', alignItems: 'center' }}>
           <Button dimension="s" onClick={run}>
             Проверить
           </Button>
+          <Button
+            dimension="s"
+            appearance="secondary"
+            disabled={!input.trim()}
+            onClick={copyInput}
+            title="Копировать текст из поля в буфер"
+          >
+            Копировать ввод
+          </Button>
+          <Button
+            dimension="s"
+            appearance="secondary"
+            disabled={!results?.length}
+            onClick={copyReport}
+            title="Копировать результаты проверки"
+          >
+            Копировать отчёт
+          </Button>
+          {copyHint ? (
+            <T font="Caption/Caption 1" as="span" style={{ color: '#2e7d32' }}>
+              {copyHint}
+            </T>
+          ) : null}
           <T font="Caption/Caption 1" color="Neutral/Neutral 50" as="span">
             Полей в форме: {fieldNames.size}
           </T>
@@ -173,6 +235,19 @@ export const ModelFormQaDevPanel = ({ fields, modelSource }: ModelFormQaDevPanel
         {parseNote ? (
           <T font="Caption/Caption 1" as="div" style={{ marginBottom: 8, color: '#b45309' }}>
             {parseNote}
+          </T>
+        ) : null}
+        {skippedSectionsByLogin > 0 ? (
+          <T font="Caption/Caption 1" as="div" style={{ marginBottom: 8, color: '#6b7280' }}>
+            Пропущено секций (в матрице другой «Пользователь:»): {skippedSectionsByLogin}
+          </T>
+        ) : null}
+        {results !== null &&
+        results.length === 0 &&
+        !parseNote &&
+        skippedSectionsByLogin > 0 ? (
+          <T font="Caption/Caption 1" as="div" style={{ marginBottom: 8, color: '#b45309' }}>
+            Нет строк для вашего логина — все секции с «Пользователь:» относятся к другим пользователям.
           </T>
         ) : null}
         {summary ? (

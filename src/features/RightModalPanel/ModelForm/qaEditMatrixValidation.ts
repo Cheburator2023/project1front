@@ -61,6 +61,20 @@ export type QaMatrixValidationItem = QaMatrixParsedRow & {
   detail: string;
 };
 
+/** Результат валидации: строки по полям + число секций, отброшенных из‑за несовпадения логина */
+export type QaMatrixValidationOutcome = {
+  items: QaMatrixValidationItem[];
+  /** Секции с «Пользователь:», не совпадающим с текущим логином (или без сессии) */
+  skippedSectionsByLogin: number;
+};
+
+const EMPTY_CONTEXT = {
+  rules: [] as QaMatrixRuleLine[],
+  usernameContextMatch: null as boolean | null,
+  groupsContextMatch: null as boolean | null,
+  modelSourceContextMatch: null as boolean | null,
+};
+
 const REQ_ACCESSIBLE = /в\s+требованиях:\s*(.+?)\s*$/;
 const SECTION_SPLIT = /\r?\n-{3,}\r?\n/;
 
@@ -371,13 +385,41 @@ function buildFieldRuleLines(
   return [accessLine, labelLine];
 }
 
+/**
+ * Секции с «Пользователь:», не совпадающим с текущим логином, не попадают в результат.
+ * Секции без «Пользователь:» проверяются только по полям формы (без login/groups/model_source).
+ */
 export function validateQaMatrixAgainstFormFields(
   sections: QaMatrixSection[],
   fields: InputFactoryProps<keyof Row>[],
   runtimeContext?: QaMatrixRuntimeContext,
-): QaMatrixValidationItem[] {
-  return sections.flatMap((section) => {
-    const ctx = buildContextRuleLines(section, runtimeContext);
+): QaMatrixValidationOutcome {
+  const skippedSectionsByLogin = sections.reduce((n, section) => {
+    const expectedLogin = section.matrixUsername?.trim();
+    if (!expectedLogin) {
+      return n;
+    }
+    const sessionLogin = runtimeContext?.username?.trim();
+    if (!sessionLogin || expectedLogin !== sessionLogin) {
+      return n + 1;
+    }
+    return n;
+  }, 0);
+
+  const sectionsToProcess = sections.filter((section) => {
+    const expectedLogin = section.matrixUsername?.trim();
+    if (!expectedLogin) {
+      return true;
+    }
+    const sessionLogin = runtimeContext?.username?.trim();
+    return Boolean(sessionLogin && expectedLogin === sessionLogin);
+  });
+
+  const items = sectionsToProcess.flatMap((section) => {
+    const expectedLogin = section.matrixUsername?.trim();
+    const ctx = expectedLogin
+      ? buildContextRuleLines(section, runtimeContext)
+      : EMPTY_CONTEXT;
 
     return section.rows.map((row) => {
       const field = getFieldByName(fields, row.artefactTechLabel);
@@ -426,4 +468,17 @@ export function validateQaMatrixAgainstFormFields(
       };
     });
   });
+
+  return { items, skippedSectionsByLogin };
+}
+
+/** Текст отчёта для буфера обмена */
+export function formatQaMatrixValidationReport(items: QaMatrixValidationItem[]): string {
+  return items
+    .map((r) => {
+      const header = `${r.artefactTechLabel}${r.expectedLabel ? ` — «${r.expectedLabel}»` : ''}`;
+      const lines = r.rules.map((x) => `  • ${x.text}`).join('\n');
+      return `${header}\n${lines}`;
+    })
+    .join('\n\n');
 }
