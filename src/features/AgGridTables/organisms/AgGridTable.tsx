@@ -1,5 +1,13 @@
 /* eslint-disable no-nested-ternary */
-import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type MouseEvent as ReactMouseEvent,
+} from 'react';
 import { AgGridReact } from 'ag-grid-react';
 
 import {
@@ -9,6 +17,7 @@ import {
   GetMainMenuItemsParams,
   GridApi,
   GridReadyEvent,
+  IRowNode,
   IDateFilterParams,
   ISetFilterParams,
   ITooltipParams,
@@ -26,10 +35,11 @@ import {
 } from 'ag-grid-community';
 import { ReactComponent as BrokerOutlineIcon } from '@admiral-ds/icons/build/finance/BrokerOutline.svg';
 import { ReactComponent as PlusCircleSolid } from '@admiral-ds/icons/build/service/PlusCircleSolid.svg';
+import { ReactComponent as ArrowsHorizontalOutline } from '@admiral-ds/icons/build/system/ArrowsHorizontalOutline.svg';
 import { ReactComponent as SearchOutline } from '@admiral-ds/icons/build/system/SearchOutline.svg';
 import { ReactComponent as DeleteSolid } from '@admiral-ds/icons/build/system/DeleteSolid.svg';
 import { ReactComponent as CalendarOutline } from '@admiral-ds/icons/build/system/CalendarOutline.svg';
-import { InputField } from '@admiral-ds/react-ui';
+import { InputField, T } from '@admiral-ds/react-ui';
 import { ErrorStatus, Flexbox, Spacer, useToast } from '@src/shared/ui/atoms';
 import { IconButton } from '@shared/ui/molecules';
 import { useNavigate } from 'react-router-dom';
@@ -48,7 +58,15 @@ import { useFiltersStore } from '../../../shared/stores/filtersStore';
 import { useTemplatesStore } from '../../../shared/stores/templatesStore';
 import { convertFilterModelToColumnsFilters } from '../../../shared/helpers/filterModelConverter';
 import { defaultExcelExportParams } from '../../../shared/helpers/excelExportHelpers';
-import { isCellMatched } from '../../../shared/helpers/highlightHelpers';
+import {
+  EMPTY_PARSED_GRID_SEARCH,
+  getDisplayedColumnsWithSearchMatches,
+  getParsedGridSearchForHighlight,
+  isCellMatched,
+  parseGridSearchQuery,
+  setParsedGridSearchForHighlight,
+  type SearchMatchColumn,
+} from '../../../shared/helpers/highlightHelpers';
 
 interface IAgGridTableProps {
   templates?: Template[];
@@ -231,12 +249,48 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     const navigate = useNavigate();
     const gridRefInner = useRef<AgGridReact>(null);
     const gridRef = ref || gridRefInner;
+    /** Синхронный доступ к api без гонки с ref AgGridReact (нужен для скролла после закрытия дропдауна). */
+    const gridApiRef = useRef<GridApi | null>(null);
     const [activeRows, setActiveRows] = useState<Partial<Row>[]>([]);
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
     const searchBeforeDatePickerRef = useRef<string>('');
     const lastUserColumnStateRef = useRef<any[] | null>(null);
     const suppressTemplateResetRef = useRef(false);
+    const [searchColumnMatches, setSearchColumnMatches] = useState<SearchMatchColumn[]>([]);
+    const [searchColumnMatchesOpen, setSearchColumnMatchesOpen] = useState(false);
+    const searchColumnMatchesHostRef = useRef<HTMLDivElement>(null);
+
+    const dataColumnNames = useMemo(
+      () => columnList.map((c) => c.name as string),
+      [columnList],
+    );
+
+    const columnHeadersForSearch = useMemo(
+      () => columnList.map((c) => ({ colId: c.name as string, headerName: c.title })),
+      [columnList],
+    );
+
+    const applySearchToGrid = useCallback(
+      (searchValue: string) => {
+        const parsed = parseGridSearchQuery(searchValue, columnHeadersForSearch);
+        setParsedGridSearchForHighlight({
+          raw: searchValue,
+          valueQuery: parsed.valueQuery,
+          columnColId: parsed.columnColId,
+          columnHeaderOnly: parsed.columnHeaderOnly,
+        });
+        const api = gridApiRef.current ?? gridRef.current?.api;
+        const quickText = parsed.columnHeaderOnly ? '' : parsed.valueQuery;
+        api?.setGridOption('quickFilterText', quickText);
+        setTimeout(() => {
+          api?.refreshClientSideRowModel('filter');
+          api?.refreshCells({ force: true });
+          api?.refreshHeader();
+        }, 0);
+      },
+      [columnHeadersForSearch],
+    );
 
     const columnDefs: ColDef[] = useMemo(() => {
       return columnList
@@ -285,6 +339,13 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
             filterParams:
               data.type === COLUMN_TYPE.DATE ? dateFilterParams : dynamicSetFilterParams,
             cellRenderer: data.cellRenderer,
+            headerClass: (params) => {
+              const p = getParsedGridSearchForHighlight();
+              if (p.columnColId && params.column.getColId() === p.columnColId) {
+                return 'search-highlight-column-header';
+              }
+              return '';
+            },
             cellClass: (params) => {
               const classes: string[] = [];
 
@@ -303,10 +364,18 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
                 classes.push(`data-tech-label_${data.name}`);
               }
 
-              // Add highlight class if cell matches search
-              const currentSearchString = useGlobalStore.getState().searchString;
-              if (currentSearchString && isCellMatched(params.value, currentSearchString)) {
-                classes.push('search-highlight-cell');
+              const p = getParsedGridSearchForHighlight();
+              if (!p.columnHeaderOnly) {
+                const effective =
+                  (p.valueQuery || '').trim() || (p.raw || '').trim();
+                const colId = params.column.getColId();
+                if (
+                  effective &&
+                  (!p.columnColId || colId === p.columnColId) &&
+                  isCellMatched(params.value, effective)
+                ) {
+                  classes.push('search-highlight-cell');
+                }
               }
 
               return classes.length > 0 ? classes.join(' ') : undefined;
@@ -403,26 +472,17 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       };
     }, []);
 
-    const debouncedQuickFilterUpdate = useMemo(() => {
+    const debouncedSetSearchString = useMemo(() => {
       return debounce((searchValue: string) => {
         setSearchString(searchValue);
-
-        const api = gridRef.current?.api;
-        api?.setGridOption('quickFilterText', searchValue);
-
-        // Ensure cellClass / renderers see the latest searchString from the store
-        // before the grid repaints.
-        setTimeout(() => {
-          api?.refreshCells({ force: true });
-        }, 0);
       }, 700);
     }, [setSearchString]);
 
     useEffect(() => {
       return () => {
-        debouncedQuickFilterUpdate.cancel();
+        debouncedSetSearchString.cancel();
       };
-    }, [debouncedQuickFilterUpdate]);
+    }, [debouncedSetSearchString]);
 
     const onFilterTextBoxChanged = useCallback(
       (e: any) => {
@@ -430,9 +490,10 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
           e?.target?.value ??
           (document.getElementById('filter-text-box') as HTMLInputElement | null)?.value ??
           '';
-        debouncedQuickFilterUpdate(searchValue);
+        applySearchToGrid(searchValue);
+        debouncedSetSearchString(searchValue);
       },
-      [debouncedQuickFilterUpdate],
+      [applySearchToGrid, debouncedSetSearchString],
     );
 
     const handleDateSelect = useCallback((date: Date) => {
@@ -458,12 +519,9 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       }
 
       setSearchString(formattedDate);
-      gridRef.current!.api.setGridOption('quickFilterText', formattedDate);
-      setTimeout(() => {
-        gridRef.current?.api.refreshCells({ force: true });
-      }, 0);
+      applySearchToGrid(formattedDate);
       setShowDatePicker(false);
-    }, [formatDateToYYYYMMDD, selectedDate, setSearchString]);
+    }, [applySearchToGrid, formatDateToYYYYMMDD, selectedDate, setSearchString]);
 
     const handleCancelDatePicker = useCallback(() => {
       const searchInput = document.getElementById('filter-text-box') as HTMLInputElement;
@@ -671,12 +729,17 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     };
 
     const clearFilters = () => {
-      const api: GridApi | undefined = gridRef.current.api;
+      const api: GridApi | undefined = gridApiRef.current ?? gridRef.current?.api;
       if (api) {
         api?.setFilterModel(null);
+        setParsedGridSearchForHighlight(EMPTY_PARSED_GRID_SEARCH);
         api?.setGridOption('quickFilterText', '');
         setSearchString('');
-        api?.refreshCells({ force: true });
+        setTimeout(() => {
+          api?.refreshClientSideRowModel('filter');
+          api?.refreshCells({ force: true });
+          api?.refreshHeader();
+        }, 0);
         api?.redrawRows();
       }
     };
@@ -694,6 +757,132 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
         searchInput.value = searchString;
       }
     }, [searchString]);
+
+    useEffect(() => {
+      const api = gridApiRef.current ?? gridRef.current?.api ?? agGridApi;
+      if (!api) {
+        return;
+      }
+      const q = searchString?.trim();
+      if (!q) {
+        setSearchColumnMatches([]);
+        return;
+      }
+      const t = window.setTimeout(() => {
+        setSearchColumnMatches(
+          getDisplayedColumnsWithSearchMatches(
+            api,
+            searchString,
+            dataColumnNames,
+            columnHeadersForSearch,
+          ),
+        );
+      }, 0);
+      return () => window.clearTimeout(t);
+    }, [
+      agGridApi,
+      dataColumnNames,
+      filterModel,
+      filtersResetCount,
+      rowList,
+      searchString,
+      columnHeadersForSearch,
+    ]);
+
+    const handleSearchColumnClick = useCallback(
+      (colId: string) => {
+        setSearchColumnMatchesOpen(false);
+        const scrollToColumnAndFirstMatch = () => {
+          const api = gridApiRef.current ?? gridRef.current?.api ?? agGridApi;
+          if (!api) {
+            return;
+          }
+          const p = getParsedGridSearchForHighlight();
+          api.ensureColumnVisible(colId, 'middle');
+          if (p.columnHeaderOnly) {
+            return;
+          }
+          const effective = (p.valueQuery || '').trim() || (p.raw || '').trim();
+          if (!effective) {
+            return;
+          }
+          let first: IRowNode | undefined;
+          api.forEachNodeAfterFilter((node) => {
+            if (first || !node.data) {
+              return;
+            }
+            if (isCellMatched(node.data[colId], effective)) {
+              first = node;
+            }
+          });
+          if (!first) {
+            return;
+          }
+          const rowIndex = first.rowIndex;
+          if (typeof rowIndex === 'number' && rowIndex >= 0) {
+            api.ensureIndexVisible(rowIndex, 'middle');
+          } else {
+            api.ensureNodeVisible(first, 'middle');
+          }
+        };
+        // После setState (закрытие дропдауна) даём React/гриду отрисоваться, иначе скролл часто не применяется.
+        window.setTimeout(() => {
+          requestAnimationFrame(scrollToColumnAndFirstMatch);
+        }, 0);
+      },
+      [agGridApi],
+    );
+
+    const isExternalFilterPresent = useCallback(
+      () => {
+        const p = getParsedGridSearchForHighlight();
+        return Boolean(
+          p.columnColId && !p.columnHeaderOnly && (p.valueQuery || '').trim(),
+        );
+      },
+      [],
+    );
+
+    const doesExternalFilterPass = useCallback((node: IRowNode) => {
+      const p = getParsedGridSearchForHighlight();
+      if (!p.columnColId || p.columnHeaderOnly) {
+        return true;
+      }
+      const effective = (p.valueQuery || '').trim() || (p.raw || '').trim();
+      if (!effective) {
+        return true;
+      }
+      return isCellMatched(node.data?.[p.columnColId], effective);
+    }, []);
+
+    useEffect(() => {
+      const hasDropdown =
+        searchColumnMatchesOpen &&
+        searchColumnMatches.length > 0 &&
+        Boolean(searchString?.trim());
+      if (!hasDropdown) {
+        return;
+      }
+
+      const handleMouseDown = (event: MouseEvent) => {
+        const host = searchColumnMatchesHostRef.current;
+        if (!host) {
+          return;
+        }
+        const target = event.target as Node | null;
+        if (target && host.contains(target)) {
+          return;
+        }
+        setSearchColumnMatchesOpen(false);
+      };
+
+      document.addEventListener('mousedown', handleMouseDown);
+      return () => document.removeEventListener('mousedown', handleMouseDown);
+    }, [
+      searchColumnMatchesOpen,
+      searchColumnMatches.length,
+      searchString,
+    ]);
 
     // Close date picker when clicking outside
     useEffect(() => {
@@ -750,10 +939,19 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       };
     }, []);
 
-    const _onGridReady = useCallback((event: GridReadyEvent) => {
-      onGridReady?.(event);
-      setAgGridApi(event.api);
-    }, []);
+    const _onGridReady = useCallback(
+      (event: GridReadyEvent) => {
+        gridApiRef.current = event.api;
+        onGridReady?.(event);
+        setAgGridApi(event.api);
+        const searchInput = document.getElementById('filter-text-box') as HTMLInputElement | null;
+        const v = searchInput?.value ?? useGlobalStore.getState().searchString ?? '';
+        if (v.trim()) {
+          applySearchToGrid(v);
+        }
+      },
+      [onGridReady, applySearchToGrid],
+    );
 
     const _onFirstDataRendered = useCallback((event: FirstDataRenderedEvent) => {
       onFirstDataRendered?.(event);
@@ -772,6 +970,24 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
 
     const quickFilterParser = (quickFilter: string) => quickFilter.split('🐸');
 
+    const searchColumnPickerTitle =
+      'Показать список колонок, в которых есть совпадения с текстом поиска. Выберите колонку — таблица прокрутится к колонке и к первой строке с совпадением. Можно указать колонку в конце строки поиска по началу её заголовка (например: «текст подразделение вла» для колонки «Подразделение владельца»).';
+
+    const canShowSearchColumnPicker =
+      searchColumnMatches.length > 0 && Boolean(searchString?.trim());
+
+    const handleToggleSearchColumnMatches = useCallback(
+      (event: ReactMouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (!canShowSearchColumnPicker) {
+          return;
+        }
+        setSearchColumnMatchesOpen((open) => !open);
+      },
+      [canShowSearchColumnPicker],
+    );
+
     return (
       <Flexbox height="calc(100vh - 220px)">
         <div style={containerStyle}>
@@ -786,6 +1002,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
                   key={filtersResetCount}
                 >
                   <div
+                    ref={searchColumnMatchesHostRef}
                     style={{
                       position: 'relative',
                       display: 'flex',
@@ -803,8 +1020,87 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
                         width: '555px',
                       }}
                       dimension="s"
-                      icons={<SearchOutline />}
+                      icons={
+                        <>
+                          <button
+                            type="button"
+                            title={searchColumnPickerTitle}
+                            aria-label={searchColumnPickerTitle}
+                            aria-expanded={searchColumnMatchesOpen}
+                            aria-haspopup="listbox"
+                            aria-controls="ag-grid-search-column-matches"
+                            disabled={!canShowSearchColumnPicker}
+                            onClick={handleToggleSearchColumnMatches}
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              margin: 0,
+                              padding: 0,
+                              border: 'none',
+                              background: 'transparent',
+                              cursor: canShowSearchColumnPicker ? 'pointer' : 'not-allowed',
+                              opacity: canShowSearchColumnPicker ? 1 : 0.4,
+                              color: 'inherit',
+                            }}
+                          >
+                            <ArrowsHorizontalOutline width={20} height={20} />
+                          </button>
+                          <SearchOutline />
+                        </>
+                      }
                     />
+                    {searchColumnMatchesOpen &&
+                    searchColumnMatches.length > 0 &&
+                    searchString.trim() ? (
+                      <div
+                        id="ag-grid-search-column-matches"
+                        role="listbox"
+                        aria-label="Колонки с совпадениями по поиску"
+                        style={{
+                          position: 'absolute',
+                          top: 'calc(100% + 4px)',
+                          left: 0,
+                          width: '100%',
+                          maxHeight: 220,
+                          overflowY: 'auto',
+                          zIndex: 1000,
+                          background: '#fff',
+                          border: '1px solid #d0d7de',
+                          borderRadius: 4,
+                          boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+                          padding: '8px 0',
+                        }}
+                      >
+                        <div style={{ padding: '0 12px 6px' }}>
+                          <T font="Caption/Caption 1" color="Neutral/Neutral 50">
+                            Найдено в колонках
+                          </T>
+                        </div>
+                        {searchColumnMatches.map(({ colId, headerName }) => (
+                          <button
+                            key={colId}
+                            type="button"
+                            role="option"
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={() => handleSearchColumnClick(colId)}
+                            style={{
+                              display: 'block',
+                              width: '100%',
+                              textAlign: 'left',
+                              border: 'none',
+                              background: 'transparent',
+                              padding: '6px 12px',
+                              cursor: 'pointer',
+                              fontSize: 13,
+                              lineHeight: '18px',
+                            }}
+                          >
+                            {headerName}
+                          </button>
+                        ))}
+                      </div>
+                    ) : null}
 
                     {/* {showDatePicker && (
                       <div
@@ -916,6 +1212,8 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
           <GridWrapper style={gridStyle} className="ag-theme-quartz">
             <AgGridReact
               quickFilterParser={quickFilterParser}
+              isExternalFilterPresent={isExternalFilterPresent}
+              doesExternalFilterPass={doesExternalFilterPass}
               maintainColumnOrder
               pagination={pagination}
               rowDragManaged={rowDragManaged}
@@ -982,6 +1280,11 @@ const GridWrapper = styled('div')`
   & .search-highlight-cell {
     background-color: #fff8e1;
     border: 1px solid #ffeb3b;
+  }
+
+  & .search-highlight-column-header {
+    background-color: #fff8e1;
+    box-shadow: inset 0 -2px 0 #ffeb3b;
   }
 `;
 

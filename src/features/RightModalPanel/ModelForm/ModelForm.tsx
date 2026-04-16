@@ -49,6 +49,8 @@ import { useActiveFormSchema } from './useActiveFormSchema';
 import { useFormFields } from './useFormFields';
 import { ALLOCATION_FIELDS_NAMES_USAGE, SCHEMA_NAME_MAP } from './constants';
 import { ModelFormDotMenu } from './ModelFormDotMenu';
+import { ModelFormQaDevPanel } from './ModelFormQaDevPanel';
+import { isModelFormInnoDevDebug } from './modelFormDevUtils';
 import { useModelsStore } from '../../../shared/stores';
 
 type SubmitType = { checkOnly?: boolean };
@@ -228,6 +230,7 @@ export const ModelForm = ({
   );
 
   const groupedFieldsBySchemaName = groupBy(refinedFields, 'schemaKey');
+  const showInnoDevHints = isModelFormInnoDevDebug();
   console.log('🐸 Pepe said >> ModelForm >> groupedFieldsBySchemaName:', groupedFieldsBySchemaName);
 
 
@@ -717,6 +720,7 @@ export const ModelForm = ({
   }, [valuesWithActiveModelFlag, dirtyFields, formSchema, wasPreviouslyActiveModel, refinedFields, initialRow]);
 
   return (
+    <>
     <RightPanel
       title={title}
       showPanel
@@ -807,6 +811,8 @@ export const ModelForm = ({
                           key={field.name}
                           ref={errorElemRef}
                           data-form-input={field.name}
+                          data-artefact-tech-label={field.name}
+                          title={showInnoDevHints ? String(field.name) : undefined}
                         >
                           <InputFactory<keyof Row>
                             values={values}
@@ -855,6 +861,10 @@ export const ModelForm = ({
         </>
       }
     />
+    {showInnoDevHints ? (
+      <ModelFormQaDevPanel fields={refinedFields} modelSource={initialRow?.model_source} />
+    ) : null}
+    </>
   );
 };
 
