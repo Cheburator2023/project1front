@@ -95,6 +95,12 @@ const ModelCount = styled('div')`
   padding: 4px 0;
 `;
 
+const HelpText = styled('div')`
+  color: #4b5563;
+  font-size: 12px;
+  padding: 4px 0 8px;
+`;
+
 const FilterRow = styled('div')`
   display: flex;
   align-items: center;
@@ -168,10 +174,11 @@ export const ConfirmationTable = ({
 
   const filterableFields = useMemo(
     () => [
-      { key: 'model_id', label: 'ID модели' },
+      { key: 'model_id', label: 'Идентификатор версии модели' },
       { key: 'model_alias', label: 'Алиас' },
-      { key: 'model_name', label: 'Название' },
-      { key: 'business_customer', label: 'Владелец' },
+      { key: 'model_name', label: 'Название модели' },
+      { key: 'model_name_dadm', label: 'Название модели в реестре ДАДМ' },
+      { key: 'business_customer', label: 'Владелец модели/алгоритма' },
       { key: 'business_customer_departament', label: 'Подразделение' },
     ],
     [],
@@ -208,7 +215,7 @@ export const ConfirmationTable = ({
               fontSize: '13px',
             }}
           >
-            <option value="">Фильтр по полю...</option>
+            <option value="">Фильтр по столбцу...</option>
             {filterableFields.map((f) => (
               <option key={f.key} value={f.key}>
                 {f.label}
@@ -219,7 +226,7 @@ export const ConfirmationTable = ({
             <input
               value={filterValue}
               onChange={(e) => setFilterValue(e.target.value)}
-              placeholder="Значение фильтра..."
+              placeholder="Введите значение фильтра..."
               style={{
                 border: '1px solid #d1d5db',
                 borderRadius: '4px',
@@ -228,6 +235,19 @@ export const ConfirmationTable = ({
                 width: '200px',
               }}
             />
+          )}
+          {(searchQuery || filterField || filterValue) && (
+            <Button
+              dimension="s"
+              appearance="secondary"
+              onClick={() => {
+                setSearchQuery('');
+                setFilterField('');
+                setFilterValue('');
+              }}
+            >
+              <T font="Button/Button 2">Сбросить фильтры</T>
+            </Button>
           )}
         </FilterRow>
         <ActionsRight>
@@ -246,25 +266,32 @@ export const ConfirmationTable = ({
         </T>
       </ModelCount>
 
+      <HelpText>
+        <T font="Caption/Caption 1">
+          В колонке «Используется в текущем квартале»: «Да» — модель используется, «Нет» — модель не используется.
+        </T>
+      </HelpText>
+
       <TableWrapper>
         <ScrollableBody>
           <StyledTable>
             <thead>
               <tr>
-                <th>ID версии модели</th>
+                <th>Идентификатор версии модели</th>
                 <th>Алиас</th>
                 <th>Название модели</th>
-                <th>Название в ДАДМ</th>
-                <th>Владелец</th>
+                <th>Название модели в реестре ДАДМ</th>
+                <th>Владелец модели/алгоритма</th>
+                <th>Подразделение владельца модели/алгоритма</th>
                 <th>Дата подтверждения</th>
-                <th>Используется заказчиком</th>
-                <th>Источник</th>
+                <th>Используется в текущем квартале</th>
+                <th>Источник предзаполнения</th>
               </tr>
             </thead>
             <tbody>
               {filteredModels.length === 0 ? (
                 <tr>
-                  <td colSpan={8} style={{ textAlign: 'center', padding: '24px', color: '#9ca3af' }}>
+                  <td colSpan={9} style={{ textAlign: 'center', padding: '24px', color: '#9ca3af' }}>
                     <T font="Body/Body 1 Long">Модели не найдены</T>
                   </td>
                 </tr>
@@ -286,6 +313,9 @@ export const ConfirmationTable = ({
                       {model.model_name_dadm ?? '-'}
                     </td>
                     <td title={model.business_customer ?? ''}>{model.business_customer ?? '-'}</td>
+                    <td title={model.business_customer_departament ?? ''}>
+                      {model.business_customer_departament ?? '-'}
+                    </td>
                     <td>
                       <DateInput
                         type="date"
@@ -300,6 +330,7 @@ export const ConfirmationTable = ({
                         checked={model.edited_is_used === true}
                         onChange={(e) => handleUsedChange(model.model_id, e.currentTarget.checked)}
                         dimension="s"
+                        title={model.edited_is_used === true ? 'Да' : model.edited_is_used === false ? 'Нет' : 'Не выбрано'}
                       />
                       <span style={{ marginLeft: '6px', fontSize: '12px' }}>
                         {model.edited_is_used === true ? 'Да' : model.edited_is_used === false ? 'Нет' : '-'}

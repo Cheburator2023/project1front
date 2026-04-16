@@ -136,7 +136,7 @@ export const SeedPimPanel = ({ quarter, year, onSeed, isSeeding }: SeedPimPanelP
   return (
     <Panel>
       <ControlRow>
-        <PanelTitle>🧪 [innodev] Засеять данные ПИМ для тестирования приоритетов</PanelTitle>
+        <PanelTitle>🧪 [панель только для dev стендов] Засеять данные ПИМ для тестирования приоритетов</PanelTitle>
         {currentUsername && <UserTag>Я: {currentUsername}</UserTag>}
       </ControlRow>
       <ControlRow>
@@ -178,7 +178,7 @@ export const SeedPimPanel = ({ quarter, year, onSeed, isSeeding }: SeedPimPanelP
             checked={seedIsUsed}
             onChange={(e) => setSeedIsUsed(e.target.checked)}
           />
-          is_used = {seedIsUsed ? 'true' : 'false'}
+          Модель используется заказчиком = {seedIsUsed ? 'true' : 'false'}
         </CheckboxLabel>
         <Button
           dimension="s"

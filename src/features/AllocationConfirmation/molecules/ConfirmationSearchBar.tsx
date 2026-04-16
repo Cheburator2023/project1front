@@ -31,7 +31,7 @@ export const ConfirmationSearchBar = ({ onSearch }: ConfirmationSearchBarProps) 
       <InputField
         value={value}
         onChange={handleChange}
-        placeholder="Поиск по моделям..."
+        placeholder="Поиск по таблице моделей..."
         dimension="s"
         icons={<SearchOutline width={20} height={20} />}
       />

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { T } from '@admiral-ds/react-ui';
 import styled from 'styled-components';
@@ -7,9 +8,11 @@ import {
   useSaveQuarterlyConfirmation,
   useSeedPimUsage,
 } from '@shared/api/hooks/useQuarterlyConfirmation';
-import type { ConfirmationModelRow } from '@shared/api/hooks/useQuarterlyConfirmation';
+import type { ConfirmationModelRow, SaveConfirmationResult } from '@shared/api/hooks/useQuarterlyConfirmation';
+import { ROUTES } from '@app/Routes';
 import { AllocationConfirmationTemplate } from '../templates/AllocationConfirmationTemplate';
 import { SeedPimPanel } from '../organisms/SeedPimPanel';
+import { SaveResultModal } from '../molecules/SaveResultModal';
 import { Loading, useToast } from '../../../shared/ui/atoms';
 
 type EditableModel = ConfirmationModelRow & {
@@ -38,6 +41,7 @@ const isInnodev = typeof window !== 'undefined' && window.location.hostname.incl
 export const AllocationConfirmationPage = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const [saveResult, setSaveResult] = useState<SaveConfirmationResult | null>(null);
 
   const { mutate: seedPim, isPending: isSeeding } = useSeedPimUsage();
 
@@ -55,7 +59,7 @@ export const AllocationConfirmationPage = () => {
   const { mutate: saveConfirmation, isPending: isSaving } = useSaveQuarterlyConfirmation();
 
   const handleCancel = () => {
-    navigate('/');
+    navigate(ROUTES.HOME);
   };
 
   const handleSave = (editableModels: EditableModel[]) => {
@@ -70,13 +74,6 @@ export const AllocationConfirmationPage = () => {
         is_used: m.edited_is_used,
       }));
 
-    console.log('[ALLOC_DEBUG] Save payload:', {
-      quarter: quarterInfo.quarter,
-      year: quarterInfo.year,
-      modelsCount: modelsToSave.length,
-      models: modelsToSave,
-    });
-
     saveConfirmation(
       {
         quarter: quarterInfo.quarter,
@@ -84,13 +81,8 @@ export const AllocationConfirmationPage = () => {
         models: modelsToSave,
       },
       {
-        onSuccess: () => {
-          showToast({
-            message: 'Подтверждение использования успешно сохранено',
-            type: 'success',
-            duration: 3000,
-          });
-          navigate('/');
+        onSuccess: (res) => {
+          setSaveResult(res.data);
         },
         onError: () => {
           showToast({
@@ -136,20 +128,6 @@ export const AllocationConfirmationPage = () => {
     });
   };
 
-  console.log('[ALLOC_DEBUG] quarterInfo:', quarterInfo);
-  console.log('[ALLOC_DEBUG] models count:', models.length);
-  console.log('[ALLOC_DEBUG] prefill stats:', {
-    pim: models.filter((m) => m.prefill_source === 'pim').length,
-    previous_quarter: models.filter((m) => m.prefill_source === 'previous_quarter').length,
-    no_data: models.filter((m) => m.prefill_source === null).length,
-  });
-  console.log('[ALLOC_DEBUG] sample models:', models.slice(0, 5).map((m) => ({
-    model_id: m.model_id,
-    prefill_source: m.prefill_source,
-    is_used: m.is_used,
-    confirmation_date: m.confirmation_date,
-  })));
-
   const seedPanel = isInnodev && quarterInfo ? (
     <SeedPimPanel
       quarter={quarterInfo.quarter}
@@ -172,15 +150,25 @@ export const AllocationConfirmationPage = () => {
     );
   }
 
+  const handleResultClose = () => {
+    setSaveResult(null);
+    navigate(ROUTES.HOME);
+  };
+
   return (
-    <AllocationConfirmationTemplate
-      quarterInfo={quarterInfo}
-      models={models}
-      onSave={handleSave}
-      onCancel={handleCancel}
-      isSaving={isSaving}
-      seedPanel={seedPanel}
-    />
+    <>
+      <AllocationConfirmationTemplate
+        quarterInfo={quarterInfo}
+        models={models}
+        onSave={handleSave}
+        onCancel={handleCancel}
+        isSaving={isSaving}
+        seedPanel={seedPanel}
+      />
+      {saveResult && (
+        <SaveResultModal result={saveResult} onClose={handleResultClose} />
+      )}
+    </>
   );
 };
 

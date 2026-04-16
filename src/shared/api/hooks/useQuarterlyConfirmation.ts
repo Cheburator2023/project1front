@@ -31,6 +31,23 @@ export type SaveQuarterlyConfirmationPayload = {
   }[];
 };
 
+export type SaveConfirmationResult = {
+  success: boolean;
+  quarter: number;
+  year: number;
+  totalInPayload: number;
+  savedToMrm: number;
+  syncedToSum: number;
+  sumSyncErrors: { model_id: string; error: string }[];
+  models: {
+    model_id: string;
+    is_used: boolean | null;
+    confirmation_date: string | null;
+    mrm: boolean;
+    sum: boolean | null;
+  }[];
+};
+
 const fetchActiveQuarter = (signal?: AbortSignal) => {
   return customInstance<{ data: QuarterInfo | null }>({
     url: '/quarterly-confirmation/active-quarter',
@@ -40,18 +57,15 @@ const fetchActiveQuarter = (signal?: AbortSignal) => {
 };
 
 const fetchModelsForConfirmation = async (signal?: AbortSignal) => {
-  const res = await customInstance<{ data: { models: ConfirmationModelRow[]; _debug?: Record<string, unknown> } }>({
+  return customInstance<{ data: { models: ConfirmationModelRow[]; _debug?: Record<string, unknown> } }>({
     url: '/quarterly-confirmation/models',
     method: 'GET',
     signal,
   });
-  console.log('[ALLOC_DEBUG] /models raw response _debug:', res?.data?._debug);
-  console.log('[ALLOC_DEBUG] /models raw response models count:', res?.data?.models?.length);
-  return res;
 };
 
 const saveQuarterlyConfirmation = (data: SaveQuarterlyConfirmationPayload) => {
-  return customInstance<{ data: { success: boolean } }>({
+  return customInstance<{ data: SaveConfirmationResult }>({
     url: '/quarterly-confirmation/save',
     method: 'POST',
     data,
@@ -117,8 +131,7 @@ export const useSeedPimUsage = () => {
 
   return useMutation({
     mutationFn: seedPimUsage,
-    onSuccess: (response) => {
-      console.log('[ALLOC_DEBUG] PIM usage seeded:', response.data);
+    onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ['quarterly-confirmation'],
       });
