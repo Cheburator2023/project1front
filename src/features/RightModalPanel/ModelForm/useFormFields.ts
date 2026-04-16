@@ -42,6 +42,7 @@ export const useFormFields = ({
       showAllFields,
       currentCustomer,
       canEditModelRiskByRole,
+      isBusinessCustomer,
     });
 
     setFields(newFields);
@@ -54,6 +55,7 @@ export const useFormFields = ({
     currentCustomer,
     values,
     canEditModelRiskByRole,
+    isBusinessCustomer,
   ]);
 
   // order field by schema order prop

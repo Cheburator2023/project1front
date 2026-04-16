@@ -566,6 +566,7 @@ const mapArtifactToField = (
   activeRow?: Partial<Row>,
   values?: FormValues,
   canEditModelRiskByRole?: boolean,
+  isBusinessCustomer?: boolean,
 ): InputFactoryProps<keyof Row> => {
   const canEdit = process.env.NO_ROLES === 'true' || canEditArtefact(artifact, activeRow);
   let isDisabled = isFieldDisabled(values, fieldSchema, artifact, activeRow, canEdit);
@@ -573,6 +574,15 @@ const mapArtifactToField = (
 
   // Extra gating: only validators can edit model_risk_type in UI
   if (artifact.artefact_tech_label === 'model_risk_type' && canEditModelRiskByRole === false) {
+    isDisabled = true;
+  }
+
+  // Матрица прав: business_customer + модель из SUM — дата окончания разработки только просмотр (не зависит от наличия значения).
+  if (
+    artifact.artefact_tech_label === 'developing_end_date' &&
+    isBusinessCustomer &&
+    activeRow?.model_source === ModelSource.SUM
+  ) {
     isDisabled = true;
   }
 
@@ -827,6 +837,7 @@ const getFormFields = ({
   showAllFields = false,
   currentCustomer = CUSTOMER_MAP.EVERY_CUSTOMER,
   canEditModelRiskByRole,
+  isBusinessCustomer,
 }: {
   artifacts: Artifact[];
   values?: FormValues;
@@ -836,6 +847,7 @@ const getFormFields = ({
   showAllFields?: boolean;
   currentCustomer: CUSTOMER_TYPE;
   canEditModelRiskByRole?: boolean;
+  isBusinessCustomer?: boolean;
 }) => {
   const isActive = currentFormSchema.some(
     ({ schemaKey }) => schemaKey === SCHEMA_NAME_MAP.ACTIVE_MODEL_SCHEMA.key,
@@ -955,6 +967,7 @@ const getFormFields = ({
         initialRow,
         values,
         canEditModelRiskByRole,
+        isBusinessCustomer,
       );
       return [...fields, field];
     }
