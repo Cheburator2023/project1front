@@ -73,7 +73,7 @@ export const markSchema = (
  * Источник модели для матрицы прав: без учёта регистра и пробелов.
  * Иначе `switch (row.model_source)` не попадал в `sum` и отдавал false для всех полей.
  */
-function getModelSourceAccessBucket(row?: Partial<Row>): 'sum' | 'sum_rm' | null {
+export function getModelSourceAccessBucket(row?: Partial<Row>): 'sum' | 'sum_rm' | null {
   const r = row?.model_source;
   if (r == null || r === '') {
     return null;
@@ -151,6 +151,11 @@ export const pickArtifactForField = (
     if (isSum && a.is_editable_by_role_sum === '1') p += 20;
     if (isSumRm && a.is_editable_by_role_sum_rm === '1') p += 20;
     if (isSumRm && a.is_editable_by_role_sum === '1') p += 5;
+    // Нет model_source в строке / неизвестное значение — выбираем строку с лучшими флагами матрицы.
+    if (!bucket) {
+      if (a.is_editable_by_role_sum === '1') p += 12;
+      if (a.is_editable_by_role_sum_rm === '1') p += 12;
+    }
     return p;
   };
 
@@ -575,7 +580,8 @@ const canEditArtefact = (
     // На стендах часто есть только строка model_source=sum без rm/sum_rm — тогда sum_rm-флаг 0, хотя по смыслу поле доступно.
     return isEditableBySumRm || isEditableBySum;
   }
-  return false;
+  // Нет model_source в строке формы / неизвестное значение — не обнуляем доступ по API.
+  return isEditableBySum || isEditableBySumRm;
 };
 
 const debugFieldAccess = ({

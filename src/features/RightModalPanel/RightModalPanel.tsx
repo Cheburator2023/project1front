@@ -9,6 +9,7 @@ import {
   useTemplatesStore,
   usePanelsStore,
 } from '@src/shared/stores';
+import { getModelSourceAccessBucket } from './helpers';
 import {
   AddModelPanel,
   EditModelPanel,
@@ -42,8 +43,9 @@ export const RightModalPanel = React.memo(() => {
     return rows?.find((row) => row.system_model_id === historyChangesPanel.activeRowId);
   }, [rows, historyChangesPanel.activeRowId]);
 
-  const editSource = editActiveRow?.model_source === 'sum' ? 'sum' : 'sum-rm';
-  const deleteSource = deleteModelPanel.activeRow?.[0]?.model_source === 'sum' ? 'sum' : 'sum-rm';
+  const editSource = getModelSourceAccessBucket(editActiveRow) === 'sum' ? 'sum' : 'sum-rm';
+  const deleteSource =
+    getModelSourceAccessBucket(deleteModelPanel.activeRow?.[0]) === 'sum' ? 'sum' : 'sum-rm';
 
   const { data: sumArtifactsResponse } = useArtefactsControllerGetArtefacts({ source: 'sum' });
   const { data: mrmArtifactsResponse } = useArtefactsControllerGetArtefacts({ source: 'sum-rm' });

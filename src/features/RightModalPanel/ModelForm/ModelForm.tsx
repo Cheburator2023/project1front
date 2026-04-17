@@ -108,6 +108,12 @@ export const ModelForm = ({
   const [submitLoading, setSubmitLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string>();
   const [initialRow, setInitialRow] = useState(activeRow);
+
+  useDeepEffect(() => {
+    if (activeRow) {
+      setInitialRow(activeRow);
+    }
+  }, [activeRow]);
   const [expandedPanel, setExpandPanel] = useState(true);
   const [showAllFields, setShowAllFields] = useState(false);
   const [activeModelByDefault, setActiveModelByDefault] = useState<boolean | undefined>(undefined);
