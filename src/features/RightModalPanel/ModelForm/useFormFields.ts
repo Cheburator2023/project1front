@@ -44,6 +44,7 @@ export const useFormFields = ({
       canEditModelRiskByRole,
       isBusinessCustomer,
       isValidatorLead,
+      isValidator,
       isDsLead,
     });
 
@@ -59,6 +60,7 @@ export const useFormFields = ({
     canEditModelRiskByRole,
     isBusinessCustomer,
     isValidatorLead,
+    isValidator,
     isDsLead,
   ]);
 

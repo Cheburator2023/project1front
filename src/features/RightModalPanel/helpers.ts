@@ -39,6 +39,11 @@ import {
 } from './types';
 
 import {
+  csvMatchedRoles,
+  CSV_EDIT_RULES_BY_ROLE,
+  type CsvEditRoleFlags,
+} from './ModelForm/editRulesFromCsv';
+import {
   ACTIVE_MODEL_SCHEMA,
   BASE_MODEL_SCHEMA,
   NOT_ACTIVE_MODEL_SCHEMA,
@@ -83,66 +88,43 @@ function getModelSourceAccessBucket(row?: Partial<Row>): 'sum' | 'sum_rm' | null
   return null;
 }
 
-const QA_SUM_ROLE_FALLBACK_LABELS: Record<string, string[]> = {
-  [Role.VALIDATOR_LEAD]: [
-    'implementation_segment',
-    'remove_decision',
-    'segment_name',
-    'validation_report_approve_date',
-  ],
-  [Role.BUSINESS_CUSTOMER]: ['implementation_segment', 'remove_decision', 'segment_name'],
-  [Role.DS_LEAD]: [
-    'model_epic_04_date',
-    'model_epic_05a',
-    'model_epic_07',
-    'customer_model_id',
-    'model_epic_09',
-    'model_epic_11_date',
-    'output_table',
-    'allocation_assessment_parameters',
-    'runtime_subsystem',
-    'developing_end_date',
-    'rs_model_decommiss_date',
-    'developing_start_date',
-    'model_epic_04',
-    'model_epic_05',
-    'data_completion_of_stage_05a',
-    'model_epic_07_date',
-    'release',
-    'model_epic_11',
-    'date_of_introduction_into_operation',
-    'allocation_assessment_class',
-    'deploy_team',
-    'buiseness_process_name',
-    'deploy_system',
-  ],
-};
-
-function canEditArtefactByQaSumFallback(
+function canEditArtefactByCsvRules(
   artifact: Artifact | undefined,
   row: Partial<Row> | undefined,
-  flags: { isValidatorLead?: boolean; isBusinessCustomer?: boolean; isDsLead?: boolean },
-): boolean {
-  if (!artifact || getModelSourceAccessBucket(row) !== 'sum') {
-    return false;
+  flags: CsvEditRoleFlags,
+): boolean | null {
+  if (!artifact) {
+    return null;
   }
+  const bucket = getModelSourceAccessBucket(row);
+  if (!bucket) {
+    return null;
+  }
+
+  const matchedRoles = csvMatchedRoles(flags);
+  if (matchedRoles.length === 0) {
+    return null;
+  }
+
   if (artifact.is_edit_flg === '0') {
     return false;
   }
   const tech = artifact.artefact_tech_label;
-  if (flags.isValidatorLead && QA_SUM_ROLE_FALLBACK_LABELS[Role.VALIDATOR_LEAD].includes(tech)) {
+
+  // Явные правила из CSV (ключевые конфликтные поля): для SUM/SUM-RM одинаковые, кроме DS Lead.
+  // DS Lead: доступ только для моделей, созданных в SUM.
+  for (const role of matchedRoles) {
+    const labels = CSV_EDIT_RULES_BY_ROLE[role];
+    if (!labels?.includes(tech)) {
+      continue;
+    }
+    if (role === Role.DS_LEAD) {
+      return bucket === 'sum';
+    }
     return true;
   }
-  if (
-    flags.isBusinessCustomer &&
-    QA_SUM_ROLE_FALLBACK_LABELS[Role.BUSINESS_CUSTOMER].includes(tech)
-  ) {
-    return true;
-  }
-  if (flags.isDsLead && QA_SUM_ROLE_FALLBACK_LABELS[Role.DS_LEAD].includes(tech)) {
-    return true;
-  }
-  return false;
+
+  return null;
 }
 
 /**
@@ -569,7 +551,7 @@ const getDisabledStatus = (minDate: Date, maxDate: Date, quarter: number, canEdi
 const canEditArtefact = (
   artifact?: Artifact,
   row?: Partial<Row>,
-  roleFlags: { isValidatorLead?: boolean; isBusinessCustomer?: boolean; isDsLead?: boolean } = {},
+  roleFlags: CsvEditRoleFlags = {},
 ): boolean => {
   if (!artifact) return false;
 
@@ -581,18 +563,19 @@ const canEditArtefact = (
   }
 
   const bucket = getModelSourceAccessBucket(row);
+  const csvRuleDecision = canEditArtefactByCsvRules(artifact, row, roleFlags);
+  if (csvRuleDecision !== null) {
+    return csvRuleDecision;
+  }
   if (bucket === 'sum') {
-    return (
-      isEditableBySum ||
-      canEditArtefactByQaSumFallback(artifact, row, roleFlags)
-    );
+    return isEditableBySum;
   }
   if (bucket === 'sum_rm') {
     // Бэкенд считает флаги по bucket’ам sum vs sum_rm в artefact_source_roles.
     // На стендах часто есть только строка model_source=sum без rm/sum_rm — тогда sum_rm-флаг 0, хотя по смыслу поле доступно.
     return isEditableBySumRm || isEditableBySum;
   }
-  return canEditArtefactByQaSumFallback(artifact, row, roleFlags);
+  return false;
 };
 
 const debugFieldAccess = ({
@@ -683,12 +666,14 @@ const mapArtifactToField = (
   canEditModelRiskByRole?: boolean,
   isBusinessCustomer?: boolean,
   isValidatorLead?: boolean,
+  isValidator?: boolean,
   isDsLead?: boolean,
 ): InputFactoryProps<keyof Row> => {
   const canEdit =
     process.env.NO_ROLES === 'true' ||
     canEditArtefact(artifact, activeRow, {
       isValidatorLead,
+      isValidator,
       isBusinessCustomer,
       isDsLead,
     });
@@ -962,6 +947,7 @@ const getFormFields = ({
   canEditModelRiskByRole,
   isBusinessCustomer,
   isValidatorLead,
+  isValidator,
   isDsLead,
 }: {
   artifacts: Artifact[];
@@ -974,6 +960,7 @@ const getFormFields = ({
   canEditModelRiskByRole?: boolean;
   isBusinessCustomer?: boolean;
   isValidatorLead?: boolean;
+  isValidator?: boolean;
   isDsLead?: boolean;
 }) => {
   const isActive = currentFormSchema.some(
@@ -1096,6 +1083,7 @@ const getFormFields = ({
         canEditModelRiskByRole,
         isBusinessCustomer,
         isValidatorLead,
+        isValidator,
         isDsLead,
       );
       return [...fields, field];

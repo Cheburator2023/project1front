@@ -50,8 +50,9 @@ export const RightModalPanel = React.memo(() => {
 
   const sumArtifacts = (sumArtifactsResponse as ArtifactResponse | undefined)?.data || [];
   const mrmArtifacts = (mrmArtifactsResponse as ArtifactResponse | undefined)?.data || [];
-  const editArtifacts = editSource === 'sum' ? sumArtifacts : mrmArtifacts;
-  const deleteArtifacts = deleteSource === 'sum' ? sumArtifacts : mrmArtifacts;
+  const effectiveSumArtifacts = sumArtifacts.length > 0 ? sumArtifacts : mrmArtifacts;
+  const editArtifacts = editSource === 'sum' ? effectiveSumArtifacts : mrmArtifacts;
+  const deleteArtifacts = deleteSource === 'sum' ? effectiveSumArtifacts : mrmArtifacts;
   const addArtifacts = mrmArtifacts;
 
   return (
