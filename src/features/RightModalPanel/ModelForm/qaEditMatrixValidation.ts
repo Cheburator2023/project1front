@@ -104,6 +104,21 @@ export function normalizeMarkdownModelSource(raw: string): string | null {
   return null;
 }
 
+/**
+ * Сравнение источника из матрицы и из строки модели (регистр, пробелы).
+ * Иначе «sum» из md и «SUM» / « sum » из грида давали mismatch в правиле «Источник».
+ */
+export function canonicalModelSourceForCompare(raw: string | null | undefined): string | null {
+  if (raw == null || String(raw).trim() === '') {
+    return null;
+  }
+  const n = normalizeMarkdownModelSource(String(raw));
+  if (n !== null) {
+    return n;
+  }
+  return String(raw).trim().toLowerCase();
+}
+
 function splitIntoSections(text: string): string[] {
   const n = text.replace(/\r\n/g, '\n');
   const byDash = n.split(SECTION_SPLIT).filter((s) => s.trim());
@@ -317,13 +332,17 @@ function buildContextRuleLines(
           text: 'Источник: у открытой модели нет model_source',
         });
       } else {
-        modelSourceContextMatch = section.matrixModelSource === actual;
+        const expectedCanon = canonicalModelSourceForCompare(section.matrixModelSource);
+        const actualCanon = canonicalModelSourceForCompare(actual);
+        modelSourceContextMatch = Boolean(
+          expectedCanon && actualCanon && expectedCanon === actualCanon,
+        );
         rules.push({
           id: 'modelSource',
           applied: true,
           pass: modelSourceContextMatch,
           text: modelSourceContextMatch
-            ? `Источник: «${section.matrixModelSource}» совпадает с моделью`
+            ? `Источник: «${section.matrixModelSource}» совпадает с моделью («${actual}»)`
             : `Источник: в матрице «${section.matrixModelSource}», у модели «${actual}»`,
         });
       }

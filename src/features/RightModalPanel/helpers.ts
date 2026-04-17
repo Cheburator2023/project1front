@@ -627,7 +627,7 @@ const mapArtifactToField = (
   if (
     artifact.artefact_tech_label === 'developing_end_date' &&
     isBusinessCustomer &&
-    activeRow?.model_source === ModelSource.SUM
+    getModelSourceAccessBucket(activeRow) === 'sum'
   ) {
     isDisabled = true;
   }
