@@ -34,9 +34,6 @@ export const RightModalPanel = React.memo(() => {
     closeDeleteModelPanel,
   } = usePanelsStore();
 
-  const { data: artifactsResponse } = useArtefactsControllerGetArtefacts();
-  const artifactsData = artifactsResponse as ArtifactResponse | undefined;
-
   const editActiveRow = useMemo(() => {
     return rows?.find((row) => row.system_model_id === editModelPanel.activeRowId);
   }, [rows, editModelPanel.activeRowId]);
@@ -45,12 +42,24 @@ export const RightModalPanel = React.memo(() => {
     return rows?.find((row) => row.system_model_id === historyChangesPanel.activeRowId);
   }, [rows, historyChangesPanel.activeRowId]);
 
+  const editSource = editActiveRow?.model_source === 'sum' ? 'sum' : 'sum-rm';
+  const deleteSource = deleteModelPanel.activeRow?.[0]?.model_source === 'sum' ? 'sum' : 'sum-rm';
+
+  const { data: sumArtifactsResponse } = useArtefactsControllerGetArtefacts({ source: 'sum' });
+  const { data: mrmArtifactsResponse } = useArtefactsControllerGetArtefacts({ source: 'sum-rm' });
+
+  const sumArtifacts = (sumArtifactsResponse as ArtifactResponse | undefined)?.data || [];
+  const mrmArtifacts = (mrmArtifactsResponse as ArtifactResponse | undefined)?.data || [];
+  const editArtifacts = editSource === 'sum' ? sumArtifacts : mrmArtifacts;
+  const deleteArtifacts = deleteSource === 'sum' ? sumArtifacts : mrmArtifacts;
+  const addArtifacts = mrmArtifacts;
+
   return (
     <>
       <AddModelPanel
         isOpen={addModelPanel.isOpen}
         rows={rows || []}
-        artifacts={artifactsData?.data || []}
+        artifacts={addArtifacts}
         onClose={closeAddModelPanel}
         onSubmit={onSubmit}
       />
@@ -58,7 +67,7 @@ export const RightModalPanel = React.memo(() => {
       <EditModelPanel
         isOpen={editModelPanel.isOpen}
         rows={rows || []}
-        artifacts={artifactsData?.data || []}
+        artifacts={editArtifacts}
         activeRow={editActiveRow}
         editCellName={editModelPanel.activeCellName}
         onClose={closeEditModelPanel}
@@ -83,7 +92,7 @@ export const RightModalPanel = React.memo(() => {
 
       <DeleteModelPanel
         isOpen={deleteModelPanel.isOpen}
-        artifacts={artifactsData?.data || []}
+        artifacts={deleteArtifacts}
         activeRow={deleteModelPanel.activeRow}
         editCellName={deleteModelPanel.activeCellName}
         onClose={closeDeleteModelPanel}

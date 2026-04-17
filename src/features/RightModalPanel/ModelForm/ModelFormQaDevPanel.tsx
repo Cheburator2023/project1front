@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { Button, T } from '@admiral-ds/react-ui';
 
+import type { Artifact } from '@shared/api/types';
 import { Row } from '@shared/types';
 import { InputFactoryProps } from '@shared/ui/organisms';
 import { useUserStore } from '@shared/stores';
@@ -17,6 +18,9 @@ const ruleLineColor = (r: QaMatrixRuleLine): string => {
   if (!r.applied) {
     return '#6b7280';
   }
+  if (r.id === 'apiFlags') {
+    return '#1565c0';
+  }
   return r.pass ? '#1b5e20' : '#b71c1c';
 };
 
@@ -24,6 +28,8 @@ type ModelFormQaDevPanelProps = {
   fields: InputFactoryProps<keyof Row>[];
   /** model_source открытой модели (Keycloak / строка в таблице) */
   modelSource?: string | null;
+  /** Список артефактов с API — для строки «API артефакта» при расхождении с матрицей */
+  artifacts?: Artifact[];
 };
 
 const panelStyle: React.CSSProperties = {
@@ -52,7 +58,7 @@ const headerStyle: React.CSSProperties = {
   gap: 8,
 };
 
-export const ModelFormQaDevPanel = ({ fields, modelSource }: ModelFormQaDevPanelProps) => {
+export const ModelFormQaDevPanel = ({ fields, modelSource, artifacts }: ModelFormQaDevPanelProps) => {
   const [open, setOpen] = useState(true);
   const [input, setInput] = useState('');
   const [results, setResults] = useState<QaMatrixValidationItem[] | null>(null);
@@ -72,14 +78,19 @@ export const ModelFormQaDevPanel = ({ fields, modelSource }: ModelFormQaDevPanel
         ? 'Не найдено строк с «⊖» и блоком «в требованиях:» — вставьте текст как в qa_edit_matrix.md'
         : null,
     );
-    const outcome = validateQaMatrixAgainstFormFields(parsed, fields, {
-      username,
-      groups,
-      modelSource,
-    });
+    const outcome = validateQaMatrixAgainstFormFields(
+      parsed,
+      fields,
+      {
+        username,
+        groups,
+        modelSource,
+      },
+      artifacts,
+    );
     setResults(outcome.items);
     setSkippedSectionsByLogin(outcome.skippedSectionsByLogin);
-  }, [input, fields, username, groups, modelSource]);
+  }, [input, fields, username, groups, modelSource, artifacts]);
 
   const summary = useMemo(() => {
     if (!results?.length) {

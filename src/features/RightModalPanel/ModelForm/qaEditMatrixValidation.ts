@@ -1,5 +1,8 @@
+import type { Artifact } from '@shared/api/types';
 import { ModelSource, Row } from '@shared/types';
 import { InputFactoryProps } from '@shared/ui/organisms';
+
+import { pickArtifactForField } from '../helpers';
 
 export type QaMatrixParsedRow = {
   artefactTechLabel: string;
@@ -28,7 +31,7 @@ export type QaMatrixRuntimeContext = {
 
 /** Отдельное правило проверки — для раскраски в UI */
 export type QaMatrixRuleLine = {
-  id: 'login' | 'groups' | 'modelSource' | 'access' | 'label';
+  id: 'login' | 'groups' | 'modelSource' | 'access' | 'label' | 'apiFlags';
   /** false — правило не применялось (нет условий в матрице), нейтральный цвет */
   applied: boolean;
   /** Имеет смысл только при applied === true */
@@ -382,6 +385,7 @@ function buildFieldRuleLines(
   actualAccessible: boolean,
   fieldPresent: boolean,
   disabled: boolean,
+  artifact?: Artifact | null,
 ): QaMatrixRuleLine[] {
   const req = row.requirementAccessible ? 'доступно' : 'недоступно';
   const act = actualAccessible ? 'доступно' : 'недоступно';
@@ -402,6 +406,16 @@ function buildFieldRuleLines(
     text: accessText,
   };
 
+  const apiFlagsLine: QaMatrixRuleLine | null =
+    !accessMatch && fieldPresent && row.requirementAccessible && artifact
+      ? {
+          id: 'apiFlags',
+          applied: true,
+          pass: true,
+          text: `API артефакта (id=${artifact.artefact_id}): is_edit_flg=${artifact.is_edit_flg}, is_editable_by_role_sum=${artifact.is_editable_by_role_sum}, is_editable_by_role_sum_rm=${artifact.is_editable_by_role_sum_rm} — для SUM-модели смотрите в первую очередь is_editable_by_role_sum (должно быть 1); иначе проверяйте artefact_source_roles / бэкенд.`,
+        }
+      : null;
+
   const labelLine: QaMatrixRuleLine = row.expectedLabel?.trim()
     ? {
         id: 'label',
@@ -418,7 +432,7 @@ function buildFieldRuleLines(
         text: 'Label: в матрице не задан',
       };
 
-  return [accessLine, labelLine];
+  return [accessLine, ...(apiFlagsLine ? [apiFlagsLine] : []), labelLine];
 }
 
 /**
@@ -429,6 +443,8 @@ export function validateQaMatrixAgainstFormFields(
   sections: QaMatrixSection[],
   fields: InputFactoryProps<keyof Row>[],
   runtimeContext?: QaMatrixRuntimeContext,
+  /** Передать список артефактов с API — при расхождении доступа добавится строка с флагами is_edit_flg / is_editable_by_role_* */
+  artifacts?: Artifact[],
 ): QaMatrixValidationOutcome {
   const skippedSectionsByLogin = sections.reduce((n, section) => {
     const expectedLogin = section.matrixUsername?.trim();
@@ -470,6 +486,13 @@ export function validateQaMatrixAgainstFormFields(
       const accessMatch = row.requirementAccessible === actualAccessible;
       const fieldPass = accessMatch && labelMatches;
 
+      const artifactForRow =
+        artifacts && artifacts.length > 0
+          ? pickArtifactForField(artifacts, row.artefactTechLabel, {
+              model_source: runtimeContext?.modelSource ?? undefined,
+            })
+          : undefined;
+
       const fieldRules = buildFieldRuleLines(
         row,
         field,
@@ -478,6 +501,7 @@ export function validateQaMatrixAgainstFormFields(
         actualAccessible,
         fieldPresent,
         disabled,
+        artifactForRow,
       );
 
       const rules: QaMatrixRuleLine[] = [...ctx.rules, ...fieldRules];

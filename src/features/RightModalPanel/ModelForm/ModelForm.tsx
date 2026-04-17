@@ -862,7 +862,11 @@ export const ModelForm = ({
       }
     />
     {showInnoDevHints ? (
-      <ModelFormQaDevPanel fields={refinedFields} modelSource={initialRow?.model_source} />
+      <ModelFormQaDevPanel
+        fields={refinedFields}
+        modelSource={initialRow?.model_source}
+        artifacts={artifacts}
+      />
     ) : null}
     </>
   );
