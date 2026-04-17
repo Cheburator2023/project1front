@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { T } from '@admiral-ds/react-ui';
 import styled from 'styled-components';
 import {
@@ -8,7 +9,6 @@ import {
   useSeedPimUsage,
 } from '@shared/api/hooks/useQuarterlyConfirmation';
 import type { ConfirmationModelRow, SaveConfirmationResult } from '@shared/api/hooks/useQuarterlyConfirmation';
-import { ROUTES } from '@app/Routes';
 import { AllocationConfirmationTemplate } from '../templates/AllocationConfirmationTemplate';
 import { SeedPimPanel } from '../organisms/SeedPimPanel';
 import { SaveResultModal } from '../molecules/SaveResultModal';
@@ -38,6 +38,7 @@ const ErrorWrapper = styled('div')`
 const isInnodev = typeof window !== 'undefined' && window.location.hostname.includes('innodev') || process.env.NO_ROLES === 'true';
 
 export const AllocationConfirmationPage = () => {
+  const navigate = useNavigate();
   const { showToast } = useToast();
   const [saveResult, setSaveResult] = useState<SaveConfirmationResult | null>(null);
 
@@ -57,10 +58,7 @@ export const AllocationConfirmationPage = () => {
   const { mutate: saveConfirmation, isPending: isSaving } = useSaveQuarterlyConfirmation();
 
   const goHome = () => {
-    const { pathname, search, hash } = window.location;
-    const escaped = ROUTES.ALLOCATION_CONFIRMATION.replace(/\//g, '\\/');
-    const homePath = pathname.replace(new RegExp(`${escaped}\\/?$`), '') || '/';
-    window.location.replace(`${homePath}${search}${hash}`);
+    navigate('..', { relative: 'path' });
   };
 
   const handleCancel = () => {

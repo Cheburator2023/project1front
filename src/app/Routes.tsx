@@ -13,7 +13,6 @@ export const ROUTES = {
   HOME: IS_DEV ? '/sum-rm' : '/',
   COMPARE_MODELS: '/compare-models',
   ALLOCATION_CONFIRMATION: '/allocation-confirmation',
-  MF_HOME_ROUTE: IS_DEV ? '/sum-rm' : '/',
   CHARTS: 'charts',
   CHARTS_BI: 'charts_bi',
   PLAYGROUND: 'playground',
