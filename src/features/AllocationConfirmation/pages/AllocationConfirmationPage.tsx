@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { T } from '@admiral-ds/react-ui';
 import styled from 'styled-components';
 import {
@@ -39,7 +38,6 @@ const ErrorWrapper = styled('div')`
 const isInnodev = typeof window !== 'undefined' && window.location.hostname.includes('innodev') || process.env.NO_ROLES === 'true';
 
 export const AllocationConfirmationPage = () => {
-  const navigate = useNavigate();
   const { showToast } = useToast();
   const [saveResult, setSaveResult] = useState<SaveConfirmationResult | null>(null);
 
@@ -58,8 +56,15 @@ export const AllocationConfirmationPage = () => {
 
   const { mutate: saveConfirmation, isPending: isSaving } = useSaveQuarterlyConfirmation();
 
+  const goHome = () => {
+    const { pathname, search, hash } = window.location;
+    const escaped = ROUTES.ALLOCATION_CONFIRMATION.replace(/\//g, '\\/');
+    const homePath = pathname.replace(new RegExp(`${escaped}\\/?$`), '') || '/';
+    window.location.replace(`${homePath}${search}${hash}`);
+  };
+
   const handleCancel = () => {
-    navigate(ROUTES.MF_HOME_ROUTE);
+    goHome();
   };
 
   const handleSave = (editableModels: EditableModel[]) => {
@@ -152,7 +157,7 @@ export const AllocationConfirmationPage = () => {
 
   const handleResultClose = () => {
     setSaveResult(null);
-    navigate(ROUTES.MF_HOME_ROUTE);
+    goHome();
   };
 
   return (

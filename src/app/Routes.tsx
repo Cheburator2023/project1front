@@ -6,11 +6,14 @@ import { Playground } from '@pages/Playground';
 import { CompareModelsPage } from '../pages/CompareModelsPage/CompareModelsPage';
 import { AllocationConfirmationPage } from '../features/AllocationConfirmation/pages/AllocationConfirmationPage';
 
+const IS_DEV = process.env.NODE_ENV === 'development';
+
+/** Paths are relative to basename: prod uses `/sum-rm` → home is `/`; dev uses `/` → home is `/sum-rm`. */
 export const ROUTES = {
-  HOME: '/sum-rm',
+  HOME: IS_DEV ? '/sum-rm' : '/',
   COMPARE_MODELS: '/compare-models',
   ALLOCATION_CONFIRMATION: '/allocation-confirmation',
-  MF_HOME_ROUTE: '/sum-rm',
+  MF_HOME_ROUTE: IS_DEV ? '/sum-rm' : '/',
   CHARTS: 'charts',
   CHARTS_BI: 'charts_bi',
   PLAYGROUND: 'playground',
@@ -19,11 +22,6 @@ export const ROUTES = {
 const ROUTE_MAP = [
   {
     path: ROUTES.HOME,
-    index: true,
-    element: <HomePage />,
-  },
-  {
-    path: ROUTES.MF_HOME_ROUTE,
     element: <HomePage />,
   },
   {
