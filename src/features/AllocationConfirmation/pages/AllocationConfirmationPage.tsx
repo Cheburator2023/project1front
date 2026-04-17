@@ -59,7 +59,7 @@ export const AllocationConfirmationPage = () => {
   const { mutate: saveConfirmation, isPending: isSaving } = useSaveQuarterlyConfirmation();
 
   const handleCancel = () => {
-    navigate(ROUTES.HOME);
+    navigate(ROUTES.MF_HOME_ROUTE);
   };
 
   const handleSave = (editableModels: EditableModel[]) => {
@@ -152,7 +152,7 @@ export const AllocationConfirmationPage = () => {
 
   const handleResultClose = () => {
     setSaveResult(null);
-    navigate(ROUTES.HOME);
+    navigate(ROUTES.MF_HOME_ROUTE);
   };
 
   return (

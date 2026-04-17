@@ -7,7 +7,7 @@ import { CompareModelsPage } from '../pages/CompareModelsPage/CompareModelsPage'
 import { AllocationConfirmationPage } from '../features/AllocationConfirmation/pages/AllocationConfirmationPage';
 
 export const ROUTES = {
-  HOME: '/',
+  HOME: '/sum-rm',
   COMPARE_MODELS: '/compare-models',
   ALLOCATION_CONFIRMATION: '/allocation-confirmation',
   MF_HOME_ROUTE: '/sum-rm',

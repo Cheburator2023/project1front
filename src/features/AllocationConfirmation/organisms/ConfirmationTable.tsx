@@ -255,7 +255,7 @@ export const ConfirmationTable = ({
             <T font="Button/Button 2">Отменить</T>
           </Button>
           <Button dimension="s" onClick={handleSave} disabled={isSaving}>
-            <T font="Button/Button 2">{isSaving ? 'Сохранение...' : 'Сохранить'}</T>
+          {isSaving ? 'Сохранение...' : 'Сохранить'}
           </Button>
         </ActionsRight>
       </ActionsBar>
