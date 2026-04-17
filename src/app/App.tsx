@@ -61,7 +61,7 @@ const App = ({ user, onLogout, keycloak }: AppProps) => {
   return (
     <div>
       <div id="portal-root" />
-      <BrowserRouter basename={IS_DEV ? '/' : 'sum-rm'}>
+      <BrowserRouter basename={IS_DEV ? '/' : '/sum-rm'}>
         <QueryClientProvider client={queryClient}>
           <GlobalStyle />
           <Container>
