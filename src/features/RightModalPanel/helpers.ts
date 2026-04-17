@@ -65,6 +65,25 @@ export const markSchema = (
   }));
 
 /**
+ * Источник модели для матрицы прав: без учёта регистра и пробелов.
+ * Иначе `switch (row.model_source)` не попадал в `sum` и отдавал false для всех полей.
+ */
+function getModelSourceAccessBucket(row?: Partial<Row>): 'sum' | 'sum_rm' | null {
+  const r = row?.model_source;
+  if (r == null || r === '') {
+    return null;
+  }
+  const s = String(r).trim().toLowerCase();
+  if (s === 'sum') {
+    return 'sum';
+  }
+  if (s === 'sum-rm' || s === 'sum_rm' || s === 'rm') {
+    return 'sum_rm';
+  }
+  return null;
+}
+
+/**
  * В БД иногда есть несколько строк `artefacts` с одним `artefact_tech_label` (разные artefact_id).
  * `find` брал первую попавшуюся — могли брать строку с is_edit_flg=0 или без матрицы, хотя для другого id всё ок.
  * Берём строку с лучшими правами для текущего model_source.
@@ -78,13 +97,9 @@ export const pickArtifactForField = (
   if (matches.length === 0) return undefined;
   if (matches.length === 1) return matches[0];
 
-  const src = row?.model_source;
-  const isSum = src === ModelSource.SUM;
-  const isSumRm =
-    src === ModelSource.SUM_RM ||
-    src === 'sum_rm' ||
-    src === 'sum-rm' ||
-    src === 'rm';
+  const bucket = getModelSourceAccessBucket(row);
+  const isSum = bucket === 'sum';
+  const isSumRm = bucket === 'sum_rm';
 
   const priority = (a: Artifact): number => {
     let p = 0;
@@ -499,19 +514,16 @@ const canEditArtefact = (artifact?: Artifact, row?: Partial<Row>): boolean => {
     return isEditableBySumRm || isEditableBySum;
   }
 
-  switch (row.model_source) {
-    case ModelSource.SUM:
-      return isEditableBySum;
-    case ModelSource.SUM_RM:
-    case 'sum_rm':
-    case 'sum-rm':
-    case 'rm':
-      // Бэкенд считает флаги по bucket’ам sum vs sum_rm в artefact_source_roles.
-      // На стендах часто есть только строка model_source=sum без rm/sum_rm — тогда sum_rm-флаг 0, хотя по смыслу поле доступно.
-      return isEditableBySumRm || isEditableBySum;
-    default:
-      return false;
+  const bucket = getModelSourceAccessBucket(row);
+  if (bucket === 'sum') {
+    return isEditableBySum;
   }
+  if (bucket === 'sum_rm') {
+    // Бэкенд считает флаги по bucket’ам sum vs sum_rm в artefact_source_roles.
+    // На стендах часто есть только строка model_source=sum без rm/sum_rm — тогда sum_rm-флаг 0, хотя по смыслу поле доступно.
+    return isEditableBySumRm || isEditableBySum;
+  }
+  return false;
 };
 
 const debugFieldAccess = ({
