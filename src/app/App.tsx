@@ -12,6 +12,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 import { Header } from './Header';
 import RoutesComponent from './Routes';
+import { ROUTER_BASENAME_PROD, TrailingSlashRedirect } from './TrailingSlashRedirect';
 import { useDeepEffect } from '../shared/hooks/useDeepEffect';
 import { ToastProvider } from '../shared/ui/atoms';
 
@@ -61,8 +62,9 @@ const App = ({ user, onLogout, keycloak }: AppProps) => {
   return (
     <div>
       <div id="portal-root" />
-      <BrowserRouter basename={IS_DEV ? '/' : '/sum-rm'}>
+      <BrowserRouter basename={IS_DEV ? '/' : ROUTER_BASENAME_PROD}>
         <QueryClientProvider client={queryClient}>
+          <TrailingSlashRedirect />
           <GlobalStyle />
           <Container>
             <ToastProvider>
