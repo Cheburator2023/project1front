@@ -64,11 +64,45 @@ export const markSchema = (
     schemaOrder: schemaFromNameMap.schemaOrder,
   }));
 
+/**
+ * В БД иногда есть несколько строк `artefacts` с одним `artefact_tech_label` (разные artefact_id).
+ * `find` брал первую попавшуюся — могли брать строку с is_edit_flg=0 или без матрицы, хотя для другого id всё ок.
+ * Берём строку с лучшими правами для текущего model_source.
+ */
+export const pickArtifactForField = (
+  artifacts: Artifact[],
+  artefact_tech_label: string,
+  row?: Partial<Row>,
+): Artifact | undefined => {
+  const matches = artifacts.filter((a) => a.artefact_tech_label === artefact_tech_label);
+  if (matches.length === 0) return undefined;
+  if (matches.length === 1) return matches[0];
+
+  const src = row?.model_source;
+  const isSum = src === ModelSource.SUM;
+  const isSumRm =
+    src === ModelSource.SUM_RM ||
+    src === 'sum_rm' ||
+    src === 'sum-rm' ||
+    src === 'rm';
+
+  const priority = (a: Artifact): number => {
+    let p = 0;
+    if (a.is_edit_flg === '1') p += 100;
+    if (isSum && a.is_editable_by_role_sum === '1') p += 20;
+    if (isSumRm && a.is_editable_by_role_sum_rm === '1') p += 20;
+    if (isSumRm && a.is_editable_by_role_sum === '1') p += 5;
+    return p;
+  };
+
+  return [...matches].sort((a, b) => priority(b) - priority(a))[0];
+};
+
 const getInputValuesFromRow = (artifacts: Artifact[], activeRow: Partial<Row> = {}): FormValues =>
   Object.entries(activeRow).reduce((inputValues, rowItem) => {
     const [name, rowValue] = rowItem as [keyof Row, string];
 
-    const artifact = artifacts.find((artifact) => artifact.artefact_tech_label === name);
+    const artifact = pickArtifactForField(artifacts, name, activeRow);
 
     if (artifact) {
       const inputValue = getInputValue(artifact, rowValue);
@@ -956,7 +990,7 @@ const getFormFields = ({
 
   // Генерация полей
   const formFields = fieldsNamesToGenerate.reduce((fields, fieldName) => {
-    const artifact = artifacts.find(({ artefact_tech_label }) => artefact_tech_label === fieldName);
+    const artifact = pickArtifactForField(artifacts, fieldName, initialRow);
     const fieldSchema = currentFormSchema.find(({ name }) => name === fieldName);
 
     if (artifact) {

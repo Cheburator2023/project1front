@@ -8,7 +8,7 @@ export type QaMatrixParsedRow = {
   requirementAccessible: boolean;
 };
 
-/** Секция матрицы: заголовок из qa_edit_matrix.md + строки ⊖ */
+/** Секция матрицы: заголовок из qa_edit_matrix.md + строки ⊖ или ⛔️ */
 export type QaMatrixSection = {
   /** Строка «Пользователь: …» без префикса */
   matrixUsername: string | null;
@@ -117,22 +117,39 @@ function splitIntoSections(text: string): string[] {
   return [n];
 }
 
+/** Строка матрицы: префикс ⊖ или ⛔/⛔️ (U+26D4, опционально VS U+FE0F), затем JSON-фрагмент */
+function stripMatrixRowMarker(line: string): string | null {
+  const t = line.trim();
+  if (t.startsWith('⊖')) {
+    return t.slice('⊖'.length).trimStart();
+  }
+  if (t.startsWith('⛔')) {
+    let rest = t.slice('⛔'.length);
+    if (rest.startsWith('\uFE0F')) {
+      rest = rest.slice(1);
+    }
+    return rest.trimStart();
+  }
+  return null;
+}
+
 function parseMatrixRowsFromSectionBody(sectionText: string): QaMatrixParsedRow[] {
   return sectionText.split(/\r?\n/).reduce<QaMatrixParsedRow[]>((rows, rawLine) => {
     const line = rawLine.trim();
-    if (!line.startsWith('⊖')) {
+    const payload = stripMatrixRowMarker(line);
+    if (payload === null) {
       return rows;
     }
 
-    const tech = line.match(/"artefact_tech_label"\s*:\s*"([^"]+)"/);
+    const tech = payload.match(/"artefact_tech_label"\s*:\s*"([^"]+)"/);
     if (!tech) {
       return rows;
     }
 
-    const labMatch = line.match(/"label"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+    const labMatch = payload.match(/"label"\s*:\s*"((?:[^"\\]|\\.)*)"/);
     const expectedLabel = labMatch ? labMatch[1].replace(/\\"/g, '"') : '';
 
-    const reqM = line.match(REQ_ACCESSIBLE);
+    const reqM = payload.match(REQ_ACCESSIBLE);
     if (!reqM) {
       return rows;
     }
@@ -171,7 +188,7 @@ function parseSectionHeader(sectionText: string): Pick<QaMatrixSection, 'matrixU
 
 /**
  * Разбор tasks/qa_edit_matrix.md: секции по ----- или по повтору «Пользователь:»;
- * в каждой — «Пользователь», «Модель создана в», строки ⊖.
+ * в каждой — «Пользователь», «Модель создана в», строки ⊖ или ⛔️ (как в отчётах теста).
  */
 export function parseQaEditMatrixMarkdown(text: string): QaMatrixSection[] {
   return splitIntoSections(text).flatMap((chunk) => {
