@@ -258,7 +258,7 @@ export const FiltersPanel = ({
             setCompareMode(event.target.checked);
             if (compareOnlyChanged) {
               if (location.pathname !== ROUTES.HOME) {
-                navigate('..', { relative: 'path' });
+                navigate(ROUTES.HOME);
               }
             } else {
               navigate(ROUTES.COMPARE_MODELS);

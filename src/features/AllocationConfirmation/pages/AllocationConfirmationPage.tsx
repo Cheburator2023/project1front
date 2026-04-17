@@ -9,6 +9,7 @@ import {
   useSeedPimUsage,
 } from '@shared/api/hooks/useQuarterlyConfirmation';
 import type { ConfirmationModelRow, SaveConfirmationResult } from '@shared/api/hooks/useQuarterlyConfirmation';
+import { ROUTES } from '@app/Routes';
 import { AllocationConfirmationTemplate } from '../templates/AllocationConfirmationTemplate';
 import { SeedPimPanel } from '../organisms/SeedPimPanel';
 import { SaveResultModal } from '../molecules/SaveResultModal';
@@ -58,7 +59,7 @@ export const AllocationConfirmationPage = () => {
   const { mutate: saveConfirmation, isPending: isSaving } = useSaveQuarterlyConfirmation();
 
   const goHome = () => {
-    navigate('..', { relative: 'path' });
+    navigate(ROUTES.HOME);
   };
 
   const handleCancel = () => {
