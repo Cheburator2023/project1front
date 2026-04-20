@@ -46,6 +46,7 @@ import {
   RATING_SYSTEM_REGULATOR_APPROVE_MODEL_SCHEMA,
   REST_MODEL_SCHEMA,
   SCHEMA_NAME_MAP,
+  SUM_ARTEFACTS,
 } from './ModelForm/constants';
 import { DELETE_CONFIRM_MODEL_SCHEMA, DELETE_MODEL_SCHEMA } from './DeleteModelForm/constants';
 
@@ -456,19 +457,69 @@ const getDisabledStatus = (minDate: Date, maxDate: Date, quarter: number, canEdi
 
 const canEditArtefact = (artifact?: Artifact, row?: Partial<Row>): boolean => {
   if (!artifact) return false;
-  if (!row) return true;
 
   const isEditableBySum = artifact.is_editable_by_role_sum === '1';
   const isEditableBySumRm = artifact.is_editable_by_role_sum_rm === '1';
+
+  if (!row) {
+    return isEditableBySumRm || isEditableBySum;
+  }
 
   switch (row.model_source) {
     case ModelSource.SUM:
       return isEditableBySum;
     case ModelSource.SUM_RM:
-      return isEditableBySumRm;
+    case 'sum_rm':
+    case 'sum-rm':
+    case 'rm':
+      // Бэкенд считает флаги по bucket’ам sum vs sum_rm в artefact_source_roles.
+      // На стендах часто есть только строка model_source=sum без rm/sum_rm — тогда sum_rm-флаг 0, хотя по смыслу поле доступно.
+      return isEditableBySumRm || isEditableBySum;
     default:
       return false;
   }
+};
+
+const debugFieldAccess = ({
+  artifact,
+  row,
+  canEdit,
+  isDisabled,
+}: {
+  artifact: Artifact;
+  row?: Partial<Row>;
+  canEdit: boolean;
+  isDisabled: boolean | undefined;
+}) => {
+  if (typeof window === 'undefined') return;
+
+  const watchedFieldsRaw = window.localStorage.getItem('rightModalDebugFields');
+  if (!watchedFieldsRaw) return;
+
+  const watchedFields = watchedFieldsRaw
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
+  if (!watchedFields.includes(artifact.artefact_tech_label)) return;
+
+  // eslint-disable-next-line no-console
+  console.log('[RightModalPanel access debug]', {
+    field: artifact.artefact_tech_label,
+    model_source: row?.model_source,
+    is_edit_flg: artifact.is_edit_flg,
+    is_editable_by_role_sum: artifact.is_editable_by_role_sum,
+    is_editable_by_role_sum_rm: artifact.is_editable_by_role_sum_rm,
+    canEdit,
+    disabled: isDisabled,
+  });
+  // eslint-disable-next-line no-console
+  console.log(
+    `[RightModalPanel access debug compact] field=${artifact.artefact_tech_label} source=${
+      row?.model_source || ''
+    } canEdit=${String(canEdit)} disabled=${String(isDisabled)} NO_ROLES=${String(
+      process.env.NO_ROLES,
+    )}`,
+  );
 };
 
 const isFieldDisabled = (
@@ -478,6 +529,11 @@ const isFieldDisabled = (
   row?: Partial<Row> | undefined,
   canEdit?: boolean,
 ): boolean | undefined => {
+  // Reporting date is system-managed and should never be editable in the form.
+  if (artifact?.artefact_tech_label === 'update_date') {
+    return true;
+  }
+
   if (fieldSchema?.alwaysDisabled) {
     return true;
   }
@@ -513,6 +569,7 @@ const mapArtifactToField = (
 ): InputFactoryProps<keyof Row> => {
   const canEdit = process.env.NO_ROLES === 'true' || canEditArtefact(artifact, activeRow);
   let isDisabled = isFieldDisabled(values, fieldSchema, artifact, activeRow, canEdit);
+  debugFieldAccess({ artifact, row: activeRow, canEdit, isDisabled });
 
   // Extra gating: only validators can edit model_risk_type in UI
   if (artifact.artefact_tech_label === 'model_risk_type' && canEditModelRiskByRole === false) {
@@ -524,7 +581,9 @@ const mapArtifactToField = (
     name: artifact.artefact_tech_label,
     label: artifact.artefact_label,
     disabled: isDisabled,
-    required: isDisabled ? false : !!fieldSchema?.required,
+    required: isDisabled
+      ? false
+      : checkRequireStatus(values, !!fieldSchema?.required, fieldSchema?.requireConditions),
     addNewOptionEnabled: artifact.can_add_new_option === '1',
     maxLength: fieldSchema?.maxLength,
     requireConditions: fieldSchema?.requireConditions,
@@ -940,6 +999,9 @@ const getFormValue = (value?: InputValue) => {
     case INPUT_TYPE.MULTI_SELECT: {
       return value?.value?.map(({ text }) => text) || '';
     }
+    case INPUT_TYPE.FLAG: {
+      return value?.value ? '1' : '0';
+    }
     default: {
       return value?.value?.toString() || '';
     }
@@ -1023,6 +1085,7 @@ const getInvalidFields = (
   values?: FormValues,
   wasPreviouslyActiveModel?: boolean,
   fields?: FormFields,
+  initialRow?: Partial<Row>
 ) => {
   return activeFormSchema
     .filter((schemaField) => {
@@ -1063,6 +1126,15 @@ const getInvalidFields = (
         return true;
       }
 
+      // Только для СУМ моделей, если значение артефакта из СУМ уже есть и оно не null, запрещаем менять на null
+      if (initialRow?.model_source === ModelSource.SUM 
+        && initialRow[field.name]
+        && SUM_ARTEFACTS.includes(field.name) 
+        && !formValue 
+      ) {
+        return true;
+      }
+      
       return false;
     })
     .map(({ name }) => name);
@@ -1070,6 +1142,26 @@ const getInvalidFields = (
 
 const getProperFormatValueForSubmit = (inputValue: InputValue) => {
   const { type, value } = inputValue;
+
+  // Defensive fallback for auto-filled select values that can occasionally
+  // lose explicit INPUT_TYPE.SELECT during derived form updates.
+  if (
+    type !== INPUT_TYPE.SELECT &&
+    !Array.isArray(value) &&
+    value &&
+    typeof value === 'object' &&
+    'id' in (value as any) &&
+    'text' in (value as any)
+  ) {
+    const normalizedValue = value as { id?: string | number; text?: string };
+    return {
+      artefact_string_value: normalizedValue.text ?? '',
+      artefact_value_id:
+        normalizedValue.id === undefined || normalizedValue.id === null
+          ? null
+          : Number(normalizedValue.id),
+    };
+  }
 
   switch (type) {
     case INPUT_TYPE.DATE:
@@ -1122,14 +1214,108 @@ const getProperFormatValueForSubmit = (inputValue: InputValue) => {
   }
 };
 
+/** Text used in form condition matching (SELECT uses value.text; plain fields use value). */
+export const getFormFieldTextForConditions = (
+  fieldValue: InputValue | undefined,
+): string | undefined => {
+  if (!fieldValue || fieldValue.value == null) {
+    return undefined;
+  }
+  const v = fieldValue.value as { text?: string } | string | number;
+  if (typeof v === 'object' && v !== null && 'text' in v) {
+    return String((v as { text?: string }).text ?? '');
+  }
+  return String(v);
+};
+
+/**
+ * True when current form values satisfy every key in each row of `conditions`
+ * (same idea as valueConditions / handleChange + isEqual in ModelForm).
+ */
+const formValuesSatisfyConditionRows = (
+  values: FormValues,
+  conditions: FormFieldConditions,
+): boolean =>
+  conditions.every((row) =>
+    (Object.keys(row) as (keyof Row)[]).every((key) => {
+      const expected = row[key];
+      if (expected === undefined) {
+        return true;
+      }
+      return getFormFieldTextForConditions(values[key]) === expected;
+    }),
+  );
+
+/**
+ * When BASE_MODEL_SCHEMA `rating_model` valueConditions (e.g. auto «Да») are met but
+ * `rating_model` is missing from state, merge the SELECT from artifacts before submit.
+ * Rules are read from {@link BASE_MODEL_SCHEMA} — not duplicated here.
+ */
+export const mergeAutoRatingModelIfEligible = (
+  values: FormValues | undefined,
+  artifacts: Artifact[],
+): FormValues | undefined => {
+  if (!values) {
+    return values;
+  }
+
+  const ratingField = BASE_MODEL_SCHEMA.find((f) => f.name === 'rating_model');
+  const matchingRule = ratingField?.valueConditions?.find(
+    (vc) => !!vc.conditions?.length && formValuesSatisfyConditionRows(values, vc.conditions),
+  );
+  if (!matchingRule) {
+    return values;
+  }
+
+  const targetText = matchingRule.value;
+  const artifact = artifacts.find((a) => a.artefact_tech_label === 'rating_model');
+  const targetOption = artifact?.values?.find((o) => o.artefact_value === targetText);
+  if (targetOption == null || targetOption.artefact_value_id == null) {
+    return values;
+  }
+
+  const nextRating: InputValue = {
+    type: INPUT_TYPE.SELECT,
+    value: {
+      id: String(targetOption.artefact_value_id),
+      text: targetOption.artefact_value,
+    },
+  };
+
+  const existing = values.rating_model;
+  if (
+    existing?.type === INPUT_TYPE.SELECT &&
+    existing.value &&
+    typeof existing.value === 'object' &&
+    'text' in existing.value &&
+    (existing.value as { text?: string }).text === targetText &&
+    String((existing.value as { id?: string | number }).id) === String(targetOption.artefact_value_id)
+  ) {
+    return values;
+  }
+
+  return { ...values, rating_model: nextRating };
+};
+
 const getArtifactApiItems = (
   values?: FormValues, 
   parentModelId?: string, 
-  changedFields?: Array<keyof Row>
+  changedFields?: Array<keyof Row>,
+  forceIncludeFields: Array<keyof Row> = []
 ) => {
-  const fieldsToProcess = changedFields?.length 
-    ? changedFields 
-    : Object.keys(values ?? {}) as Array<keyof Row>;
+  const baseFieldsToProcess = changedFields?.length
+    ? changedFields
+    : (Object.keys(values ?? {}) as Array<keyof Row>);
+  // active_model: в БД три состояния — '1', '0', пусто. Не отправляем, пока пользователь явно не менял
+  // чекбокс (иначе пустое превращалось бы в '0' при любом сохранении).
+  const fieldsToProcess = uniqBy([...baseFieldsToProcess, ...forceIncludeFields], String).filter(
+    (fieldName) => {
+      if (fieldName === 'active_model') {
+        return Boolean(changedFields?.includes('active_model'));
+      }
+      return true;
+    },
+  );
 
   const artifactApiItems = fieldsToProcess.reduce(
     (bodyItems, fieldName): any => {

@@ -56,6 +56,18 @@ export const formatValuesForSelect = (
   if (type === INPUT_TYPE.MULTI_SELECT) {
     return value.length ? value.map(({ id }) => id) : undefined;
   }
+
+  // Autofill / state drift: { id, text } without explicit `type` (see ModelForm useLayoutEffect)
+  if (
+    value &&
+    typeof value === 'object' &&
+    !Array.isArray(value) &&
+    'id' in value &&
+    'text' in value &&
+    String((value as { id?: string }).id ?? '').length > 0
+  ) {
+    return [(value as { id: string }).id];
+  }
 };
 
 export const getNumberValue = (value?: InputValue) => {
@@ -108,6 +120,8 @@ export const getSelectValue = (value?: InputValue) => {
   ) {
     return formatValuesForSelect(value);
   }
+  // Field is SELECT in schema but InputValue.type was lost — still format if shape matches
+  return formatValuesForSelect(value as SelectInputValue);
 };
 
 export const getFieldValueAsNumber = (rawValue: unknown): number => {
