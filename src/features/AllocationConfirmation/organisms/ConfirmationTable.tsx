@@ -205,13 +205,13 @@ export const ConfirmationTable = ({
         filter: 'agSetColumnFilter',
         sortable: true,
       },
-      {
-        field: 'model_source',
-        headerName: 'Источник модели',
-        minWidth: 140,
-        filter: 'agSetColumnFilter',
-        valueGetter: (p: ValueGetterParams<EditableModel>) => p.data?.model_source ?? '—',
-      },
+      // {
+      //   field: 'model_source',
+      //   headerName: 'Источник модели',
+      //   minWidth: 140,
+      //   filter: 'agSetColumnFilter',
+      //   valueGetter: (p: ValueGetterParams<EditableModel>) => p.data?.model_source ?? '—',
+      // },
     ],
     [DateCell, UsageCell, PrefillCell],
   );
@@ -262,7 +262,7 @@ export const ConfirmationTable = ({
           enableCellTextSelection
           rowHeight={44}
           pagination
-          paginationPageSize={1000}
+          paginationPageSize={100}
           localeText={AG_GRID_LOCALE_RU}
           overlayNoRowsTemplate={'<span style="color:#9ca3af">Модели не найдены</span>'}
         />

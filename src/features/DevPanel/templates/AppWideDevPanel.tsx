@@ -14,13 +14,13 @@ export const AppWideDevPanel = () => {
     return null;
   }
 
-  if (pathname.includes('/allocation-confirmation')) {
-    return (
-      <DevPanelShell title="Dev · Seed PIM" launcherLabel="🧪 Seed PIM" width={620}>
-        <SeedPimTool />
-      </DevPanelShell>
-    );
-  }
+  // if (pathname.includes('/allocation-confirmation')) {
+  //   return (
+  //     <DevPanelShell title="Dev · Seed PIM" launcherLabel="🧪 Seed PIM" width={620}>
+  //       <SeedPimTool />
+  //     </DevPanelShell>
+  //   );
+  // }
 
   return null;
 };
