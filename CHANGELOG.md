@@ -1,5 +1,18 @@
 # Semantic Versioning Changelog
 
+# [1.60.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.59.0...v1.60.0) (2026-04-20)
+
+
+### Features
+
+* add business customer condition to artifact field handling in RightModalPanel ([10538f7](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/10538f70bb96a774d8ced8bdc087b7a4cc14c557))
+* add model source access bucket function to streamline artifact editing logic in RightModalPanel ([cbcca75](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/cbcca7531975715a7d4bdb8af6f844a2e8d6040f))
+* add QA matrix validation panel and enhance model form with debug hints for development ([e92c217](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/e92c2176c44a7d3387bbb1845dc46520aa0e4bc5))
+* enhance artifact editing logic by integrating role-based access checks and improving QA matrix validation in RightModalPanel ([f173769](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/f17376966ea5e9c7c6105abc469ca119877cc815))
+* enhance QA matrix validation with copy functionality and improved user feedback ([33703fb](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/33703fba501a3a27d6031b62f250224ca05f0071))
+* implement artifact selection logic for improved handling of multiple entries in RightModalPanel ([7e16e80](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/7e16e803f6983fbeb0e90cbc2a1b4d8dd2960d14))
+* implement canonical model source comparison to enhance validation logic in RightModalPanel ([08fb989](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/08fb989d74cb8133e75c248afb8ed2bbc652e442))
+
 # [1.59.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.58.0...v1.59.0) (2026-04-14)
 
 
