@@ -7,6 +7,28 @@ export type CsvEditRoleFlags = {
   isDsLead?: boolean;
 };
 
+/**
+ * Поля, которые по требованиям матрицы должны быть НЕдоступны роли на конкретном source,
+ * даже если артефактная матрица на бэке вернула is_editable_by_role_* = 1. Проверяется
+ * раньше allow-правил ниже. Ключ bucket совпадает с результатом getModelSourceAccessBucket.
+ */
+export const CSV_DENY_RULES_BY_ROLE_AND_BUCKET: Partial<
+  Record<Role, Partial<Record<'sum' | 'sum_rm', string[]>>>
+> = {
+  [Role.BUSINESS_CUSTOMER]: {
+    sum: ['developing_report'],
+  },
+  [Role.DS_LEAD]: {
+    sum_rm: [
+      'model_epic_12_date',
+      'dev_team',
+      'model_desc',
+      'model_epic_12',
+      'project_ref',
+    ],
+  },
+};
+
 export const CSV_EDIT_RULES_BY_ROLE: Record<string, string[]> = {
   [Role.VALIDATOR_LEAD]: [
     'implementation_segment',

@@ -41,6 +41,7 @@ import {
 import {
   csvMatchedRoles,
   CSV_EDIT_RULES_BY_ROLE,
+  CSV_DENY_RULES_BY_ROLE_AND_BUCKET,
   type CsvEditRoleFlags,
 } from './ModelForm/editRulesFromCsv';
 import {
@@ -111,7 +112,16 @@ function canEditArtefactByCsvRules(
   }
   const tech = artifact.artefact_tech_label;
 
-  // Явные правила из CSV (ключевые конфликтные поля): для SUM/SUM-RM одинаковые, кроме DS Lead.
+  // Deny-правила: даже если API сказал «редактируемо», для конкретной пары (роль, bucket)
+  // поле принудительно disabled (матрица требований).
+  for (const role of matchedRoles) {
+    const denyLabels = CSV_DENY_RULES_BY_ROLE_AND_BUCKET[role]?.[bucket];
+    if (denyLabels?.includes(tech)) {
+      return false;
+    }
+  }
+
+  // Явные allow-правила из CSV (ключевые конфликтные поля): для SUM/SUM-RM одинаковые, кроме DS Lead.
   // DS Lead: доступ только для моделей, созданных в SUM.
   for (const role of matchedRoles) {
     const labels = CSV_EDIT_RULES_BY_ROLE[role];
