@@ -6,12 +6,10 @@ import {
   useActiveQuarter,
   useModelsForConfirmation,
   useSaveQuarterlyConfirmation,
-  useSeedPimUsage,
 } from '@shared/api/hooks/useQuarterlyConfirmation';
 import type { ConfirmationModelRow, SaveConfirmationResult } from '@shared/api/hooks/useQuarterlyConfirmation';
 import { ROUTES } from '@app/Routes';
 import { AllocationConfirmationTemplate } from '../templates/AllocationConfirmationTemplate';
-import { SeedPimPanel } from '../organisms/SeedPimPanel';
 import { SaveResultModal } from '../molecules/SaveResultModal';
 import { Loading, useToast } from '../../../shared/ui/atoms';
 
@@ -36,14 +34,10 @@ const ErrorWrapper = styled('div')`
   color: #dc2626;
 `;
 
-const isInnodev = typeof window !== 'undefined' && window.location.hostname.includes('innodev') || process.env.NO_ROLES === 'true';
-
 export const AllocationConfirmationPage = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const [saveResult, setSaveResult] = useState<SaveConfirmationResult | null>(null);
-
-  const { mutate: seedPim, isPending: isSeeding } = useSeedPimUsage();
 
   const {
     data: quarterData,
@@ -73,7 +67,7 @@ export const AllocationConfirmationPage = () => {
     const modelsToSave = editableModels
       .filter((m) => m.edited_is_used !== null && m.edited_is_used !== undefined)
       .map((m) => ({
-        model_id: m.model_id,
+        system_model_id: m.system_model_id,
         confirmation_date: m.edited_confirmation_date,
         is_used: m.edited_is_used,
       }));
@@ -121,26 +115,6 @@ export const AllocationConfirmationPage = () => {
   const quarterInfo = quarterData?.data ?? null;
   const models = modelsData?.data?.models ?? [];
 
-  const handleSeedPim = (payload: Parameters<typeof seedPim>[0]) => {
-    seedPim(payload, {
-      onSuccess: (res) => {
-        showToast({ message: `ПИМ засеян: ${res.data.seeded.length} моделей`, type: 'success', duration: 3000 });
-      },
-      onError: () => {
-        showToast({ message: 'Ошибка при засеивании ПИМ данных', type: 'error', duration: 4000 });
-      },
-    });
-  };
-
-  const seedPanel = isInnodev && quarterInfo ? (
-    <SeedPimPanel
-      quarter={quarterInfo.quarter}
-      year={quarterInfo.year}
-      onSeed={handleSeedPim}
-      isSeeding={isSeeding}
-    />
-  ) : null;
-
   if (!quarterInfo) {
     return (
       <AllocationConfirmationTemplate
@@ -149,7 +123,6 @@ export const AllocationConfirmationPage = () => {
         onSave={handleSave}
         onCancel={handleCancel}
         isSaving={isSaving}
-        seedPanel={seedPanel}
       />
     );
   }
@@ -167,7 +140,6 @@ export const AllocationConfirmationPage = () => {
         onSave={handleSave}
         onCancel={handleCancel}
         isSaving={isSaving}
-        seedPanel={seedPanel}
       />
       {saveResult && (
         <SaveResultModal result={saveResult} onClose={handleResultClose} />

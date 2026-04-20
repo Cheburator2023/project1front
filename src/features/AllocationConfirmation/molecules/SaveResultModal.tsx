@@ -137,8 +137,8 @@ export const SaveResultModal = ({ result, onClose }: SaveResultModalProps) => {
             </T>
             <ErrorBlock>
               {result.sumSyncErrors.map((e) => (
-                <ErrorItem key={e.model_id}>
-                  <strong>{e.model_id}</strong>: {e.error}
+                <ErrorItem key={e.system_model_id}>
+                  <strong>{e.system_model_id}</strong>: {e.error}
                 </ErrorItem>
               ))}
             </ErrorBlock>
@@ -161,9 +161,9 @@ export const SaveResultModal = ({ result, onClose }: SaveResultModalProps) => {
               </thead>
               <tbody>
                 {result.models.map((m) => (
-                  <tr key={m.model_id} style={{ borderBottom: '1px solid #f3f4f6' }}>
+                  <tr key={m.system_model_id} style={{ borderBottom: '1px solid #f3f4f6' }}>
                     <td style={{ padding: '4px 8px', fontFamily: 'monospace', fontSize: 12 }}>
-                      {m.model_id}
+                      {m.system_model_id}
                     </td>
                     <td style={{ padding: '4px 8px' }}>
                       {m.is_used === true ? 'Да' : m.is_used === false ? 'Нет' : '—'}

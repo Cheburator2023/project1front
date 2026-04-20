@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react';
 import styled from 'styled-components';
 import { T } from '@admiral-ds/react-ui';
 import type { QuarterInfo, ConfirmationModelRow } from '@shared/api/hooks/useQuarterlyConfirmation';
@@ -16,7 +15,6 @@ type AllocationConfirmationTemplateProps = {
   onSave: (models: EditableModel[]) => void;
   onCancel: () => void;
   isSaving: boolean;
-  seedPanel?: ReactNode;
 };
 
 const PageContainer = styled('div')`
@@ -41,7 +39,6 @@ export const AllocationConfirmationTemplate = ({
   onSave,
   onCancel,
   isSaving,
-  seedPanel,
 }: AllocationConfirmationTemplateProps) => {
   if (!quarterInfo) {
     return (
@@ -58,7 +55,6 @@ export const AllocationConfirmationTemplate = ({
 
   return (
     <PageContainer>
-      {seedPanel}
       <QuarterHeader quarter={quarterInfo.quarter} year={quarterInfo.year} />
       <ConfirmationTable
         models={models}

@@ -15,6 +15,7 @@ import RoutesComponent from './Routes';
 import { ROUTER_BASENAME_PROD, TrailingSlashRedirect } from './TrailingSlashRedirect';
 import { useDeepEffect } from '../shared/hooks/useDeepEffect';
 import { ToastProvider } from '../shared/ui/atoms';
+import { AppWideDevPanel } from '../features/DevPanel/templates/AppWideDevPanel';
 
 const GIT_REVISION = process.env.GIT_REVISION;
 const RC_STATS = process.env.RC_STATS;
@@ -72,6 +73,7 @@ const App = ({ user, onLogout, keycloak }: AppProps) => {
               <RoutesWrapper>
                 <RoutesComponent />
               </RoutesWrapper>
+              <AppWideDevPanel />
             </ToastProvider>
           </Container>
         </QueryClientProvider>

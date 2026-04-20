@@ -1,9 +1,13 @@
-import { useEffect, useMemo, useState, useCallback } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { AgGridReact } from 'ag-grid-react';
+import type { ColDef, ICellRendererParams, ValueGetterParams } from 'ag-grid-community';
 import styled from 'styled-components';
-import { T, Button, Toggle } from '@admiral-ds/react-ui';
+import { T, Button } from '@admiral-ds/react-ui';
 import type { ConfirmationModelRow } from '@shared/api/hooks/useQuarterlyConfirmation';
 import { PrefillSourceBadge } from '../atoms/PrefillSourceBadge';
 import { ConfirmationSearchBar } from '../molecules/ConfirmationSearchBar';
+import { ConfirmationDateCell } from '../molecules/ConfirmationDateCell';
+import { UsageStatusCell, usageLabel } from '../molecules/UsageStatusCell';
 
 type EditableModel = ConfirmationModelRow & {
   edited_confirmation_date: string | null;
@@ -19,48 +23,10 @@ type ConfirmationTableProps = {
   isSaving: boolean;
 };
 
-const TableWrapper = styled('div')`
-  width: 100%;
-  overflow-x: auto;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  background: #fff;
-`;
-
-const StyledTable = styled('table')`
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-
-  th,
-  td {
-    padding: 8px 12px;
-    text-align: left;
-    border-bottom: 1px solid #e5e7eb;
-    white-space: nowrap;
-  }
-
-  th {
-    background: #f3f4f6;
-    font-weight: 600;
-    position: sticky;
-    top: 0;
-    z-index: 1;
-  }
-
-  tr:hover {
-    background: #f9fafb;
-  }
-
-  tr:last-child td {
-    border-bottom: none;
-  }
-`;
-
-const ScrollableBody = styled('div')`
-  max-height: calc(100vh - 280px);
-  overflow-y: auto;
-`;
+const toDateInput = (value: string | null | undefined): string => {
+  if (!value) return '';
+  return value.length >= 10 ? value.slice(0, 10) : value;
+};
 
 const ActionsBar = styled('div')`
   display: flex;
@@ -75,18 +41,15 @@ const ActionsRight = styled('div')`
   gap: 8px;
 `;
 
-const DateInput = styled('input')`
-  border: 1px solid #d1d5db;
-  border-radius: 4px;
-  padding: 4px 8px;
-  font-size: 13px;
-  font-family: inherit;
+const HelpText = styled('div')`
+  color: #4b5563;
+  font-size: 12px;
+  padding: 4px 0 8px;
+`;
 
-  &:focus {
-    outline: none;
-    border-color: #0132b0;
-    box-shadow: 0 0 0 2px rgba(1, 50, 176, 0.1);
-  }
+const GridWrapper = styled('div')`
+  height: calc(100vh - 260px);
+  width: 100%;
 `;
 
 const ModelCount = styled('div')`
@@ -95,17 +58,11 @@ const ModelCount = styled('div')`
   padding: 4px 0;
 `;
 
-const HelpText = styled('div')`
-  color: #4b5563;
-  font-size: 12px;
-  padding: 4px 0 8px;
-`;
-
-const FilterRow = styled('div')`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-`;
+const PREFILL_SOURCE_LABEL: Record<string, string> = {
+  pim: 'ПИМ',
+  previous_quarter: 'Предыдущий квартал',
+  none: 'Нет данных',
+};
 
 export const ConfirmationTable = ({
   models,
@@ -115,237 +72,207 @@ export const ConfirmationTable = ({
   onCancel,
   isSaving,
 }: ConfirmationTableProps) => {
-  const toDateInputValue = useCallback((value: string | null | undefined) => {
-    if (!value) return '';
-    // Accept `YYYY-MM-DD` or ISO timestamps.
-    return value.length >= 10 ? value.slice(0, 10) : value;
-  }, []);
+  const gridRef = useRef<AgGridReact<EditableModel>>(null);
 
-  const normalizedMinDate = toDateInputValue(minDate);
-  const normalizedMaxDate = toDateInputValue(maxDate);
+  const normalizedMinDate = toDateInput(minDate);
+  const normalizedMaxDate = toDateInput(maxDate);
 
-  const [editableModels, setEditableModels] = useState<EditableModel[]>(() => {
-    return models.map((m) => ({
-      ...m,
-      edited_confirmation_date: m.confirmation_date ? toDateInputValue(m.confirmation_date) : null,
-      edited_is_used: m.is_used,
-    }));
-  });
-
-  useEffect(() => {
-    setEditableModels(
+  const initialRows = useMemo<EditableModel[]>(
+    () =>
       models.map((m) => ({
         ...m,
-        edited_confirmation_date: m.confirmation_date ? toDateInputValue(m.confirmation_date) : null,
+        edited_confirmation_date: m.confirmation_date ? toDateInput(m.confirmation_date) : null,
+        // По умолчанию is_used наследуется из предыдущего квартала (backend уже
+        // положил prev.is_used в is_used при prefill_source='previous_quarter').
+        // Если данных нет — значение null ("Не выбрано").
         edited_is_used: m.is_used,
       })),
-    );
-  }, [models, toDateInputValue]);
+    [models],
+  );
+
+  const [rows, setRows] = useState<EditableModel[]>(initialRows);
+  const rowsRef = useRef(rows);
+  rowsRef.current = rows;
+
+  useEffect(() => {
+    setRows(initialRows);
+  }, [initialRows]);
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterField, setFilterField] = useState<string>('');
-  const [filterValue, setFilterValue] = useState<string>('');
 
-  const filteredModels = useMemo(() => {
-    let result = editableModels;
+  const updateRow = useCallback((systemModelId: string, patch: Partial<EditableModel>) => {
+    setRows((prev) =>
+      prev.map((r) => (r.system_model_id === systemModelId ? { ...r, ...patch } : r)),
+    );
+  }, []);
 
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      result = result.filter(
-        (m) =>
-          m.model_id?.toLowerCase().includes(q) ||
-          m.model_alias?.toLowerCase().includes(q) ||
-          m.model_name?.toLowerCase().includes(q) ||
-          m.model_name_dadm?.toLowerCase().includes(q) ||
-          m.business_customer?.toLowerCase().includes(q),
+  const DateCell = useCallback(
+    (params: ICellRendererParams<EditableModel>) => {
+      const row = params.data;
+      if (!row) return null;
+      return (
+        <ConfirmationDateCell
+          value={row.edited_confirmation_date}
+          min={normalizedMinDate}
+          max={normalizedMaxDate}
+          onChange={(next) =>
+            updateRow(row.system_model_id, { edited_confirmation_date: next })
+          }
+        />
       );
-    }
+    },
+    [normalizedMinDate, normalizedMaxDate, updateRow],
+  );
 
-    if (filterField && filterValue) {
-      const fv = filterValue.toLowerCase();
-      result = result.filter((m) => {
-        const val = m[filterField as keyof ConfirmationModelRow];
-        return val !== null && val !== undefined && String(val).toLowerCase().includes(fv);
-      });
-    }
+  const UsageCell = useCallback(
+    (params: ICellRendererParams<EditableModel>) => {
+      const row = params.data;
+      if (!row) return null;
+      return (
+        <UsageStatusCell
+          value={row.edited_is_used}
+          onChange={(next) => updateRow(row.system_model_id, { edited_is_used: next })}
+        />
+      );
+    },
+    [updateRow],
+  );
 
-    return result;
-  }, [editableModels, searchQuery, filterField, filterValue]);
+  const PrefillCell = useCallback((params: ICellRendererParams<EditableModel>) => {
+    const row = params.data;
+    if (!row) return null;
+    return <PrefillSourceBadge source={row.prefill_source} />;
+  }, []);
 
-  const filterableFields = useMemo(
+  const columnDefs = useMemo<ColDef<EditableModel>[]>(
     () => [
-      { key: 'model_id', label: 'Идентификатор версии модели' },
-      { key: 'model_alias', label: 'Алиас' },
-      { key: 'model_name', label: 'Название модели' },
-      { key: 'model_name_dadm', label: 'Название модели в реестре ДАДМ' },
-      { key: 'business_customer', label: 'Владелец модели/алгоритма' },
-      { key: 'business_customer_departament', label: 'Подразделение' },
+      {
+        field: 'system_model_id',
+        headerName: 'Идентификатор версии модели',
+        flex: 1,
+        minWidth: 180,
+        pinned: 'left',
+      },
+      { field: 'model_alias', headerName: 'Алиас', flex: 1, minWidth: 140 },
+      { field: 'model_name', headerName: 'Название модели', flex: 2, minWidth: 200 },
+      {
+        field: 'model_source',
+        headerName: 'Источник модели',
+        minWidth: 140,
+        filter: 'agSetColumnFilter',
+        valueGetter: (p: ValueGetterParams<EditableModel>) => p.data?.model_source ?? '—',
+      },
+      {
+        field: 'model_name_dadm',
+        headerName: 'Название модели в реестре ДАДМ',
+        flex: 2,
+        minWidth: 200,
+      },
+      {
+        field: 'business_customer',
+        headerName: 'Владелец модели/алгоритма',
+        flex: 1,
+        minWidth: 180,
+      },
+      {
+        field: 'business_customer_departament',
+        headerName: 'Подразделение владельца модели/алгоритма',
+        flex: 1,
+        minWidth: 220,
+      },
+      {
+        headerName: 'Дата подтверждения',
+        colId: 'confirmation_date',
+        cellRenderer: DateCell,
+        valueGetter: (p: ValueGetterParams<EditableModel>) =>
+          p.data?.edited_confirmation_date ?? '',
+        minWidth: 170,
+        filter: 'agDateColumnFilter',
+        sortable: true,
+      },
+      {
+        headerName: 'Используется в текущем квартале',
+        colId: 'is_used',
+        cellRenderer: UsageCell,
+        valueGetter: (p: ValueGetterParams<EditableModel>) =>
+          usageLabel(p.data?.edited_is_used ?? null),
+        minWidth: 200,
+        filter: 'agSetColumnFilter',
+        filterParams: { values: ['Да', 'Нет', 'Не выбрано'] },
+        sortable: true,
+      },
+      {
+        headerName: 'Источник предзаполнения',
+        colId: 'prefill_source',
+        cellRenderer: PrefillCell,
+        valueGetter: (p: ValueGetterParams<EditableModel>) =>
+          PREFILL_SOURCE_LABEL[p.data?.prefill_source ?? 'none'],
+        minWidth: 180,
+        filter: 'agSetColumnFilter',
+        sortable: true,
+      },
     ],
+    [DateCell, UsageCell, PrefillCell],
+  );
+
+  const defaultColDef = useMemo<ColDef>(
+    () => ({
+      resizable: true,
+      sortable: true,
+      filter: true,
+      floatingFilter: true,
+    }),
     [],
   );
 
-  const handleDateChange = useCallback((modelId: string, date: string) => {
-    setEditableModels((prev) =>
-      prev.map((m) => (m.model_id === modelId ? { ...m, edited_confirmation_date: date } : m)),
-    );
-  }, []);
-
-  const handleUsedChange = useCallback((modelId: string, isUsed: boolean) => {
-    setEditableModels((prev) =>
-      prev.map((m) => (m.model_id === modelId ? { ...m, edited_is_used: isUsed } : m)),
-    );
-  }, []);
+  useEffect(() => {
+    if (!gridRef.current?.api) return;
+    gridRef.current.api.setGridOption('quickFilterText', searchQuery);
+  }, [searchQuery]);
 
   const handleSave = () => {
-    onSave(editableModels);
+    onSave(rowsRef.current);
   };
 
   return (
     <div>
       <ActionsBar>
-        <FilterRow>
-          <ConfirmationSearchBar onSearch={setSearchQuery} />
-          <select
-            value={filterField}
-            onChange={(e) => setFilterField(e.target.value)}
-            style={{
-              border: '1px solid #d1d5db',
-              borderRadius: '4px',
-              padding: '6px 8px',
-              fontSize: '13px',
-            }}
-          >
-            <option value="">Фильтр по столбцу...</option>
-            {filterableFields.map((f) => (
-              <option key={f.key} value={f.key}>
-                {f.label}
-              </option>
-            ))}
-          </select>
-          {filterField && (
-            <input
-              value={filterValue}
-              onChange={(e) => setFilterValue(e.target.value)}
-              placeholder="Введите значение фильтра..."
-              style={{
-                border: '1px solid #d1d5db',
-                borderRadius: '4px',
-                padding: '6px 8px',
-                fontSize: '13px',
-                width: '200px',
-              }}
-            />
-          )}
-          {(searchQuery || filterField || filterValue) && (
-            <Button
-              dimension="s"
-              appearance="secondary"
-              onClick={() => {
-                setSearchQuery('');
-                setFilterField('');
-                setFilterValue('');
-              }}
-            >
-              <T font="Button/Button 2">Сбросить фильтры</T>
-            </Button>
-          )}
-        </FilterRow>
+        <ConfirmationSearchBar onSearch={setSearchQuery} />
         <ActionsRight>
           <Button dimension="s" appearance="secondary" onClick={onCancel} disabled={isSaving}>
             <T font="Button/Button 2">Отменить</T>
           </Button>
           <Button dimension="s" onClick={handleSave} disabled={isSaving}>
-          {isSaving ? 'Сохранение...' : 'Сохранить'}
+            {isSaving ? 'Сохранение...' : 'Сохранить'}
           </Button>
         </ActionsRight>
       </ActionsBar>
 
       <ModelCount>
-        <T font="Caption/Caption 1">
-          Показано {filteredModels.length} из {editableModels.length} моделей
-        </T>
+        <T font="Caption/Caption 1">Всего моделей: {rows.length}</T>
       </ModelCount>
 
       <HelpText>
         <T font="Caption/Caption 1">
-          В колонке «Используется в текущем квартале»: «Да» — модель используется, «Нет» — модель не используется.
+          В колонке «Используется в текущем квартале» значение по умолчанию наследуется из
+          предыдущего квартала; если данных нет — «Не выбрано».
         </T>
       </HelpText>
 
-      <TableWrapper>
-        <ScrollableBody>
-          <StyledTable>
-            <thead>
-              <tr>
-                <th>Идентификатор версии модели</th>
-                <th>Алиас</th>
-                <th>Название модели</th>
-                <th>Название модели в реестре ДАДМ</th>
-                <th>Владелец модели/алгоритма</th>
-                <th>Подразделение владельца модели/алгоритма</th>
-                <th>Дата подтверждения</th>
-                <th>Используется в текущем квартале</th>
-                <th>Источник предзаполнения</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredModels.length === 0 ? (
-                <tr>
-                  <td colSpan={9} style={{ textAlign: 'center', padding: '24px', color: '#9ca3af' }}>
-                    <T font="Body/Body 1 Long">Модели не найдены</T>
-                  </td>
-                </tr>
-              ) : (
-                filteredModels.map((model) => (
-                  <tr key={model.model_id}>
-                    <td title={model.model_id}>{model.model_id}</td>
-                    <td title={model.model_alias ?? ''}>{model.model_alias ?? '-'}</td>
-                    <td
-                      title={model.model_name ?? ''}
-                      style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis' }}
-                    >
-                      {model.model_name ?? '-'}
-                    </td>
-                    <td
-                      title={model.model_name_dadm ?? ''}
-                      style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis' }}
-                    >
-                      {model.model_name_dadm ?? '-'}
-                    </td>
-                    <td title={model.business_customer ?? ''}>{model.business_customer ?? '-'}</td>
-                    <td title={model.business_customer_departament ?? ''}>
-                      {model.business_customer_departament ?? '-'}
-                    </td>
-                    <td>
-                      <DateInput
-                        type="date"
-                        value={model.edited_confirmation_date ?? ''}
-                        min={normalizedMinDate}
-                        max={normalizedMaxDate}
-                        onChange={(e) => handleDateChange(model.model_id, e.target.value)}
-                      />
-                    </td>
-                    <td>
-                      <Toggle
-                        checked={model.edited_is_used === true}
-                        onChange={(e) => handleUsedChange(model.model_id, e.currentTarget.checked)}
-                        dimension="s"
-                        title={model.edited_is_used === true ? 'Да' : model.edited_is_used === false ? 'Нет' : 'Не выбрано'}
-                      />
-                      <span style={{ marginLeft: '6px', fontSize: '12px' }}>
-                        {model.edited_is_used === true ? 'Да' : model.edited_is_used === false ? 'Нет' : '-'}
-                      </span>
-                    </td>
-                    <td>
-                      <PrefillSourceBadge source={model.prefill_source} />
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </StyledTable>
-        </ScrollableBody>
-      </TableWrapper>
+      <GridWrapper className="ag-theme-quartz">
+        <AgGridReact<EditableModel>
+          ref={gridRef}
+          rowData={rows}
+          columnDefs={columnDefs}
+          defaultColDef={defaultColDef}
+          getRowId={(p) => p.data.system_model_id}
+          animateRows={false}
+          suppressMovableColumns
+          enableCellTextSelection
+          rowHeight={44}
+          overlayNoRowsTemplate={'<span style="color:#9ca3af">Модели не найдены</span>'}
+        />
+      </GridWrapper>
     </div>
   );
 };

@@ -10,9 +10,11 @@ export type QuarterInfo = {
 };
 
 export type ConfirmationModelRow = {
+  system_model_id: string;
   model_id: string;
   model_alias: string | null;
   model_name: string | null;
+  model_source: string | null;
   model_name_dadm: string | null;
   business_customer: string | null;
   business_customer_departament: string | null;
@@ -25,7 +27,7 @@ export type SaveQuarterlyConfirmationPayload = {
   quarter: number;
   year: number;
   models: {
-    model_id: string;
+    system_model_id: string;
     confirmation_date: string | null;
     is_used: boolean | null;
   }[];
@@ -38,9 +40,9 @@ export type SaveConfirmationResult = {
   totalInPayload: number;
   savedToMrm: number;
   syncedToSum: number;
-  sumSyncErrors: { model_id: string; error: string }[];
+  sumSyncErrors: { system_model_id: string; error: string }[];
   models: {
-    model_id: string;
+    system_model_id: string;
     is_used: boolean | null;
     confirmation_date: string | null;
     mrm: boolean;
@@ -105,7 +107,7 @@ export type SeedPimUsagePayload = {
   quarter: number;
   year: number;
   models: {
-    model_id: string;
+    system_model_id: string;
     is_used: boolean;
   }[];
 };
@@ -116,7 +118,7 @@ const seedPimUsage = (data: SeedPimUsagePayload) => {
       success: boolean;
       quarter: number;
       year: number;
-      seeded: { model_id: string; pim_usage_id: number | null; is_used: boolean }[];
+      seeded: { system_model_id: string; pim_usage_id: number | null; is_used: boolean }[];
     };
   }>({
     url: '/quarterly-confirmation/seed-pim-usage',
