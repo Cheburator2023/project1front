@@ -11,8 +11,10 @@ import { COLUMN_TYPE } from '@src/shared/types';
 import { Tooltip } from '@src/shared/ui/atoms';
 import { usePermissions } from '@src/shared/hooks';
 import { usePanelsStore } from '@src/shared/stores/panelsStore';
-import { useGlobalStore } from '@src/shared/stores/globalStore';
-import { highlightText } from '@src/shared/helpers/highlightHelpers';
+import {
+  getGridSearchHighlightForCell,
+  highlightText,
+} from '@src/shared/helpers/highlightHelpers';
 
 const NO_ROLES = process.env.NO_ROLES;
 
@@ -78,10 +80,10 @@ export const AgGridTableCustomCell = (params: AgGridTableCustomCellParams) => {
   const [visible, setVisible] = useState(false);
   const { isEditModelEnabled } = usePermissions();
   const panelStore = usePanelsStore();
-  const searchString = useGlobalStore((s) => s.searchString);
 
   const { openEditModelPanel, openHistoryChangesPanel } = panelStore;
   const colName = params.colDef?.field;
+  const highlightForSearch = getGridSearchHighlightForCell(colName);
 
   const noCustomCells = params?.noCustomCells;
 
@@ -124,7 +126,7 @@ export const AgGridTableCustomCell = (params: AgGridTableCustomCellParams) => {
     value: params.value,
     column: params.colDef,
     isCompare: params?.isCompare,
-    searchString,
+    searchString: highlightForSearch,
   });
 
   const editable =

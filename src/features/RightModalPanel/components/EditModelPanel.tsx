@@ -29,6 +29,7 @@ export const EditModelPanel = ({
 
   return (
     <ModelForm
+      key={activeRow.system_model_id}
       rows={rows}
       mode="edit"
       artifacts={artifacts}

@@ -34,9 +34,6 @@ export const RightModalPanel = React.memo(() => {
     closeDeleteModelPanel,
   } = usePanelsStore();
 
-  const { data: artifactsResponse } = useArtefactsControllerGetArtefacts();
-  const artifactsData = artifactsResponse as ArtifactResponse | undefined;
-
   const editActiveRow = useMemo(() => {
     return rows?.find((row) => row.system_model_id === editModelPanel.activeRowId);
   }, [rows, editModelPanel.activeRowId]);
@@ -45,12 +42,18 @@ export const RightModalPanel = React.memo(() => {
     return rows?.find((row) => row.system_model_id === historyChangesPanel.activeRowId);
   }, [rows, historyChangesPanel.activeRowId]);
 
+  // Один запрос: сервер считает обе матрицы (is_editable_by_role_sum / is_editable_by_role_sum_rm)
+  // и возвращает все артефакты с флагами для текущего пользователя. Source теперь выбирается на клиенте
+  // при отрисовке поля (см. canEditArtefact по model_source строки).
+  const { data: artefactsResponse } = useArtefactsControllerGetArtefacts();
+  const artifacts = (artefactsResponse as ArtifactResponse | undefined)?.data || [];
+
   return (
     <>
       <AddModelPanel
         isOpen={addModelPanel.isOpen}
         rows={rows || []}
-        artifacts={artifactsData?.data || []}
+        artifacts={artifacts}
         onClose={closeAddModelPanel}
         onSubmit={onSubmit}
       />
@@ -58,7 +61,7 @@ export const RightModalPanel = React.memo(() => {
       <EditModelPanel
         isOpen={editModelPanel.isOpen}
         rows={rows || []}
-        artifacts={artifactsData?.data || []}
+        artifacts={artifacts}
         activeRow={editActiveRow}
         editCellName={editModelPanel.activeCellName}
         onClose={closeEditModelPanel}
@@ -83,7 +86,7 @@ export const RightModalPanel = React.memo(() => {
 
       <DeleteModelPanel
         isOpen={deleteModelPanel.isOpen}
-        artifacts={artifactsData?.data || []}
+        artifacts={artifacts}
         activeRow={deleteModelPanel.activeRow}
         editCellName={deleteModelPanel.activeCellName}
         onClose={closeDeleteModelPanel}
