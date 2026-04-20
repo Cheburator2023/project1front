@@ -8,6 +8,7 @@ import { PrefillSourceBadge } from '../atoms/PrefillSourceBadge';
 import { ConfirmationSearchBar } from '../molecules/ConfirmationSearchBar';
 import { ConfirmationDateCell } from '../molecules/ConfirmationDateCell';
 import { UsageStatusCell, usageLabel } from '../molecules/UsageStatusCell';
+import { AG_GRID_LOCALE_RU } from '../../../app/agGridLocale.ru';
 
 type EditableModel = ConfirmationModelRow & {
   edited_confirmation_date: string | null;
@@ -156,13 +157,6 @@ export const ConfirmationTable = ({
       { field: 'model_alias', headerName: 'Алиас', flex: 1, minWidth: 140 },
       { field: 'model_name', headerName: 'Название модели', flex: 2, minWidth: 200 },
       {
-        field: 'model_source',
-        headerName: 'Источник модели',
-        minWidth: 140,
-        filter: 'agSetColumnFilter',
-        valueGetter: (p: ValueGetterParams<EditableModel>) => p.data?.model_source ?? '—',
-      },
-      {
         field: 'model_name_dadm',
         headerName: 'Название модели в реестре ДАДМ',
         flex: 2,
@@ -211,6 +205,13 @@ export const ConfirmationTable = ({
         filter: 'agSetColumnFilter',
         sortable: true,
       },
+      {
+        field: 'model_source',
+        headerName: 'Источник модели',
+        minWidth: 140,
+        filter: 'agSetColumnFilter',
+        valueGetter: (p: ValueGetterParams<EditableModel>) => p.data?.model_source ?? '—',
+      },
     ],
     [DateCell, UsageCell, PrefillCell],
   );
@@ -240,7 +241,7 @@ export const ConfirmationTable = ({
         <ConfirmationSearchBar onSearch={setSearchQuery} />
         <ActionsRight>
           <Button dimension="s" appearance="secondary" onClick={onCancel} disabled={isSaving}>
-            <T font="Button/Button 2">Отменить</T>
+           Отменить
           </Button>
           <Button dimension="s" onClick={handleSave} disabled={isSaving}>
             {isSaving ? 'Сохранение...' : 'Сохранить'}
@@ -248,16 +249,6 @@ export const ConfirmationTable = ({
         </ActionsRight>
       </ActionsBar>
 
-      <ModelCount>
-        <T font="Caption/Caption 1">Всего моделей: {rows.length}</T>
-      </ModelCount>
-
-      <HelpText>
-        <T font="Caption/Caption 1">
-          В колонке «Используется в текущем квартале» значение по умолчанию наследуется из
-          предыдущего квартала; если данных нет — «Не выбрано».
-        </T>
-      </HelpText>
 
       <GridWrapper className="ag-theme-quartz">
         <AgGridReact<EditableModel>
@@ -270,6 +261,9 @@ export const ConfirmationTable = ({
           suppressMovableColumns
           enableCellTextSelection
           rowHeight={44}
+          pagination
+          paginationPageSize={1000}
+          localeText={AG_GRID_LOCALE_RU}
           overlayNoRowsTemplate={'<span style="color:#9ca3af">Модели не найдены</span>'}
         />
       </GridWrapper>
