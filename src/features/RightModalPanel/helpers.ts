@@ -589,32 +589,60 @@ const debugFieldAccess = ({
   row,
   canEdit,
   isDisabled,
+  fieldSchema,
+  roleFlags,
 }: {
   artifact: Artifact;
   row?: Partial<Row>;
   canEdit: boolean;
   isDisabled: boolean | undefined;
+  fieldSchema?: FormFieldsSchema[number];
+  roleFlags?: CsvEditRoleFlags;
 }) => {
   if (typeof window === 'undefined') return;
 
+  // Временный набор «всегда логируемых» полей: разбираем дизейбл при BC + SUM.
+  // Убрать после того как причина disabled подтверждена.
+  const alwaysWatched = new Set([
+    'segment_name',
+    'remove_decision',
+    'implementation_segment',
+  ]);
   const watchedFieldsRaw = window.localStorage.getItem('rightModalDebugFields');
-  if (!watchedFieldsRaw) return;
-
-  const watchedFields = watchedFieldsRaw
+  const watchedFields = (watchedFieldsRaw ?? '')
     .split(',')
     .map((item) => item.trim())
     .filter(Boolean);
-  if (!watchedFields.includes(artifact.artefact_tech_label)) return;
+  if (
+    !alwaysWatched.has(artifact.artefact_tech_label) &&
+    !watchedFields.includes(artifact.artefact_tech_label)
+  ) {
+    return;
+  }
 
   // eslint-disable-next-line no-console
   console.log('[RightModalPanel access debug]', {
     field: artifact.artefact_tech_label,
     model_source: row?.model_source,
+    bucket: getModelSourceAccessBucket(row),
     is_edit_flg: artifact.is_edit_flg,
     is_editable_by_role_sum: artifact.is_editable_by_role_sum,
     is_editable_by_role_sum_rm: artifact.is_editable_by_role_sum_rm,
     canEdit,
     disabled: isDisabled,
+    roleFlags,
+    csvMatched: roleFlags ? csvMatchedRoles(roleFlags) : undefined,
+    fieldSchema: fieldSchema
+      ? {
+          schemaKey: fieldSchema.schemaKey,
+          alwaysDisabled: fieldSchema.alwaysDisabled,
+          required: fieldSchema.required,
+          hasEnabledByValueConditions: Array.isArray(fieldSchema.enabledByValueConditions)
+            && fieldSchema.enabledByValueConditions.length > 0,
+          hasDisabledConditions: Array.isArray(fieldSchema.disabledConditions)
+            && fieldSchema.disabledConditions.length > 0,
+        }
+      : null,
   });
   // eslint-disable-next-line no-console
   console.log(
@@ -675,16 +703,16 @@ const mapArtifactToField = (
   isValidator?: boolean,
   isDsLead?: boolean,
 ): InputFactoryProps<keyof Row> => {
+  const roleFlags: CsvEditRoleFlags = {
+    isValidatorLead,
+    isValidator,
+    isBusinessCustomer,
+    isDsLead,
+  };
   const canEdit =
-    process.env.NO_ROLES === 'true' ||
-    canEditArtefact(artifact, activeRow, {
-      isValidatorLead,
-      isValidator,
-      isBusinessCustomer,
-      isDsLead,
-    });
+    process.env.NO_ROLES === 'true' || canEditArtefact(artifact, activeRow, roleFlags);
   let isDisabled = isFieldDisabled(values, fieldSchema, artifact, activeRow, canEdit);
-  debugFieldAccess({ artifact, row: activeRow, canEdit, isDisabled });
+  debugFieldAccess({ artifact, row: activeRow, canEdit, isDisabled, fieldSchema, roleFlags });
 
   // Extra gating: only validators can edit model_risk_type in UI
   if (artifact.artefact_tech_label === 'model_risk_type' && canEditModelRiskByRole === false) {

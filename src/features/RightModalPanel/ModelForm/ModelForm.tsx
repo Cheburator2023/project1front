@@ -15,13 +15,18 @@ import { format } from 'date-fns';
 import { Row } from '@shared/types';
 import { StatusScreen } from '@shared/ui/molecules';
 import { MODEL_FORM_MODE, initialColumns } from '@shared/constants';
-import { INPUT_TYPE, InputFactory, InputValue, RightPanel } from '@shared/ui/organisms';
-import { ArtifactApi, ModelEditApi, ArtifactBlockListResponse } from '@shared/api';
+import {
+  INPUT_TYPE,
+  InputFactory,
+  InputFactoryProps,
+  InputValue,
+  RightPanel,
+} from '@shared/ui/organisms';
+import { ArtifactApi, ModelEditApi } from '@shared/api';
 import {
   useModelsControllerUpdateModels,
   useModelsControllerCreateModel,
   useModelsControllerGetModels,
-  useArtefactsControllerGetBlockList,
 } from '@shared/api/generated/endpoints';
 import { usePermissions, useRoles } from '@src/shared/hooks';
 
@@ -55,6 +60,7 @@ import { useModelsStore } from '../../../shared/stores';
 
 type SubmitType = { checkOnly?: boolean };
 
+
 export interface ModelFormProps {
   mode: 'add' | 'edit';
   artifacts: Artifact[];
@@ -84,9 +90,6 @@ export const ModelForm = ({
   });
 
   const modelsData = _modelsData as ModelsResponseType | undefined;
-
-  const { data: blockedArtifactsResponse } = useArtefactsControllerGetBlockList(activeRow?.system_model_id ?? '');
-  const _blockedArtifactsList = blockedArtifactsResponse as ArtifactBlockListResponse | undefined;
 
   const isUpdateLoading = updateModelsMutation.isPending;
   const isCreateLoading = createModelMutation.isPending;
@@ -201,19 +204,10 @@ export const ModelForm = ({
   const IS_FORM_MODE_ADD = formMode === MODEL_FORM_MODE.ADD;
   const title = IS_FORM_MODE_ADD ? 'Новая модель' : 'Редактирование модели';
 
-  const refinedFields = useMemo(
-    () =>
-      fields.map((field) => {
-        if (field.name === 'update_date') {
-          return { ...field, disabled: true };
-        }
-        if (_blockedArtifactsList?.data?.includes(field.name)) {
-          return { ...field, disabled: true };
-        }
-        return field;
-      }),
-    [fields, _blockedArtifactsList?.data],
-  );
+  // Раньше здесь был слой applyBlockListRespectingApiFlags + запрос /artefacts/block-list/:id.
+  // Эндпоинт был мёртвый (на бэке он только возвращал пустой массив), а update_date уже
+  // принудительно disabled в isFieldDisabled (см. helpers.ts). Теперь просто используем fields как есть.
+  const refinedFields = fields;
 
   const refinedFieldsRef = useRef(refinedFields);
   refinedFieldsRef.current = refinedFields;

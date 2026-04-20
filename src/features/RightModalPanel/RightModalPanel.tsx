@@ -9,7 +9,6 @@ import {
   useTemplatesStore,
   usePanelsStore,
 } from '@src/shared/stores';
-import { getModelSourceAccessBucket } from './helpers';
 import {
   AddModelPanel,
   EditModelPanel,
@@ -43,26 +42,18 @@ export const RightModalPanel = React.memo(() => {
     return rows?.find((row) => row.system_model_id === historyChangesPanel.activeRowId);
   }, [rows, historyChangesPanel.activeRowId]);
 
-  const editSource = getModelSourceAccessBucket(editActiveRow) === 'sum' ? 'sum' : 'sum-rm';
-  const deleteSource =
-    getModelSourceAccessBucket(deleteModelPanel.activeRow?.[0]) === 'sum' ? 'sum' : 'sum-rm';
-
-  const { data: sumArtifactsResponse } = useArtefactsControllerGetArtefacts({ source: 'sum' });
-  const { data: mrmArtifactsResponse } = useArtefactsControllerGetArtefacts({ source: 'sum-rm' });
-
-  const sumArtifacts = (sumArtifactsResponse as ArtifactResponse | undefined)?.data || [];
-  const mrmArtifacts = (mrmArtifactsResponse as ArtifactResponse | undefined)?.data || [];
-  const effectiveSumArtifacts = sumArtifacts.length > 0 ? sumArtifacts : mrmArtifacts;
-  const editArtifacts = editSource === 'sum' ? effectiveSumArtifacts : mrmArtifacts;
-  const deleteArtifacts = deleteSource === 'sum' ? effectiveSumArtifacts : mrmArtifacts;
-  const addArtifacts = mrmArtifacts;
+  // Один запрос: сервер считает обе матрицы (is_editable_by_role_sum / is_editable_by_role_sum_rm)
+  // и возвращает все артефакты с флагами для текущего пользователя. Source теперь выбирается на клиенте
+  // при отрисовке поля (см. canEditArtefact по model_source строки).
+  const { data: artefactsResponse } = useArtefactsControllerGetArtefacts();
+  const artifacts = (artefactsResponse as ArtifactResponse | undefined)?.data || [];
 
   return (
     <>
       <AddModelPanel
         isOpen={addModelPanel.isOpen}
         rows={rows || []}
-        artifacts={addArtifacts}
+        artifacts={artifacts}
         onClose={closeAddModelPanel}
         onSubmit={onSubmit}
       />
@@ -70,7 +61,7 @@ export const RightModalPanel = React.memo(() => {
       <EditModelPanel
         isOpen={editModelPanel.isOpen}
         rows={rows || []}
-        artifacts={editArtifacts}
+        artifacts={artifacts}
         activeRow={editActiveRow}
         editCellName={editModelPanel.activeCellName}
         onClose={closeEditModelPanel}
@@ -95,7 +86,7 @@ export const RightModalPanel = React.memo(() => {
 
       <DeleteModelPanel
         isOpen={deleteModelPanel.isOpen}
-        artifacts={deleteArtifacts}
+        artifacts={artifacts}
         activeRow={deleteModelPanel.activeRow}
         editCellName={deleteModelPanel.activeCellName}
         onClose={closeDeleteModelPanel}
