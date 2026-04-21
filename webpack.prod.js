@@ -17,9 +17,6 @@ module.exports = merge(common, {
   mode: 'production',
   devtool: 'cheap-module-source-map',
   cache: false,
-  output: {
-    publicPath: '/sum-rm/',
-  },
   optimization: {
     minimize: false,
   },
