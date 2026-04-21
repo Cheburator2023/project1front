@@ -185,7 +185,7 @@ export const ConfirmationTable = ({
         sortable: true,
       },
       {
-        headerName: 'Используется в текущем квартале',
+        headerName: 'Модель используется заказчиком (текущий квартал)',
         colId: 'is_used',
         cellRenderer: UsageCell,
         valueGetter: (p: ValueGetterParams<EditableModel>) =>
