@@ -5,6 +5,8 @@ import styled from 'styled-components';
 import { COLUMN_TYPE } from '../../../shared/types';
 import { FilterValuesModal } from './FilterValuesModal';
 
+
+
 const ChipsContainer = styled('div')`
   display: flex;
   flex-wrap: wrap;

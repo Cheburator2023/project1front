@@ -58,6 +58,8 @@ export const AllocationConfirmationTemplate = ({
       <QuarterHeader quarter={quarterInfo.quarter} year={quarterInfo.year} />
       <ConfirmationTable
         models={models}
+        quarter={quarterInfo.quarter}
+        year={quarterInfo.year}
         minDate={quarterInfo.startDate}
         maxDate={quarterInfo.maxDate}
         onSave={onSave}

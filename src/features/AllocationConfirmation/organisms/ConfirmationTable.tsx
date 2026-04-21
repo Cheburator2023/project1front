@@ -1,13 +1,18 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AgGridReact } from 'ag-grid-react';
-import type { ColDef, ICellRendererParams, ValueGetterParams } from 'ag-grid-community';
+import type {
+  ColDef,
+  ICellRendererParams,
+  RowClassParams,
+  ValueGetterParams,
+} from 'ag-grid-community';
 import styled from 'styled-components';
-import { T, Button } from '@admiral-ds/react-ui';
+import { Button, Tag } from '@admiral-ds/react-ui';
 import type { ConfirmationModelRow } from '@shared/api/hooks/useQuarterlyConfirmation';
-import { PrefillSourceBadge } from '../atoms/PrefillSourceBadge';
 import { ConfirmationSearchBar } from '../molecules/ConfirmationSearchBar';
 import { ConfirmationDateCell } from '../molecules/ConfirmationDateCell';
 import { UsageStatusCell, usageLabel } from '../molecules/UsageStatusCell';
+import { RowStatusChips, rowStatusLabel } from '../molecules/RowStatusChips';
 import { AG_GRID_LOCALE_RU } from '../../../app/agGridLocale.ru';
 
 type EditableModel = ConfirmationModelRow & {
@@ -17,6 +22,8 @@ type EditableModel = ConfirmationModelRow & {
 
 type ConfirmationTableProps = {
   models: ConfirmationModelRow[];
+  quarter: number;
+  year: number;
   minDate: string;
   maxDate: string;
   onSave: (models: EditableModel[]) => void;
@@ -42,31 +49,42 @@ const ActionsRight = styled('div')`
   gap: 8px;
 `;
 
-const HelpText = styled('div')`
-  color: #4b5563;
-  font-size: 12px;
-  padding: 4px 0 8px;
-`;
-
 const GridWrapper = styled('div')`
-  height: calc(100vh - 260px);
+  height: calc(100vh - 300px);
   width: 100%;
+
+  .ag-row.confirmation-row-new {
+    background-color: #fef3c7;
+  }
+  .ag-row.confirmation-row-new.ag-row-hover {
+    background-color: #fde68a;
+  }
 `;
 
-const ModelCount = styled('div')`
+const LegendBar = styled('div')`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 0 10px;
+`;
+
+const LegendLabel = styled('span')`
   color: #6b7280;
   font-size: 12px;
-  padding: 4px 0;
+  margin-right: 4px;
 `;
 
-const PREFILL_SOURCE_LABEL: Record<string, string> = {
-  pim: 'ПИМ',
-  previous_quarter: 'Предыдущий квартал',
-  none: 'Нет данных',
-};
+const computePrevQuarter = (
+  quarter: number,
+  year: number,
+): { quarter: number; year: number } =>
+  quarter === 1 ? { quarter: 4, year: year - 1 } : { quarter: quarter - 1, year };
 
 export const ConfirmationTable = ({
   models,
+  quarter,
+  year,
   minDate,
   maxDate,
   onSave,
@@ -78,18 +96,30 @@ export const ConfirmationTable = ({
   const normalizedMinDate = toDateInput(minDate);
   const normalizedMaxDate = toDateInput(maxDate);
 
+  const prevQuarter = useMemo(
+    () => computePrevQuarter(quarter, year),
+    [quarter, year],
+  );
+  const prevQuarterLabel = `Q${prevQuarter.quarter} ${prevQuarter.year}`;
+
   const initialRows = useMemo<EditableModel[]>(
     () =>
       models.map((m) => ({
         ...m,
         edited_confirmation_date: m.confirmation_date ? toDateInput(m.confirmation_date) : null,
-        // По умолчанию is_used наследуется из предыдущего квартала (backend уже
-        // положил prev.is_used в is_used при prefill_source='previous_quarter').
+        // По умолчанию is_used наследуется из предыдущего квартала/ПИМ (backend уже
+        // положил prev.is_used / pim.is_used в is_used при prefill_source='previous_quarter'|'pim').
         // Если данных нет — значение null ("Не выбрано").
         edited_is_used: m.is_used,
       })),
     [models],
   );
+
+  const initialIsUsedMap = useMemo(() => {
+    const map = new Map<string, boolean | null>();
+    for (const m of models) map.set(m.system_model_id, m.is_used);
+    return map;
+  }, [models]);
 
   const [rows, setRows] = useState<EditableModel[]>(initialRows);
   const rowsRef = useRef(rows);
@@ -139,11 +169,35 @@ export const ConfirmationTable = ({
     [updateRow],
   );
 
-  const PrefillCell = useCallback((params: ICellRendererParams<EditableModel>) => {
-    const row = params.data;
-    if (!row) return null;
-    return <PrefillSourceBadge source={row.prefill_source} />;
-  }, []);
+  const isRowEdited = useCallback(
+    (row: EditableModel): boolean => {
+      const initial = initialIsUsedMap.get(row.system_model_id);
+      // Если было значение (boolean) — проверяем изменилось ли
+      if (initial === true || initial === false) {
+        return row.edited_is_used !== initial;
+      }
+      // Если изначально было null, а теперь есть — это считается "Заполнена",
+      // а не "Изменено"; так что не считаем правкой.
+      return false;
+    },
+    [initialIsUsedMap],
+  );
+
+  const StatusCell = useCallback(
+    (params: ICellRendererParams<EditableModel>) => {
+      const row = params.data;
+      if (!row) return null;
+      return (
+        <RowStatusChips
+          prefillSource={row.prefill_source}
+          isEdited={isRowEdited(row)}
+          editedIsUsed={row.edited_is_used}
+          prevQuarterLabel={prevQuarterLabel}
+        />
+      );
+    },
+    [isRowEdited, prevQuarterLabel],
+  );
 
   const columnDefs = useMemo<ColDef<EditableModel>[]>(
     () => [
@@ -196,12 +250,19 @@ export const ConfirmationTable = ({
         sortable: true,
       },
       {
-        headerName: 'Источник предзаполнения',
-        colId: 'prefill_source',
-        cellRenderer: PrefillCell,
-        valueGetter: (p: ValueGetterParams<EditableModel>) =>
-          PREFILL_SOURCE_LABEL[p.data?.prefill_source ?? 'none'],
-        minWidth: 180,
+        headerName: 'Статус',
+        colId: 'row_status',
+        cellRenderer: StatusCell,
+        valueGetter: (p: ValueGetterParams<EditableModel>) => {
+          if (!p.data) return '';
+          return rowStatusLabel({
+            prefillSource: p.data.prefill_source,
+            isEdited: isRowEdited(p.data),
+            editedIsUsed: p.data.edited_is_used,
+            prevQuarterLabel,
+          });
+        },
+        minWidth: 220,
         filter: 'agSetColumnFilter',
         sortable: true,
       },
@@ -213,8 +274,18 @@ export const ConfirmationTable = ({
       //   valueGetter: (p: ValueGetterParams<EditableModel>) => p.data?.model_source ?? '—',
       // },
     ],
-    [DateCell, UsageCell, PrefillCell],
+    [DateCell, UsageCell, StatusCell, isRowEdited, prevQuarterLabel],
   );
+
+  const getRowClass = useCallback((params: RowClassParams<EditableModel>) => {
+    const row = params.data;
+    if (!row) return undefined;
+    // Подсветка новых моделей без данных ни из ПИМ, ни из прошлого квартала.
+    if (row.prefill_source === null && row.edited_is_used === null) {
+      return 'confirmation-row-new';
+    }
+    return undefined;
+  }, []);
 
   const defaultColDef = useMemo<ColDef>(
     () => ({
@@ -235,6 +306,14 @@ export const ConfirmationTable = ({
     onSave(rowsRef.current);
   };
 
+  const newModelsCount = rows.filter(
+    (r) => r.prefill_source === null && r.edited_is_used === null,
+  ).length;
+  const editedCount = rows.filter((r) => isRowEdited(r)).length;
+  const carriedCount = rows.filter(
+    (r) => r.prefill_source !== null && !isRowEdited(r),
+  ).length;
+
   return (
     <div>
       <ActionsBar>
@@ -249,14 +328,27 @@ export const ConfirmationTable = ({
         </ActionsRight>
       </ActionsBar>
 
+      <LegendBar>
+        <LegendLabel>Обозначения:</LegendLabel>
+        <Tag kind="warning" statusViaBackground dimension="s">
+          Новая модель — {newModelsCount}
+        </Tag>
+        <Tag kind="neutral" statusViaBackground dimension="s">
+          Перенесено (ПИМ / {prevQuarterLabel}) — {carriedCount}
+        </Tag>
+        <Tag kind="success" statusViaBackground dimension="s">
+          Изменено — {editedCount}
+        </Tag>
+      </LegendBar>
 
-      <GridWrapper className="ag-theme-quartz">
+      <GridWrapper className="ag-theme-quartz confirmation-grid">
         <AgGridReact<EditableModel>
           ref={gridRef}
           rowData={rows}
           columnDefs={columnDefs}
           defaultColDef={defaultColDef}
           getRowId={(p) => p.data.system_model_id}
+          getRowClass={getRowClass}
           animateRows={false}
           suppressMovableColumns
           enableCellTextSelection
