@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.60.3](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.60.2...v1.60.3) (2026-04-22)
+
+
+### Bug Fixes
+
+* version ci fix ([2032434](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/2032434a74f5d437c5913754c053c2c0062d3339))
+
 ## [1.60.2](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.60.1...v1.60.2) (2026-04-22)
 
 ## [1.60.1](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.60.0...v1.60.1) (2026-04-22)
