@@ -12,7 +12,7 @@ import type { ConfirmationModelRow } from '@shared/api/hooks/useQuarterlyConfirm
 import { ConfirmationSearchBar } from '../molecules/ConfirmationSearchBar';
 import { ConfirmationDateCell } from '../molecules/ConfirmationDateCell';
 import { UsageStatusCell, usageLabel } from '../molecules/UsageStatusCell';
-import { RowStatusChips, rowStatusLabel } from '../molecules/RowStatusChips';
+import { RowStatusChips, rowStatusLabel, rowStatusTitle } from '../molecules/RowStatusChips';
 import { AG_GRID_LOCALE_RU } from '../../../app/agGridLocale.ru';
 
 type EditableModel = ConfirmationModelRow & {
@@ -204,32 +204,49 @@ export const ConfirmationTable = ({
       {
         field: 'system_model_id',
         headerName: 'Идентификатор версии модели',
+        headerTooltip: 'Технический идентификатор версии модели. Поле только для просмотра.',
         flex: 1,
         minWidth: 180,
         pinned: 'left',
       },
-      { field: 'model_alias', headerName: 'Алиас', flex: 1, minWidth: 140 },
-      { field: 'model_name', headerName: 'Название модели', flex: 2, minWidth: 200 },
+      {
+        field: 'model_alias',
+        headerName: 'Алиас',
+        headerTooltip: 'Алиас модели, собранный из root_model_id и версии.',
+        flex: 1,
+        minWidth: 140,
+      },
+      {
+        field: 'model_name',
+        headerName: 'Название модели',
+        headerTooltip: 'Внутреннее название модели. Поле только для просмотра.',
+        flex: 2,
+        minWidth: 200,
+      },
       {
         field: 'model_name_dadm',
         headerName: 'Название модели в реестре ДАДМ',
+        headerTooltip: 'Название модели в реестре ДАДМ. Поле только для просмотра.',
         flex: 2,
         minWidth: 200,
       },
       {
         field: 'business_customer',
         headerName: 'Владелец модели/алгоритма',
+        headerTooltip: 'Бизнес-заказчик модели. Поле только для просмотра.',
         flex: 1,
         minWidth: 180,
       },
       {
         field: 'business_customer_departament',
         headerName: 'Подразделение владельца модели/алгоритма',
+        headerTooltip: 'Подразделение владельца модели/алгоритма. Поле только для просмотра.',
         flex: 1,
         minWidth: 220,
       },
       {
         headerName: 'Дата подтверждения',
+        headerTooltip: `Дата подтверждения использования модели. Допустимый диапазон: ${normalizedMinDate} - ${normalizedMaxDate}.`,
         colId: 'confirmation_date',
         cellRenderer: DateCell,
         valueGetter: (p: ValueGetterParams<EditableModel>) =>
@@ -240,6 +257,7 @@ export const ConfirmationTable = ({
       },
       {
         headerName: 'Модель используется заказчиком (текущий квартал)',
+        headerTooltip: 'Признак использования модели в текущем квартале. Можно выбрать Да, Нет или оставить Не выбрано.',
         colId: 'is_used',
         cellRenderer: UsageCell,
         valueGetter: (p: ValueGetterParams<EditableModel>) =>
@@ -251,8 +269,18 @@ export const ConfirmationTable = ({
       },
       {
         headerName: 'Статус',
+        headerTooltip: 'Подсказка о происхождении значения: новая модель, перенос из ПИМ/предыдущего квартала или изменение пользователем.',
         colId: 'row_status',
         cellRenderer: StatusCell,
+        tooltipValueGetter: (p) => {
+          if (!p.data) return '';
+          return rowStatusTitle({
+            prefillSource: p.data.prefill_source,
+            isEdited: isRowEdited(p.data),
+            editedIsUsed: p.data.edited_is_used,
+            prevQuarterLabel,
+          });
+        },
         valueGetter: (p: ValueGetterParams<EditableModel>) => {
           if (!p.data) return '';
           return rowStatusLabel({
@@ -330,13 +358,28 @@ export const ConfirmationTable = ({
 
       <LegendBar>
         <LegendLabel>Обозначения:</LegendLabel>
-        <Tag kind="warning" statusViaBackground dimension="s">
+        <Tag
+          kind="warning"
+          statusViaBackground
+          dimension="s"
+          title="Новая модель: в ПИМ и в предыдущем квартале нет данных для предзаполнения."
+        >
           Новая модель — {newModelsCount}
         </Tag>
-        <Tag kind="neutral" statusViaBackground dimension="s">
+        <Tag
+          kind="neutral"
+          statusViaBackground
+          dimension="s"
+          title={`Перенесённые значения: предзаполнены из ПИМ или из ${prevQuarterLabel} и пока не изменены.`}
+        >
           Перенесено (ПИМ / {prevQuarterLabel}) — {carriedCount}
         </Tag>
-        <Tag kind="success" statusViaBackground dimension="s">
+        <Tag
+          kind="success"
+          statusViaBackground
+          dimension="s"
+          title="Изменённые значения: пользователь изменил предзаполненное значение."
+        >
           Изменено — {editedCount}
         </Tag>
       </LegendBar>

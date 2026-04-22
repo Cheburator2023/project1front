@@ -46,12 +46,17 @@ export const usageLabel = (v: UsageStatus): string => {
   return 'Не выбрано';
 };
 
+const usageTitle = (v: UsageStatus): string => {
+  const current = usageLabel(v);
+  return `Признак использования модели в текущем квартале. Текущее значение: ${current}. Доступные варианты: Да, Нет, Не выбрано.`;
+};
+
 export const UsageStatusCell = ({ value, onChange }: UsageStatusCellProps) => {
   return (
     <Select
       value={usageToOption(value)}
       onChange={(e) => onChange(optionToUsage(e.target.value))}
-      title={usageLabel(value)}
+      title={usageTitle(value)}
     >
       {USAGE_OPTIONS.map((opt) => (
         <option key={opt.value} value={opt.value}>

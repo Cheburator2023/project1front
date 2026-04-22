@@ -27,6 +27,14 @@ export const ConfirmationDateCell = ({
   max,
   onChange,
 }: ConfirmationDateCellProps) => {
+  const titleParts = ['Дата подтверждения использования модели.'];
+  if (min && max) {
+    titleParts.push(`Допустимый диапазон: ${min} - ${max}.`);
+  }
+  if (value) {
+    titleParts.push(`Текущее значение: ${value}.`);
+  }
+
   return (
     <DateInput
       type="date"
@@ -34,6 +42,7 @@ export const ConfirmationDateCell = ({
       min={min}
       max={max}
       onChange={(e) => onChange(e.target.value || null)}
+      title={titleParts.join(' ')}
     />
   );
 };

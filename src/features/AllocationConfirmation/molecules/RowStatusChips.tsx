@@ -39,6 +39,30 @@ export const rowStatusLabel = ({
   return parts.join(', ');
 };
 
+export const rowStatusTitle = ({
+  prefillSource,
+  isEdited,
+  editedIsUsed,
+  prevQuarterLabel,
+}: RowStatusChipsProps): string => {
+  if (prefillSource === null) {
+    if (editedIsUsed === null) {
+      return 'Новая модель: нет данных ни из ПИМ, ни из предыдущего квартала.';
+    }
+    return 'Новая модель была заполнена вручную пользователем в текущем квартале.';
+  }
+
+  if (prefillSource === 'pim') {
+    return isEdited
+      ? 'Значение было предзаполнено из ПИМ и затем изменено пользователем.'
+      : 'Значение предзаполнено из ПИМ и пока не изменялось.';
+  }
+
+  return isEdited
+    ? `Значение было перенесено из ${prevQuarterLabel} и затем изменено пользователем.`
+    : `Значение перенесено из ${prevQuarterLabel} и пока не изменялось.`;
+};
+
 export const RowStatusChips = ({
   prefillSource,
   isEdited,
@@ -74,7 +98,18 @@ export const RowStatusChips = ({
   return (
     <ChipsRow>
       {chips.map((c) => (
-        <Tag key={c.key} kind={c.kind} statusViaBackground dimension="s">
+        <Tag
+          key={c.key}
+          kind={c.kind}
+          statusViaBackground
+          dimension="s"
+          title={rowStatusTitle({
+            prefillSource,
+            isEdited,
+            editedIsUsed,
+            prevQuarterLabel,
+          })}
+        >
           {c.label}
         </Tag>
       ))}
