@@ -29,6 +29,25 @@ export const CSV_DENY_RULES_BY_ROLE_AND_BUCKET: Partial<
   },
 };
 
+/**
+ * Поля, которые по требованиям матрицы должны быть доступны роли на конкретном source,
+ * даже если API артефактной матрицы вернул is_editable_by_role_* = 0. Применяются после
+ * deny-правил и до общих allow-правил ниже (CSV_EDIT_RULES_BY_ROLE). Полезны там, где
+ * allow для bucket несимметричен (напр. разрешить только SUM, не трогая SUM-RM).
+ */
+export const CSV_ALLOW_RULES_BY_ROLE_AND_BUCKET: Partial<
+  Record<Role, Partial<Record<'sum' | 'sum_rm', string[]>>>
+> = {
+  [Role.DS_LEAD]: {
+    sum: [
+      'operational_control_epic',
+      'analytical_control_epic',
+      'model_values_control_epic',
+      'impact_assessment_epic',
+    ],
+  },
+};
+
 export const CSV_EDIT_RULES_BY_ROLE: Record<string, string[]> = {
   [Role.VALIDATOR_LEAD]: [
     'implementation_segment',

@@ -42,6 +42,7 @@ import {
   csvMatchedRoles,
   CSV_EDIT_RULES_BY_ROLE,
   CSV_DENY_RULES_BY_ROLE_AND_BUCKET,
+  CSV_ALLOW_RULES_BY_ROLE_AND_BUCKET,
   type CsvEditRoleFlags,
 } from './ModelForm/editRulesFromCsv';
 import {
@@ -118,6 +119,14 @@ function canEditArtefactByCsvRules(
     const denyLabels = CSV_DENY_RULES_BY_ROLE_AND_BUCKET[role]?.[bucket];
     if (denyLabels?.includes(tech)) {
       return false;
+    }
+  }
+
+  // Allow-правила по bucket: поле доступно роли на указанном source даже если API вернул 0.
+  for (const role of matchedRoles) {
+    const allowLabels = CSV_ALLOW_RULES_BY_ROLE_AND_BUCKET[role]?.[bucket];
+    if (allowLabels?.includes(tech)) {
+      return true;
     }
   }
 
