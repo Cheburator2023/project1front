@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.60.1](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.60.0...v1.60.1) (2026-04-22)
+
+
+### Bug Fixes
+
+* nginx rollback ([a91c06b](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/a91c06b103292e322822e0764094275d5b43e622))
+
 # [1.60.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.59.0...v1.60.0) (2026-04-20)
 
 
