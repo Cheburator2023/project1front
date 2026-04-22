@@ -60,7 +60,6 @@ const columnDefs: ColDef[] = [
 
 export const TemplateFiltersGrid = () => {
   const columnFilters = useTemplateFiltersModalStoreSelected.use.columnFilters();
-  console.log('🐸 Pepe said >> TemplateFiltersGrid >> columnFilters:', columnFilters);
 
   const reorderColumns = useTemplateFiltersModalStoreSelected.use.reorderColumns();
   const _quickFilterText = useTemplateFiltersModalStoreSelected.use.quickFilterText();

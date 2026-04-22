@@ -231,7 +231,6 @@ export const ModelForm = ({
 
   const groupedFieldsBySchemaName = groupBy(refinedFields, 'schemaKey');
   const showInnoDevHints = isModelFormInnoDevDebug();
-  console.log('🐸 Pepe said >> ModelForm >> groupedFieldsBySchemaName:', groupedFieldsBySchemaName);
 
 
   const handleChange = (name: keyof Row, value: InputValue) => {

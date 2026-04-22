@@ -155,8 +155,6 @@ const setFilterParams: ISetFilterParams = {
   refreshValuesOnOpen: true,
   cellHeight: 30,
   cellRenderer: (props) => {
-    console.log('🐸 Pepe said >> props:', props);
-
     const text = props.value === null ? '(Пустые)' : props.value || '';
     const maxLength = 80; // Fallback character limit
     const truncatedText = text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
@@ -601,8 +599,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       //     ...pendingTemplate,
       //     columnState,
       //   };
-      //   console.log('🐸 Pepe said >> handleColumnStateChange >> updatedTemplate:', updatedTemplate);
-      //   setPendingTemplate(updatedTemplate as any);
+      //  setPendingTemplate(updatedTemplate as any);
       // }
     };
 
