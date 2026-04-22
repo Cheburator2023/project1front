@@ -7,6 +7,15 @@ import { themes } from './app/theme/theme';
 
 import App from './app/App';
 
+// Баннер версии сборки в консоль (прокидывается из CHANGELOG.md на этапе webpack DefinePlugin).
+// eslint-disable-next-line no-console
+console.log(
+  `%c[sumRM] version ${process.env.APP_VERSION || 'unknown'} (${
+    process.env.APP_VERSION_DATE || 'n/a'
+  }) git=${process.env.GIT_REVISION || 'n/a'}`,
+  'color:#4f8cff;font-weight:bold',
+);
+
 (window as any).urlConfig = {
   SUM_FRONTEND: 'http://test.host:8002/test',
   SUM_API: 'https://test.host',

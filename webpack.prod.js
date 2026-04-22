@@ -4,6 +4,7 @@ const webpack = require('webpack');
 const { DefinePlugin } = webpack;
 const common = require('./webpack.common.js');
 const packageJSON = require('./package.json');
+const { readChangelogVersion } = require('./webpack.version.js');
 
 const git_revision = require('child_process')
   .execSync('git show --format="short" -s')
@@ -12,6 +13,7 @@ const git_revision = require('child_process')
 
 const RC_STATS = packageJSON.release_stats;
 const NO_ROLES = process.env.NO_ROLES;
+const { version: APP_VERSION, date: APP_VERSION_DATE } = readChangelogVersion();
 
 module.exports = merge(common, {
   mode: 'production',
@@ -27,6 +29,8 @@ module.exports = merge(common, {
       'process.env.GIT_REVISION': JSON.stringify(git_revision || ''),
       'process.env.NO_ROLES': JSON.stringify(NO_ROLES || ''),
       'process.env.API_BASE_URL': JSON.stringify(''),
+      'process.env.APP_VERSION': JSON.stringify(APP_VERSION),
+      'process.env.APP_VERSION_DATE': JSON.stringify(APP_VERSION_DATE),
     }),
   ],
 });

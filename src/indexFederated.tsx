@@ -16,6 +16,16 @@ import { CUSTOMER_MAP } from './shared/constants/customers';
 import { Flexbox, Loading } from './shared/ui/atoms';
 import { useDeepEffect } from './shared/hooks/useDeepEffect';
 
+// Баннер версии сборки в консоль (прокидывается из CHANGELOG.md на этапе webpack DefinePlugin).
+// Нужен QA/тестерам, чтобы понимать какую сборку они действительно видят на стенде.
+// eslint-disable-next-line no-console
+console.log(
+  `%c[sumRM] version ${process.env.APP_VERSION || 'unknown'} (${
+    process.env.APP_VERSION_DATE || 'n/a'
+  }) git=${process.env.GIT_REVISION || 'n/a'}`,
+  'color:#4f8cff;font-weight:bold',
+);
+
 export type MFProps = {
   urlConfig?: T_CONFIG_MAP;
   token?: string;
@@ -29,7 +39,7 @@ export type MFProps = {
 };
 
 const MfeRoot = (props: MFProps) => {
-  console.log('MfeRoot >> props:', props);
+  console.log('MfeRoot >> bridged:', props);
   const { user, protectedFetch, onLogout, keycloak } = props;
 
   const { setCurrentCustomer } = useGlobalStore();

@@ -28,9 +28,6 @@ export const TemplatesFilterInput = ({
   error = '',
 }: TemplatesFilterInputProps) => {
   const { topFilters, setTopFilters, setFilterModel, resetFilters } = useFiltersStore();
-  console.log('🐸 Pepe said >> TemplatesFilterInput >> topFilters:', topFilters);
-
-
   const { openAddTemplatePanel } = usePanelsStore();
 
   const { getIsModifiedFilter } = useFiltersStore();
@@ -210,8 +207,6 @@ export const TemplatesFilterInput = ({
     <>
       <StyledButton
         onClick={(e) => {
-          console.log('🐸 Pepe said >> TemplatesFilterInput >> e:', e);
-
           e.stopPropagation();
           e.preventDefault();
           setModalOpen(true);

@@ -18,6 +18,8 @@
     "no-restricted-exports": "off",
     "no-restricted-modules": "off",
     "no-restricted-properties": "off",
+    "no-lone-blocks": "off",
+    "jsx-a11y/role-has-required-aria-props": "off",
     "no-param-reassign": [
       "warn",
       {

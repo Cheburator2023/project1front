@@ -94,7 +94,6 @@ function InputFactorySwitcher<T extends string>({
     'Обязательное поле'
   );
 
-    console.log('🐸 Pepe said >> InputFactorySwitcher >> type:', type, name);
 
   switch (type) {
 

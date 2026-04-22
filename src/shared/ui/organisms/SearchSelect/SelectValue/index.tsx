@@ -40,7 +40,6 @@ export const SelectValue = React.memo(
         const selectedValueText = options.groups
           .flatMap((group) => group.options)
           .find((option) => option.value === value[0])?.text;
-        console.log('🐸 Pepe said >> selectedValueText:', selectedValueText);
 
         return (
           <SingleSelectContainer>

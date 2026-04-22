@@ -747,6 +747,24 @@ const mapArtifactToField = (
     isDisabled = true;
   }
 
+  // Железный финальный override: поля из CSV_ALLOW_RULES_BY_ROLE_AND_BUCKET должны быть
+  // доступны для пары (роль, bucket) даже если выше по цепочке поле было заблокировано
+  // (включая случаи, когда бек не вернул нужные флаги или ещё не применил миграцию).
+  {
+    const bucket = getModelSourceAccessBucket(activeRow);
+    const matchedRoles = csvMatchedRoles(roleFlags);
+    if (
+      bucket &&
+      matchedRoles.some((role) =>
+        CSV_ALLOW_RULES_BY_ROLE_AND_BUCKET[role]?.[bucket]?.includes(
+          artifact.artefact_tech_label,
+        ),
+      )
+    ) {
+      isDisabled = false;
+    }
+  }
+
   const commonAttributes: CommonInputProps<keyof Row> = {
     id: artifact.artefact_id.toString(),
     name: artifact.artefact_tech_label,
