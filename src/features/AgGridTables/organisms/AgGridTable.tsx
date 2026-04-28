@@ -293,6 +293,9 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     const columnDefs: ColDef[] = useMemo(() => {
       return columnList
         .map((data, colIndex) => {
+          const effectiveColumnType =
+            data.name === 'remove_date_validation' ? COLUMN_TYPE.STRING : data.type;
+
           const dynamicSetFilterParams = {
             ...setFilterParams,
             valueFormatter: (params: any) => {
@@ -324,18 +327,19 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
 
           return {
             ...data,
+            type: effectiveColumnType,
             headerName: data.title,
             field: data.name,
             headerTooltip: data.title,
             rowDrag: colIndex === 0 && rowDragManaged,
             filter:
-              data.type === COLUMN_TYPE.DATE
+              effectiveColumnType === COLUMN_TYPE.DATE
                 ? 'agDateColumnFilter'
-                : data.type === COLUMN_TYPE.NUMBER
+                : effectiveColumnType === COLUMN_TYPE.NUMBER
                 ? 'agNumberColumnFilter'
                 : 'agSetColumnFilter',
             filterParams:
-              data.type === COLUMN_TYPE.DATE ? dateFilterParams : dynamicSetFilterParams,
+              effectiveColumnType === COLUMN_TYPE.DATE ? dateFilterParams : dynamicSetFilterParams,
             cellRenderer: data.cellRenderer,
             headerClass: (params) => {
               const p = getParsedGridSearchForHighlight();
