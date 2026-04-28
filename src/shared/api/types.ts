@@ -234,6 +234,16 @@ export type Artifact = {
   is_editable_by_role_sum?: ArtifactFlag;
 };
 
+const FRONTEND_ARTIFACT_TYPE_OVERRIDES: Partial<Record<Artifact['artefact_tech_label'], ArtifactType>> = {
+  // Backend returns `date`, but this artifact stores free-text values.
+  remove_date_validation: ArtifactType.TEXT,
+};
+
+export const getFrontendArtifactTypeDesc = (
+  artifact: Pick<Artifact, 'artefact_tech_label' | 'artefact_type_desc'>,
+): ArtifactTypeUnion =>
+  FRONTEND_ARTIFACT_TYPE_OVERRIDES[artifact.artefact_tech_label] ?? artifact.artefact_type_desc;
+
 export type ArtifactResponse = {
   data?: Array<Artifact>;
 };

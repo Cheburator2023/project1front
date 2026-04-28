@@ -12,7 +12,13 @@ import {
   startOfYear,
 } from 'date-fns';
 
-import { ArtifactType, type Artifact, type ArtifactApi, type ArtifactValue } from '@shared/api';
+import {
+  ArtifactType,
+  getFrontendArtifactTypeDesc,
+  type Artifact,
+  type ArtifactApi,
+  type ArtifactValue,
+} from '@shared/api';
 import { Column, COLUMN_TYPE, ModelSource, Role, Row } from '@shared/types';
 import { initialColumns, MODEL_FORM_MODE } from '@shared/constants';
 import {
@@ -200,7 +206,7 @@ const getInputValuesFromRow = (artifacts: Artifact[], activeRow: Partial<Row> = 
   }, {});
 
 const getInputValue = (artifact: Artifact, rowValue: string) => {
-  switch (artifact.artefact_type_desc) {
+  switch (getFrontendArtifactTypeDesc(artifact)) {
     case ArtifactType.BOOLEAN: {
       const type = INPUT_TYPE.FLAG;
 
@@ -789,7 +795,7 @@ const mapArtifactToField = (
 
   const activeRowValue = activeRow?.[artifact?.artefact_tech_label];
 
-  switch (artifact.artefact_type_desc) {
+  switch (getFrontendArtifactTypeDesc(artifact)) {
     case ArtifactType.BOOLEAN: {
       const type = INPUT_TYPE.FLAG;
 
