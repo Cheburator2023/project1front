@@ -477,6 +477,27 @@
         "tags": ["Артефакты"]
       }
     },
+    "/api/rest/v1/artefacts/block-list/{modelId}": {
+      "get": {
+        "operationId": "ArtefactsController_getBlockList",
+        "summary": "Получить список заблокированных артефактов",
+        "description": "Возвращает список всех заблокированных артефактов для текущей модели",
+        "parameters": [
+          {
+            "name": "modelId",
+            "required": true,
+            "in": "path",
+            "description": "Идентификатор версии модели",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Список заблокированных артефактов успешно получен" },
+          "500": { "description": "Внутренняя ошибка сервера" }
+        },
+        "tags": ["Артефакты"]
+      }
+    },
     "/api/rest/v1/reports": {
       "post": {
         "operationId": "ReportsController_getReport",
