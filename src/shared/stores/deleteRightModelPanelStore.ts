@@ -48,10 +48,6 @@ export const useDeleteRightModelPanelStore = create<DeleteRightModelPanelStoreSt
       count === 1 &&
       source === 'sum-rm' &&
       (NO_ROLES === 'true' || isAdmin || userMatches || isValidatorLead);
-    console.log('🐸 Pepe said >> status:', status);
-    console.log('🐸 Pepe said >> isValidatorLead:', isValidatorLead);
-    console.log('🐸 Pepe said >> userMatches:', userMatches);
-    console.log('🐸 Pepe said >> isAdmin:', isAdmin);
 
     set({
       modelsCount: count,

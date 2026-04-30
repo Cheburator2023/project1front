@@ -158,6 +158,18 @@ export const BASE_MODEL_SCHEMA: FormFieldsSchema = [
     required: false,
   },
   {
+    name: 'model_data_07k_control',
+    required: false,
+    maxLength: 250,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
+  },
+  {
+    name: 'model_data_07k_control_epic',
+    required: false,
+    maxLength: 250,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
+  },
+  {
     name: 'target',
     required: false,
     customers: [CUSTOMER_MAP.DADM],
@@ -168,6 +180,174 @@ export const BASE_MODEL_SCHEMA: FormFieldsSchema = [
     required: false,
     customers: [CUSTOMER_MAP.DADM],
     maxLength: 250,
+  },
+  // Создание модели (ADD): getFormFields берёт только BASE_MODEL_SCHEMA — иначе полей нет на странице.
+  {
+    name: 'implementation_segment',
+    required: false,
+    maxLength: 250,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
+  },
+  {
+    name: 'remove_decision',
+    required: false,
+    maxLength: 250,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
+  },
+  {
+    name: 'segment_name',
+    required: false,
+    maxLength: 250,
+    customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
+  },
+  {
+    name: 'validation_report_approve_date',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'model_epic_04_date',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'model_epic_05a',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'model_epic_07',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'customer_model_id',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'model_epic_09',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'model_epic_11_date',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'model_epic_12_date',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'output_table',
+    required: false,
+    maxLength: 250,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'allocation_assessment_parameters',
+    required: false,
+    maxLength: 250,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'runtime_subsystem',
+    required: false,
+    maxLength: 250,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'developing_end_date',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'rs_model_decommiss_date',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'developing_start_date',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'model_epic_04',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'model_epic_05',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'data_completion_of_stage_05a',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'model_epic_07_date',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'release',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'model_epic_11',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'model_epic_12',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'date_of_introduction_into_operation',
+    required: false,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'allocation_assessment_class',
+    required: false,
+    maxLength: 250,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'deploy_team',
+    required: false,
+    maxLength: 250,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'buiseness_process_name',
+    required: false,
+    maxLength: 250,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'deploy_system',
+    required: false,
+    maxLength: 250,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'dev_team',
+    required: false,
+    maxLength: 250,
+    customers: [CUSTOMER_MAP.UMRV],
+  },
+  {
+    name: 'project_ref',
+    required: false,
+    maxLength: 250,
+    customers: [CUSTOMER_MAP.UMRV],
   },
 ];
 
@@ -236,7 +416,8 @@ export const ACTIVE_MODEL_SCHEMA: FormFieldsSchema = [
   {
     name: 'business_customer_departament',
     customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
-    required: true,
+    required: false,
+    requireConditions: [{ active_model: '1' }],
   },
   {
     name: 'implementation_validity',
@@ -258,7 +439,8 @@ export const ACTIVE_MODEL_SCHEMA: FormFieldsSchema = [
   {
     name: 'developing_report',
     customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
-    required: true,
+    required: false,
+    requireConditions: [{ active_model: '1' }],
     maxLength: 250,
   },
   {
@@ -277,6 +459,7 @@ export const ACTIVE_MODEL_SCHEMA: FormFieldsSchema = [
         model_risk_type: 'Кредитный риск',
       },
     ],
+    // value: подставляется при выполнении conditions (форма: handleChange; сабмит: mergeAutoRatingModelIfEligible в helpers)
     valueConditions: [
       {
         value: 'Да',
@@ -321,6 +504,7 @@ export const ACTIVE_MODEL_SCHEMA: FormFieldsSchema = [
   {
     name: 'update_date',
     required: false,
+    alwaysDisabled: true,
     customers: [CUSTOMER_MAP.UMRV],
   },
 ];
@@ -925,6 +1109,7 @@ export const REST_MODEL_SCHEMA: FormFieldsSchema = [
   name: item.name,
   maxLength: item.maxLength,
   required: false,
+  alwaysDisabled: item.alwaysDisabled,
   customers: [CUSTOMER_MAP.UMRV, CUSTOMER_MAP.DADM],
 }));
 
@@ -950,6 +1135,8 @@ export const SUM_ARTEFACTS = [
   'target_variable_collecting_prototype_code',
   'developing_start_date',
   'developing_end_date',
+  'model_data_07k_control',
+  'model_data_07k_control_epic',
   'jupyter_notebook_link',
   'rstudio_link',
   'sas_link',

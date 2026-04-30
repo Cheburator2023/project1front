@@ -9,11 +9,22 @@ import App from './app/App';
 import { themes } from './app/theme/theme';
 
 import { T_CONFIG_MAP, T_KEYCLOAK_USER } from './shared/types/infra';
-import { ColumnsFilter, Permission, Role } from './shared/types';
+import { ColumnsFilter, Permission } from './shared/types';
+import { keycloakGroupsToRoles } from './shared/helpers';
 import { useFetchStore, useGlobalStore, useUserStore } from './shared/stores';
 import { CUSTOMER_MAP } from './shared/constants/customers';
 import { Flexbox, Loading } from './shared/ui/atoms';
 import { useDeepEffect } from './shared/hooks/useDeepEffect';
+
+// Баннер версии сборки в консоль (прокидывается из CHANGELOG.md на этапе webpack DefinePlugin).
+// Нужен QA/тестерам, чтобы понимать какую сборку они действительно видят на стенде.
+// eslint-disable-next-line no-console
+console.log(
+  `%c[sumRM] version ${process.env.APP_VERSION || 'unknown'} (${
+    process.env.APP_VERSION_DATE || 'n/a'
+  }) git=${process.env.GIT_REVISION || 'n/a'}`,
+  'color:#4f8cff;font-weight:bold',
+);
 
 export type MFProps = {
   urlConfig?: T_CONFIG_MAP;
@@ -28,7 +39,7 @@ export type MFProps = {
 };
 
 const MfeRoot = (props: MFProps) => {
-  console.log('MfeRoot >> props:', props);
+  console.log('MfeRoot >> bridged:', props);
   const { user, protectedFetch, onLogout, keycloak } = props;
 
   const { setCurrentCustomer } = useGlobalStore();
@@ -70,10 +81,7 @@ const MfeRoot = (props: MFProps) => {
     if (user?.groups) {
       setGroups(user.groups);
 
-      const roles = user.groups.filter((group) =>
-        Object.values(Role).includes(group as Role),
-      ) as Role[];
-      setRoles(roles);
+      setRoles(keycloakGroupsToRoles(user.groups));
     }
 
     if (user?.realm_access?.roles) {

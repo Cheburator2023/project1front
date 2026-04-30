@@ -1,13 +1,27 @@
 /* eslint-disable array-callback-return */
 /* eslint-disable no-unneeded-ternary */
-import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  ChangeEvent,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { Button, CheckboxField, T } from '@admiral-ds/react-ui';
 import { format } from 'date-fns';
 
 import { Row } from '@shared/types';
 import { StatusScreen } from '@shared/ui/molecules';
 import { MODEL_FORM_MODE, initialColumns } from '@shared/constants';
-import { INPUT_TYPE, InputFactory, InputValue, RightPanel } from '@shared/ui/organisms';
+import {
+  INPUT_TYPE,
+  InputFactory,
+  InputFactoryProps,
+  InputValue,
+  RightPanel,
+} from '@shared/ui/organisms';
 import { ArtifactApi, ModelEditApi, ArtifactBlockListResponse } from '@shared/api';
 import {
   useModelsControllerUpdateModels,
@@ -29,9 +43,11 @@ import { FormValues } from '../types';
 import {
   getFormMode,
   getArtifactApiItems,
+  getFormFieldTextForConditions,
   getInvalidFields,
   getInputValuesFromRow,
   getProperFormatValueForSubmit,
+  mergeAutoRatingModelIfEligible,
 } from '../helpers';
 import { ButtonContainer, FormContainer } from './styles';
 import { ParentModelSelect } from './ParentModelSelect';
@@ -39,9 +55,12 @@ import { useActiveFormSchema } from './useActiveFormSchema';
 import { useFormFields } from './useFormFields';
 import { ALLOCATION_FIELDS_NAMES_USAGE, SCHEMA_NAME_MAP } from './constants';
 import { ModelFormDotMenu } from './ModelFormDotMenu';
+import { ModelFormQaDevPanel } from './ModelFormQaDevPanel';
+import { isModelFormInnoDevDebug } from './modelFormDevUtils';
 import { useModelsStore } from '../../../shared/stores';
 
 type SubmitType = { checkOnly?: boolean };
+
 
 export interface ModelFormProps {
   mode: 'add' | 'edit';
@@ -96,6 +115,12 @@ export const ModelForm = ({
   const [submitLoading, setSubmitLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string>();
   const [initialRow, setInitialRow] = useState(activeRow);
+
+  useDeepEffect(() => {
+    if (activeRow) {
+      setInitialRow(activeRow);
+    }
+  }, [activeRow]);
   const [expandedPanel, setExpandPanel] = useState(true);
   const [showAllFields, setShowAllFields] = useState(false);
   const [activeModelByDefault, setActiveModelByDefault] = useState<boolean | undefined>(undefined);
@@ -115,9 +140,10 @@ export const ModelForm = ({
     isModelOps,
     isModelOpsLead,
     isMIPM,
+    isGod
   } = useRoles();
 
-  const isEditByRatingModel = isValidator || isValidatorLead || isBusinessCustomer;
+  const isEditByRatingModel = isValidator || isValidatorLead || isBusinessCustomer || isGod;
   const hasNoAccessToActiveModel =
     isValidator || isValidatorLead || isBusinessCustomer
       ? false
@@ -135,10 +161,32 @@ export const ModelForm = ({
 
   const scrollToActiveError = useScrollTo(errorElemRef, formRef);
 
+  // Действующая модель в БД: '1' | '0' | '' | null — активна / снята / никогда не активировали.
   const wasPreviouslyActiveModel = activeRow?.active_model === '1';
 
+  const valuesWithActiveModelFlag = useMemo(() => {
+    if (!values) {
+      return values;
+    }
+    const flagFromCheckbox =
+      hasNoAccessToActiveModel && formMode === MODEL_FORM_MODE.EDIT
+        ? wasPreviouslyActiveModel
+        : activeModelByDefault;
+    // Пока чекбокс не трогали (undefined), не подменяем values — сохраняем различие пусто vs '0' из строки.
+    if (flagFromCheckbox === undefined) {
+      return values;
+    }
+    return {
+      ...values,
+      active_model: {
+        type: INPUT_TYPE.FLAG as typeof INPUT_TYPE.FLAG,
+        value: !!flagFromCheckbox,
+      },
+    };
+  }, [values, hasNoAccessToActiveModel, formMode, wasPreviouslyActiveModel, activeModelByDefault]);
+
   const { formSchema } = useActiveFormSchema({
-    values,
+    values: valuesWithActiveModelFlag,
     initialRow,
     mode: formMode,
     activeModelByDefault:
@@ -149,7 +197,7 @@ export const ModelForm = ({
 
   const { fields } = useFormFields({
     formSchema,
-    values,
+    values: valuesWithActiveModelFlag,
     mode: formMode,
     initialRow,
     artifacts,
@@ -160,6 +208,10 @@ export const ModelForm = ({
   const IS_FORM_MODE_ADD = formMode === MODEL_FORM_MODE.ADD;
   const title = IS_FORM_MODE_ADD ? 'Новая модель' : 'Редактирование модели';
 
+  // Раньше здесь был слой applyBlockListRespectingApiFlags + запрос /artefacts/block-list/:id.
+  // Эндпоинт был мёртвый (на бэке он только возвращал пустой массив), а update_date уже
+  // принудительно disabled в isFieldDisabled (см. helpers.ts). Теперь просто используем fields как есть.
+  // Вернул обработку списка заблокированных артефактов из сума
   const refinedFields = fields.map((field) => {
     if (_blockedArtifactsList?.data?.includes(field.name)) {
       field.disabled = true;
@@ -167,8 +219,28 @@ export const ModelForm = ({
     return field;
   });
 
+  const refinedFieldsRef = useRef(refinedFields);
+  refinedFieldsRef.current = refinedFields;
+
+  const completesConditionFieldsRef = useRef(completesConditionFields);
+  completesConditionFieldsRef.current = completesConditionFields;
+
+  /** Стабильная подпись, иначе новый [] по ссылке на каждом рендере крутит useLayoutEffect бесконечно */
+  const completesConditionSignature = useMemo(
+    () =>
+      completesConditionFields?.length
+        ? JSON.stringify(
+            completesConditionFields.map(({ connectedName, connectedValue }) => ({
+              connectedName,
+              connectedValue,
+            })),
+          )
+        : '',
+    [completesConditionFields],
+  );
+
   const groupedFieldsBySchemaName = groupBy(refinedFields, 'schemaKey');
-  console.log('🐸 Pepe said >> ModelForm >> groupedFieldsBySchemaName:', groupedFieldsBySchemaName);
+  const showInnoDevHints = isModelFormInnoDevDebug();
 
 
   const handleChange = (name: keyof Row, value: InputValue) => {
@@ -184,8 +256,9 @@ export const ModelForm = ({
 
         conditions?.map((condition) => {
           Object.keys(condition).map((fieldName) => {
-            // @ts-ignore
-            const formFieldValue = values?.[fieldName as any]?.value?.text;
+            const formFieldValue = getFormFieldTextForConditions(
+              values?.[fieldName as keyof Row] as InputValue | undefined,
+            );
 
             if (fieldName === name || formFieldValue) {
               // @ts-ignore
@@ -194,8 +267,9 @@ export const ModelForm = ({
                 fieldName === name ? value : values?.[fieldName as any];
 
               connectedValuesToContitions[fieldName] =
-                // @ts-ignore
-                fieldName === name ? value?.value?.text : formFieldValue;
+                fieldName === name
+                  ? getFormFieldTextForConditions(value)
+                  : formFieldValue;
             }
           });
         });
@@ -270,48 +344,82 @@ export const ModelForm = ({
     setValues((prevValues) => ({ ...prevValues, ...newValues }));
   };
 
-  useDeepEffect(() => {
-    setTimeout(() => {
-      completesConditionFields?.map((completesConditionField) => {
-        if (completesConditionField?.connectedName) {
-          let autoCompletedField = {};
+  useLayoutEffect(() => {
+    const list = completesConditionFieldsRef.current;
+    if (!list?.length) {
+      return;
+    }
 
-          const connectedField = refinedFields.find((_field) => {
-            return _field.name === completesConditionField?.connectedName;
-          });
+    const refined = refinedFieldsRef.current;
 
-          const artifact = artifacts.find(
-            (_artifact) => _artifact.artefact_tech_label === completesConditionField?.connectedName,
-          );
-          const connectedArtifactOption = artifact?.values?.find(
-            (option) => option.artefact_value === completesConditionField?.connectedValue,
-          );
+    list.forEach((completesConditionField) => {
+      if (!completesConditionField?.connectedName) {
+        return;
+      }
 
+      const connectedField = refined.find(
+        (_field) => _field.name === completesConditionField.connectedName,
+      );
+
+      const artifact = artifacts.find(
+        (_artifact) => _artifact.artefact_tech_label === completesConditionField.connectedName,
+      );
+      const connectedArtifactOption = artifact?.values?.find(
+        (option) => option.artefact_value === completesConditionField.connectedValue,
+      );
+
+      if (
+        !connectedField?.disabled &&
+        connectedArtifactOption?.artefact_value === completesConditionField.connectedValue
+      ) {
+        const inferredType = connectedField?.type ?? INPUT_TYPE.SELECT;
+        const key = completesConditionField.connectedName as keyof Row;
+        const nextFieldValue = {
+          type: inferredType,
+          value: {
+            id: `${connectedArtifactOption?.artefact_value_id}`,
+            text: `${connectedArtifactOption?.artefact_value}`,
+          },
+        } as InputValue;
+
+        setValues((prevValues) => {
+          const prev = prevValues?.[key];
+          const pv = prev?.value;
+          const nv = nextFieldValue.value;
           if (
-            !connectedField?.disabled &&
-            connectedArtifactOption?.artefact_value === completesConditionField?.connectedValue
+            prev?.type === nextFieldValue.type &&
+            pv &&
+            typeof pv === 'object' &&
+            !Array.isArray(pv) &&
+            'id' in pv &&
+            'text' in pv &&
+            typeof nv === 'object' &&
+            !Array.isArray(nv) &&
+            String((pv as { id: string }).id) === String((nv as { id: string }).id) &&
+            (pv as { text: string }).text === (nv as { text: string }).text
           ) {
-            autoCompletedField = {
-              [completesConditionField.connectedName]: {
-                type: connectedField?.type,
-                value: {
-                  id: `${connectedArtifactOption?.artefact_value_id}`,
-                  text: `${connectedArtifactOption?.artefact_value}`,
-                },
-              },
-            };
+            return prevValues;
+          }
+          return { ...prevValues, [key]: nextFieldValue };
+        });
 
-            setValues((prevValues) => ({ ...prevValues, ...autoCompletedField }));
+        setChangedFields((prevChangedFields) =>
+          prevChangedFields.includes(key)
+            ? prevChangedFields
+            : [...prevChangedFields, key],
+        );
+      }
+
+      if (connectedField?.disabled) {
+        setValues((prevValues) => {
+          if (prevValues?.[completesConditionField.connectedName as keyof Row] === undefined) {
+            return prevValues;
           }
-          if (connectedField?.disabled) {
-            setValues((prevValues) => ({
-              ...omit(prevValues, completesConditionField?.connectedName),
-            }));
-          }
-        }
-      });
-    }, 100);
-  }, [completesConditionFields, refinedFields]);
+          return omit(prevValues, completesConditionField.connectedName) as FormValues;
+        });
+      }
+    });
+  }, [completesConditionSignature, artifacts]);
 
   const checkAllocationFieldsChanged = () => {
     const fieldsChanged = ALLOCATION_FIELDS_NAMES_USAGE.some((fieldName) => {
@@ -359,18 +467,17 @@ export const ModelForm = ({
   const handleSubmit = useCallback(
     async ({ checkOnly = false }: SubmitType) => {
       const valuesWithAddedOutsideControls = {
-        ...values,
-        active_model: {
-          type: INPUT_TYPE.FLAG,
-          value: hasNoAccessToActiveModel
-            ? wasPreviouslyActiveModel
-            : activeModelByDefault || false,
-        },
+        ...valuesWithActiveModelFlag,
       };
+
+      const valuesForSubmit = mergeAutoRatingModelIfEligible(
+        valuesWithAddedOutsideControls as FormValues,
+        artifacts,
+      ) as typeof valuesWithAddedOutsideControls;
 
       const newInvalidFields = getInvalidFields(
         formSchema,
-        valuesWithAddedOutsideControls as any,
+        valuesForSubmit as any,
         wasPreviouslyActiveModel,
         refinedFields,
         initialRow
@@ -389,7 +496,7 @@ export const ModelForm = ({
 
       setInvalidFields(fieldsChanged ? [] : newInvalidFields);
       scrollToActiveError();
-      setDirtyFields((prevDirtyFields) => [...prevDirtyFields, refinedFields[0].name]);
+      setDirtyFields((prevDirtyFields) => [...prevDirtyFields, refinedFields[0]?.name]);
 
       console.log('📝 FORM LOGS: >> newInvalidFields:', newInvalidFields);
 
@@ -403,9 +510,10 @@ export const ModelForm = ({
       }
 
       const artifactApiItems = getArtifactApiItems(
-        valuesWithAddedOutsideControls as any,
+        valuesForSubmit as any,
         parentModelId,
         changedFields,
+        ['rating_model'],
       );
 
       // TODO: check this type
@@ -420,10 +528,7 @@ export const ModelForm = ({
         console.log('📝 FORM LOGS: ~ system_model_id:', system_model_id);
         console.log('📝 FORM LOGS: ~ model_source:', model_source);
         console.log('📝 FORM LOGS: ~ sent artifacts:', artifactApiItems);
-        console.log(
-          '📝 FORM LOGS: ~ sent valuesWithAddedOutsideControls:',
-          valuesWithAddedOutsideControls,
-        );
+        console.log('📝 FORM LOGS: ~ sent valuesForSubmit:', valuesForSubmit);
 
         if (system_model_id && model_source) {
           updateModelsMutation.mutate({
@@ -444,7 +549,24 @@ export const ModelForm = ({
         });
       }
     },
-    [values, formSchema, formMode, activeModelByDefault, hasNoAccessToActiveModel, refinedFields, initialRow],
+    [
+      valuesWithActiveModelFlag,
+      formSchema,
+      activeModelByDefault,
+      hasNoAccessToActiveModel,
+      fields,
+      refinedFields,
+      changedFields,
+      parentModelId,
+      IS_FORM_MODE_ADD,
+      initialRow,
+      onSubmit,
+      scrollToActiveError,
+      wasPreviouslyActiveModel,
+      createModelMutation,
+      updateModelsMutation,
+      artifacts,
+    ],
   );
 
   const handleChangeParentModel = useCallback(
@@ -475,7 +597,20 @@ export const ModelForm = ({
   }, [onClose]);
 
   const activeModelCheckboxHandler = async (e: any) => {
-    setActiveModelByDefault(e?.target?.checked);
+    const checked = Boolean(e?.target?.checked);
+    setActiveModelByDefault(checked);
+    setValues((prev) => ({
+      ...prev,
+      active_model: {
+        type: INPUT_TYPE.FLAG,
+        value: checked,
+      },
+    }));
+    setChangedFields((prevChangedFields) =>
+      prevChangedFields.includes('active_model')
+        ? prevChangedFields
+        : [...prevChangedFields, 'active_model'],
+    );
 
     await handleSubmit({ checkOnly: true });
   };
@@ -584,16 +719,17 @@ export const ModelForm = ({
     if (dirtyFields.length) {
       const newInvalidFields = getInvalidFields(
         formSchema,
-        values,
+        valuesWithActiveModelFlag,
         wasPreviouslyActiveModel,
         refinedFields,
         initialRow
       );
       setInvalidFields(newInvalidFields);
     }
-  }, [values, dirtyFields, formSchema, wasPreviouslyActiveModel, refinedFields, initialRow]);
+  }, [valuesWithActiveModelFlag, dirtyFields, formSchema, wasPreviouslyActiveModel, refinedFields, initialRow]);
 
   return (
+    <>
     <RightPanel
       title={title}
       showPanel
@@ -684,6 +820,8 @@ export const ModelForm = ({
                           key={field.name}
                           ref={errorElemRef}
                           data-form-input={field.name}
+                          data-artefact-tech-label={field.name}
+                          title={showInnoDevHints ? String(field.name) : undefined}
                         >
                           <InputFactory<keyof Row>
                             values={values}
@@ -732,6 +870,14 @@ export const ModelForm = ({
         </>
       }
     />
+    {showInnoDevHints ? (
+      <ModelFormQaDevPanel
+        fields={refinedFields}
+        modelSource={initialRow?.model_source}
+        artifacts={artifacts}
+      />
+    ) : null}
+    </>
   );
 };
 

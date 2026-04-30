@@ -354,7 +354,7 @@ export const initialColumns: Array<Column> = [
   {
     name: 'remove_date_validation',
     title: 'Дата выведения РС / Модели из эксплуатации',
-    type: COLUMN_TYPE.DATE,
+    type: COLUMN_TYPE.STRING,
   },
   {
     name: 'assignment_contractor',

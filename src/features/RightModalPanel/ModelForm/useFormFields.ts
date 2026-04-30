@@ -29,8 +29,8 @@ export const useFormFields = ({
   values,
 }: UseFormFieldsProps) => {
   const [fields, setFields] = useState<FormFields>([]);
-  const { isValidator, isValidatorLead } = useRoles();
-  const canEditModelRiskByRole = isValidator || isValidatorLead;
+  const { isValidator, isValidatorLead, isBusinessCustomer, isDsLead } = useRoles();
+  const canEditModelRiskByRole = isValidator || isValidatorLead || isBusinessCustomer;
 
   useDeepEffect(() => {
     const newFields = getFormFields({
@@ -42,6 +42,10 @@ export const useFormFields = ({
       showAllFields,
       currentCustomer,
       canEditModelRiskByRole,
+      isBusinessCustomer,
+      isValidatorLead,
+      isValidator,
+      isDsLead,
     });
 
     setFields(newFields);
@@ -54,6 +58,10 @@ export const useFormFields = ({
     currentCustomer,
     values,
     canEditModelRiskByRole,
+    isBusinessCustomer,
+    isValidatorLead,
+    isValidator,
+    isDsLead,
   ]);
 
   // order field by schema order prop
@@ -64,3 +72,4 @@ export const useFormFields = ({
     fields: orderedFields,
   };
 };
+

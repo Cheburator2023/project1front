@@ -1,2 +1,16 @@
-npx commitlint --edit $1
+#!/usr/bin/env sh
+. "$(dirname "$0")/_/husky.sh"
 
+export PATH="/usr/local/bin:/opt/homebrew/bin:$HOME/.local/bin:$PATH"
+if [ -n "${HOME:-}" ] && [ -f "$HOME/.nvm/nvm.sh" ]; then
+  . "$HOME/.nvm/nvm.sh"
+fi
+if command -v fnm >/dev/null 2>&1; then
+  eval "$(fnm env)"
+fi
+if [ -d "${HOME:-}/.volta" ]; then
+  export VOLTA_HOME="$HOME/.volta"
+  export PATH="$VOLTA_HOME/bin:$PATH"
+fi
+
+npx commitlint --edit "$1"

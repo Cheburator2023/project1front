@@ -2225,29 +2225,38 @@ export function useMonitoringControllerGetSystemMonitoring<
  * Возвращает список всех доступных артефактов для текущего пользователя
  * @summary Получить список артефактов
  */
-export const artefactsControllerGetArtefacts = (signal?: AbortSignal) => {
-  return customInstance<null>({ url: `/artefacts`, method: 'GET', signal });
+export const artefactsControllerGetArtefacts = (
+  source?: 'sum' | 'sum-rm',
+  signal?: AbortSignal,
+) => {
+  return customInstance<null>({
+    url: `/artefacts`,
+    method: 'GET',
+    params: source ? { source } : undefined,
+    signal,
+  });
 };
 
-export const getArtefactsControllerGetArtefactsQueryKey = () => {
-  return [`/artefacts`] as const;
+export const getArtefactsControllerGetArtefactsQueryKey = (source?: 'sum' | 'sum-rm') => {
+  return [`/artefacts`, source || 'sum-rm'] as const;
 };
 
 export const getArtefactsControllerGetArtefactsQueryOptions = <
   TData = Awaited<ReturnType<typeof artefactsControllerGetArtefacts>>,
   TError = ErrorType<null>,
 >(options?: {
+  source?: 'sum' | 'sum-rm';
   query?: Partial<
     UseQueryOptions<Awaited<ReturnType<typeof artefactsControllerGetArtefacts>>, TError, TData>
   >;
 }) => {
-  const { query: queryOptions } = options ?? {};
+  const { query: queryOptions, source } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getArtefactsControllerGetArtefactsQueryKey();
+  const queryKey = queryOptions?.queryKey ?? getArtefactsControllerGetArtefactsQueryKey(source);
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof artefactsControllerGetArtefacts>>> = ({
     signal,
-  }) => artefactsControllerGetArtefacts(signal);
+  }) => artefactsControllerGetArtefacts(source, signal);
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof artefactsControllerGetArtefacts>>,
@@ -2266,6 +2275,7 @@ export function useArtefactsControllerGetArtefacts<
   TError = ErrorType<null>,
 >(
   options: {
+    source?: 'sum' | 'sum-rm';
     query: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof artefactsControllerGetArtefacts>>, TError, TData>
     > &
@@ -2285,6 +2295,7 @@ export function useArtefactsControllerGetArtefacts<
   TError = ErrorType<null>,
 >(
   options?: {
+    source?: 'sum' | 'sum-rm';
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof artefactsControllerGetArtefacts>>, TError, TData>
     > &
@@ -2304,6 +2315,7 @@ export function useArtefactsControllerGetArtefacts<
   TError = ErrorType<null>,
 >(
   options?: {
+    source?: 'sum' | 'sum-rm';
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof artefactsControllerGetArtefacts>>, TError, TData>
     >;
@@ -2319,6 +2331,7 @@ export function useArtefactsControllerGetArtefacts<
   TError = ErrorType<null>,
 >(
   options?: {
+    source?: 'sum' | 'sum-rm';
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof artefactsControllerGetArtefacts>>, TError, TData>
     >;

@@ -12,7 +12,13 @@ import {
   startOfYear,
 } from 'date-fns';
 
-import { ArtifactType, type Artifact, type ArtifactApi, type ArtifactValue } from '@shared/api';
+import {
+  ArtifactType,
+  getFrontendArtifactTypeDesc,
+  type Artifact,
+  type ArtifactApi,
+  type ArtifactValue,
+} from '@shared/api';
 import { Column, COLUMN_TYPE, ModelSource, Role, Row } from '@shared/types';
 import { initialColumns, MODEL_FORM_MODE } from '@shared/constants';
 import {
@@ -39,6 +45,13 @@ import {
 } from './types';
 
 import {
+  csvMatchedRoles,
+  CSV_EDIT_RULES_BY_ROLE,
+  CSV_DENY_RULES_BY_ROLE_AND_BUCKET,
+  CSV_ALLOW_RULES_BY_ROLE_AND_BUCKET,
+  type CsvEditRoleFlags,
+} from './ModelForm/editRulesFromCsv';
+import {
   ACTIVE_MODEL_SCHEMA,
   BASE_MODEL_SCHEMA,
   NOT_ACTIVE_MODEL_SCHEMA,
@@ -64,11 +77,121 @@ export const markSchema = (
     schemaOrder: schemaFromNameMap.schemaOrder,
   }));
 
+/**
+ * Источник модели для матрицы прав: без учёта регистра и пробелов.
+ * Иначе `switch (row.model_source)` не попадал в `sum` и отдавал false для всех полей.
+ */
+export function getModelSourceAccessBucket(row?: Partial<Row>): 'sum' | 'sum_rm' | null {
+  const r = row?.model_source;
+  if (r == null || r === '') {
+    return null;
+  }
+  const s = String(r).trim().toLowerCase();
+  if (s === 'sum') {
+    return 'sum';
+  }
+  if (s === 'sum-rm' || s === 'sum_rm' || s === 'rm') {
+    return 'sum_rm';
+  }
+  return null;
+}
+
+function canEditArtefactByCsvRules(
+  artifact: Artifact | undefined,
+  row: Partial<Row> | undefined,
+  flags: CsvEditRoleFlags,
+): boolean | null {
+  if (!artifact) {
+    return null;
+  }
+  const bucket = getModelSourceAccessBucket(row);
+  if (!bucket) {
+    return null;
+  }
+
+  const matchedRoles = csvMatchedRoles(flags);
+  if (matchedRoles.length === 0) {
+    return null;
+  }
+
+  if (artifact.is_edit_flg === '0') {
+    return false;
+  }
+  const tech = artifact.artefact_tech_label;
+
+  // Deny-правила: даже если API сказал «редактируемо», для конкретной пары (роль, bucket)
+  // поле принудительно disabled (матрица требований).
+  for (const role of matchedRoles) {
+    const denyLabels = CSV_DENY_RULES_BY_ROLE_AND_BUCKET[role]?.[bucket];
+    if (denyLabels?.includes(tech)) {
+      return false;
+    }
+  }
+
+  // Allow-правила по bucket: поле доступно роли на указанном source даже если API вернул 0.
+  for (const role of matchedRoles) {
+    const allowLabels = CSV_ALLOW_RULES_BY_ROLE_AND_BUCKET[role]?.[bucket];
+    if (allowLabels?.includes(tech)) {
+      return true;
+    }
+  }
+
+  // Явные allow-правила из CSV (ключевые конфликтные поля): для SUM/SUM-RM одинаковые, кроме DS Lead.
+  // DS Lead: доступ только для моделей, созданных в SUM.
+  for (const role of matchedRoles) {
+    const labels = CSV_EDIT_RULES_BY_ROLE[role];
+    if (!labels?.includes(tech)) {
+      continue;
+    }
+    if (role === Role.DS_LEAD) {
+      return bucket === 'sum';
+    }
+    return true;
+  }
+
+  return null;
+}
+
+/**
+ * В БД иногда есть несколько строк `artefacts` с одним `artefact_tech_label` (разные artefact_id).
+ * `find` брал первую попавшуюся — могли брать строку с is_edit_flg=0 или без матрицы, хотя для другого id всё ок.
+ * Берём строку с лучшими правами для текущего model_source.
+ */
+export const pickArtifactForField = (
+  artifacts: Artifact[],
+  artefact_tech_label: string,
+  row?: Partial<Row>,
+): Artifact | undefined => {
+  const matches = artifacts.filter((a) => a.artefact_tech_label === artefact_tech_label);
+  if (matches.length === 0) return undefined;
+  if (matches.length === 1) return matches[0];
+
+  const bucket = getModelSourceAccessBucket(row);
+  const isSum = bucket === 'sum';
+  const isSumRm = bucket === 'sum_rm';
+
+  const priority = (a: Artifact): number => {
+    let p = 0;
+    if (a.is_edit_flg === '1') p += 100;
+    if (isSum && a.is_editable_by_role_sum === '1') p += 20;
+    if (isSumRm && a.is_editable_by_role_sum_rm === '1') p += 20;
+    if (isSumRm && a.is_editable_by_role_sum === '1') p += 5;
+    // Нет model_source в строке / неизвестное значение — выбираем строку с лучшими флагами матрицы.
+    if (!bucket) {
+      if (a.is_editable_by_role_sum === '1') p += 12;
+      if (a.is_editable_by_role_sum_rm === '1') p += 12;
+    }
+    return p;
+  };
+
+  return [...matches].sort((a, b) => priority(b) - priority(a))[0];
+};
+
 const getInputValuesFromRow = (artifacts: Artifact[], activeRow: Partial<Row> = {}): FormValues =>
   Object.entries(activeRow).reduce((inputValues, rowItem) => {
     const [name, rowValue] = rowItem as [keyof Row, string];
 
-    const artifact = artifacts.find((artifact) => artifact.artefact_tech_label === name);
+    const artifact = pickArtifactForField(artifacts, name, activeRow);
 
     if (artifact) {
       const inputValue = getInputValue(artifact, rowValue);
@@ -83,7 +206,7 @@ const getInputValuesFromRow = (artifacts: Artifact[], activeRow: Partial<Row> = 
   }, {});
 
 const getInputValue = (artifact: Artifact, rowValue: string) => {
-  switch (artifact.artefact_type_desc) {
+  switch (getFrontendArtifactTypeDesc(artifact)) {
     case ArtifactType.BOOLEAN: {
       const type = INPUT_TYPE.FLAG;
 
@@ -455,21 +578,105 @@ const getDisabledStatus = (minDate: Date, maxDate: Date, quarter: number, canEdi
   return !isWithinInterval(currentDate, { start: minDate, end: maxDate });
 };
 
-const canEditArtefact = (artifact?: Artifact, row?: Partial<Row>): boolean => {
+const canEditArtefact = (
+  artifact?: Artifact,
+  row?: Partial<Row>,
+  roleFlags: CsvEditRoleFlags = {},
+): boolean => {
   if (!artifact) return false;
-  if (!row) return true;
 
   const isEditableBySum = artifact.is_editable_by_role_sum === '1';
   const isEditableBySumRm = artifact.is_editable_by_role_sum_rm === '1';
 
-  switch (row.model_source) {
-    case ModelSource.SUM:
-      return isEditableBySum;
-    case ModelSource.SUM_RM:
-      return isEditableBySumRm;
-    default:
-      return false;
+  if (!row) {
+    return isEditableBySumRm || isEditableBySum;
   }
+
+  const bucket = getModelSourceAccessBucket(row);
+  const csvRuleDecision = canEditArtefactByCsvRules(artifact, row, roleFlags);
+  if (csvRuleDecision !== null) {
+    return csvRuleDecision;
+  }
+  if (bucket === 'sum') {
+    return isEditableBySum;
+  }
+  if (bucket === 'sum_rm') {
+    // Бэкенд считает флаги по bucket’ам sum vs sum_rm в artefact_source_roles.
+    // На стендах часто есть только строка model_source=sum без rm/sum_rm — тогда sum_rm-флаг 0, хотя по смыслу поле доступно.
+    return isEditableBySumRm || isEditableBySum;
+  }
+  // Нет model_source в строке формы / неизвестное значение — не обнуляем доступ по API.
+  return isEditableBySum || isEditableBySumRm;
+};
+
+const debugFieldAccess = ({
+  artifact,
+  row,
+  canEdit,
+  isDisabled,
+  fieldSchema,
+  roleFlags,
+}: {
+  artifact: Artifact;
+  row?: Partial<Row>;
+  canEdit: boolean;
+  isDisabled: boolean | undefined;
+  fieldSchema?: FormFieldsSchema[number];
+  roleFlags?: CsvEditRoleFlags;
+}) => {
+  if (typeof window === 'undefined') return;
+
+  // Временный набор «всегда логируемых» полей: разбираем дизейбл при BC + SUM.
+  // Убрать после того как причина disabled подтверждена.
+  const alwaysWatched = new Set([
+    'segment_name',
+    'remove_decision',
+    'implementation_segment',
+  ]);
+  const watchedFieldsRaw = window.localStorage.getItem('rightModalDebugFields');
+  const watchedFields = (watchedFieldsRaw ?? '')
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
+  if (
+    !alwaysWatched.has(artifact.artefact_tech_label) &&
+    !watchedFields.includes(artifact.artefact_tech_label)
+  ) {
+    return;
+  }
+
+  // eslint-disable-next-line no-console
+  console.log('[RightModalPanel access debug]', {
+    field: artifact.artefact_tech_label,
+    model_source: row?.model_source,
+    bucket: getModelSourceAccessBucket(row),
+    is_edit_flg: artifact.is_edit_flg,
+    is_editable_by_role_sum: artifact.is_editable_by_role_sum,
+    is_editable_by_role_sum_rm: artifact.is_editable_by_role_sum_rm,
+    canEdit,
+    disabled: isDisabled,
+    roleFlags,
+    csvMatched: roleFlags ? csvMatchedRoles(roleFlags) : undefined,
+    fieldSchema: fieldSchema
+      ? {
+          schemaKey: fieldSchema.schemaKey,
+          alwaysDisabled: fieldSchema.alwaysDisabled,
+          required: fieldSchema.required,
+          hasEnabledByValueConditions: Array.isArray(fieldSchema.enabledByValueConditions)
+            && fieldSchema.enabledByValueConditions.length > 0,
+          hasDisabledConditions: Array.isArray(fieldSchema.disabledConditions)
+            && fieldSchema.disabledConditions.length > 0,
+        }
+      : null,
+  });
+  // eslint-disable-next-line no-console
+  console.log(
+    `[RightModalPanel access debug compact] field=${artifact.artefact_tech_label} source=${
+      row?.model_source || ''
+    } canEdit=${String(canEdit)} disabled=${String(isDisabled)} NO_ROLES=${String(
+      process.env.NO_ROLES,
+    )}`,
+  );
 };
 
 const isFieldDisabled = (
@@ -479,6 +686,11 @@ const isFieldDisabled = (
   row?: Partial<Row> | undefined,
   canEdit?: boolean,
 ): boolean | undefined => {
+  // Reporting date is system-managed and should never be editable in the form.
+  if (artifact?.artefact_tech_label === 'update_date') {
+    return true;
+  }
+
   if (fieldSchema?.alwaysDisabled) {
     return true;
   }
@@ -511,13 +723,52 @@ const mapArtifactToField = (
   activeRow?: Partial<Row>,
   values?: FormValues,
   canEditModelRiskByRole?: boolean,
+  isBusinessCustomer?: boolean,
+  isValidatorLead?: boolean,
+  isValidator?: boolean,
+  isDsLead?: boolean,
 ): InputFactoryProps<keyof Row> => {
-  const canEdit = process.env.NO_ROLES === 'true' || canEditArtefact(artifact, activeRow);
+  const roleFlags: CsvEditRoleFlags = {
+    isValidatorLead,
+    isValidator,
+    isBusinessCustomer,
+    isDsLead,
+  };
+  const canEdit =
+    process.env.NO_ROLES === 'true' || canEditArtefact(artifact, activeRow, roleFlags);
   let isDisabled = isFieldDisabled(values, fieldSchema, artifact, activeRow, canEdit);
+  debugFieldAccess({ artifact, row: activeRow, canEdit, isDisabled, fieldSchema, roleFlags });
 
   // Extra gating: only validators can edit model_risk_type in UI
   if (artifact.artefact_tech_label === 'model_risk_type' && canEditModelRiskByRole === false) {
     isDisabled = true;
+  }
+
+  // Матрица прав: business_customer + модель из SUM — дата окончания разработки только просмотр (не зависит от наличия значения).
+  if (
+    artifact.artefact_tech_label === 'developing_end_date' &&
+    isBusinessCustomer &&
+    getModelSourceAccessBucket(activeRow) === 'sum'
+  ) {
+    isDisabled = true;
+  }
+
+  // Железный финальный override: поля из CSV_ALLOW_RULES_BY_ROLE_AND_BUCKET должны быть
+  // доступны для пары (роль, bucket) даже если выше по цепочке поле было заблокировано
+  // (включая случаи, когда бек не вернул нужные флаги или ещё не применил миграцию).
+  {
+    const bucket = getModelSourceAccessBucket(activeRow);
+    const matchedRoles = csvMatchedRoles(roleFlags);
+    if (
+      bucket &&
+      matchedRoles.some((role) =>
+        CSV_ALLOW_RULES_BY_ROLE_AND_BUCKET[role]?.[bucket]?.includes(
+          artifact.artefact_tech_label,
+        ),
+      )
+    ) {
+      isDisabled = false;
+    }
   }
 
   const commonAttributes: CommonInputProps<keyof Row> = {
@@ -525,7 +776,9 @@ const mapArtifactToField = (
     name: artifact.artefact_tech_label,
     label: artifact.artefact_label,
     disabled: isDisabled,
-    required: isDisabled ? false : !!fieldSchema?.required,
+    required: isDisabled
+      ? false
+      : checkRequireStatus(values, !!fieldSchema?.required, fieldSchema?.requireConditions),
     addNewOptionEnabled: artifact.can_add_new_option === '1',
     maxLength: fieldSchema?.maxLength,
     requireConditions: fieldSchema?.requireConditions,
@@ -542,7 +795,7 @@ const mapArtifactToField = (
 
   const activeRowValue = activeRow?.[artifact?.artefact_tech_label];
 
-  switch (artifact.artefact_type_desc) {
+  switch (getFrontendArtifactTypeDesc(artifact)) {
     case ArtifactType.BOOLEAN: {
       const type = INPUT_TYPE.FLAG;
 
@@ -769,6 +1022,10 @@ const getFormFields = ({
   showAllFields = false,
   currentCustomer = CUSTOMER_MAP.EVERY_CUSTOMER,
   canEditModelRiskByRole,
+  isBusinessCustomer,
+  isValidatorLead,
+  isValidator,
+  isDsLead,
 }: {
   artifacts: Artifact[];
   values?: FormValues;
@@ -778,6 +1035,10 @@ const getFormFields = ({
   showAllFields?: boolean;
   currentCustomer: CUSTOMER_TYPE;
   canEditModelRiskByRole?: boolean;
+  isBusinessCustomer?: boolean;
+  isValidatorLead?: boolean;
+  isValidator?: boolean;
+  isDsLead?: boolean;
 }) => {
   const isActive = currentFormSchema.some(
     ({ schemaKey }) => schemaKey === SCHEMA_NAME_MAP.ACTIVE_MODEL_SCHEMA.key,
@@ -886,7 +1147,7 @@ const getFormFields = ({
 
   // Генерация полей
   const formFields = fieldsNamesToGenerate.reduce((fields, fieldName) => {
-    const artifact = artifacts.find(({ artefact_tech_label }) => artefact_tech_label === fieldName);
+    const artifact = pickArtifactForField(artifacts, fieldName, initialRow);
     const fieldSchema = currentFormSchema.find(({ name }) => name === fieldName);
 
     if (artifact) {
@@ -897,6 +1158,10 @@ const getFormFields = ({
         initialRow,
         values,
         canEditModelRiskByRole,
+        isBusinessCustomer,
+        isValidatorLead,
+        isValidator,
+        isDsLead,
       );
       return [...fields, field];
     }
@@ -940,6 +1205,9 @@ const getFormValue = (value?: InputValue) => {
     }
     case INPUT_TYPE.MULTI_SELECT: {
       return value?.value?.map(({ text }) => text) || '';
+    }
+    case INPUT_TYPE.FLAG: {
+      return value?.value ? '1' : '0';
     }
     default: {
       return value?.value?.toString() || '';
@@ -1082,6 +1350,26 @@ const getInvalidFields = (
 const getProperFormatValueForSubmit = (inputValue: InputValue) => {
   const { type, value } = inputValue;
 
+  // Defensive fallback for auto-filled select values that can occasionally
+  // lose explicit INPUT_TYPE.SELECT during derived form updates.
+  if (
+    type !== INPUT_TYPE.SELECT &&
+    !Array.isArray(value) &&
+    value &&
+    typeof value === 'object' &&
+    'id' in (value as any) &&
+    'text' in (value as any)
+  ) {
+    const normalizedValue = value as { id?: string | number; text?: string };
+    return {
+      artefact_string_value: normalizedValue.text ?? '',
+      artefact_value_id:
+        normalizedValue.id === undefined || normalizedValue.id === null
+          ? null
+          : Number(normalizedValue.id),
+    };
+  }
+
   switch (type) {
     case INPUT_TYPE.DATE:
     case INPUT_TYPE.QUARTERLY_DATE:
@@ -1133,14 +1421,108 @@ const getProperFormatValueForSubmit = (inputValue: InputValue) => {
   }
 };
 
+/** Text used in form condition matching (SELECT uses value.text; plain fields use value). */
+export const getFormFieldTextForConditions = (
+  fieldValue: InputValue | undefined,
+): string | undefined => {
+  if (!fieldValue || fieldValue.value == null) {
+    return undefined;
+  }
+  const v = fieldValue.value as { text?: string } | string | number;
+  if (typeof v === 'object' && v !== null && 'text' in v) {
+    return String((v as { text?: string }).text ?? '');
+  }
+  return String(v);
+};
+
+/**
+ * True when current form values satisfy every key in each row of `conditions`
+ * (same idea as valueConditions / handleChange + isEqual in ModelForm).
+ */
+const formValuesSatisfyConditionRows = (
+  values: FormValues,
+  conditions: FormFieldConditions,
+): boolean =>
+  conditions.every((row) =>
+    (Object.keys(row) as (keyof Row)[]).every((key) => {
+      const expected = row[key];
+      if (expected === undefined) {
+        return true;
+      }
+      return getFormFieldTextForConditions(values[key]) === expected;
+    }),
+  );
+
+/**
+ * When BASE_MODEL_SCHEMA `rating_model` valueConditions (e.g. auto «Да») are met but
+ * `rating_model` is missing from state, merge the SELECT from artifacts before submit.
+ * Rules are read from {@link BASE_MODEL_SCHEMA} — not duplicated here.
+ */
+export const mergeAutoRatingModelIfEligible = (
+  values: FormValues | undefined,
+  artifacts: Artifact[],
+): FormValues | undefined => {
+  if (!values) {
+    return values;
+  }
+
+  const ratingField = BASE_MODEL_SCHEMA.find((f) => f.name === 'rating_model');
+  const matchingRule = ratingField?.valueConditions?.find(
+    (vc) => !!vc.conditions?.length && formValuesSatisfyConditionRows(values, vc.conditions),
+  );
+  if (!matchingRule) {
+    return values;
+  }
+
+  const targetText = matchingRule.value;
+  const artifact = artifacts.find((a) => a.artefact_tech_label === 'rating_model');
+  const targetOption = artifact?.values?.find((o) => o.artefact_value === targetText);
+  if (targetOption == null || targetOption.artefact_value_id == null) {
+    return values;
+  }
+
+  const nextRating: InputValue = {
+    type: INPUT_TYPE.SELECT,
+    value: {
+      id: String(targetOption.artefact_value_id),
+      text: targetOption.artefact_value,
+    },
+  };
+
+  const existing = values.rating_model;
+  if (
+    existing?.type === INPUT_TYPE.SELECT &&
+    existing.value &&
+    typeof existing.value === 'object' &&
+    'text' in existing.value &&
+    (existing.value as { text?: string }).text === targetText &&
+    String((existing.value as { id?: string | number }).id) === String(targetOption.artefact_value_id)
+  ) {
+    return values;
+  }
+
+  return { ...values, rating_model: nextRating };
+};
+
 const getArtifactApiItems = (
   values?: FormValues, 
   parentModelId?: string, 
-  changedFields?: Array<keyof Row>
+  changedFields?: Array<keyof Row>,
+  forceIncludeFields: Array<keyof Row> = []
 ) => {
-  const fieldsToProcess = changedFields?.length 
-    ? changedFields 
-    : Object.keys(values ?? {}) as Array<keyof Row>;
+  const baseFieldsToProcess = changedFields?.length
+    ? changedFields
+    : (Object.keys(values ?? {}) as Array<keyof Row>);
+  // active_model: в БД три состояния — '1', '0', пусто. Не отправляем, пока пользователь явно не менял
+  // чекбокс (иначе пустое превращалось бы в '0' при любом сохранении).
+  const fieldsToProcess = uniqBy([...baseFieldsToProcess, ...forceIncludeFields], String).filter(
+    (fieldName) => {
+      if (fieldName === 'active_model') {
+        return Boolean(changedFields?.includes('active_model'));
+      }
+      return true;
+    },
+  );
 
   const artifactApiItems = fieldsToProcess.reduce(
     (bodyItems, fieldName): any => {
