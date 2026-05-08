@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { T } from '@admiral-ds/react-ui';
+import { Spinner, T } from '@admiral-ds/react-ui';
 import type { QuarterInfo, ConfirmationModelRow } from '@shared/api/hooks/useQuarterlyConfirmation';
 import { QuarterHeader } from '../atoms/QuarterHeader';
 import { ConfirmationTable } from '../organisms/ConfirmationTable';
@@ -33,6 +33,18 @@ const NoQuarterMessage = styled('div')`
   color: #6b7280;
 `;
 
+const SavingBar = styled('div')`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  background: #eff6ff;
+  color: #1d4ed8;
+`;
+
 export const AllocationConfirmationTemplate = ({
   quarterInfo,
   models,
@@ -56,6 +68,12 @@ export const AllocationConfirmationTemplate = ({
   return (
     <PageContainer>
       <QuarterHeader quarter={quarterInfo.quarter} year={quarterInfo.year} />
+      {isSaving && (
+        <SavingBar>
+          <Spinner dimension="s" />
+          <T font="Body/Body 2 Long">Сохранение данных выполняется, дождитесь результата операции</T>
+        </SavingBar>
+      )}
       <ConfirmationTable
         models={models}
         quarter={quarterInfo.quarter}

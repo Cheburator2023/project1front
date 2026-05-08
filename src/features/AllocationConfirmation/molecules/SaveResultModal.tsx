@@ -77,7 +77,14 @@ export const SaveResultModal = ({ result, onClose }: SaveResultModalProps) => {
   const mrmOnlyCount = result.models.filter((m) => m.sum === false).length;
 
   return (
-    <Modal onClose={onClose} dimension="m" style={{ maxWidth: 520 }}>
+    <Modal
+      onClose={onClose}
+      dimension="m"
+      displayCloseIcon={false}
+      closeOnEscapeKeyDown={false}
+      closeOnOutsideClick={false}
+      style={{ maxWidth: 520 }}
+    >
       <ModalTitle>Результат сохранения</ModalTitle>
       <ModalContent>
         <Section>
