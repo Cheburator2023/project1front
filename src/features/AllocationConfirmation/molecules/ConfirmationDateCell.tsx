@@ -43,6 +43,9 @@ export const ConfirmationDateCell = ({
       max={max}
       onChange={(e) => onChange(e.target.value || null)}
       title={titleParts.join(' ')}
+      onKeyDown={(e) => {
+        e.preventDefault();
+      }}
     />
   );
 };
