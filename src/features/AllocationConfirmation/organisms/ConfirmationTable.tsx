@@ -59,6 +59,10 @@ const GridWrapper = styled('div')`
   .ag-row.confirmation-row-new.ag-row-hover {
     background-color: #fde68a;
   }
+
+  & .ag-filter-menu .ag-set-filter-list {
+    min-width: 340px;
+  }
 `;
 
 const LegendBar = styled('div')`
