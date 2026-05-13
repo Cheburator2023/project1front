@@ -59,7 +59,7 @@ export const useModelsStore = create<ModelsStore>((set, get) => ({
   updateRow: (updatedRow: Partial<Row>) =>
     set((state) => ({
       rows: state?.rows?.map((row) =>
-        row?.system_model_id === updatedRow.system_model_id ? updatedRow : row,
+        row?.system_model_id === updatedRow.system_model_id ? { ...row, ...updatedRow } : row,
       ),
     })),
 
@@ -71,7 +71,7 @@ export const useModelsStore = create<ModelsStore>((set, get) => ({
   handleSubmit: (newRow?: Row | CustomError | ArtifactApi[], formMode?: MODEL_FORM_MODE) => {
     if (newRow && typeof newRow === 'object' && 'system_model_id' in newRow) {
       const newRowWithId = { ...newRow, id: newRow.system_model_id, hover: true };
-      const { updateRow, addRow, initColOptionsMap, rows } = get();
+      const { updateRow, addRow, initColOptionsMap } = get();
 
       if (
         formMode === MODEL_FORM_MODE.EDIT ||
@@ -83,7 +83,7 @@ export const useModelsStore = create<ModelsStore>((set, get) => ({
         addRow(newRowWithId);
       }
 
-      initColOptionsMap(rows);
+      initColOptionsMap(get().rows);
     }
   },
 

@@ -484,6 +484,13 @@ const ENABLE_2Q_EXTENSION_UNTIL_NOVEMBER_30 = false;
 const QUARTER_EDIT_PERIOD_MONTHS = 2;
 const QUARTER_EDIT_PERIOD_DAYS = 0;
 
+/** Квартал 1–4 из последнего символа tech_label (как для QUARTERLY_DATE). */
+const parseQuarterDigitFromTechLabel = (techLabel: string): number | undefined => {
+  if (!techLabel?.length) return undefined;
+  const d = Number(techLabel[techLabel.length - 1]);
+  return Number.isFinite(d) && d >= 1 && d <= 4 ? d : undefined;
+};
+
 const getDateLimits = (quarter: number) => {
   const currentDate = new Date();
   const currentYear = currentDate.getFullYear();
@@ -894,6 +901,28 @@ const mapArtifactToField = (
     case ArtifactType.DATE:
     case ArtifactType.DATE_ISO8601:
     case ArtifactType.CASE_DATE: {
+      const quarterFromLabel = parseQuarterDigitFromTechLabel(artifact.artefact_tech_label);
+      const isConfirmationQuarterlyDate =
+        artifact.group === ArtifactGroup.CONFIRMATION_DATE && quarterFromLabel !== undefined;
+
+      if (isConfirmationQuarterlyDate) {
+        const { minDate, maxDate } = getDateLimits(quarterFromLabel);
+        const quarterDisabledStatus = getDisabledStatus(
+          minDate,
+          maxDate,
+          quarterFromLabel,
+          canEdit,
+        );
+
+        return {
+          ...commonAttributes,
+          type: INPUT_TYPE.DATE,
+          minDate,
+          maxDate,
+          disabled: quarterDisabledStatus,
+        };
+      }
+
       return {
         ...commonAttributes,
         type: INPUT_TYPE.DATE,
