@@ -37,6 +37,17 @@ const toDateInput = (value: string | null | undefined): string => {
   return value.length >= 10 ? value.slice(0, 10) : value;
 };
 
+function readRegistryString(
+  card: Record<string, unknown> | null | undefined,
+  key: string,
+  fallback: string | null | undefined,
+): string {
+  const v = card?.[key];
+  if (typeof v === 'string' && v.trim() !== '') return v;
+  if (fallback != null && String(fallback).trim() !== '') return String(fallback);
+  return '';
+}
+
 const ActionsBar = styled('div')`
   display: flex;
   align-items: center;
@@ -234,7 +245,7 @@ export const ConfirmationTable = ({
         valueGetter: (p: ValueGetterParams<EditableModel>) => {
           if (!p.data) return '';
           if (p.data.model_source === ModelSource.SUM_RM) return '';
-          return p.data.model_alias ?? '';
+          return readRegistryString(p.data.registry_card, 'model_alias', p.data.model_alias);
         },
       });
     }
@@ -246,6 +257,8 @@ export const ConfirmationTable = ({
         headerTooltip: 'Внутреннее название модели. Поле только для просмотра.',
         flex: 2,
         minWidth: 200,
+        valueGetter: (p: ValueGetterParams<EditableModel>) =>
+          readRegistryString(p.data?.registry_card, 'model_name', p.data?.model_name),
       },
       {
         field: 'model_name_dadm',
@@ -253,6 +266,12 @@ export const ConfirmationTable = ({
         headerTooltip: 'Название модели в реестре ДАДМ. Поле только для просмотра.',
         flex: 2,
         minWidth: 200,
+        valueGetter: (p: ValueGetterParams<EditableModel>) =>
+          readRegistryString(
+            p.data?.registry_card,
+            'model_name_dadm',
+            p.data?.model_name_dadm,
+          ),
       },
       {
         field: 'business_customer',
@@ -260,6 +279,12 @@ export const ConfirmationTable = ({
         headerTooltip: 'Бизнес-заказчик модели. Поле только для просмотра.',
         flex: 1,
         minWidth: 180,
+        valueGetter: (p: ValueGetterParams<EditableModel>) =>
+          readRegistryString(
+            p.data?.registry_card,
+            'business_customer',
+            p.data?.business_customer,
+          ),
       },
       {
         field: 'business_customer_departament',
@@ -267,6 +292,12 @@ export const ConfirmationTable = ({
         headerTooltip: 'Подразделение владельца модели/алгоритма. Поле только для просмотра.',
         flex: 1,
         minWidth: 220,
+        valueGetter: (p: ValueGetterParams<EditableModel>) =>
+          readRegistryString(
+            p.data?.registry_card,
+            'business_customer_departament',
+            p.data?.business_customer_departament,
+          ),
       },
       {
         headerName: 'Дата подтверждения',

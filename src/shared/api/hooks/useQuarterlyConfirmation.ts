@@ -21,6 +21,8 @@ export type ConfirmationModelRow = {
   confirmation_date: string | null;
   is_used: boolean | null;
   prefill_source: 'pim' | 'previous_quarter' | null;
+  /** Как элемент `GET /models` (`data.cards[]`): плоские поля после merge/format. */
+  registry_card?: Record<string, unknown> | null;
 };
 
 export type SaveQuarterlyConfirmationPayload = {
