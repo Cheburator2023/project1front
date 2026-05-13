@@ -118,7 +118,7 @@ export type MetricsResponseType = {
 };
 
 export type Template = {
-  template_id: number | string;
+  template_id: number | null;
   user_id: string | null;
   group_id?: number;
   template_name: string;

@@ -1,6 +1,6 @@
 /* eslint-disable no-useless-concat */
 import React from 'react';
-import { isWithinInterval, parse } from 'date-fns';
+import { parse } from 'date-fns';
 import {
   CheckboxField,
   DateField,
@@ -132,6 +132,29 @@ function InputFactorySwitcher<T extends string>({
     }
     case INPUT_TYPE.DATE: {
       const { maxDate, minDate } = inputFactory;
+
+      const boundsOk =
+        minDate != null &&
+        maxDate != null &&
+        !Number.isNaN(minDate.getTime()) &&
+        !Number.isNaN(maxDate.getTime());
+
+      if (boundsOk) {
+        return (
+          <InputFactoryDateField
+            values={values}
+            field={{
+              ...inputFactory,
+              type: INPUT_TYPE.DATE,
+              minDate,
+              maxDate,
+            }}
+            editFieldName={editFieldName}
+            onChange={onChange as any}
+            ref={ref as any}
+          />
+        );
+      }
 
       const dateValue = getDateValue(value);
 

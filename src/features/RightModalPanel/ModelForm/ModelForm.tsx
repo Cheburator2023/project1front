@@ -645,10 +645,13 @@ export const ModelForm = ({
       console.log('📝 FORM LOGS: ~ newRow:', newRow);
 
       const getModelsAndSubmit = async () => {
-        refetchModels?.();
+        const refetchResult = await refetchModels?.();
+        const freshRow = refetchResult?.data?.data?.cards?.find(
+          (row: Row) => row.system_model_id === newRow.system_model_id,
+        );
 
         if (formMode) {
-          onSubmit(newRow, formMode);
+          onSubmit(freshRow ?? newRow, formMode);
           setSubmitLoading(false);
           setSubmitError('');
         }
@@ -656,24 +659,27 @@ export const ModelForm = ({
 
       getModelsAndSubmit();
     }
-  }, [isUpdateSuccess, updateModelsMutation.data, formMode, onSubmit]);
+  }, [isUpdateSuccess, updateModelsMutation.data, formMode, onSubmit, refetchModels]);
 
   useEffect(() => {
     const refetchModelsEffect = async () => {
       if (isCreateSuccess && createModelMutation.data) {
         const newRow = createModelMutation.data as Row;
 
-        refetchModels?.();
+        const refetchResult = await refetchModels?.();
+        const freshRow = refetchResult?.data?.data?.cards?.find(
+          (row: Row) => row.system_model_id === newRow.system_model_id,
+        );
 
         if (formMode) {
-          onSubmit(newRow, formMode);
+          onSubmit(freshRow ?? newRow, formMode);
           setSubmitLoading(false);
           setSubmitError('');
         }
       }
     };
     refetchModelsEffect();
-  }, [isCreateSuccess, createModelMutation.data, formMode, onSubmit]);
+  }, [isCreateSuccess, createModelMutation.data, formMode, onSubmit, refetchModels]);
 
   useEffect(() => {
     if (!hasNoAccessToActiveModel) {

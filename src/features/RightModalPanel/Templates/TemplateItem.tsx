@@ -86,23 +86,21 @@ export const TemplateItem = ({
         setIsEditMode(true);
         setEditedTemplateValue(template.template_name);
       } else {
-        onDelete?.(template.template_id);
+        onDelete?.(template.template_id || 0);
       }
     },
-    [template],
+    [onDelete, template.template_id, template.template_name],
   );
 
   const handleChangeEditedTemplateValue = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
-
     setEditedTemplateValue(e.target.value);
   }, []);
 
   const handleOnSave = useCallback(() => {
-    onEdit?.(template.template_id, editedTemplateValue, editedTemplateIsPublic);
+    onEdit?.(template.template_id || 0, editedTemplateValue, editedTemplateIsPublic);
 
     setIsEditMode(false);
-  }, [template, editedTemplateIsPublic, editedTemplateValue]);
+  }, [onEdit, template, editedTemplateIsPublic, editedTemplateValue]);
 
   return (
     <Wrapper>

@@ -295,33 +295,33 @@ export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((s
           });
         });
       } else {
-          if (currentColumnState && currentColumnState.length > 0) {
-            mergedColumns = currentColumnState
-              .map((currentCol, index) => {
-                const baseColumn = baseColumns.find((col) => col.colId === currentCol.colId);
-                if (!baseColumn) return null;
+        if (currentColumnState && currentColumnState.length > 0) {
+          mergedColumns = currentColumnState
+            .map((currentCol, index) => {
+              const baseColumn = baseColumns.find((col) => col.colId === currentCol.colId);
+              if (!baseColumn) return null;
 
-                // Check both template filter and current filter model
-                const templateFilter = template.filterModel?.[baseColumn.colId];
-                const currentFilter = currentFilterModel[baseColumn.colId];
+              // Check both template filter and current filter model
+              const templateFilter = template.filterModel?.[baseColumn.colId];
+              const currentFilter = currentFilterModel[baseColumn.colId];
 
-                let filterValues: (string | null)[] = [];
-                // Prioritize current filter over template filter to show newly added filters
-                const activeFilter = currentFilter || templateFilter;
-                if (activeFilter) {
-                  if ('values' in activeFilter && activeFilter.values) {
-                    filterValues = activeFilter.values;
-                  } else if ('dateFrom' in activeFilter && 'dateTo' in activeFilter) {
-                    const dateFilter = activeFilter as { dateFrom: string; dateTo: string };
-                    const dateRange: (string | null)[] = [];
-                    if (dateFilter.dateFrom) dateRange.push(dateFilter.dateFrom);
-                    if (dateFilter.dateTo) dateRange.push(dateFilter.dateTo);
-                    filterValues = dateRange;
-                  }
+              let filterValues: (string | null)[] = [];
+              // Prioritize current filter over template filter to show newly added filters
+              const activeFilter = currentFilter || templateFilter;
+              if (activeFilter) {
+                if ('values' in activeFilter && activeFilter.values) {
+                  filterValues = activeFilter.values;
+                } else if ('dateFrom' in activeFilter && 'dateTo' in activeFilter) {
+                  const dateFilter = activeFilter as { dateFrom: string; dateTo: string };
+                  const dateRange: (string | null)[] = [];
+                  if (dateFilter.dateFrom) dateRange.push(dateFilter.dateFrom);
+                  if (dateFilter.dateTo) dateRange.push(dateFilter.dateTo);
+                  filterValues = dateRange;
                 }
+              }
 
-                return {
-                  ...baseColumn,
+              return {
+                ...baseColumn,
                 isActive: !currentCol.hide,
                 filterValues,
                 order: index,
@@ -448,21 +448,21 @@ export const useTemplateFiltersModalStore = create<TemplateFiltersModalStore>((s
     if (selectedTemplateId === null) {
       if (!originalTemplateFilters) {
         // Compare with initial state - check if any column has filters or is inactive
-        return columnFilters.some(column => 
-          column.filterValues.length > 0 || !column.isActive
-        );
+        return columnFilters.some((column) => column.filterValues.length > 0 || !column.isActive);
       }
       // If we have original template filters but no selected template, compare against them
       return columnFilters.some((current, index) => {
         const original = originalTemplateFilters[index];
         if (!original) return true;
-        
+
         return (
           current.isActive !== original.isActive ||
           current.order !== original.order ||
           current.colId !== original.colId ||
           current.filterValues.length !== original.filterValues.length ||
-          current.filterValues.some((value, valueIndex) => value !== original.filterValues[valueIndex])
+          current.filterValues.some(
+            (value, valueIndex) => value !== original.filterValues[valueIndex],
+          )
         );
       });
     }

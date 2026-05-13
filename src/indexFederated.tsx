@@ -8,8 +8,8 @@ import { DropdownProvider } from '@admiral-ds/react-ui';
 import App from './app/App';
 import { themes } from './app/theme/theme';
 
-import { T_CONFIG_MAP, T_KEYCLOAK_USER } from './shared/types/infra';
-import { ColumnsFilter, Permission } from './shared/types';
+import { T_CONFIG_MAP, T_KEYCLOAK_INSTANCE, T_KEYCLOAK_USER } from './shared/types/infra';
+import { ColumnsFilter, Permission, Role } from './shared/types';
 import { keycloakGroupsToRoles } from './shared/helpers';
 import { useFetchStore, useGlobalStore, useUserStore } from './shared/stores';
 import { CUSTOMER_MAP } from './shared/constants/customers';
@@ -30,7 +30,7 @@ export type MFProps = {
   urlConfig?: T_CONFIG_MAP;
   token?: string;
   user?: T_KEYCLOAK_USER;
-  keycloak?: any;
+  keycloak?: T_KEYCLOAK_INSTANCE;
   userPermissions?: string[];
   navigate?: (to: string) => void;
   protectedFetch?: any;

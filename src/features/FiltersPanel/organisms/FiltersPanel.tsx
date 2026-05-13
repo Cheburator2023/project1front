@@ -256,7 +256,13 @@ export const FiltersPanel = ({
           labelPosition="right"
           onChange={(event) => {
             setCompareMode(event.target.checked);
-            navigate(compareOnlyChanged ? ROUTES.HOME : ROUTES.COMPARE_MODELS);
+            if (compareOnlyChanged) {
+              if (location.pathname !== ROUTES.HOME) {
+                navigate(ROUTES.HOME);
+              }
+            } else {
+              navigate(ROUTES.COMPARE_MODELS);
+            }
           }}
         >
           Включен

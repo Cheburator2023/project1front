@@ -1,10 +1,5 @@
-import { IconButton } from '@admiral-ds/react-ui';
-import { ReactComponent as SettingsIcon } from '@admiral-ds/icons/build/system/SettingsOutline.svg';
-import { useMemo, useState } from 'react';
-import {
-  useTemplateFiltersModalStore,
-  useTemplateFiltersModalStoreSelected,
-} from '../stores/templateFiltersModalStore';
+import { useMemo } from 'react';
+import { useTemplateFiltersModalStoreSelected } from '../stores/templateFiltersModalStore';
 import { TemplateFiltersModal } from './TemplateFiltersModal';
 import {
   BadgeCount,
@@ -16,7 +11,6 @@ import { useFiltersStore, useModelsStore } from '../../../shared/stores';
 import { useTemplatesStore } from '../../../shared/stores/templatesStore';
 import { getActiveFiltersCount } from '../../../shared/helpers';
 
-import { useCompareModels } from '../../CompareModels/hooks';
 import { TemplateFiltersGrid } from './TemplateFiltersGrid';
 
 export const TemplatesPanelContainer = () => {
@@ -34,7 +28,7 @@ export const TemplatesPanelContainer = () => {
 
   const hasTemplates = topFilters.templates.length > 0;
   const activeTemplate = hasTemplates
-    ? templates.find((t) => t.template_id.toString() === topFilters.templates[0])
+    ? templates.find((t) => t.template_id?.toString() === topFilters.templates[0]?.toString())
     : undefined;
 
   const activeTemplateFromServiceFilterCount = Object.keys(

@@ -26,8 +26,8 @@ export const AgGridModelsTable = (props: {
   overrideRowList?: Partial<Row>[];
   overlayNoRowsTemplate?: string;
 }) => {
-  const { setRows, modelsParams, setModelsParams, setRefetchModels } = useModelsStore();
-
+  const { setRows, modelsParams, setModelsParams, setRefetchModels, rows: storeRows } =
+    useModelsStore();
   const { showToast } = useToast();
 
   const { modelsDownloadingDate } = useFiltersStore();
@@ -140,7 +140,12 @@ export const AgGridModelsTable = (props: {
   return (
     <AgGridTable
       templates={templates}
-      rowList={props.overrideRowList || (modelsData as any)?.data?.cards}
+      rowList={
+        props.overrideRowList ??
+        storeRows ??
+        (modelsData as ModelsResponseType | undefined)?.data?.cards ??
+        []
+      }
       columnList={props.overrideColumnList || initialColumns}
       isCompared={props.isCompared}
       handleClickOnActionCell={handleClickOnActionCell}

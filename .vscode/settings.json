@@ -42,8 +42,7 @@
     "**/coverage/**": true,
     "**/.cache/**": true,
     ".cache/**": true,
-    "**/logs/**": true,
-    ".git/**": true
+    "**/logs/**": true
   },
   "search.exclude": {
     "**/dist/**": true,
@@ -58,8 +57,5 @@
     ".cache/**": true,
     "**/logs/**": true,
     "**/lib/**": true
-  },
-  "[typescriptreact]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
   }
 }
