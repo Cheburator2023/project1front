@@ -1,5 +1,37 @@
 # Semantic Versioning Changelog
 
+# [1.62.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.61.0...v1.62.0) (2026-05-13)
+
+
+### Bug Fixes
+
+* ag grid filter width fixed ([e7a8d81](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/e7a8d81312d59894029db2b2604b87a39e7fcfff))
+* alloc bug fixes ([9c8a861](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/9c8a8617e18e0bb8d871187b8fe201dd06a61262))
+* improve AgGridModelsTable row handling and enhance models store functionality ([550a5db](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/550a5db725c4021f9069e22a0d36d4482788601e))
+* update header name in ConfirmationTable for clarity ([c0ba9eb](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/c0ba9eb6a5b888660e3def482f10b944a9094e14))
+* обновлен react-router-dom до версии 6.28.2, улучшена логика навигации на странице подтверждения и в фильтрах, удалены неиспользуемые маршруты ([fe98366](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/fe98366132dbe4073cb2dff222f89d63be45c175))
+* обновлен базовый путь маршрутизации для корректной работы в продакшене и разработке ([9b18461](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/9b18461f242c88e2c63c6185bb5b40ea1627b6c9))
+* обновлен базовый путь маршрутов и изменена логика навигации на странице подтверждения, улучшен переход на главную страницу ([b0cbd26](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/b0cbd267a057ce4c632cd144f9daebb74152dbec))
+* обновлена логика навигации на страницах подтверждения и фильтров, заменены относительные пути на константы маршрутов ([d8f8961](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/d8f89611121b8a828ae3822b5b8ef0732562cfdb))
+* отключена возможность ввода с клавиатуры в ConfirmationDateCell ([78c68ef](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/78c68efc6fa1cabe4468c0e4209c4ff8a6006b8d))
+
+
+### Features
+
+* add AppWideDevPanel and new input components for allocation confirmation ([9cf4394](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/9cf4394e28ee632e7c2fe2255510bc5bf004862f))
+* add RowStatusChips component and integrate into ConfirmationTable ([e375e8b](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/e375e8b4bd8ebe86ff319b7a979f037f0074a48b))
+* enhance AllocationConfirmation components with tooltips and titles ([57669f4](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/57669f43db180f1a430f0b3fe9738350878ab0ef))
+* enhance ConfirmationTable with model source column and localization support ([c244a41](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/c244a4110395cc10b9f6c769b2afa9b7cb41cf5d))
+* добавлен компонент SeedPimPanel для засеивания данных ПИМ на странице подтверждения использования моделей, улучшена обработка состояния и интеграция с API ([aa3ad7e](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/aa3ad7e86f1b2cfb95ed957f873014d75f5dd974))
+* добавлен компонент TrailingSlashRedirect для нормализации URL и обновлен базовый путь маршрутов в App.tsx ([f716714](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/f716714f5ee831d7f5e8962e85267c5c4e0e8395))
+* добавлен модальный компонент SaveResultModal для отображения результатов сохранения, обновлены заголовки и плейсхолдеры в компонентах, улучшена логика отображения кнопок и фильтров на странице подтверждения использования моделей ([7934b6f](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/7934b6fe7fcef159907036144100ff1d99e96fb9))
+* добавлен функционал для засеивания данных ПИМ на странице подтверждения использования моделей, включая новый интерфейс и обработку состояния ([9a7622f](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/9a7622fd67b832e031de3a090cc5b533ff045400))
+* добавлен функционал фильтрации моделей по текущему пользователю в компоненте SeedPimPanel, добавлен отображение имени пользователя ([c333945](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/c33394523a09c61d64f1dabce38c92bcc1c5ff63))
+* добавлена страница подтверждения использования моделей за квартал с функционалом фильтрации и предзаполнения данных ([12dc396](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/12dc39603e097ea313159297161e7f2d97391237))
+* добавлено асинхронное получение моделей для подтверждения с логированием отладочной информации ([5f8a4de](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/5f8a4debd7d22536507bb1599e4cf61778554dfa))
+* добавлено логирование параметров моделей в компоненте AgGridModelsTable и обновлен запрос в SeedPimPanel для фильтрации моделей по статусу ([5ac4845](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/5ac48456a85773476dab2499a5d3e2476f17c9ce))
+* обновлены маршруты навигации на странице подтверждения использования моделей и в фильтрах, изменен текст кнопки сохранения в таблице подтверждения ([0dad839](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/0dad839eca81311ac6ff021f6f4505070e65c2f5))
+
 # [1.61.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.60.4...v1.61.0) (2026-05-04)
 
 
