@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect } from 'react';
+import type { SelectionChangedEvent } from 'ag-grid-community';
 import { ModelsResponseType } from '@src/shared/api';
 import { Column, Row } from '@src/shared/types';
 import { getISODateFormat } from '@shared/helpers';
@@ -25,6 +26,7 @@ export const AgGridModelsTable = (props: {
   overrideColumnList?: Column[];
   overrideRowList?: Partial<Row>[];
   overlayNoRowsTemplate?: string;
+  onSelectionChanged?: (event: SelectionChangedEvent) => void;
 }) => {
   const { setRows, modelsParams, setModelsParams, setRefetchModels, rows: storeRows } =
     useModelsStore();
@@ -152,6 +154,7 @@ export const AgGridModelsTable = (props: {
       error={modelsError && 'Ошибка загрузки моделей'}
       loading={loadingModels || fetchingModels}
       overlayNoRowsTemplate={props.overlayNoRowsTemplate}
+      onSelectionChanged={props.onSelectionChanged}
     />
   );
 };

@@ -1,10 +1,18 @@
-import React from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { format } from 'date-fns';
 import { Link, useNavigate } from 'react-router-dom';
 import Keycloak from 'keycloak-js';
 import styled from 'styled-components';
 
-import { T, Button, Avatar } from '@admiral-ds/react-ui';
+import {
+  T,
+  Button,
+  Avatar,
+  DropdownContainer,
+  Menu,
+  MenuItem,
+} from '@admiral-ds/react-ui';
+import type { RenderOptionProps } from '@admiral-ds/react-ui';
 import { ReactComponent as ExitIcon } from '@admiral-ds/icons/build/system/ExitSolid.svg';
 import { ReactComponent as ArrowsHorizontalOutline } from '@admiral-ds/icons/build/system/ArrowsHorizontalOutline.svg';
 import { ReactComponent as PersonSolid } from '@admiral-ds/icons/build/system/PersonSolid.svg';
@@ -88,6 +96,51 @@ const Header = ({ user, downloadReportStatus, onLogout }: HeaderProps) => {
   const { isBusinessCustomer } = useRoles();
   const navigate = useNavigate();
 
+  const userMenuRef = useRef<HTMLDivElement>(null);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [userMenuSelected, setUserMenuSelected] = useState<string | undefined>();
+  const [userMenuActive, setUserMenuActive] = useState<string | undefined>();
+
+  const userMenuModel = useMemo(
+    () => [
+      {
+        id: 'home',
+        render: (options: RenderOptionProps) => (
+          <MenuItem key="home" dimension="s" {...options}>
+            Главная
+          </MenuItem>
+        ),
+      },
+      {
+        id: 'pim-seed',
+        render: (options: RenderOptionProps) => (
+          <MenuItem key="pim-seed" dimension="s" {...options}>
+            Наполнение ПИМ
+          </MenuItem>
+        ),
+      },
+    ],
+    [],
+  );
+
+  const handleUserMenuSelect = (id?: string) => {
+    setUserMenuSelected(id);
+    setUserMenuOpen(false);
+    if (id === 'home') {
+      navigate(ROUTES.HOME);
+    }
+    if (id === 'pim-seed') {
+      navigate(ROUTES.PIM_USAGE_SEED);
+    }
+  };
+
+  const handleUserMenuClickOutside = (e: Event) => {
+    if (userMenuRef.current?.contains(e.target as Node)) {
+      return;
+    }
+    setUserMenuOpen(false);
+  };
+
   const isGod = process.env.NO_ROLES === 'true';
 
   const { downloadReport: downloadModelRiskReport, isDownloading: isDownloadingKMR } =
@@ -158,7 +211,7 @@ const Header = ({ user, downloadReportStatus, onLogout }: HeaderProps) => {
           <T font="Button/Button 2">Выгрузить отчет</T>
         </CustomButton>
 
-        {(isBusinessCustomer || isGod)  && (
+        {(isBusinessCustomer || isGod) && (
           <CustomButton dimension="s" onClick={() => navigate(ROUTES.ALLOCATION_CONFIRMATION)}>
             <T font="Button/Button 2">Подтвердить аллокацию за квартал</T>
           </CustomButton>
@@ -176,13 +229,51 @@ const Header = ({ user, downloadReportStatus, onLogout }: HeaderProps) => {
         >
           <T font="Button/Button 2">СУМ</T>
         </CustomButton>
-        <Avatar
-          dimension="xs"
-          showTooltip
-          icon={<PersonSolid />}
-          status="success"
-          userName={userName}
-        />
+        <div
+          ref={userMenuRef}
+          onClick={() => setUserMenuOpen((o) => !o)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              setUserMenuOpen((o) => !o);
+            }
+          }}
+          role="button"
+          tabIndex={0}
+          aria-expanded={userMenuOpen}
+          aria-haspopup="menu"
+          style={{ cursor: 'pointer', display: 'inline-flex' }}
+        >
+          <Avatar
+            dimension="xs"
+            showTooltip
+            icon={<PersonSolid />}
+            status="success"
+            userName={userName}
+          />
+        </div>
+        {userMenuOpen && (
+          <DropdownContainer
+            alignSelf="auto"
+            targetElement={userMenuRef.current ?? undefined}
+            onClickOutside={handleUserMenuClickOutside}
+            className="dropContainerClass"
+            targetRef={userMenuRef as any}
+          >
+            <Menu
+              model={userMenuModel}
+              selected={userMenuSelected}
+              active={userMenuActive}
+              onActivateItem={setUserMenuActive}
+              onSelectItem={handleUserMenuSelect}
+              style={{
+                borderRadius: '4px',
+                boxShadow:
+                  '0px -1.5px 6px rgba(0, 0, 0, 0.06), 0px 0.6px 1.8px rgba(0, 0, 0, 0.1), 0px 3.2px 9px rgba(0, 0, 0, 0.16)',
+              }}
+            />
+          </DropdownContainer>
+        )}
         <IconButton
           color="#fff"
           dimension="mBig"

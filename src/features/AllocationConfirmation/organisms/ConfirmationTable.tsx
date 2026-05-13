@@ -9,6 +9,7 @@ import type {
 import styled from 'styled-components';
 import { Button, Tag } from '@admiral-ds/react-ui';
 import type { ConfirmationModelRow } from '@shared/api/hooks/useQuarterlyConfirmation';
+import { ModelSource } from '@shared/types/general';
 import { ConfirmationSearchBar } from '../molecules/ConfirmationSearchBar';
 import { ConfirmationDateCell } from '../molecules/ConfirmationDateCell';
 import { UsageStatusCell, usageLabel } from '../molecules/UsageStatusCell';
@@ -203,8 +204,15 @@ export const ConfirmationTable = ({
     [isRowEdited, prevQuarterLabel],
   );
 
-  const columnDefs = useMemo<ColDef<EditableModel>[]>(
-    () => [
+  const hideAliasColumn = useMemo(
+    () =>
+      models.length > 0 &&
+      models.every((m) => m.model_source === ModelSource.SUM_RM),
+    [models],
+  );
+
+  const columnDefs = useMemo<ColDef<EditableModel>[]>(() => {
+    const cols: ColDef<EditableModel>[] = [
       {
         field: 'system_model_id',
         headerName: 'Идентификатор версии модели',
@@ -213,13 +221,25 @@ export const ConfirmationTable = ({
         minWidth: 180,
         pinned: 'left',
       },
-      {
+    ];
+
+    if (!hideAliasColumn) {
+      cols.push({
         field: 'model_alias',
         headerName: 'Алиас',
-        headerTooltip: 'Алиас модели, собранный из root_model_id и версии.',
+        headerTooltip:
+          'Алиас модели (для моделей только из СУРМ без отображения, как на стороне СУМ при отсутствии версии из СУМ).',
         flex: 1,
         minWidth: 140,
-      },
+        valueGetter: (p: ValueGetterParams<EditableModel>) => {
+          if (!p.data) return '';
+          if (p.data.model_source === ModelSource.SUM_RM) return '';
+          return p.data.model_alias ?? '';
+        },
+      });
+    }
+
+    cols.push(
       {
         field: 'model_name',
         headerName: 'Название модели',
@@ -261,7 +281,8 @@ export const ConfirmationTable = ({
       },
       {
         headerName: 'Модель используется заказчиком (текущий квартал)',
-        headerTooltip: 'Признак использования модели в текущем квартале. Можно выбрать Да, Нет или оставить Не выбрано.',
+        headerTooltip:
+          'Признак использования модели в текущем квартале. Можно выбрать Да, Нет или оставить Не выбрано.',
         colId: 'is_used',
         cellRenderer: UsageCell,
         valueGetter: (p: ValueGetterParams<EditableModel>) =>
@@ -273,7 +294,8 @@ export const ConfirmationTable = ({
       },
       {
         headerName: 'Статус',
-        headerTooltip: 'Подсказка о происхождении значения: новая модель, перенос из ПИМ/предыдущего квартала или изменение пользователем.',
+        headerTooltip:
+          'Подсказка о происхождении значения: новая модель, перенос из ПИМ/предыдущего квартала или изменение пользователем.',
         colId: 'row_status',
         cellRenderer: StatusCell,
         tooltipValueGetter: (p) => {
@@ -298,16 +320,19 @@ export const ConfirmationTable = ({
         filter: 'agSetColumnFilter',
         sortable: true,
       },
-      // {
-      //   field: 'model_source',
-      //   headerName: 'Источник модели',
-      //   minWidth: 140,
-      //   filter: 'agSetColumnFilter',
-      //   valueGetter: (p: ValueGetterParams<EditableModel>) => p.data?.model_source ?? '—',
-      // },
-    ],
-    [DateCell, UsageCell, StatusCell, isRowEdited, prevQuarterLabel],
-  );
+    );
+
+    return cols;
+  }, [
+    DateCell,
+    UsageCell,
+    StatusCell,
+    isRowEdited,
+    prevQuarterLabel,
+    hideAliasColumn,
+    normalizedMinDate,
+    normalizedMaxDate,
+  ]);
 
   const getRowClass = useCallback((params: RowClassParams<EditableModel>) => {
     const row = params.data;
