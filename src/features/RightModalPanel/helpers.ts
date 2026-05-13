@@ -6,6 +6,7 @@ import {
   addMonths,
   addYears,
   differenceInYears,
+  endOfMonth,
   endOfQuarter,
   format,
   isWithinInterval,
@@ -483,6 +484,8 @@ const ENABLE_4Q_EXTENSION_UNTIL_APRIL_13 = true;
 const ENABLE_2Q_EXTENSION_UNTIL_NOVEMBER_30 = false;
 const QUARTER_EDIT_PERIOD_MONTHS = 2;
 const QUARTER_EDIT_PERIOD_DAYS = 0;
+/** Месяцев после конца квартала, доступных в календаре для выбора даты подтверждения. */
+const QUARTER_PICKER_MONTHS_AFTER_QUARTER_END = 1;
 
 /** Квартал 1–4 из последнего символа tech_label (как для QUARTERLY_DATE). */
 const parseQuarterDigitFromTechLabel = (techLabel: string): number | undefined => {
@@ -505,12 +508,15 @@ const getQuarterAnchorDates = (quarter: number) => {
 };
 
 /**
- * Границы календаря: только даты внутри квартала (без +QUARTER_EDIT_PERIOD_MONTHS к max).
- * Иначе для Q2 в пикере доступен август (конец квартала + 2 месяца).
+ * Границы календаря: квартал + N полных месяцев после его окончания (заполнение).
+ * Окно редактирования формы по-прежнему задаётся в getDateLimits (+2 мес и флаги для Q4 и т.д.).
  */
 const getQuarterPickerDateLimits = (quarter: number) => {
   const { quarterStart } = getQuarterAnchorDates(quarter);
-  return { minDate: quarterStart, maxDate: endOfQuarter(quarterStart) };
+  const quarterEnd = endOfQuarter(quarterStart);
+  const maxDate = endOfMonth(addMonths(quarterEnd, QUARTER_PICKER_MONTHS_AFTER_QUARTER_END));
+
+  return { minDate: quarterStart, maxDate };
 };
 
 /** Окно, в течение которого разрешено редактирование полей квартала (расширенный maxDate). */
