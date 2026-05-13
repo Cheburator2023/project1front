@@ -491,16 +491,32 @@ const parseQuarterDigitFromTechLabel = (techLabel: string): number | undefined =
   return Number.isFinite(d) && d >= 1 && d <= 4 ? d : undefined;
 };
 
-const getDateLimits = (quarter: number) => {
+/** Первый день квартала и год (та же логика effectiveYear, что в getDateLimits). */
+const getQuarterAnchorDates = (quarter: number) => {
   const currentDate = new Date();
   const currentYear = currentDate.getFullYear();
-  const currentQuarter = Math.floor((currentDate.getMonth() + 3) / 3); // TODO: Преобразуем месяц (0-11) в квартал (1-4)
+  const currentQuarter = Math.floor((currentDate.getMonth() + 3) / 3);
 
-  // TODO: Если просят 4-й квартал, а сейчас 1-й или 2-й, значит речь о прошлом годе — корректируем effectiveYear
   const effectiveYear = quarter === 4 && currentQuarter <= 2 ? currentYear - 1 : currentYear;
+  const firstDateOfEffectiveYear = startOfYear(new Date(effectiveYear, 0, 1));
+  const quarterStart = addMonths(firstDateOfEffectiveYear, (quarter - 1) * 3);
 
-  const firstDateOfEffectiveYear = startOfYear(new Date(effectiveYear, 0, 1)); // TODO: Получаем 1 января effectiveYear
-  const minDate = addMonths(firstDateOfEffectiveYear, (quarter - 1) * 3); // TODO: Старт квартала
+  return { quarterStart, effectiveYear };
+};
+
+/**
+ * Границы календаря: только даты внутри квартала (без +QUARTER_EDIT_PERIOD_MONTHS к max).
+ * Иначе для Q2 в пикере доступен август (конец квартала + 2 месяца).
+ */
+const getQuarterPickerDateLimits = (quarter: number) => {
+  const { quarterStart } = getQuarterAnchorDates(quarter);
+  return { minDate: quarterStart, maxDate: endOfQuarter(quarterStart) };
+};
+
+/** Окно, в течение которого разрешено редактирование полей квартала (расширенный maxDate). */
+const getDateLimits = (quarter: number) => {
+  const { quarterStart, effectiveYear } = getQuarterAnchorDates(quarter);
+  const minDate = quarterStart;
   let maxDate = addDays(addMonths(endOfQuarter(minDate), QUARTER_EDIT_PERIOD_MONTHS), QUARTER_EDIT_PERIOD_DAYS); // TODO: По умолчанию — конец квартала + QUARTER_EDIT_PERIOD_MONTHS + QUARTER_EDIT_PERIOD_DAYS
 
   if (quarter === 2) {
@@ -886,14 +902,20 @@ const mapArtifactToField = (
       const fields = Number(artifact.artefact_tech_label[artifact.artefact_tech_label.length - 1]);
       // ****
 
-      const { minDate, maxDate } = getDateLimits(fields);
-      const quarterDisabledStatus = getDisabledStatus(minDate, maxDate, fields, canEdit);
+      const editWindow = getDateLimits(fields);
+      const pickerLimits = getQuarterPickerDateLimits(fields);
+      const quarterDisabledStatus = getDisabledStatus(
+        editWindow.minDate,
+        editWindow.maxDate,
+        fields,
+        canEdit,
+      );
 
       return {
         ...commonAttributes,
         fields,
-        minDate,
-        maxDate,
+        minDate: pickerLimits.minDate,
+        maxDate: pickerLimits.maxDate,
         disabled: quarterDisabledStatus,
         type,
       };
@@ -906,10 +928,11 @@ const mapArtifactToField = (
         artifact.group === ArtifactGroup.CONFIRMATION_DATE && quarterFromLabel !== undefined;
 
       if (isConfirmationQuarterlyDate) {
-        const { minDate, maxDate } = getDateLimits(quarterFromLabel);
+        const editWindow = getDateLimits(quarterFromLabel);
+        const pickerLimits = getQuarterPickerDateLimits(quarterFromLabel);
         const quarterDisabledStatus = getDisabledStatus(
-          minDate,
-          maxDate,
+          editWindow.minDate,
+          editWindow.maxDate,
           quarterFromLabel,
           canEdit,
         );
@@ -917,8 +940,8 @@ const mapArtifactToField = (
         return {
           ...commonAttributes,
           type: INPUT_TYPE.DATE,
-          minDate,
-          maxDate,
+          minDate: pickerLimits.minDate,
+          maxDate: pickerLimits.maxDate,
           disabled: quarterDisabledStatus,
         };
       }
