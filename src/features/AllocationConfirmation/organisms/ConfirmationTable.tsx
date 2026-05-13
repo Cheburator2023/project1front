@@ -271,7 +271,7 @@ export const ConfirmationTable = ({
             p.data?.registry_card,
             'model_name_dadm',
             p.data?.model_name_dadm,
-          ),
+          ) || (p.data?.model_name ?? ''),
       },
       {
         field: 'business_customer',
