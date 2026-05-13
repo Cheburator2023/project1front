@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.63.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.62.1...v1.63.0) (2026-05-13)
+
+
+### Features
+
+* enhance Header component with user menu and navigation ([4c90f54](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/4c90f54f2afb1d6758013575ec780b6c9e9e7be8))
+
 ## [1.62.1](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.62.0...v1.62.1) (2026-05-13)
 
 
