@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.62.1](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.62.0...v1.62.1) (2026-05-13)
+
+
+### Bug Fixes
+
+* add newline at end of README.md file ([cd0d9ce](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/cd0d9ce22514b61d4e538e1c305389324ec47e28))
+
 # [1.62.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.61.0...v1.62.0) (2026-05-13)
 
 
