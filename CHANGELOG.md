@@ -1,5 +1,13 @@
 # Semantic Versioning Changelog
 
+# [1.64.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.63.0...v1.64.0) (2026-05-14)
+
+
+### Features
+
+* enhance ConfirmationTable with registry card data retrieval ([00e9e7e](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/00e9e7e4c58f2741f86380752e6a03afb616a94a))
+* enhance ConfirmationTable with registry card data retrieval ([35fb0fd](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/35fb0fd5ce694b7cb5be3c062a497b9444f98dc9))
+
 # [1.63.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.62.1...v1.63.0) (2026-05-13)
 
 
