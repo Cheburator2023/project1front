@@ -13,7 +13,7 @@ const DateInput = styled('input')`
   padding: 4px 8px;
   font-size: 13px;
   font-family: inherit;
-  width: 100%;
+  width: -webkit-fill-available;
   &:focus {
     outline: none;
     border-color: #0132b0;
