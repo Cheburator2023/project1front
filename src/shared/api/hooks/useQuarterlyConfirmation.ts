@@ -142,3 +142,29 @@ export const useSeedPimUsage = () => {
     },
   });
 };
+
+export type PimUsageTableRow = {
+  pim_usage_id: number;
+  system_model_id: string;
+  confirmation_quarter: number;
+  confirmation_year: number;
+  is_used: boolean;
+  source_system: string;
+  create_date: string;
+  update_date: string;
+};
+
+const fetchPimUsageTable = (signal?: AbortSignal) => {
+  return customInstance<{ data: { rows: PimUsageTableRow[] } }>({
+    url: '/quarterly-confirmation/pim-usage',
+    method: 'GET',
+    signal,
+  });
+};
+
+export const usePimUsageTable = () => {
+  return useQuery({
+    queryKey: ['quarterly-confirmation', 'pim-usage-table'],
+    queryFn: ({ signal }) => fetchPimUsageTable(signal),
+  });
+};

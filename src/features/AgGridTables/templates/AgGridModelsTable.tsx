@@ -27,6 +27,8 @@ export const AgGridModelsTable = (props: {
   overrideRowList?: Partial<Row>[];
   overlayNoRowsTemplate?: string;
   onSelectionChanged?: (event: SelectionChangedEvent) => void;
+  /** Проброс в {@link AgGridTable}: для страниц с несколькими гридами — `100%` и ограниченный по высоте контейнер. */
+  wrapperHeight?: string;
 }) => {
   const { setRows, modelsParams, setModelsParams, setRefetchModels, rows: storeRows } =
     useModelsStore();
@@ -155,6 +157,7 @@ export const AgGridModelsTable = (props: {
       loading={loadingModels || fetchingModels}
       overlayNoRowsTemplate={props.overlayNoRowsTemplate}
       onSelectionChanged={props.onSelectionChanged}
+      wrapperHeight={props.wrapperHeight}
     />
   );
 };

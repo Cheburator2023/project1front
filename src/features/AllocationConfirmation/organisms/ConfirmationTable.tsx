@@ -202,6 +202,7 @@ export const ConfirmationTable = ({
   const StatusCell = useCallback(
     (params: ICellRendererParams<EditableModel>) => {
       const row = params.data;
+      console.log('row', row?.prefill_source);
       if (!row) return null;
       return (
         <RowStatusChips
@@ -328,6 +329,7 @@ export const ConfirmationTable = ({
         headerTooltip:
           'Подсказка о происхождении значения: новая модель, перенос из ПИМ/предыдущего квартала или изменение пользователем.',
         colId: 'row_status',
+        cellStyle: { display: 'flex', justifyContent: 'flex-start' },
         cellRenderer: StatusCell,
         tooltipValueGetter: (p) => {
           if (!p.data) return '';

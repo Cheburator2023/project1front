@@ -96,6 +96,8 @@ interface IAgGridTableProps {
   noCustomCells?: boolean;
   pivot?: boolean;
   overlayNoRowsTemplate?: string;
+  /** Высота обёртки грида; по умолчанию под полноэкранный реестр. Для вложенных страниц — например `100%` + фиксированный родитель. */
+  wrapperHeight?: string;
 }
 
 const sideBarProps: SideBarDef | string | string[] | boolean | null = {
@@ -221,6 +223,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       pivot = false,
       noCustomCells = false,
       overlayNoRowsTemplate,
+      wrapperHeight = 'calc(100vh - 220px)',
     }: IAgGridTableProps,
     ref: any,
   ) => {
@@ -994,7 +997,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     );
 
     return (
-      <Flexbox height="calc(100vh - 220px)">
+      <Flexbox height={wrapperHeight}>
         <div style={containerStyle}>
           {actionPanel && (
             <>

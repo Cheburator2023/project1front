@@ -78,19 +78,22 @@ export const RowStatusChips = ({
       chips.push({ key: 'filled', label: 'Заполнена', kind: 'primary' });
     }
   } else {
-    const sourceLabel =
-      prefillSource === 'pim' ? 'ПИМ' : prevQuarterLabel;
-    if (isEdited) {
+    if (!isEdited) {
       chips.push({
-        key: 'edited',
-        label: `Изменено (было: ${sourceLabel})`,
-        kind: 'success',
+        key: 'carried',
+        label:
+          prefillSource === 'pim'
+            ? 'Перенесено из ПИМ'
+            : `Перенесено из ${prevQuarterLabel}`,
+        kind: 'neutral',
       });
     } else {
       chips.push({
-        key: 'carried',
-        label: `Перенесено: ${sourceLabel}`,
-        kind: 'neutral',
+        key: 'edited',
+        label: `Изменено (было: ${
+          prefillSource === 'pim' ? 'ПИМ' : prevQuarterLabel
+        })`,
+        kind: 'success',
       });
     }
   }

@@ -1,16 +1,18 @@
-import { useCallback, useEffect, useState, type ChangeEvent } from 'react';
-import type { SelectionChangedEvent } from 'ag-grid-community';
+import { useCallback, useEffect, useMemo, useState, type ChangeEvent } from 'react';
+import { AgGridReact } from 'ag-grid-react';
+import type { SelectionChangedEvent, ColDef } from 'ag-grid-community';
 import { Button, Checkbox, InputField, T } from '@admiral-ds/react-ui';
-
 import { AgGridModelsTable } from '@src/features/AgGridTables/templates/AgGridModelsTable';
+
+import { AG_GRID_LOCALE_RU } from '../../app/agGridLocale.ru';
 import { RightModalPanel } from '../../features/RightModalPanel';
-import { FiltersPanel } from '../../features/FiltersPanel/organisms/FiltersPanel';
-import { TemplatesPanel } from '../../features/TemplatesPanel/organisms/TemplatesPanel';
 import { Flexbox, Spacer, useToast } from '../../shared/ui/atoms';
 import { Row } from '../../shared/types';
 import {
   useActiveQuarter,
   useSeedPimUsage,
+  usePimUsageTable,
+  type PimUsageTableRow,
 } from '../../shared/api/hooks/useQuarterlyConfirmation';
 
 /**
@@ -44,6 +46,36 @@ export const PimUsageSeedPage = () => {
   }, []);
 
   const seedMutation = useSeedPimUsage();
+  const { data: pimTableRes, isLoading: pimTableLoading, refetch: refetchPimTable } =
+    usePimUsageTable();
+
+  const pimUsageRows = pimTableRes?.data?.rows ?? [];
+
+  const pimUsageColDefs = useMemo<ColDef<PimUsageTableRow>[]>(
+    () => [
+      { field: 'pim_usage_id', headerName: 'ID', width: 80, pinned: 'left' },
+      { field: 'system_model_id', headerName: 'system_model_id', flex: 1, minWidth: 280 },
+      {
+        field: 'confirmation_year',
+        headerName: 'Год',
+        width: 90,
+      },
+      {
+        field: 'confirmation_quarter',
+        headerName: 'Квартал',
+        width: 100,
+      },
+      {
+        field: 'is_used',
+        headerName: 'is_used',
+        width: 100,
+      },
+      { field: 'source_system', headerName: 'source_system', flex: 0.8, minWidth: 110 },
+      { field: 'create_date', headerName: 'create_date', flex: 1, minWidth: 160 },
+      { field: 'update_date', headerName: 'update_date', flex: 1, minWidth: 160 },
+    ],
+    [],
+  );
 
   const handleSeed = () => {
     if (selectedIds.length === 0) {
@@ -64,8 +96,9 @@ export const PimUsageSeedPage = () => {
         })),
       },
       {
-        onSuccess: (res) => {
+        onSuccess: async (res) => {
           const n = res?.data?.seeded?.length ?? selectedIds.length;
+          await refetchPimTable();
           showToast({
             message: `Записано в ПИМ: ${n} модель(ей) для Q${quarter} ${year}.`,
             type: 'success',
@@ -89,7 +122,17 @@ export const PimUsageSeedPage = () => {
   return (
     <>
       <RightModalPanel />
-      <Flexbox flexDirection="column" style={{ gap: 0, minHeight: '100%', background: '#f3f4f6' }}>
+      <Flexbox
+        flexDirection="column"
+        style={{
+          gap: 0,
+          flex: 1,
+          width: '100%',
+          minHeight: 0,
+          overflowY: 'auto',
+          background: '#f3f4f6',
+        }}
+      >
         <Flexbox
           alignItems="flex-end"
           wrap="wrap"
@@ -135,19 +178,71 @@ export const PimUsageSeedPage = () => {
             <T font="Body/Body 2 Short">Признак is_used для выбранных</T>
           </Flexbox>
           <Spacer />
+          <Button dimension="s" appearance="secondary" onClick={() => refetchPimTable()}>
+            Обновить таблицу ПИМ
+          </Button>
           <Button dimension="s" onClick={handleSeed} loading={seedMutation.isPending}>
             Seed PIM (выбрано: {selectedIds.length})
           </Button>
         </Flexbox>
 
-        <Flexbox alignItems="center" gap={12} style={{ padding: '0px 12px', background: '#e5e7eb' }}>
-          <TemplatesPanel />
-          <FiltersPanel />
-        </Flexbox>
 
-        <div style={{ flex: 1, minHeight: 480 }}>
-          <AgGridModelsTable onSelectionChanged={handleSelectionChanged} />
+        <div
+          data-name="pim-seed-models-grid-slot"
+          style={{
+            flex: '0 0 auto',
+            width: '100%',
+            height: 'clamp(260px, 46vh, 560px)',
+            minHeight: 260,
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+          }}
+        >
+          <AgGridModelsTable
+            onSelectionChanged={handleSelectionChanged}
+            wrapperHeight="100%"
+          />
         </div>
+
+        <div data-name="pim-usage-grid-header" style={{ flex: '0 0 auto', padding: '12px 12px 8px', background: '#f3f4f6' }}>
+          <T font="Subtitle/Subtitle 2" color="Neutral/Neutral 90" as="div">
+            Таблица models_pim_usage (текущее состояние)
+          </T>
+        </div>
+        <div
+          data-name="pim-usage-grid"
+          className="ag-theme-quartz"
+          style={{
+            flex: '0 0 auto',
+            width: '100%',
+            padding: '0 12px 16px',
+            background: '#f3f4f6',
+            height: 'clamp(240px, 34vh, 440px)',
+            minHeight: 240,
+            display: 'flex',
+            flexDirection: 'column',
+            boxSizing: 'border-box',
+          }}
+        >
+          <div style={{ flex: '1 1 auto', width: '100%', minHeight: 0 }}>
+            <AgGridReact<PimUsageTableRow>
+              rowData={pimUsageRows}
+              columnDefs={pimUsageColDefs}
+              defaultColDef={{ resizable: true, sortable: true, filter: true }}
+              loading={pimTableLoading}
+              getRowId={(p) => String(p.data.pim_usage_id)}
+              animateRows={false}
+              enableCellTextSelection
+              rowHeight={40}
+              localeText={AG_GRID_LOCALE_RU}
+              overlayNoRowsTemplate={
+                '<span style="color:#9ca3af">Нет строк в models_pim_usage</span>'
+              }
+            />
+          </div>
+        </div>
+        <Spacer height={200} />
       </Flexbox>
     </>
   );
