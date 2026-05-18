@@ -1,5 +1,17 @@
 # Semantic Versioning Changelog
 
+# [1.65.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.64.0...v1.65.0) (2026-05-18)
+
+
+### Bug Fixes
+
+* update ConfirmationDateCell input width and enhance ConfirmationTable header tooltip for clarity ([4921dd4](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/4921dd491f9ffc4e1f24fad07b0478009447999d))
+
+
+### Features
+
+* add wrapperHeight prop to AgGridTable and AgGridModelsTable for flexible height management ([f4b8e1d](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/f4b8e1dab60601264b30f658bda02c87c009498d))
+
 # [1.64.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.63.0...v1.64.0) (2026-05-14)
 
 
