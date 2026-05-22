@@ -72,6 +72,16 @@ export const AllocationConfirmationPage = () => {
         is_used: m.edited_is_used,
       }));
 
+    if (editableModels.length > 0 && modelsToSave.length === 0) {
+      showToast({
+        message:
+          'Среди отмеченных строк заполните «Модель используется» (Да или Нет) хотя бы у одной строки.',
+        type: 'warning',
+        duration: 5000,
+      });
+      return;
+    }
+
     saveConfirmation(
       {
         quarter: quarterInfo.quarter,

@@ -2,8 +2,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import type {
   ColDef,
+  GetMainMenuItemsParams,
   ICellRendererParams,
+  MenuItemDef,
   RowClassParams,
+  RowSelectionOptions,
+  SelectionChangedEvent,
+  SelectionColumnDef,
   ValueGetterParams,
 } from 'ag-grid-community';
 import styled from 'styled-components';
@@ -48,6 +53,40 @@ function readRegistryString(
   return '';
 }
 
+/** Рендер значений в списке agSetColumnFilter — как в AgGridTable (`setFilterParams.cellRenderer`). */
+function allocationConfirmationSetFilterCellRenderer(
+  props: Pick<ICellRendererParams, 'value'>,
+) {
+  const text = props.value === null ? '(Пустые)' : String(props.value ?? '');
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        height: '100%',
+        width: '100%',
+        minWidth: 0,
+        lineHeight: '18px',
+      }}
+      title={text}
+    >
+      <span
+        style={{
+          display: 'block',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+          minWidth: 0,
+          flex: '1 1 auto',
+        }}
+      >
+        {text}
+      </span>
+    </div>
+  );
+}
+
 const ActionsBar = styled('div')`
   display: flex;
   align-items: center;
@@ -77,6 +116,21 @@ const GridWrapper = styled('div')`
   }
 `;
 
+/** Легенда: жёлтая зона строки таблицы + подпись и счётчик в одном блоке. */
+const LegendNewModelBadge = styled('div')`
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  min-height: 24px;
+  border-radius: 4px;
+  box-sizing: border-box;
+  background-color: #fef3c7;
+  border: 1px solid #fde68a;
+  font-size: 12px;
+  line-height: 1.3;
+  color: #78350f;
+`;
+
 const LegendBar = styled('div')`
   display: flex;
   flex-wrap: wrap;
@@ -96,6 +150,27 @@ const computePrevQuarter = (
   year: number,
 ): { quarter: number; year: number } =>
   quarter === 1 ? { quarter: 4, year: year - 1 } : { quarter: quarter - 1, year };
+
+/** Текст кнопки «Сохранить» с числом выделенных строк (модель / модели / моделей). */
+function saveConfirmButtonCaption(selectedModelsCount: number, isSaving: boolean): string {
+  if (isSaving) return 'Сохранение...';
+  if (selectedModelsCount <= 0) return 'Сохранить';
+
+  const n10 = selectedModelsCount % 100;
+  const n1 = selectedModelsCount % 10;
+  let noun: string;
+  if (n10 > 10 && n10 < 20) {
+    noun = 'моделей';
+  } else if (n1 === 1) {
+    noun = 'модель';
+  } else if (n1 >= 2 && n1 <= 4) {
+    noun = 'модели';
+  } else {
+    noun = 'моделей';
+  }
+
+  return `Сохранить (${selectedModelsCount} ${noun})`;
+}
 
 export const ConfirmationTable = ({
   models,
@@ -138,12 +213,70 @@ export const ConfirmationTable = ({
   }, [models]);
 
   const [rows, setRows] = useState<EditableModel[]>(initialRows);
-  const rowsRef = useRef(rows);
-  rowsRef.current = rows;
+
+  const [selectedSaveCount, setSelectedSaveCount] = useState(0);
 
   useEffect(() => {
     setRows(initialRows);
+    queueMicrotask(() => {
+      const api = gridRef.current?.api;
+      api?.deselectAll?.();
+      setSelectedSaveCount(0);
+    });
   }, [initialRows]);
+
+  const rowSelection = useMemo<RowSelectionOptions>(
+    () => ({
+      mode: 'multiRow',
+      headerCheckbox: true,
+      /** Чекбокс в заголовке — только строки, попадающие под текущие фильтры/поиск (на всех страницах набора после фильтра). */
+      selectAll: 'filtered',
+    }),
+    [],
+  );
+
+  const selectionColumnDef = useMemo<SelectionColumnDef>(
+    () => ({
+      pinned: 'left',
+      width: 52,
+      minWidth: 52,
+      maxWidth: 52,
+      resizable: false,
+      sortable: false,
+      suppressHeaderMenuButton: true,
+      suppressHeaderFilterButton: true,
+      tooltipValueGetter: () =>
+        'Флажок: строка попадёт в запрос при «Сохранить». В заголовке — выделить все строки, проходящие текущие фильтры колонок и быстрый поиск (со всех страниц отфильтрованного набора). То, что скрыто фильтром, не попадает в выделение.',
+    }),
+    [],
+  );
+
+  const onSelectionChanged = useCallback((e: SelectionChangedEvent<EditableModel>) => {
+    setSelectedSaveCount(e.api.getSelectedNodes().length);
+  }, []);
+
+  const getMainMenuItems = useCallback(
+    (params: GetMainMenuItemsParams): (string | MenuItemDef)[] => {
+      const defaults = [...(params.defaultItems ?? [])];
+      const colId = params.column?.getColId();
+      const filterAllowed = !!params.column?.getColDef()?.filter;
+      const resetColumnFilter: MenuItemDef = {
+        name: 'Сбросить фильтр колонки',
+        disabled: !filterAllowed || !colId,
+        action: () => {
+          if (!colId || !filterAllowed) return;
+          const prev = params.api.getFilterModel() ?? {};
+          if (!(colId in prev)) return;
+          const next = { ...prev };
+          delete next[colId];
+          params.api.setFilterModel(Object.keys(next).length ? next : null);
+        },
+      };
+
+      return [...defaults, 'separator', resetColumnFilter];
+    },
+    [],
+  );
 
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -202,7 +335,6 @@ export const ConfirmationTable = ({
   const StatusCell = useCallback(
     (params: ICellRendererParams<EditableModel>) => {
       const row = params.data;
-      console.log('row', row?.prefill_source);
       if (!row) return null;
       return (
         <RowStatusChips
@@ -309,6 +441,7 @@ export const ConfirmationTable = ({
           p.data?.edited_confirmation_date ?? '',
         minWidth: 170,
         filter: 'agDateColumnFilter',
+        filterParams: { buttons: ['reset', 'clear'] },
         sortable: true,
       },
       {
@@ -321,7 +454,12 @@ export const ConfirmationTable = ({
           usageLabel(p.data?.edited_is_used ?? null),
         minWidth: 200,
         filter: 'agSetColumnFilter',
-        filterParams: { values: ['Да', 'Нет', 'Не выбрано'] },
+        filterParams: {
+          values: ['Да', 'Нет', 'Не выбрано'],
+          buttons: ['reset', 'clear'],
+          cellHeight: 42,
+          cellRenderer: allocationConfirmationSetFilterCellRenderer,
+        },
         sortable: true,
       },
       {
@@ -351,6 +489,11 @@ export const ConfirmationTable = ({
         },
         minWidth: 220,
         filter: 'agSetColumnFilter',
+        filterParams: {
+          buttons: ['reset', 'clear'],
+          cellHeight: 42,
+          cellRenderer: allocationConfirmationSetFilterCellRenderer,
+        },
         sortable: true,
       },
     );
@@ -370,7 +513,7 @@ export const ConfirmationTable = ({
   const getRowClass = useCallback((params: RowClassParams<EditableModel>) => {
     const row = params.data;
     if (!row) return undefined;
-    // Подсветка новых моделей без данных ни из ПИМ, ни из прошлого квартала.
+    // Жёлтая строка («новая модель» в легенде): нет prefill ни из ПИМ, ни из прошл. квартала и «используется» не выбрано.
     if (row.prefill_source === null && row.edited_is_used === null) {
       return 'confirmation-row-new';
     }
@@ -383,6 +526,9 @@ export const ConfirmationTable = ({
       sortable: true,
       filter: true,
       floatingFilter: true,
+      filterParams: {
+        buttons: ['reset', 'clear'],
+      },
     }),
     [],
   );
@@ -393,7 +539,9 @@ export const ConfirmationTable = ({
   }, [searchQuery]);
 
   const handleSave = () => {
-    onSave(rowsRef.current);
+    const api = gridRef.current?.api;
+    if (!api) return;
+    onSave(api.getSelectedRows() as EditableModel[]);
   };
 
   const newModelsCount = rows.filter(
@@ -412,8 +560,12 @@ export const ConfirmationTable = ({
           <Button dimension="s" appearance="secondary" onClick={onCancel} disabled={isSaving}>
            Отменить
           </Button>
-          <Button dimension="s" onClick={handleSave} disabled={isSaving}>
-            {isSaving ? 'Сохранение...' : 'Сохранить'}
+          <Button
+            dimension="s"
+            onClick={handleSave}
+            disabled={isSaving || selectedSaveCount === 0}
+          >
+            {saveConfirmButtonCaption(selectedSaveCount, isSaving)}
           </Button>
         </ActionsRight>
       </ActionsBar>
@@ -421,13 +573,21 @@ export const ConfirmationTable = ({
       <LegendBar>
         <LegendLabel>Обозначения:</LegendLabel>
         <Tag
-          kind="warning"
+          kind="primary"
           statusViaBackground
           dimension="s"
-          title="Новая модель: в ПИМ и в предыдущем квартале нет данных для предзаполнения."
+          title="Только строки с флажком попадут в запрос при нажатии «Сохранить»."
         >
-          Новая модель — {newModelsCount}
+          Выбрано для сохранения — {selectedSaveCount}
         </Tag>
+        <LegendNewModelBadge
+          title={
+            'Жёлтый фон строки в таблице: модель новая для квартала — нет предзаполнения ни из ПИМ, ни из предыдущего квартала; признак «Модель используется» ещё не выбран (Да/Нет).' +
+            ' После заполнения «Да» или «Нет» строка становится без жёлтой подсветки.'
+          }
+        >
+          Новая модель без предзаполнения — {newModelsCount}
+        </LegendNewModelBadge>
         <Tag
           kind="neutral"
           statusViaBackground
@@ -452,6 +612,10 @@ export const ConfirmationTable = ({
           rowData={rows}
           columnDefs={columnDefs}
           defaultColDef={defaultColDef}
+          rowSelection={rowSelection}
+          selectionColumnDef={selectionColumnDef}
+          onSelectionChanged={onSelectionChanged}
+          getMainMenuItems={getMainMenuItems}
           getRowId={(p) => p.data.system_model_id}
           getRowClass={getRowClass}
           animateRows={false}
