@@ -1,4 +1,5 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+/* eslint-disable no-void */
+import { useQuery, useMutation, useQueryClient, type QueryClient } from '@tanstack/react-query';
 import { customInstance } from '@shared/api/customInstance';
 
 export type QuarterInfo = {
@@ -77,6 +78,14 @@ const saveQuarterlyConfirmation = (data: SaveQuarterlyConfirmationPayload) => {
   });
 };
 
+/** Префикс ключей запросов квартального подтверждения (активный квартал, список на странице аллокации, ПИМ и т.д.). */
+export const QUARTERLY_CONFIRMATION_QUERY_KEY_PREFIX = ['quarterly-confirmation'] as const;
+
+/** Обновляет кэш страницы аллокации после изменений в реестре моделей — иначе GET /models обновится, а GET /quarterly-confirmation/models останется старым. */
+export function invalidateQuarterlyConfirmationQueries(queryClient: QueryClient): void {
+  void queryClient.invalidateQueries({ queryKey: [...QUARTERLY_CONFIRMATION_QUERY_KEY_PREFIX] });
+}
+
 export const useActiveQuarter = () => {
   return useQuery({
     queryKey: ['quarterly-confirmation', 'active-quarter'],
@@ -99,7 +108,7 @@ export const useSaveQuarterlyConfirmation = () => {
     mutationFn: saveQuarterlyConfirmation,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['quarterly-confirmation'],
+        queryKey: [...QUARTERLY_CONFIRMATION_QUERY_KEY_PREFIX],
       });
     },
   });
@@ -137,7 +146,7 @@ export const useSeedPimUsage = () => {
     mutationFn: seedPimUsage,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['quarterly-confirmation'],
+        queryKey: [...QUARTERLY_CONFIRMATION_QUERY_KEY_PREFIX],
       });
     },
   });

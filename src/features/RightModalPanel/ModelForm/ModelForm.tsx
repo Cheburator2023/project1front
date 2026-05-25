@@ -39,6 +39,7 @@ import { useGlobalStore } from '@shared/stores/globalStore';
 import { useScrollTo } from '@src/shared/hooks/useScrollTo';
 import { useDeepEffect } from '@src/shared/hooks/useDeepEffect';
 import { useQueryClient } from '@tanstack/react-query';
+import { invalidateQuarterlyConfirmationQueries } from '@shared/api/hooks/useQuarterlyConfirmation';
 import { FormValues } from '../types';
 import {
   getFormMode,
@@ -646,6 +647,7 @@ export const ModelForm = ({
 
       const getModelsAndSubmit = async () => {
         const refetchResult = await refetchModels?.();
+        invalidateQuarterlyConfirmationQueries(queryClient);
         const freshRow = refetchResult?.data?.data?.cards?.find(
           (row: Row) => row.system_model_id === newRow.system_model_id,
         );
@@ -659,7 +661,7 @@ export const ModelForm = ({
 
       getModelsAndSubmit();
     }
-  }, [isUpdateSuccess, updateModelsMutation.data, formMode, onSubmit, refetchModels]);
+  }, [isUpdateSuccess, updateModelsMutation.data, formMode, onSubmit, queryClient, refetchModels]);
 
   useEffect(() => {
     const refetchModelsEffect = async () => {
@@ -667,6 +669,7 @@ export const ModelForm = ({
         const newRow = createModelMutation.data as Row;
 
         const refetchResult = await refetchModels?.();
+        invalidateQuarterlyConfirmationQueries(queryClient);
         const freshRow = refetchResult?.data?.data?.cards?.find(
           (row: Row) => row.system_model_id === newRow.system_model_id,
         );
@@ -679,7 +682,7 @@ export const ModelForm = ({
       }
     };
     refetchModelsEffect();
-  }, [isCreateSuccess, createModelMutation.data, formMode, onSubmit, refetchModels]);
+  }, [isCreateSuccess, createModelMutation.data, formMode, onSubmit, queryClient, refetchModels]);
 
   useEffect(() => {
     if (!hasNoAccessToActiveModel) {

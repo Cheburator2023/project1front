@@ -24,6 +24,7 @@ import { useDeleteRightModelPanelStore, useModelsStore } from '@src/shared/store
 import { useScrollTo } from '@src/shared/hooks/useScrollTo';
 import { useRoles } from '@src/shared/hooks';
 import { useQueryClient } from '@tanstack/react-query';
+import { invalidateQuarterlyConfirmationQueries } from '@shared/api/hooks/useQuarterlyConfirmation';
 import { FormValues } from '../types';
 import { getArtifactApiItems, getInputValuesFromRow, getInvalidFields } from '../helpers';
 import { ButtonContainer, FormContainer } from '../ModelForm/styles';
@@ -296,7 +297,8 @@ export const DeleteModelForm = ({
               },
               {
                 onSuccess: async (data) => {
-                  await         refetchModels?.();
+                  await refetchModels?.();
+                  invalidateQuarterlyConfirmationQueries(queryClient);
 
                   return resolve({ data: { data: { cards: [data] } }, error: false });
                 },

@@ -1,3 +1,4 @@
+/* eslint-disable no-void */
 import React, { useCallback, useEffect } from 'react';
 import type { SelectionChangedEvent } from 'ag-grid-community';
 import { ModelsResponseType } from '@src/shared/api';
@@ -18,6 +19,8 @@ import {
   useModelsControllerGetModels,
   useTemplatesControllerGetTemplates,
 } from '@shared/api/generated/endpoints';
+import { useQueryClient } from '@tanstack/react-query';
+import { invalidateQuarterlyConfirmationQueries } from '@shared/api/hooks/useQuarterlyConfirmation';
 
 import { AgGridTable } from '../organisms/AgGridTable';
 
@@ -26,13 +29,15 @@ export const AgGridModelsTable = (props: {
   overrideColumnList?: Column[];
   overrideRowList?: Partial<Row>[];
   overlayNoRowsTemplate?: string;
-  onSelectionChanged?: (event: SelectionChangedEvent) => void;
+  onSelectionChanged?: (event: SelectionChangedEvent) => any;
   /** Проброс в {@link AgGridTable}: для страниц с несколькими гридами — `100%` и ограниченный по высоте контейнер. */
   wrapperHeight?: string;
 }) => {
   const { setRows, modelsParams, setModelsParams, setRefetchModels, rows: storeRows } =
     useModelsStore();
   const { showToast } = useToast();
+
+  const queryClient = useQueryClient();
 
   const { modelsDownloadingDate } = useFiltersStore();
 
@@ -104,10 +109,13 @@ export const AgGridModelsTable = (props: {
       }
 
       setTimeout(() => {
-        refetchModels();
+        void (async () => {
+          await refetchModels();
+          invalidateQuarterlyConfirmationQueries(queryClient);
+        })();
       }, 100);
     },
-    [modelsDownloadingDate, refetchModels, setModelsParams, showToast],
+    [modelsDownloadingDate, queryClient, refetchModels, setModelsParams, showToast],
   );
 
   useEffect(() => {
