@@ -498,7 +498,13 @@ export const ConfirmationTable = ({
       },
     );
 
-    return cols;
+    return cols.map((col) => ({
+      ...col,
+      filterParams: {
+        cellRenderer: allocationConfirmationSetFilterCellRenderer, 
+      }
+    }));
+
   }, [
     DateCell,
     UsageCell,
