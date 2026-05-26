@@ -1,5 +1,14 @@
 # Semantic Versioning Changelog
 
+# [1.66.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.65.0...v1.66.0) (2026-05-26)
+
+
+### Features
+
+* enhance ConfirmationTable to include filter parameters for cell renderer ([7f1ec6b](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/7f1ec6b3e4a1728f135d1ad3902517d6b98abf29))
+* enhance ConfirmationTable with new cell renderer and selection features ([8b3d4cf](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/8b3d4cfe55bdcbb38ff62438b7ecee697255112b))
+* integrate quarterly confirmation query invalidation across components ([4213c2a](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/4213c2abdebad5b78ab83656827c7515a4f894c0))
+
 # [1.65.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.64.0...v1.65.0) (2026-05-18)
 
 
