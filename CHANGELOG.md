@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.67.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.66.0...v1.67.0) (2026-05-26)
+
+
+### Features
+
+* conditionally render user menu model based on environment ([e25f97e](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/e25f97e8219a81dc666c2e81dc5861d182e2a86e))
+
 # [1.66.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.65.0...v1.66.0) (2026-05-26)
 
 
