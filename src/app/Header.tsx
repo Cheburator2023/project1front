@@ -28,6 +28,8 @@ import { ROUTES } from './Routes';
 import { useGlobalStore } from '../shared/stores/globalStore';
 import { defaultExcelExportParams } from '../shared/helpers/excelExportHelpers';
 
+const IS_DEV = process.env.NODE_ENV === 'development' || location.hostname.includes('dev');
+
 const Container = styled('div')`
   width: 100%;
   height: 64px;
@@ -261,7 +263,7 @@ const Header = ({ user, downloadReportStatus, onLogout }: HeaderProps) => {
             targetRef={userMenuRef as any}
           >
             <Menu
-              model={userMenuModel}
+              model={IS_DEV ? userMenuModel : []}
               selected={userMenuSelected}
               active={userMenuActive}
               onActivateItem={setUserMenuActive}
