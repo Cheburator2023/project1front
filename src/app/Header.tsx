@@ -213,11 +213,11 @@ const Header = ({ user, downloadReportStatus, onLogout }: HeaderProps) => {
           <T font="Button/Button 2">Выгрузить отчет</T>
         </CustomButton>
 
-        {(isBusinessCustomer || isGod) && (
+        {/* {(isBusinessCustomer || isGod) && (
           <CustomButton dimension="s" onClick={() => navigate(ROUTES.ALLOCATION_CONFIRMATION)}>
             <T font="Button/Button 2">Подтвердить аллокацию за квартал</T>
           </CustomButton>
-        )}
+        )} */}
 
         <CustomButton
           title="Перейти в СУМ"
