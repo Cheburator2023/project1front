@@ -1,0 +1,179 @@
+/* eslint-disable no-void */
+import { useQuery, useMutation, useQueryClient, type QueryClient } from '@tanstack/react-query';
+import { customInstance } from '@shared/api/customInstance';
+
+export type QuarterInfo = {
+  quarter: number;
+  year: number;
+  startDate: string;
+  endDate: string;
+  maxDate: string;
+};
+
+export type ConfirmationModelRow = {
+  system_model_id: string;
+  model_id: string;
+  model_alias: string | null;
+  model_name: string | null;
+  model_source: string | null;
+  model_name_dadm: string | null;
+  business_customer: string | null;
+  business_customer_departament: string | null;
+  confirmation_date: string | null;
+  is_used: boolean | null;
+  prefill_source: 'pim' | 'previous_quarter' | null;
+  /** Как элемент `GET /models` (`data.cards[]`): плоские поля после merge/format. */
+  registry_card?: Record<string, unknown> | null;
+};
+
+export type SaveQuarterlyConfirmationPayload = {
+  quarter: number;
+  year: number;
+  models: {
+    system_model_id: string;
+    confirmation_date: string | null;
+    is_used: boolean | null;
+  }[];
+};
+
+export type SaveConfirmationResult = {
+  success: boolean;
+  quarter: number;
+  year: number;
+  totalInPayload: number;
+  savedToMrm: number;
+  syncedToSum: number;
+  sumSyncErrors: { system_model_id: string; error: string }[];
+  models: {
+    system_model_id: string;
+    is_used: boolean | null;
+    confirmation_date: string | null;
+    mrm: boolean;
+    sum: boolean | null;
+  }[];
+};
+
+const fetchActiveQuarter = (signal?: AbortSignal) => {
+  return customInstance<{ data: QuarterInfo | null }>({
+    url: '/quarterly-confirmation/active-quarter',
+    method: 'GET',
+    signal,
+  });
+};
+
+const fetchModelsForConfirmation = async (signal?: AbortSignal) => {
+  return customInstance<{ data: { models: ConfirmationModelRow[]; _debug?: Record<string, unknown> } }>({
+    url: '/quarterly-confirmation/models',
+    method: 'GET',
+    signal,
+  });
+};
+
+const saveQuarterlyConfirmation = (data: SaveQuarterlyConfirmationPayload) => {
+  return customInstance<{ data: SaveConfirmationResult }>({
+    url: '/quarterly-confirmation/save',
+    method: 'POST',
+    data,
+    headers: { 'Content-Type': 'application/json' },
+  });
+};
+
+/** Префикс ключей запросов квартального подтверждения (активный квартал, список на странице аллокации, ПИМ и т.д.). */
+export const QUARTERLY_CONFIRMATION_QUERY_KEY_PREFIX = ['quarterly-confirmation'] as const;
+
+/** Обновляет кэш страницы аллокации после изменений в реестре моделей — иначе GET /models обновится, а GET /quarterly-confirmation/models останется старым. */
+export function invalidateQuarterlyConfirmationQueries(queryClient: QueryClient): void {
+  void queryClient.invalidateQueries({ queryKey: [...QUARTERLY_CONFIRMATION_QUERY_KEY_PREFIX] });
+}
+
+export const useActiveQuarter = () => {
+  return useQuery({
+    queryKey: ['quarterly-confirmation', 'active-quarter'],
+    queryFn: ({ signal }) => fetchActiveQuarter(signal),
+  });
+};
+
+export const useModelsForConfirmation = (enabled = true) => {
+  return useQuery({
+    queryKey: ['quarterly-confirmation', 'models'],
+    queryFn: ({ signal }) => fetchModelsForConfirmation(signal),
+    enabled,
+  });
+};
+
+export const useSaveQuarterlyConfirmation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: saveQuarterlyConfirmation,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [...QUARTERLY_CONFIRMATION_QUERY_KEY_PREFIX],
+      });
+    },
+  });
+};
+
+export type SeedPimUsagePayload = {
+  quarter: number;
+  year: number;
+  models: {
+    system_model_id: string;
+    is_used: boolean;
+  }[];
+};
+
+const seedPimUsage = (data: SeedPimUsagePayload) => {
+  return customInstance<{
+    data: {
+      success: boolean;
+      quarter: number;
+      year: number;
+      seeded: { system_model_id: string; pim_usage_id: number | null; is_used: boolean }[];
+    };
+  }>({
+    url: '/quarterly-confirmation/seed-pim-usage',
+    method: 'POST',
+    data,
+    headers: { 'Content-Type': 'application/json' },
+  });
+};
+
+export const useSeedPimUsage = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: seedPimUsage,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [...QUARTERLY_CONFIRMATION_QUERY_KEY_PREFIX],
+      });
+    },
+  });
+};
+
+export type PimUsageTableRow = {
+  pim_usage_id: number;
+  system_model_id: string;
+  confirmation_quarter: number;
+  confirmation_year: number;
+  is_used: boolean;
+  source_system: string;
+  create_date: string;
+  update_date: string;
+};
+
+const fetchPimUsageTable = (signal?: AbortSignal) => {
+  return customInstance<{ data: { rows: PimUsageTableRow[] } }>({
+    url: '/quarterly-confirmation/pim-usage',
+    method: 'GET',
+    signal,
+  });
+};
+
+export const usePimUsageTable = () => {
+  return useQuery({
+    queryKey: ['quarterly-confirmation', 'pim-usage-table'],
+    queryFn: ({ signal }) => fetchPimUsageTable(signal),
+  });
+};

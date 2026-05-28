@@ -121,7 +121,7 @@ export const getSelectValue = (value?: InputValue) => {
     return formatValuesForSelect(value);
   }
   // Field is SELECT in schema but InputValue.type was lost — still format if shape matches
-  return formatValuesForSelect(value as SelectInputValue);
+  return formatValuesForSelect(value as unknown as SelectInputValue);
 };
 
 export const getFieldValueAsNumber = (rawValue: unknown): number => {

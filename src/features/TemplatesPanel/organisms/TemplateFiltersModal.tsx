@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useMemo } from 'react';
+import { ReactNode, useMemo } from 'react';
 import {
   Modal,
   ModalTitle,
@@ -6,7 +6,6 @@ import {
   Select,
   Option,
   OptionGroup,
-  TextField,
   InputField,
   Field,
 } from '@admiral-ds/react-ui';
@@ -49,7 +48,7 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
     const activeTemplateId = topFilters.templates?.[0];
 
     const activeTemplate = activeTemplateId
-      ? templates.find((t) => t.template_id.toString() === activeTemplateId)
+      ? templates.find((t) => t.template_id?.toString() === activeTemplateId?.toString())
       : undefined;
 
     if (activeTemplate) {
@@ -61,8 +60,7 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
       const filterModel = agGridApiGlobal?.getFilterModel();
 
       initializeFromTemplate({
-        // @ts-ignore
-        template_id: 'Не активен',
+        template_id: null,
         template_name: 'Новый шаблон',
         user_id: null,
         filterModel,
@@ -127,7 +125,6 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
           setFiltersResetCount();
           initializeFromTemplate(undefined);
           setPendingTemplate(undefined);
-          console.log('🐸 AAA 1', setPendingTemplate);
         }
       } else {
         // Apply the same reset logic as in TemplatesFilterInput (full reset)
@@ -137,7 +134,6 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
         resetState();
         initializeFromTemplate(undefined);
         setPendingTemplate(undefined);
-        console.log('🐸 AAA 2', setPendingTemplate);
       }
 
       // Reset the resetInitialized flag
@@ -150,13 +146,9 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
     // Check if there are any changes before applying template logic
     if (!hasChanges()) {
       // No changes detected, just close the modal without applying anything
-      console.log('🐸 Pepe said >> handleSave >> No changes detected');
-
       closeModal();
       return;
     }
-
-    console.log('🐸 Pepe said >> handleSave >> agGridApiGlobal:', agGridApiGlobal);
 
     if (agGridApiGlobal) {
       const newFilterModel: any = {};
@@ -194,7 +186,6 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
       let savedTemplate: Template;
 
       if (selectedTemplateId) {
-        console.log('🐸 Pepe said >> handleSave >> selectedTemplateId 111:', selectedTemplateId);
         const template = templates.find((t) => t.template_id === selectedTemplateId);
         if (template) {
           savedTemplate = {
@@ -202,8 +193,6 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
             filterModel: newFilterModel,
             columnState,
           };
-          console.log('🐸 AAA 3', setPendingTemplate);
-
           setPendingTemplate(savedTemplate);
           agGridApiGlobal.setFilterModel(newFilterModel);
           agGridApiGlobal.applyColumnState({ state: columnState, applyOrder: true });
@@ -211,18 +200,15 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
         }
       } else {
         savedTemplate = {
-          // @ts-ignore
-          template_id: 'Не активен',
+          template_id: null,
           template_name: 'Новый шаблон',
           user_id: null,
           filterModel: newFilterModel,
           columnState,
           isPending: true,
         };
-        console.log('🐸 AAA 4', setPendingTemplate);
         setPendingTemplate(savedTemplate);
         agGridApiGlobal.setFilterModel(newFilterModel);
-        console.log('🐸 Pepe said >> handleSave >> columnState 222:', columnState);
         agGridApiGlobal.applyColumnState({ state: columnState, applyOrder: true });
 
         setTopFilters({ ...topFilters, templates: [] });
@@ -231,7 +217,6 @@ export const TemplateFiltersModal = ({ children }: { children: ReactNode }) => {
       setTimeout(() => {
         // setFilterModel(newFilterModel);
         agGridApiGlobal.setFilterModel(newFilterModel);
-        console.log('🐸 Pepe said >> handleSave >> columnState 333:', columnState);
         agGridApiGlobal.applyColumnState({ state: columnState, applyOrder: true });
       }, 30);
     }

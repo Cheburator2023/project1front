@@ -14,6 +14,7 @@ import {
 import { getISODateFormat } from '@shared/helpers';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRoles } from '@shared/hooks';
+import { invalidateQuarterlyConfirmationQueries } from '@shared/api/hooks/useQuarterlyConfirmation';
 import { Container, CustomDateField, FiltersDivider, FilterButton, FiltersBox } from '../styles';
 import { useGlobalStore } from '../../../shared/stores/globalStore';
 import { TemplatesPanel } from '../../TemplatesPanel/organisms/TemplatesPanel';
@@ -125,6 +126,7 @@ export const FiltersPanel = ({
             return Array.isArray(queryKey) && queryKey[0] === '/models';
           },
         });
+        invalidateQuarterlyConfirmationQueries(queryClient);
       }, 100);
     },
     [setModelsDownloadingDate],
@@ -256,7 +258,13 @@ export const FiltersPanel = ({
           labelPosition="right"
           onChange={(event) => {
             setCompareMode(event.target.checked);
-            navigate(compareOnlyChanged ? ROUTES.HOME : ROUTES.COMPARE_MODELS);
+            if (compareOnlyChanged) {
+              if (location.pathname !== ROUTES.HOME) {
+                navigate(ROUTES.HOME);
+              }
+            } else {
+              navigate(ROUTES.COMPARE_MODELS);
+            }
           }}
         >
           Включен

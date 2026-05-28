@@ -96,6 +96,8 @@ interface IAgGridTableProps {
   noCustomCells?: boolean;
   pivot?: boolean;
   overlayNoRowsTemplate?: string;
+  /** Высота обёртки грида; по умолчанию под полноэкранный реестр. Для вложенных страниц — например `100%` + фиксированный родитель. */
+  wrapperHeight?: string;
 }
 
 const sideBarProps: SideBarDef | string | string[] | boolean | null = {
@@ -153,22 +155,26 @@ const dateFilterParams: IDateFilterParams = {
 const setFilterParams: ISetFilterParams = {
   buttons: ['clear'],
   refreshValuesOnOpen: true,
-  cellHeight: 30,
+  cellHeight: 42,
   cellRenderer: (props) => {
     const text = props.value === null ? '(Пустые)' : props.value || '';
-    const maxLength = 80; // Fallback character limit
+    const maxLength = 80;
     const truncatedText = text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
 
     return (
       <div
         style={{
+          display: 'flex',
+          alignItems: 'center',
+          height: '100%',
+          lineHeight: '18px',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
           maxWidth: '100%',
-          minWidth: 0, // Ensures flex shrinking works
+          minWidth: 0,
         }}
-        title={text} // Tooltip shows full text on hover
+        title={text}
       >
         {truncatedText}
       </div>
@@ -217,6 +223,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
       pivot = false,
       noCustomCells = false,
       overlayNoRowsTemplate,
+      wrapperHeight = 'calc(100vh - 220px)',
     }: IAgGridTableProps,
     ref: any,
   ) => {
@@ -990,7 +997,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
     );
 
     return (
-      <Flexbox height="calc(100vh - 220px)">
+      <Flexbox height={wrapperHeight}>
         <div style={containerStyle}>
           {actionPanel && (
             <>
@@ -1083,6 +1090,7 @@ export const AgGridTable = forwardRef<HTMLDivElement, IAgGridTableProps>(
                             key={colId}
                             type="button"
                             role="option"
+                            aria-selected
                             onMouseDown={(e) => e.preventDefault()}
                             onClick={() => handleSearchColumnClick(colId)}
                             style={{

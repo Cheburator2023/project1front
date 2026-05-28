@@ -1,7 +1,7 @@
 import React from 'react';
 import styled, { createGlobalStyle, ThemeProvider } from 'styled-components';
 import { DropdownProvider } from '@admiral-ds/react-ui';
-import Keycloak from 'keycloak-js';
+import type { T_KEYCLOAK_INSTANCE, T_KEYCLOAK_USER } from '@shared/types/infra';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 import 'ag-grid-enterprise';
@@ -12,8 +12,10 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 import { Header } from './Header';
 import RoutesComponent from './Routes';
+import { ROUTER_BASENAME_PROD, TrailingSlashRedirect } from './TrailingSlashRedirect';
 import { useDeepEffect } from '../shared/hooks/useDeepEffect';
 import { ToastProvider } from '../shared/ui/atoms';
+import { AppWideDevPanel } from '../features/DevPanel/templates/AppWideDevPanel';
 
 const GIT_REVISION = process.env.GIT_REVISION;
 const RC_STATS = process.env.RC_STATS;
@@ -36,21 +38,12 @@ const queryClient = new QueryClient({
 interface AppProps {
   bridged?: boolean;
   token?: string;
-  keycloak?: any;
+  keycloak?: T_KEYCLOAK_INSTANCE;
   downloadReportStatus?: boolean;
   columnsFilters?: ColumnsFilter[];
   updateColumnsFilters?: (filters: ColumnsFilter[]) => void;
   setDownloadReportStatus?: (status: boolean) => void;
-  user?: Keycloak.KeycloakTokenParsed & {
-    family_name: string;
-    given_name: string;
-    realm_access: {
-      roles: string[];
-    };
-    groups: string[];
-    roles: string[];
-    preferred_username: string;
-  };
+  user?: T_KEYCLOAK_USER;
   onLogout?: () => void;
 }
 
@@ -59,7 +52,7 @@ const IS_DEV = process.env.NODE_ENV === 'development';
 const App = ({ user, onLogout, keycloak }: AppProps) => {
   const onLogoutHandler = () => {
     if (onLogout || keycloak) {
-      keycloak.logout({ redirectUri: window.location.origin });
+      keycloak?.logout({ redirectUri: window.location.origin });
       onLogout?.();
     }
     localStorage.removeItem('currentCustomer');
@@ -70,8 +63,9 @@ const App = ({ user, onLogout, keycloak }: AppProps) => {
   return (
     <div>
       <div id="portal-root" />
-      <BrowserRouter basename={IS_DEV ? '/' : 'sum-rm'}>
+      <BrowserRouter basename={IS_DEV ? '/' : ROUTER_BASENAME_PROD}>
         <QueryClientProvider client={queryClient}>
+          <TrailingSlashRedirect />
           <GlobalStyle />
           <Container>
             <ToastProvider>
@@ -79,6 +73,7 @@ const App = ({ user, onLogout, keycloak }: AppProps) => {
               <RoutesWrapper>
                 <RoutesComponent />
               </RoutesWrapper>
+              <AppWideDevPanel />
             </ToastProvider>
           </Container>
         </QueryClientProvider>

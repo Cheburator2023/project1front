@@ -54,6 +54,7 @@
     "react/jsx-no-constructed-context-values": "off",
     "prefer-regex-literals": "warn",
     "react/display-name": "off",
+    "no-void": "off",
     "jsx-a11y/label-has-associated-control": "off",
     "no-underscore-dangle": "off",
     "no-empty": "warn",
