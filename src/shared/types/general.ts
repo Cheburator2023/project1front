@@ -61,8 +61,8 @@ type Row = ArtificialRow & {
   auto_validation_result: string | null;
   uuid: string | null;
   model_status: string | null;
+  model_stage: string | null;
   model_status_assignee: string | null;
-  business_status: string | null;
   pvr: string | null;
   group_company: string | null;
   update_date: string | null;
@@ -244,4 +244,3 @@ export {
   ModelSource,
   ModelStatus,
 };
-

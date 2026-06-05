@@ -1,5 +1,20 @@
 # Semantic Versioning Changelog
 
+# [1.68.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.67.0...v1.68.0) (2026-05-29)
+
+
+### Bug Fixes
+
+* comment out conditional rendering for allocation confirmation button in Header component ([19ebbbb](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/19ebbbb7a141137cc25aac622027191b648f01b3))
+* фикс по виджету распред этап жцм ([8fba5f2](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/8fba5f28bb8db2ec7af58ec9492aac4a4d5c441f))
+
+
+### Features
+
+* новый механизм model_status и model_stage ([1e37168](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/1e3716814aa8a54299b9e521392fde4dda246970))
+* ограничение редактирования атрибутов ([a72e83a](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/a72e83ab2a17966992e246eb129bcbc32c95f282))
+* ограничение редактирования атрибутов - api ([35a2f8a](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/35a2f8a8c3f175208f3b83504382a491cea3378d))
+
 # [1.67.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.66.0...v1.67.0) (2026-05-26)
 
 
