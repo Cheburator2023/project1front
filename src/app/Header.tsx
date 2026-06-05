@@ -30,6 +30,20 @@ import { defaultExcelExportParams } from '../shared/helpers/excelExportHelpers';
 
 const IS_DEV = process.env.NODE_ENV === 'development' || location.hostname.includes('dev');
 
+const ALLOCATION_FEATURE_FLAG_KEY = 'ALLOC_ON';
+
+/** Включение кнопки аллокации через localStorage: `ALLOC_ON` = true / 1 / yes (не false / 0). */
+function isAllocationFeatureEnabledInStorage(): boolean {
+  try {
+    const value = localStorage.getItem(ALLOCATION_FEATURE_FLAG_KEY);
+    if (value == null || value.trim() === '') return false;
+    const normalized = value.trim().toLowerCase();
+    return normalized !== 'false' && normalized !== '0' && normalized !== 'no';
+  } catch {
+    return false;
+  }
+}
+
 const Container = styled('div')`
   width: 100%;
   height: 64px;
@@ -144,6 +158,8 @@ const Header = ({ user, downloadReportStatus, onLogout }: HeaderProps) => {
   };
 
   const isGod = process.env.NO_ROLES === 'true';
+  const showAllocationConfirmationButton =
+    isAllocationFeatureEnabledInStorage() && (isBusinessCustomer || isGod);
 
   const { downloadReport: downloadModelRiskReport, isDownloading: isDownloadingKMR } =
     useModelRiskReport();
@@ -213,11 +229,11 @@ const Header = ({ user, downloadReportStatus, onLogout }: HeaderProps) => {
           <T font="Button/Button 2">Выгрузить отчет</T>
         </CustomButton>
 
-        {/* {(isBusinessCustomer || isGod) && (
+        {showAllocationConfirmationButton && (
           <CustomButton dimension="s" onClick={() => navigate(ROUTES.ALLOCATION_CONFIRMATION)}>
             <T font="Button/Button 2">Подтвердить аллокацию за квартал</T>
           </CustomButton>
-        )} */}
+        )}
 
         <CustomButton
           title="Перейти в СУМ"
