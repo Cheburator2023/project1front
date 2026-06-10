@@ -158,8 +158,7 @@ const Header = ({ user, downloadReportStatus, onLogout }: HeaderProps) => {
   };
 
   const isGod = process.env.NO_ROLES === 'true';
-  const showAllocationConfirmationButton =
-    isAllocationFeatureEnabledInStorage() && (isBusinessCustomer || isGod);
+  const showAllocationConfirmationButton = (isBusinessCustomer || isGod);
 
   const { downloadReport: downloadModelRiskReport, isDownloading: isDownloadingKMR } =
     useModelRiskReport();
