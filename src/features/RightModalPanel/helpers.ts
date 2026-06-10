@@ -1352,6 +1352,9 @@ const getInvalidFields = (
   fields?: FormFields,
   initialRow?: Partial<Row>
 ) => {
+  const isBeingMadeActive = getFormValue(values?.active_model) === '1';
+  const notActiveSchemaFieldNames = new Set(NOT_ACTIVE_MODEL_SCHEMA.map(({ name }) => name));
+
   return activeFormSchema
     .filter((schemaField) => {
       const { name, required, requireConditions, valueConditions, schemaKey } = schemaField;
@@ -1369,6 +1372,9 @@ const getInvalidFields = (
         schemaKey === SCHEMA_NAME_MAP.NOT_ACTIVE_MODEL_SCHEMA.key &&
         requireConditions?.toString().includes('wasPreviouslyActiveModel')
       ) {
+        if (isBeingMadeActive) {
+          return false;
+        }
         if (wasPreviouslyActiveModel) {
           if (!formValue) {
             return true;
@@ -1392,14 +1398,16 @@ const getInvalidFields = (
       }
 
       // Только для СУМ моделей, если значение артефакта из СУМ уже есть и оно не null, запрещаем менять на null
-      if (initialRow?.model_source === ModelSource.SUM 
+      if (
+        initialRow?.model_source === ModelSource.SUM
         && initialRow[field.name]
-        && SUM_ARTEFACTS.includes(field.name) 
-        && !formValue 
+        && SUM_ARTEFACTS.includes(field.name)
+        && !formValue
+        && !(isBeingMadeActive && notActiveSchemaFieldNames.has(name))
       ) {
         return true;
       }
-      
+
       return false;
     })
     .map(({ name }) => name);
