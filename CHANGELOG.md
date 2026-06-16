@@ -1,5 +1,17 @@
 # Semantic Versioning Changelog
 
+# [1.69.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.68.0...v1.69.0) (2026-06-16)
+
+
+### Bug Fixes
+
+* update allocation confirmation button logic in Header component ([610403a](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/610403af88b6f2848d524a9fbe53cfd2a1e745d7))
+
+
+### Features
+
+* implement allocation feature flag in Header component ([5a1efc6](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/5a1efc6fd3fbf2065083aee3b2f86e5205839ce6))
+
 # [1.68.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.67.0...v1.68.0) (2026-05-29)
 
 
