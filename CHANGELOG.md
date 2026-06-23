@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.69.1](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.69.0...v1.69.1) (2026-06-23)
+
+
+### Bug Fixes
+
+* атрибуты 2038 и 2558 не обязательны при переводе сум-модели в действующую ([b34ae4c](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/commit/b34ae4c259c867ac452ae02e2eb210f9dc03d00b))
+
 # [1.69.0](https://git.sfera.inno.local:7999/SUMD/mrms-frontend/compare/v1.68.0...v1.69.0) (2026-06-16)
 
 
