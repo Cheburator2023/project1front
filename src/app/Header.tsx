@@ -94,6 +94,56 @@ const Header = ({ user, downloadReportStatus, onLogout }: HeaderProps) => {
       ? `${user.family_name} ${user.given_name}`
       : 'Анонимный пользователь';
 
+  // Функция для отправки аудит-события на бэкенд (без генерации отчёта)
+  const sendAuditForReportExport = async () => {
+    if (!agGridApi) return;
+
+    try {
+      const filterModel = agGridApi.getFilterModel();
+      const filters = JSON.stringify(filterModel);
+
+      const displayedRows = agGridApi.getDisplayedRowCount();
+
+      // Вызываем отдельный эндпоинт для аудита
+      await fetch('/api/audit/report-export', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          filters,
+          recordsCount: displayedRows,
+        }),
+      });
+    } catch (error) {
+    }
+  };
+
+  const handleExportClick = () => {
+    if (!agGridApi) return;
+
+    // 1. Отправляем аудит (асинхронно, не блокируем экспорт)
+    sendAuditForReportExport();
+
+    // 2. Выполняем клиентский экспорт
+    // Get only visible columns in their current display order
+    const visibleColumns = agGridApi.getAllDisplayedColumns();
+    const columnKeys = visibleColumns
+      .filter((col) => col.getColId() !== 'ag-Grid-ControlsColumn')
+      .map((col) => col.getColId());
+
+    agGridApi.exportDataAsExcel({
+      columnKeys,
+      fileName: `Отчет ${format(new Date(), 'dd.MM.yyyy')}.xlsx`,
+      // Export only filtered data if filters are applied
+      onlySelected: false,
+      // Include column headers
+      skipColumnHeaders: false,
+      // Use current column widths and order
+      allColumns: false,
+    });
+  };
+
   return (
     <Container>
       <Link to="/">
@@ -107,27 +157,7 @@ const Header = ({ user, downloadReportStatus, onLogout }: HeaderProps) => {
         <CustomButton
           dimension="s"
           disabled={!agGridApi}
-          onClick={() => {
-            if (!agGridApi) return;
-
-            // Get only visible columns in their current display order
-            const visibleColumns = agGridApi.getAllDisplayedColumns();
-
-            const columnKeys = visibleColumns
-              .filter((col) => col.getColId() !== 'ag-Grid-ControlsColumn')
-              .map((col) => col.getColId());
-
-            return agGridApi.exportDataAsExcel({
-              columnKeys,
-              fileName: `Отчет ${format(new Date(), 'dd.MM.yyyy')}.xlsx`,
-              // Export only filtered data if filters are applied
-              onlySelected: false,
-              // Include column headers
-              skipColumnHeaders: false,
-              // Use current column widths and order
-              allColumns: false,
-            });
-          }}
+          onClick={handleExportClick}
         >
           <T font="Button/Button 2">Выгрузить отчет</T>
         </CustomButton>
