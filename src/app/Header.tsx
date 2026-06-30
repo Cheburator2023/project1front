@@ -28,6 +28,8 @@ import { ROUTES } from './Routes';
 import { useGlobalStore } from '../shared/stores/globalStore';
 import { defaultExcelExportParams } from '../shared/helpers/excelExportHelpers';
 
+import { customInstance } from '@shared/api/customInstance';
+
 const IS_DEV = process.env.NODE_ENV === 'development' || location.hostname.includes('dev');
 
 const ALLOCATION_FEATURE_FLAG_KEY = 'ALLOC_ON';
@@ -204,6 +206,23 @@ const Header = ({ user, downloadReportStatus, onLogout }: HeaderProps) => {
           disabled={!agGridApi}
           onClick={() => {
             if (!agGridApi) return;
+
+            // --- Отправка аудита ---
+            const filters = getFiltersFromAgGrid();
+
+            customInstance({
+              url: '/audit/report-export',
+              method: 'POST',
+              data: { filters },
+              headers: { 'Content-Type': 'application/json' },
+            })
+              .then(() => {
+                console.debug('Аудит выгрузки отчета успешно отправлен');
+              })
+              .catch((error) => {
+                console.error('Ошибка при отправке аудита выгрузки отчета:', error);
+              });
+            // --- Конец отправки аудита ---
 
             // Get only visible columns in their current display order
             const visibleColumns = agGridApi.getAllDisplayedColumns();
